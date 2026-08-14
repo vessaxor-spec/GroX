@@ -5,6 +5,7 @@
 **Current verdict:** NOT YET APEX
 **Priority:** Apex run is the Vessel critical path
 **A1 status:** SESSION-QUALIFIED with GPT-5.6 Sol; deterministic fallback retained
+**A2 status:** QUALIFIED; durable Mission Graph and bounded replanning proven
 
 ## Definition
 
@@ -27,18 +28,16 @@ Apex is a demonstrated operating standard, not a title.
 
 ## Proven gaps
 
-1. **Cognition is session-bound.** GPT-5.6 Sol is now connected through the host-session reasoning bridge, but cognition is available only while a capable hosting session is present; the deterministic control plane remains the fallback.
-2. **No mission decomposition.** One Commander directive becomes one primary Crew Order plus optional verification, not a dependency-aware mission graph.
-3. **No true multi-Crew orchestration.** GorXu cannot yet schedule parallel or sequential specialist work and dynamically re-plan from intermediate findings.
-4. **No synthesis engine.** Crew evidence is recorded, but GorXu cannot reconcile disagreement, rank options, or produce an evidence-weighted executive conclusion.
-5. **Exception handling stops too early.** Failures return to `needs_pilot_decision`; GorXu does not yet consult relevant Crew, research alternatives, decide within authority, and continue.
-6. **Routing is shallow.** Selection is primarily tag/capability scoring and does not yet use historical success, uncertainty, load, cost, latency, risk, or Crew performance.
-7. **Memory is incomplete.** Episodic notes exist, but semantic, procedural, Commander, Pilot, and Vessel-wide memory with retrieval/consolidation do not.
-8. **Durability is incomplete.** Interrupted Missions are marked, but exact workflow replay/resume and idempotent step recovery are not implemented.
-9. **Tool power is intentionally narrow.** No governed shell, network, browser/computer-use, MCP tool plane, secret brokerage, or isolated execution workspace exists yet.
-10. **No orchestration telemetry/evals.** There is no trajectory scoring, routing-quality measurement, cost accounting, regression replay, or self-improvement proposal loop.
-11. **No external-agent interoperability layer.** Standing Crew are native dossiers only; external opaque agents cannot yet be discovered or delegated to through a standard adapter.
-12. **No apex qualification gauntlet.** The Vessel has not yet passed adversarial, long-horizon, multi-domain, recovery, contradiction, and irreversible-decision tests.
+1. **Cognition is project-hosted, not an autonomous daemon.** GPT-5.6 Sol occupies the Pilot cognition seat when a capable project session is active; deterministic control remains the safe fallback.
+2. **Synthesis depth is incomplete.** A2 provides Pilot-owned structural synthesis, but GorXu does not yet semantically reconcile contradictory specialist judgments, rank competing evidence, or construct calibrated executive conclusions from disagreement.
+3. **The executive exception loop is partial.** A2 can boundedly replan recoverable Crew/runtime failures, but broader consult -> investigate -> compare -> decide -> continue handling remains A4 work.
+4. **Routing is shallow.** Selection is still primarily tag/capability scoring and does not yet learn from historical success, evidence quality, uncertainty, load, cost, latency, risk, or Crew performance.
+5. **Memory is incomplete.** Episodic notes exist, but semantic, procedural, Commander, Pilot, and Vessel-wide memory with retrieval and consolidation do not.
+6. **Durability is partial.** Mission Graph nodes/events persist, but exact idempotent mid-step replay/resume after process interruption is not yet implemented.
+7. **Tool power is intentionally narrow.** No governed shell, network, browser/computer-use, MCP tool plane, secret brokerage, or isolated execution workspace exists yet.
+8. **No orchestration telemetry/evals.** There is no trajectory scoring, routing-quality measurement, cost accounting, regression replay, or evidence-driven self-improvement proposal loop.
+9. **No external-agent interoperability layer.** Standing Crew are native dossiers only; external opaque agents cannot yet be discovered or delegated to through a standard adapter.
+10. **No apex qualification gauntlet.** The Vessel has not yet passed the full adversarial, long-horizon, multi-domain, recovery, contradiction, and irreversible-decision gauntlet.
 
 ## Evolution sequence
 
@@ -151,7 +150,7 @@ GorXu earns Apex status only after passing a formal gauntlet covering:
 
 ## Current priority
 
-**A1 - Cognitive Pilot is the critical path.** Everything beyond the current deterministic control plane depends on giving GorXu genuine reasoning while keeping policy enforcement outside the model.
+**A3 - Living Company Intelligence is the current critical stage.** A1 cognition and A2 Mission Graph Orchestration are qualified for the current project-hosted operating model.
 
 A1 foundation now present:
 
@@ -181,4 +180,22 @@ Evidence:
 
 **A1 status:** complete for the current session-bound operating model. A standalone provider is optional infrastructure, not a blocker for continuing the Apex run while this host session remains available.
 
-Next critical stage: **A2 - Mission Graph Orchestration**. Intelligence remains separated from execution authority.
+### A2 live qualification: PASSED
+
+A2 implementation now provides durable DAG validation, bounded Mission Graph nodes, parallel-ready scheduling, per-node Crew assignment, explicit node/Mission budgets, persisted graph events, bounded recoverable replanning, independent verification nodes, and Pilot-owned synthesis.
+
+Qualification Mission: `MSN-f522e1ff611e`.
+
+Evidence:
+- seven Crew identities participated;
+- parallel root branches executed;
+- an injected `database-reliability-engineer` availability failure was detected;
+- GorXu reassigned the bounded node to `distributed-systems-engineer`;
+- downstream dependencies were rewired without Commander intervention or authority widening;
+- `code-reviewer` independently verified five completed work branches;
+- the complete 40-test Vessel suite passed;
+- Pilot synthesis recorded one replan, no unresolved nodes, and verification PASS.
+
+**A2 status: QUALIFIED.**
+
+Next critical stage: **A3 - Living Company Intelligence**.

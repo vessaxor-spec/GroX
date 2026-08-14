@@ -24,6 +24,7 @@ Verified in the current sandbox:
 - independent verifier must differ from executor
 - interrupted Crew duty state recovers safely on restart
 - domain-routing contracts added for the expanded company
+- 40 automated contract/unit/integration tests passing
 - live Inspect Mission completed successfully
 - live medium-risk Repair Mission completed with independent verification
 
@@ -50,24 +51,25 @@ Verified in the current sandbox:
 
 ## Evidence boundary
 
-The live Vessel source has now been synchronized to `vessaxor-spec/GroX` on `main`. Private SQLite and `.groxstate` operational state remain outside public Git by design. The previous external sandbox implementation remains unrecovered and is not treated as current source truth.
+The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/GroX` on `main`. Private SQLite and `.groxstate` operational state remain outside public Git by design. The previous external sandbox implementation remains unrecovered and is not treated as current source truth.
 
 ## Known deliberate limits
 
-- GorXu cognition is session-qualified through the project/host GPT-5.6 Sol reasoning bridge; deterministic control remains the safe fallback when cognition is unavailable.
+- GorXu cognition is project-hosted through GPT-5.6 Sol when a capable Space Exploration session is active; deterministic control remains the safe fallback when cognition is unavailable.
 - Tool Gateway exposes safe filesystem/list/test operations only; arbitrary shell, network, browser, and credential actuation remain disabled.
 - Episodic Crew continuity is live; semantic, procedural, and Vessel-wide memory planes are not yet implemented.
-- Crash-safe durable state exists, but automatic mid-step workflow replay/resume is not yet implemented.
+- Durable Mission Graph nodes/events and crash-safe state exist, but exact idempotent mid-step workflow replay/resume is not yet implemented.
 
 ## Apex Orchestrator readiness
 
 **Current status: NOT YET APEX**
 
-Evidence from live self-assessment Mission `MSN-354de0550dd5`: GorXu correctly delegated the inspection to `orchestration-evaluation-analyst` and required independent verification, but the current deterministic runtime could only inventory the implementation and execute tests. It could not itself reason over findings, decompose a mission graph, synthesize competing Crew judgments, or adaptively resolve exceptions.
+The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot and A2 Mission Graph Orchestration have qualified. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, parallel scheduling, bounded replanning for recoverable Crew/runtime failure, independent graph verification, and Pilot-owned structural synthesis.
 
 The canonical evolution path is recorded in `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md`.
 
-A1 has since passed session qualification; the current critical path is A2.
+Current critical path: **A3 - Living Company Intelligence**. GorXu remains **NOT YET APEX** until later stages and the final gauntlet pass.
+
 
 ## Apex critical-path update - A1 Cognitive Pilot
 
@@ -97,7 +99,7 @@ Current critical path: **A2 - Mission Graph Orchestration**.
 
 ## Persistence foundation
 
-**Status: LOCKED AND IMPLEMENTED**
+**Status: LOCKED AND IMPLEMED**
 
 - cognitive continuity home: ChatGPT project `Space Exploration`;
 - Pilot identity: GorXu; preferred reasoning runtime: GPT-5.6 Sol / high reasoning;
@@ -108,17 +110,56 @@ Current critical path: **A2 - Mission Graph Orchestration**.
 - `configs/persistence/project-binding.json` records the active persistence bindings;
 - automated suite: **31 tests passing** after persistence-plane implementation.
 
-The sandbox is now explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. A2 Mission Graph Orchestration remains the Apex critical path.
+The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed; the current Apex critical path is A3 Living Company Intelligence.
+
+
 
 ## Durable source synchronization
 
 **Status: COMPLETE**
 
-- complete Git-tracked live Vessel source synchronized to GitHub;
-- 82 standing Crew dossiers present in durable source;
-- runtime, cognition boundary, persistence subsystem, tests, Apex plan, and Ship's Log synchronized;
-- private operational SQLite and `.groxstate` snapshots excluded from public Git;
-- post-sync documentation reconciliation preserved richer approved canonical doctrine rather than allowing bootstrap summaries to overwrite it;
-- local automated suite remains **31 tests passing**.
+- complete Git-tracked Vessel runtime synchronized to GitHub;
+- 82 Standing Crew dossiers present in durable source;
+- cognition boundary, persistence system, Mission Graph runtime, tests, Apex plan, and Ship's Log are source-controlled;
+- private SQLite and `.groxstate` files remain excluded from public Git;
+- canonical architecture was reconciled after synchronization to avoid documentation regression.
 
-A2 Mission Graph Orchestration remains the current Apex stage.
+## Apex critical-path update - A2 Mission Graph Orchestration
+
+**Status: QUALIFIED**
+
+Implemented and verified in the live Vessel:
+
+- durable `MissionGraphPlan` and node contracts;
+- Commander-intent preservation and DAG validation;
+- explicit node attempt/time budgets and Mission node/parallel/replan budgets;
+- dependency-aware scheduling with true parallel-ready batches;
+- Crew selection per graph node with capability enforcement;
+- each node materializes as a bounded native Mission Order;
+- graph node/event persistence in SQLite;
+- explicit independent verification nodes;
+- repair nodes denied unless GorXu receives explicit mutation authorization;
+- bounded automatic replanning for recoverable Crew/runtime failures;
+- downstream dependency rewiring after replacement;
+- Pilot-owned persisted synthesis;
+- Commander Seat `graph-mission` command with validated JSON plan input;
+- session reasoning provider supports validated Mission Graph proposals;
+- **40 automated tests passing**.
+
+A2 qualification Mission: `MSN-f522e1ff611e`.
+
+Qualification evidence:
+
+- seven Crew identities participated;
+- three root branches were scheduled as a parallel batch;
+- `database-reliability-engineer` received an injected recoverable availability failure;
+- GorXu replaced it with `distributed-systems-engineer` without Commander intervention;
+- downstream `operations` dependency was rewired to the replacement node;
+- `architect`, `formal-methods-engineer`, `application-security-engineer`, `site-reliability-engineer`, and the replacement Crew all completed bounded branches;
+- `code-reviewer` independently verified five branch results and ran the full test suite;
+- verification passed;
+- final Pilot synthesis recorded `replans=1`, no unresolved nodes, and Mission status `completed`.
+
+**A2 exit gate: PASSED.**
+
+Current Apex stage: **A3 - Living Company Intelligence**.
