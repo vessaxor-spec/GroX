@@ -11,6 +11,8 @@ dependencies = []
 
 [project.optional-dependencies]
 browser = ["playwright>=1.50,<2"]
+test = ["pytest>=8,<9"]
+dev = ["pytest>=8,<9"]
 
 [project.scripts]
 grox = "grox.cli:main"
@@ -20,3 +22,7 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
