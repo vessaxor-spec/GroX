@@ -52,6 +52,7 @@ class GraphNodeSpec:
     dependencies: list[str] = field(default_factory=list)
     candidate_crew_ids: list[str] = field(default_factory=list)
     required_capabilities: list[str] = field(default_factory=lambda: ["repo_read"])
+    allowed_actions: list[str] = field(default_factory=list)
     scope: list[str] = field(default_factory=lambda: ["."])
     risk_class: RiskClass = RiskClass.low
     stop_conditions: list[str] = field(default_factory=lambda: [
@@ -79,6 +80,7 @@ class GraphNodeSpec:
         dependencies = raw.get("dependencies") or []
         candidates = raw.get("candidate_crew_ids") or []
         required = raw.get("required_capabilities") or ["repo_read"]
+        allowed = raw.get("allowed_actions") or []
         scope = raw.get("scope") or ["."]
         stop = raw.get("stop_conditions") or [
             "blocker", "better_or_safer_path", "missing_capability", "elevated_risk",
@@ -86,7 +88,7 @@ class GraphNodeSpec:
         ]
         for field_name, value in (
             ("dependencies", dependencies), ("candidate_crew_ids", candidates),
-            ("required_capabilities", required), ("scope", scope), ("stop_conditions", stop),
+            ("required_capabilities", required), ("allowed_actions", allowed), ("scope", scope), ("stop_conditions", stop),
         ):
             if not isinstance(value, list) or not all(isinstance(x, str) and x for x in value):
                 raise ValueError(f"graph node {node_id}: {field_name} must be non-empty strings")
@@ -96,7 +98,7 @@ class GraphNodeSpec:
         return cls(
             node_id=node_id.strip(), objective=objective.strip(), mode=mode,
             dependencies=list(dependencies), candidate_crew_ids=list(candidates),
-            required_capabilities=list(required), scope=list(scope), risk_class=risk,
+            required_capabilities=list(required), allowed_actions=list(allowed), scope=list(scope), risk_class=risk,
             stop_conditions=list(stop), parameters=dict(parameters),
             budget=NodeBudget.from_mapping(raw.get("budget")),
         )

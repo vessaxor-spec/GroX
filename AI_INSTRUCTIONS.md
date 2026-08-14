@@ -18,9 +18,9 @@ Higher authority wins when instructions conflict.
 
 ## Canonical command spine
 
-**Commander → Pilot GorXu → Mission Control → Divisions → Standing Crew**
+**Commander → Pilot GorXu → Divisions → Standing Crew**
 
-Pilot GorXu is the primary orchestrator and second-in-command. Mission Control is native to GroX and operates under GorXu. No Crew member, Division, verifier, tool, scheduler, or external system may become a parallel orchestrator.
+Pilot GorXu is the primary orchestrator and second-in-command. Mission Control is a native GroX policy/advisory service used by GorXu; it is not a command layer. No Crew member, Division, verifier, tool, scheduler, or external system may become a parallel orchestrator.
 
 ## Hard constraints
 

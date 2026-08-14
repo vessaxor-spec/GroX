@@ -2,9 +2,9 @@
 
 GroX is an independent, persistent AI command environment built around a clear chain of command:
 
-**Commander → Pilot GorXu → Mission Control → Divisions → Standing Crew**
+**Commander → Pilot GorXu → Divisions → Standing Crew**
 
-The Commander provides intent and retains final authority over critical, irreversible, or intent-changing decisions. Pilot GorXu is the primary orchestrator and second-in-command. Mission Control is a GroX-native command system used by GorXu for governance, risk analysis, routing support, verification policy, and operational intelligence. Standing Crew execute bounded Mission Orders under explicit authority and evidence requirements.
+The Commander provides intent and retains final authority over critical, irreversible, or intent-changing decisions. Pilot GorXu is the primary orchestrator and second-in-command. Mission Control is a GroX-native policy/advisory service used by GorXu for governance, risk analysis, routing support, verification policy, and operational intelligence; it is not a command layer. Standing Crew execute bounded Mission Orders under explicit authority and evidence requirements.
 
 GroX is not a wrapper around an external orchestration system. Its governance, mission control, crew model, memory, verification, tool policy, and evolutionary mechanisms are native parts of the Vessel.
 

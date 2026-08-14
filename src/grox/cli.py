@@ -14,7 +14,7 @@ def dump(x): print(json.dumps(x,indent=2,default=str))
 def status(p):
     ms=p.store.recent_missions(5); states=p.store.crew_states()
     print("GroX Vessel: ONLINE")
-    print("Command spine: Commander -> Pilot GorXu -> Mission Control -> Divisions -> Standing Crew")
+    print("Command spine: Commander -> Pilot GorXu -> Divisions -> Standing Crew")
     print(f"Vessel root: {p.root}")
     print(f"Standing Crew: {len(p.roster.all())} | Missions recorded: {len(p.store.recent_missions(1000))}")
     print(f"Cognitive Pilot: {p.cognitive_status}")

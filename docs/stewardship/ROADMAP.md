@@ -6,7 +6,7 @@ GroX now has a runnable native Vessel, a full standing company, project/session-
 
 The command architecture is native to the Vessel:
 
-**Commander → Pilot GorXu → Mission Control → Divisions → Standing Crew**
+**Commander → Pilot GorXu → Divisions → Standing Crew**
 
 ## Completed foundation
 

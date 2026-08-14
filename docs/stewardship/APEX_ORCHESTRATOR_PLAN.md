@@ -17,7 +17,7 @@ Apex is a demonstrated operating standard, not a title.
 
 ## Current strengths
 
-- Single unambiguous command spine: Commander -> GorXu -> Mission Control / Divisions / Standing Crew.
+- Single unambiguous command spine: Commander -> GorXu -> Divisions -> Standing Crew; Mission Control remains a GorXu-owned policy/advisory service, not a command layer.
 - 81 specialist-inspired Standing Crew plus an independent verifier.
 - Native Mission Orders with bounded scope and deny-wins authority.
 - Inspect and Repair are structurally separated.

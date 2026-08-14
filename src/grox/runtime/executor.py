@@ -108,8 +108,41 @@ class CrewExecutor:
                     return TourResult(order.order_id,order.assigned_crew,'exception','Repair requires an explicit supported operation',evidence,{'type':'unsupported_repair','recommendation':'GorXu must issue a narrower repair order'})
                 return self._repair_write_text(order)
 
+            op=order.parameters.get('operation')
+            if op=='workspace_shell':
+                result=self.gateway.workspace_shell(
+                    order, str(order.parameters.get('script') or ''),
+                    secret_env=order.parameters.get('secret_env') or {},
+                )
+                evidence.append(Evidence('workspace_execution',{**result,'side_effect_class':'private_workspace'}))
+                if result['returncode']!=0:
+                    return TourResult(order.order_id,order.assigned_crew,'exception','Isolated workspace command failed',evidence,
+                                      {'type':'workspace_failure','recommendation':'Return to GorXu with workspace evidence'})
+                return TourResult(order.order_id,order.assigned_crew,'completed','Completed isolated workspace execution',evidence)
+
+            if op=='http_fetch':
+                result=self.gateway.fetch_url(order,str(order.parameters.get('url') or ''))
+                evidence.append(Evidence('network_fetch',{**result,'side_effect_class':'read_only_network','untrusted_content':True}))
+                if int(result['status']) >= 400:
+                    return TourResult(order.order_id,order.assigned_crew,'exception',f"Network fetch returned HTTP {result['status']}",evidence,
+                                      {'type':'network_response_failure','recommendation':'Return to GorXu; do not broaden origin policy'})
+                return TourResult(order.order_id,order.assigned_crew,'completed',f"Fetched granted origin {result['origin']}",evidence)
+
+            if op=='browser_capture':
+                result=self.gateway.browser_capture(order,str(order.parameters.get('url') or ''))
+                evidence.append(Evidence('browser_capture',{**result,'side_effect_class':'private_evidence_capture','untrusted_content':True}))
+                return TourResult(order.order_id,order.assigned_crew,'completed',f"Captured browser evidence for {result['origin']}",evidence)
+
+            if op=='mcp_call':
+                result=self.gateway.mcp_call(
+                    order, str(order.parameters.get('adapter') or ''), str(order.parameters.get('tool') or ''),
+                    dict(order.parameters.get('arguments') or {}),
+                )
+                evidence.append(Evidence('mcp_call',{**result,'side_effect_class':'external_adapter' if result.get('mutating') else 'read_only_adapter','untrusted_content':True}))
+                return TourResult(order.order_id,order.assigned_crew,'completed',f"Called governed MCP adapter {result['adapter']}/{result['tool']}",evidence)
+
             files=self.gateway.list_path(order,order.scope[0] if order.scope else '.')
             evidence.append(Evidence('inventory',{'files':files[:100],'count':len(files)}))
             return TourResult(order.order_id,order.assigned_crew,'completed',f"Executed bounded mission context scan across {len(files)} files",evidence)
-        except (ToolDenied,FileNotFoundError,IsADirectoryError) as e:
+        except (ToolDenied,FileNotFoundError,IsADirectoryError,TimeoutError) as e:
             return TourResult(order.order_id,order.assigned_crew,'exception',str(e),evidence,{'type':type(e).__name__,'recommendation':'Return to GorXu; do not widen authority'})
