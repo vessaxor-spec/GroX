@@ -119,14 +119,10 @@ class BrowserRuntime:
 
         docker = shutil.which("docker")
         image = self.policy.browser_docker_image
-        seccomp = self.policy.browser_docker_seccomp_profile
-        if not (docker and image and seccomp and docker_backend_available(image)):
+        if not (docker and image and docker_backend_available(image)):
             raise BrowserUnavailable(
-                "browser capture requires either usable user/PID/network namespaces or a pre-provisioned governed Docker browser image with seccomp profile"
+                "browser capture requires either usable user/PID/network namespaces or a pre-provisioned governed Docker browser image"
             )
-        profile = Path(seccomp).resolve()
-        if not profile.is_file():
-            raise BrowserUnavailable("configured browser Docker seccomp profile is unavailable")
         inspect = subprocess.run(
             [docker, "image", "inspect", "--format", "{{.Id}}", image],
             text=True,
@@ -136,6 +132,7 @@ class BrowserRuntime:
         if inspect.returncode != 0 or not inspect.stdout.strip():
             raise BrowserUnavailable("configured browser Docker image is not pre-provisioned")
         request["outer_namespace"] = False
+        request["outer_container"] = True
         request["screenshot"] = "/work/capture.png"
         return (
             [
@@ -143,7 +140,7 @@ class BrowserRuntime:
                 "--network", "none",
                 "--cap-drop", "ALL",
                 "--security-opt", "no-new-privileges",
-                "--security-opt", f"seccomp={profile}",
+                "--security-opt", "seccomp=builtin",
                 "--user", "groxbrowser",
                 "--read-only",
                 "--pids-limit", "256",
@@ -166,8 +163,8 @@ class BrowserRuntime:
             "docker_user:groxbrowser",
             [
                 "docker_container", "docker_network_none", "capabilities_dropped",
-                "no_new_privileges", "read_only_root", "playwright_seccomp",
-                "chromium_native_sandbox", "playwright_request_abort",
+                "no_new_privileges", "read_only_root", "docker_builtin_seccomp",
+                "outer_container_sandbox", "playwright_request_abort",
                 "offline_gateway_content", "host_resolver_block", "dead_proxy",
             ],
             inspect.stdout.strip(),
