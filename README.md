@@ -30,6 +30,9 @@ The current native runtime includes:
 - durable Mission, Order, Evidence, Crew, memory, and performance state;
 - Living Company Intelligence with attributable semantic/procedural/Vessel memory and bounded selective retrieval;
 - experienced eligible-Crew routing informed by evidence, reliability, load, cost, latency, and risk;
+- A4 durable Mission Graph resume with committed-step preservation, checkpointed execution, and bounded cancellation/resume controls;
+- executive exception handling with real bounded Crew consultation before ordinary recoverable replans;
+- atomic journaled `write_text` Repair with idempotent replay, compensation, and fail-closed divergence handling;
 - bounded filesystem/test Tool Gateway;
 - Inspect/Repair separation;
 - independent verification;
