@@ -14,7 +14,7 @@ permissions:
 jobs:
   vessel-tests:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout A5 branch
         uses: actions/checkout@v4
@@ -22,16 +22,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Commission qualified isolation backends
+      - name: Commission qualified workspace isolation
         shell: bash
         run: |
           set -euo pipefail
           command -v unshare
           command -v chroot
           command -v prlimit
-          BROWSER_BIN="$(command -v chromium || command -v chromium-browser || command -v google-chrome || command -v google-chrome-stable || true)"
-          test -n "$BROWSER_BIN"
-          echo "Host browser: $BROWSER_BIN"
           if unshare --user --map-root-user --pid --fork --mount-proc --net /bin/sh -c 'true'; then
             BACKEND=namespace
           else
@@ -63,6 +60,7 @@ jobs:
               --env LC_ALL=C \
               "$IMAGE" /bin/sh -s <<'EOF'
           set -eu
+          test ! -e /host
           printf qualified > /work/canary
           EOF
             test "$(cat "$WORK/canary")" = qualified
@@ -71,15 +69,23 @@ jobs:
           fi
           echo "A5_ISOLATION_BACKEND=$BACKEND" | tee -a "$GITHUB_ENV"
           test "$(id -u)" -ne 0 || test "$BACKEND" = namespace
-
-          PLAYWRIGHT_IMAGE='mcr.microsoft.com/playwright/python:v1.62.0-noble'
-          docker pull "$PLAYWRIGHT_IMAGE"
-          docker image inspect --format 'A5_PLAYWRIGHT_REPODIGEST={{index .RepoDigests 0}}' "$PLAYWRIGHT_IMAGE"
+      - name: Commission governed browser isolation
+        shell: bash
+        env:
+          A5_BROWSER_STATE_DIR: /tmp/a5-browser
+          A5_BROWSER_DOCKER_IMAGE: grox-a5-browser:qualification
+        run: |
+          set -euo pipefail
+          bash scripts/commission-a5-browser.sh
+          test -s /tmp/a5-browser/seccomp_profile.json
+          docker image inspect grox-a5-browser:qualification
+          echo 'A5_BROWSER_DOCKER_IMAGE=grox-a5-browser:qualification' >> "$GITHUB_ENV"
+          echo 'A5_BROWSER_SECCOMP_PROFILE=/tmp/a5-browser/seccomp_profile.json' >> "$GITHUB_ENV"
       - name: Install Vessel with browser adapter
         shell: bash
         run: |
           python -m pip install -e '.[browser]'
-          python -m playwright install chromium
+          command -v chromium || command -v chromium-browser || command -v google-chrome || command -v google-chrome-stable
       - name: Compile source and tests
         run: python -m compileall -q src tests
       - name: Run complete Vessel suite
