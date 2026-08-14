@@ -1,16 +1,43 @@
 version: 1
 project: GroX
 principle: "Every artifact belongs in a canonical location."
+
 root_allowed:
   - README.md
   - AI_INSTRUCTIONS.md
   - LICENSE
   - pyproject.toml
   - .gitignore
+
 directories:
-  docs: "Architecture, specifications, stewardship, history"
-  policy: "Machine-readable governance policy"
-  src: "Runtime implementation"
-  configs: "Runtime configuration and durable state"
-  tests: "Unit, integration, and contract tests"
-  scripts: "Operator automation"
+  docs:
+    architecture: "Canonical system architecture and structural decisions"
+    specification: "Normative GroX contracts, principles, and protocols"
+    stewardship: "Roadmap, progress, inspections, readiness, and maintenance state"
+    history: "Ship's Log and historical records"
+    releases: "Release notes and release-specific records"
+  policy:
+    governance: "Machine-readable repository and governance policy"
+  src:
+    grox: "Runtime implementation"
+  configs: "Runtime configuration and durable configuration-backed state"
+  reference: "Schemas and reference implementations"
+  tests:
+    unit: "Unit tests"
+    integration: "Integration tests"
+    contracts: "Contract and invariant tests"
+  scripts: "Repository automation and operator scripts"
+  ci: "Continuous integration assets"
+  community: "Community-facing contribution material"
+  assets: "Non-code project assets"
+
+rules:
+  - "Do not create ad hoc root files when a canonical directory exists."
+  - "Architecture decisions belong under docs/architecture."
+  - "Normative behavioral contracts belong under docs/specification."
+  - "Operational state and planning belong under docs/stewardship."
+  - "Historical narrative belongs under docs/history."
+  - "Runtime code belongs under src/grox."
+  - "Tests must mirror the behavior or invariant they verify."
+  - "New top-level directories require an architectural reason, not convenience."
+  - "Private runtime state under configs/state is not source-controlled."

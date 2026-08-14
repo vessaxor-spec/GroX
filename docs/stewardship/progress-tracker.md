@@ -24,7 +24,6 @@ Verified in the current sandbox:
 - independent verifier must differ from executor
 - interrupted Crew duty state recovers safely on restart
 - domain-routing contracts added for the expanded company
-- 18 automated contract/unit/integration tests passing
 - live Inspect Mission completed successfully
 - live medium-risk Repair Mission completed with independent verification
 
@@ -51,11 +50,11 @@ Verified in the current sandbox:
 
 ## Evidence boundary
 
-This state is live in `/mnt/data/GroX-live` only. It has not yet been synchronized to GitHub. The previous external sandbox implementation remains unrecovered and is not treated as current source truth.
+The live Vessel source has now been synchronized to `vessaxor-spec/GroX` on `main`. Private SQLite and `.groxstate` operational state remain outside public Git by design. The previous external sandbox implementation remains unrecovered and is not treated as current source truth.
 
 ## Known deliberate limits
 
-- Pilot/Crew cognition is currently deterministic; no external model adapter is connected.
+- GorXu cognition is session-qualified through the project/host GPT-5.6 Sol reasoning bridge; deterministic control remains the safe fallback when cognition is unavailable.
 - Tool Gateway exposes safe filesystem/list/test operations only; arbitrary shell, network, browser, and credential actuation remain disabled.
 - Episodic Crew continuity is live; semantic, procedural, and Vessel-wide memory planes are not yet implemented.
 - Crash-safe durable state exists, but automatic mid-step workflow replay/resume is not yet implemented.
@@ -68,12 +67,11 @@ Evidence from live self-assessment Mission `MSN-354de0550dd5`: GorXu correctly d
 
 The canonical evolution path is recorded in `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md`.
 
-Current critical path: **A1 - Cognitive Pilot**. Intelligence and structured planning must be added before broader operational power.
-
+A1 has since passed session qualification; the current critical path is A2.
 
 ## Apex critical-path update - A1 Cognitive Pilot
 
-**Status:** FOUNDATION IMPLEMENTED; LIVE MODEL QUALIFICATION PENDING
+**Status:** SESSION-QUALIFIED
 
 Verified in the live sandbox Vessel:
 
@@ -111,3 +109,16 @@ Current critical path: **A2 - Mission Graph Orchestration**.
 - automated suite: **31 tests passing** after persistence-plane implementation.
 
 The sandbox is now explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. A2 Mission Graph Orchestration remains the Apex critical path.
+
+## Durable source synchronization
+
+**Status: COMPLETE**
+
+- complete Git-tracked live Vessel source synchronized to GitHub;
+- 82 standing Crew dossiers present in durable source;
+- runtime, cognition boundary, persistence subsystem, tests, Apex plan, and Ship's Log synchronized;
+- private operational SQLite and `.groxstate` snapshots excluded from public Git;
+- post-sync documentation reconciliation preserved richer approved canonical doctrine rather than allowing bootstrap summaries to overwrite it;
+- local automated suite remains **31 tests passing**.
+
+A2 Mission Graph Orchestration remains the current Apex stage.
