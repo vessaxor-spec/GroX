@@ -207,7 +207,7 @@ class MissionGraphRunner:
             node_id=replacement_id,
             candidate_crew_ids=[replacement.crew_id],
         )
-      specs[replacement_id] = recovery_spec
+        specs[replacement_id] = recovery_spec
         statuses[replacement_id] = "pending"
         attempts[replacement_id] = new_attempt
         used_crew.add(replacement.crew_id)
