@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import json
 from dataclasses import replace
 from time import perf_counter
 from typing import Any
@@ -10,12 +11,13 @@ from ..crew.roster import CrewDossier, CrewRoster
 from ..mission_control.core import MissionControl
 from ..runtime.executor import CrewExecutor
 from ..state import StateStore
+from ..durable_state import DurableState
 from ..verification.core import IndependentVerifier
 from ..intelligence import LivingCompanyIntelligence, RoutingDecision
+from ..operations import ExecutiveExceptionLoop, ExceptionDecision
 from .contracts import GraphNodeOutcome, GraphNodeSpec, MissionGraphPlan, PilotSynthesis
 
 _RISK_RANK = {RiskClass.low: 0, RiskClass.medium: 1, RiskClass.high: 2, RiskClass.critical: 3}
-_RECOVERABLE_EXCEPTIONS = {"crew_unavailable", "transient_failure", "TimeoutError"}
 
 
 class GraphExecutionError(RuntimeError):
@@ -39,6 +41,8 @@ class MissionGraphRunner:
         mission_control: MissionControl,
         verifier: IndependentVerifier,
         intelligence: LivingCompanyIntelligence,
+        exception_loop: ExecutiveExceptionLoop,
+        durable: DurableState,
     ):
         self.store = store
         self.roster = roster
@@ -46,6 +50,8 @@ class MissionGraphRunner:
         self.mission_control = mission_control
         self.verifier = verifier
         self.intelligence = intelligence
+        self.exception_loop = exception_loop
+        self.durable = durable
 
     def _effective_risk(self, global_risk: RiskClass, node_risk: RiskClass) -> RiskClass:
         return node_risk if _RISK_RANK[node_risk] > _RISK_RANK[global_risk] else global_risk
@@ -83,6 +89,7 @@ class MissionGraphRunner:
         crew: CrewDossier,
         global_risk: RiskClass,
         parent_order_id: str | None = None,
+        attempt: int = 1,
     ) -> MissionOrder:
         risk = self._effective_risk(global_risk, spec.risk_class)
         required = self._required_caps(spec)
@@ -100,7 +107,11 @@ class MissionGraphRunner:
             verification_requirements=["independent"] if spec.mode is MissionMode.verify else [],
             stop_conditions=list(spec.stop_conditions),
             parent_order_id=parent_order_id,
-            parameters={**dict(spec.parameters), "_graph_max_seconds": spec.budget.max_seconds},
+            parameters={
+                **dict(spec.parameters),
+                "_graph_max_seconds": spec.budget.max_seconds,
+                "_idempotency_key": f"{mission_id}:{spec.node_id}:{attempt}",
+            },
         )
 
     def _execute_prepared(
@@ -135,6 +146,100 @@ class MissionGraphRunner:
             }
         return result
 
+    def _consult_recovery(
+        self,
+        *,
+        mission_id: str,
+        directive: str,
+        spec: GraphNodeSpec,
+        failed_order_id: str,
+        crew: CrewDossier,
+        risk: RiskClass,
+    ) -> tuple[str | None, TourResult]:
+        objective = f"Consult bounded recovery evidence for: {spec.objective}"
+        order = MissionOrder.new(
+            mission_id, directive, objective, MissionMode.inspect, crew.crew_id,
+            required_capabilities=['repo_read'], allowed_actions=['fs_list','fs_read'],
+            forbidden_actions=['fs_write'], scope=list(spec.scope), risk_class=risk,
+            parent_order_id=failed_order_id,
+            stop_conditions=['elevated_risk','scope_change','irreversible_consequence'],
+            parameters={'_exception_consultation': True, '_task_class': self.intelligence.task_class(spec.objective)},
+        )
+        memory_meta = self.intelligence.inject_order_context(order, objective)
+        self.store.save_order(order)
+        self.store.add_evidence(mission_id, order.order_id, Evidence('exception_consultation', {
+            'failed_order_id': failed_order_id, 'failed_node': spec.node_id, 'consulted_crew': crew.crew_id,
+        }))
+        self.store.add_evidence(mission_id, order.order_id, Evidence('memory_selection', memory_meta))
+        self.store.crew_on_duty(crew.crew_id, mission_id)
+        self.store.update_order(order.order_id, 'running')
+        self.durable.checkpoint(mission_id, 'exception_consultation', 'running', node_id=spec.node_id, order_id=order.order_id)
+        started = perf_counter()
+        result = self.executor.execute(order)
+        latency_ms = (perf_counter() - started) * 1000.0
+        for ev in result.evidence:
+            self.store.add_evidence(mission_id, order.order_id, ev)
+        self.store.update_order(order.order_id, result.status)
+        self.store.crew_sleep(crew.crew_id, mission_id, result.summary)
+        self.intelligence.record_performance(
+            crew_id=crew.crew_id, mission_id=mission_id, order_id=order.order_id,
+            task_class=order.parameters.get('_task_class', 'general'), result=result,
+            latency_ms=latency_ms, risk=risk, verified=None,
+        )
+        self.durable.checkpoint(
+            mission_id, 'exception_consultation', result.status, node_id=spec.node_id,
+            order_id=order.order_id, payload={'summary': result.summary},
+        )
+        return order.order_id, result
+
+    def _restore_execution(
+        self,
+        mission_id: str,
+    ) -> tuple[
+        dict[str, GraphNodeSpec], dict[str, str], dict[str, int],
+        dict[str, GraphNodeOutcome], dict[str, TourResult], int, set[str]
+    ]:
+        rows = self.store.graph_nodes(mission_id)
+        if not rows:
+            raise GraphExecutionError('durable Mission Graph has no persisted nodes')
+        specs: dict[str, GraphNodeSpec] = {}
+        statuses: dict[str, str] = {}
+        attempts: dict[str, int] = {}
+        outcomes: dict[str, GraphNodeOutcome] = {}
+        tour_results: dict[str, TourResult] = {}
+        used_crew: set[str] = set()
+        for row in rows:
+            spec = GraphNodeSpec.from_mapping(json.loads(row['payload']))
+            specs[row['node_id']] = spec
+            status = row['status']
+            statuses[row['node_id']] = status
+            attempts[row['node_id']] = int(row['attempt']) or 1
+            if row.get('crew_id'):
+                used_crew.add(row['crew_id'])
+            if status == 'completed' and row.get('order_id') and row.get('crew_id'):
+                persisted = self.durable.order_result(row['order_id'])
+                evidence = []
+                if persisted:
+                    evidence = [Evidence(ev['kind'], ev['content']) for ev in persisted['evidence']]
+                result = TourResult(row['order_id'], row['crew_id'], 'completed', f"Recovered committed node {row['node_id']}", evidence)
+                outcome = GraphNodeOutcome(
+                    node_id=row['node_id'], order_id=row['order_id'], crew_id=row['crew_id'],
+                    status='completed', summary=result.summary,
+                    evidence_kinds=sorted({ev.kind for ev in evidence}), attempt=attempts[row['node_id']],
+                )
+                outcomes[row['node_id']] = outcome
+                tour_results[row['node_id']] = result
+            elif status == 'interrupted':
+                statuses[row['node_id']] = 'pending'
+                self.store.update_graph_node(mission_id, row['node_id'], 'pending', attempt=attempts[row['node_id']])
+                self.durable.checkpoint(
+                    mission_id, 'resume_interrupted_step', 'pending', node_id=row['node_id'],
+                    attempt=attempts[row['node_id']], order_id=row.get('order_id'),
+                    payload={'mode': spec.mode.value, 'idempotent_replay': True},
+                )
+        replan_count = sum(1 for ev in self.store.graph_events(mission_id) if ev['event_type'] == 'pilot_replan')
+        return specs, statuses, attempts, outcomes, tour_results, replan_count, used_crew
+
     def _rewire_downstream(
         self,
         mission_id: str,
@@ -163,6 +268,7 @@ class MissionGraphRunner:
         self,
         *,
         mission_id: str,
+        directive: str,
         failed_spec: GraphNodeSpec,
         failed_outcome: GraphNodeOutcome,
         failed_result: TourResult,
@@ -174,68 +280,96 @@ class MissionGraphRunner:
         plan: MissionGraphPlan,
         global_risk: RiskClass,
     ) -> tuple[str | None, int]:
-        exc_type = (failed_result.exception or {}).get("type")
-        if exc_type not in _RECOVERABLE_EXCEPTIONS:
+        effective_risk = self._effective_risk(global_risk, failed_spec.risk_class)
+        exc_type = str((failed_result.exception or {}).get('type') or 'unknown')
+        decision = self.exception_loop.decide(
+            risk=effective_risk, result=failed_result, mutation=failed_spec.mode is MissionMode.repair,
+        )
+        if decision.disposition != 'consult_then_replan':
+            self.exception_loop.persist(
+                mission_id=mission_id, node_id=failed_spec.node_id, order_id=failed_outcome.order_id,
+                exception_type=exc_type, risk=effective_risk, decision=decision,
+            )
             return None, replan_count
         current_attempt = attempts[failed_spec.node_id]
+        budget_reason = None
         if current_attempt >= failed_spec.budget.max_attempts:
-            return None, replan_count
-        if replan_count >= plan.budget.max_replans:
-            return None, replan_count
-        if len(specs) + 1 > plan.budget.max_nodes:
+            budget_reason = 'node attempt budget exhausted'
+        elif replan_count >= plan.budget.max_replans:
+            budget_reason = 'Mission replan budget exhausted'
+        elif len(specs) + 1 > plan.budget.max_nodes:
+            budget_reason = 'Mission node budget exhausted'
+        if budget_reason:
+            halted = ExceptionDecision('pilot_halt', budget_reason)
+            self.exception_loop.persist(
+                mission_id=mission_id, node_id=failed_spec.node_id, order_id=failed_outcome.order_id,
+                exception_type=exc_type, risk=effective_risk, decision=halted,
+            )
             return None, replan_count
 
         try:
             replacement_decision = self._select_crew(
-                failed_spec,
-                exclude={failed_outcome.crew_id},
-                dependency_crew=set(),
-                risk=self._effective_risk(global_risk, failed_spec.risk_class),
+                failed_spec, exclude={failed_outcome.crew_id}, dependency_crew=set(), risk=effective_risk,
             )
             replacement = replacement_decision.crew
         except LookupError:
+            halted = ExceptionDecision('pilot_halt', 'no eligible replacement Crew remains within the Mission authority envelope')
+            self.exception_loop.persist(
+                mission_id=mission_id, node_id=failed_spec.node_id, order_id=failed_outcome.order_id,
+                exception_type=exc_type, risk=effective_risk, decision=halted,
+            )
             return None, replan_count
+
+        self.store.add_evidence(
+            mission_id, failed_outcome.order_id,
+            Evidence('recovery_comparison', {
+                'failed_crew': failed_outcome.crew_id, 'candidate': replacement_decision.to_dict(),
+                'exception_type': exc_type,
+            }),
+        )
+        consultation_order_id, consultation = self._consult_recovery(
+            mission_id=mission_id, directive=directive, spec=failed_spec,
+            failed_order_id=failed_outcome.order_id, crew=replacement, risk=effective_risk,
+        )
+        if consultation.status != 'completed':
+            halted = ExceptionDecision('pilot_halt', 'bounded recovery consultation failed; do not continue automatically')
+            self.exception_loop.persist(
+                mission_id=mission_id, node_id=failed_spec.node_id, order_id=failed_outcome.order_id,
+                exception_type=exc_type, risk=effective_risk, decision=halted,
+                consulted_crew=replacement.crew_id, consultation_order_id=consultation_order_id,
+            )
+            return None, replan_count
+        self.exception_loop.persist(
+            mission_id=mission_id, node_id=failed_spec.node_id, order_id=failed_outcome.order_id,
+            exception_type=exc_type, risk=effective_risk, decision=decision,
+            consulted_crew=replacement.crew_id, consultation_order_id=consultation_order_id,
+        )
+        used_crew.add(replacement.crew_id)
 
         new_attempt = current_attempt + 1
         replacement_id = f"{failed_spec.node_id}__replan{new_attempt - 1}"
         while replacement_id in specs:
             new_attempt += 1
             replacement_id = f"{failed_spec.node_id}__replan{new_attempt - 1}"
-        recovery_spec = replace(
-            failed_spec,
-            node_id=replacement_id,
-            candidate_crew_ids=[replacement.crew_id],
-        )
+        recovery_spec = replace(failed_spec, node_id=replacement_id, candidate_crew_ids=[replacement.crew_id])
         specs[replacement_id] = recovery_spec
-        statuses[replacement_id] = "pending"
+        statuses[replacement_id] = 'pending'
         attempts[replacement_id] = new_attempt
-        used_crew.add(replacement.crew_id)
         self.store.save_graph_node(
-            mission_id,
-            replacement_id,
-            payload=recovery_spec.to_dict(),
-            dependencies=recovery_spec.dependencies,
-            status="pending",
-            attempt=new_attempt,
-            crew_id=replacement.crew_id,
+            mission_id, replacement_id, payload=recovery_spec.to_dict(), dependencies=recovery_spec.dependencies,
+            status='pending', attempt=new_attempt, crew_id=replacement.crew_id,
         )
-        statuses[failed_spec.node_id] = "replanned"
-        self.store.update_graph_node(mission_id, failed_spec.node_id, "replanned")
+        statuses[failed_spec.node_id] = 'replanned'
+        self.store.update_graph_node(mission_id, failed_spec.node_id, 'replanned')
         self._rewire_downstream(mission_id, specs, failed_spec.node_id, replacement_id, statuses)
         replan_count += 1
         self.store.add_graph_event(
-            mission_id,
-            "pilot_replan",
-            {
-                "failed_node": failed_spec.node_id,
-                "replacement_node": replacement_id,
-                "failed_crew": failed_outcome.crew_id,
-                "replacement_crew": replacement.crew_id,
-                "exception_type": exc_type,
-                "reason": "recoverable Crew/runtime failure",
-                "replan_number": replan_count,
-            },
-            node_id=failed_spec.node_id,
+            mission_id, 'pilot_replan', {
+                'failed_node': failed_spec.node_id, 'replacement_node': replacement_id,
+                'failed_crew': failed_outcome.crew_id, 'replacement_crew': replacement.crew_id,
+                'exception_type': exc_type, 'reason': 'consulted recoverable Crew/runtime failure',
+                'consultation_order_id': consultation_order_id, 'replan_number': replan_count,
+            }, node_id=failed_spec.node_id,
         )
         return replacement_id, replan_count
 
@@ -247,37 +381,40 @@ class MissionGraphRunner:
         plan: MissionGraphPlan,
         global_risk: RiskClass,
         allow_repair: bool = False,
+        resume: bool = False,
     ) -> tuple[dict[str, GraphNodeOutcome], PilotSynthesis]:
         plan.validate()
         if any(n.mode is MissionMode.repair for n in plan.nodes) and not allow_repair:
             raise GraphExecutionError("Mission Graph repair nodes require explicit Pilot mutation authorization")
 
-        specs = {n.node_id: n for n in plan.nodes}
-        statuses = {n.node_id: "pending" for n in plan.nodes}
-        attempts = {n.node_id: 1 for n in plan.nodes}
-        outcomes: dict[str, GraphNodeOutcome] = {}
-        tour_results: dict[str, TourResult] = {}
-        replan_count = 0
-        used_crew: set[str] = set()
-        verification_nodes: set[str] = {n.node_id for n in plan.nodes if n.mode is MissionMode.verify}
-
-        for spec in plan.nodes:
-            self.store.save_graph_node(
-                mission_id,
-                spec.node_id,
-                payload=spec.to_dict(),
-                dependencies=spec.dependencies,
-                status="pending",
-                attempt=1,
+        if resume:
+            specs,statuses,attempts,outcomes,tour_results,replan_count,used_crew = self._restore_execution(mission_id)
+        else:
+            specs = {n.node_id: n for n in plan.nodes}
+            statuses = {n.node_id: "pending" for n in plan.nodes}
+            attempts = {n.node_id: 1 for n in plan.nodes}
+            outcomes = {}
+            tour_results = {}
+            replan_count = 0
+            used_crew = set()
+            for spec in plan.nodes:
+                self.store.save_graph_node(
+                    mission_id, spec.node_id, payload=spec.to_dict(), dependencies=spec.dependencies,
+                    status="pending", attempt=1,
+                )
+            self.store.add_graph_event(
+                mission_id, "graph_started",
+                {"objective": plan.objective, "nodes": len(plan.nodes), "budget": plan.to_dict()["budget"]},
             )
-        self.store.add_graph_event(
-            mission_id,
-            "graph_started",
-            {"objective": plan.objective, "nodes": len(plan.nodes), "budget": plan.to_dict()["budget"]},
-        )
+            self.durable.checkpoint(mission_id, 'graph_started', 'committed', payload={'nodes': len(plan.nodes)})
+        verification_nodes: set[str] = {node_id for node_id,spec in specs.items() if spec.mode is MissionMode.verify}
 
         unresolved_reason: str | None = None
         while True:
+            run_state = self.durable.graph_run(mission_id)
+            if run_state and run_state['cancelled']:
+                unresolved_reason = 'mission cancelled'
+                break
             pending = [node_id for node_id, status in statuses.items() if status == "pending"]
             if not pending:
                 break
@@ -307,7 +444,7 @@ class MissionGraphRunner:
                 batch_crew.add(crew.crew_id)
                 used_crew.add(crew.crew_id)
                 parent_order = outcomes[spec.dependencies[-1]].order_id if spec.dependencies and spec.dependencies[-1] in outcomes else None
-                order = self._make_order(mission_id, directive, spec, crew, global_risk, parent_order)
+                order = self._make_order(mission_id, directive, spec, crew, global_risk, parent_order, attempt=attempts[node_id])
                 memory_meta = self.intelligence.inject_order_context(order, spec.objective)
                 self.store.save_order(order)
                 self.store.add_evidence(mission_id, order.order_id, Evidence("routing_decision", routing.to_dict()))
@@ -323,6 +460,10 @@ class MissionGraphRunner:
                     crew_id=crew.crew_id,
                 )
                 statuses[node_id] = "running"
+                self.durable.checkpoint(
+                    mission_id, 'before_execute', 'running', node_id=node_id, attempt=attempts[node_id],
+                    order_id=order.order_id, payload={'idempotency_key': order.parameters.get('_idempotency_key')},
+                )
                 deps = [tour_results[d] for d in spec.dependencies if d in tour_results]
                 prepared[node_id] = (spec, order, deps)
             if unresolved_reason:
@@ -352,6 +493,10 @@ class MissionGraphRunner:
                         self.store.add_evidence(mission_id, order.order_id, ev)
                     self.store.update_order(order.order_id, result.status)
                     self.store.crew_sleep(order.assigned_crew, mission_id, result.summary)
+                    self.durable.checkpoint(
+                        mission_id, 'after_execute', result.status, node_id=node_id, attempt=attempts[node_id],
+                        order_id=order.order_id, payload={'summary': result.summary, 'exception': result.exception or {}},
+                    )
                     outcome = GraphNodeOutcome(
                         node_id=node_id,
                         order_id=order.order_id,
@@ -379,16 +524,19 @@ class MissionGraphRunner:
                         statuses[node_id] = "completed"
                         self.store.update_graph_node(mission_id, node_id, "completed")
                         self.store.add_graph_event(
-                            mission_id,
-                            "node_completed",
+                            mission_id, "node_completed",
                             {"crew": order.assigned_crew, "summary": result.summary, "attempt": attempts[node_id]},
                             node_id=node_id,
+                        )
+                        self.durable.checkpoint(
+                            mission_id, 'node_committed', 'completed', node_id=node_id, attempt=attempts[node_id],
+                            order_id=order.order_id, payload={'crew': order.assigned_crew},
                         )
                         continue
                     statuses[node_id] = "exception"
                     self.store.update_graph_node(mission_id, node_id, "exception")
                     replacement_id, replan_count = self._try_replan(
-                        mission_id=mission_id,
+                        mission_id=mission_id, directive=directive,
                         failed_spec=spec,
                         failed_outcome=outcome,
                         failed_result=result,
@@ -411,10 +559,19 @@ class MissionGraphRunner:
             statuses.get(node_id) in {"completed", "replanned"} for node_id in verification_nodes
         )
         evidence_kinds = sorted({kind for outcome in outcomes.values() for kind in outcome.evidence_kinds})
-        outcome_status = "completed" if not unresolved and unresolved_reason is None else "needs_pilot_decision"
+        decisions = self.durable.exception_decisions(mission_id)
+        commander_required = any(d['requires_commander'] for d in decisions)
+        run_state = self.durable.graph_run(mission_id)
+        if run_state and run_state['cancelled']:
+            outcome_status = 'cancelled'
+        elif commander_required:
+            outcome_status = 'needs_commander_decision'
+        else:
+            outcome_status = "completed" if not unresolved and unresolved_reason is None else "needs_pilot_decision"
         summary = (
             f"GorXu coordinated {len(completed)} completed graph nodes across {len(used_crew)} Crew; "
-            f"replans={replan_count}; verification={'PASS' if verification_passed else 'NOT PROVEN'}"
+            f"replans={replan_count}; exceptions={len(decisions)}; "
+            f"resumes={(run_state or {}).get('resume_count',0)}; verification={'PASS' if verification_passed else 'NOT PROVEN'}"
         )
         if unresolved_reason:
             summary += f"; unresolved: {unresolved_reason}"
@@ -429,4 +586,5 @@ class MissionGraphRunner:
             evidence_kinds=evidence_kinds,
         )
         self.store.add_graph_event(mission_id, "pilot_synthesis", synthesis.to_dict())
+        self.durable.checkpoint(mission_id, 'pilot_synthesis', synthesis.outcome, payload=synthesis.to_dict())
         return outcomes, synthesis
