@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+configs/state/*.sqlite3
+configs/state/*.sqlite3-*
+configs/state/snapshots/
+*.groxstate
