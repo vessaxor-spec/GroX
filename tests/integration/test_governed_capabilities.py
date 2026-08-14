@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import os
 import json
 from pathlib import Path
 import shutil
@@ -19,6 +20,8 @@ from grox.tools.secrets import SecretBroker
 
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "mcp_echo_server.py"
 DOCKER_IMAGE = "alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc"
+BROWSER_DOCKER_IMAGE = os.environ.get("A5_BROWSER_DOCKER_IMAGE")
+BROWSER_SECCOMP_PROFILE = os.environ.get("A5_BROWSER_SECCOMP_PROFILE")
 
 
 class PageHandler(BaseHTTPRequestHandler):
@@ -61,7 +64,12 @@ class GovernedCapabilityIntegrationTests(unittest.TestCase):
             mcp_spec=MCPAdapterSpec(argv=(sys.executable,str(FIXTURE)),allowed_tools=frozenset({'echo'}))
             p=PilotGorXu(
                 root, reasoner=None, extra_allowed_origins=[origin],
-                gateway_policy=GatewayPolicy(allowed_origins=frozenset({origin}), workspace_docker_image=DOCKER_IMAGE),
+                gateway_policy=GatewayPolicy(
+                    allowed_origins=frozenset({origin}),
+                    workspace_docker_image=DOCKER_IMAGE,
+                    browser_docker_image=BROWSER_DOCKER_IMAGE,
+                    browser_docker_seccomp_profile=BROWSER_SECCOMP_PROFILE,
+                ),
                 secret_broker=SecretBroker({'qualification_token':secret_value}),
                 mcp_registry={'qualification':mcp_spec},
             )
@@ -75,7 +83,7 @@ class GovernedCapabilityIntegrationTests(unittest.TestCase):
                         'node_id':'workspace','objective':'Execute a bounded isolated shell workspace with an ephemeral credential alias','mode':'execute','dependencies':[],
                         'candidate_crew_ids':['devops-engineer'],'required_capabilities':['repo_read','workspace_exec','secret_use'],
                         'allowed_actions':['workspace_exec','secret_use'],'scope':['.'],'risk_class':'high',
-                        'parameters':{'operation':'workspace_shell','script':'test ! -e /etc/passwd; printf "%s" "$TOKEN"; printf qualified > /work/result.txt',
+                        'parameters':{'operation':'workspace_shell','script':'test ! -e /host; printf "%s" "$TOKEN"; printf qualified > /work/result.txt',
                                       'secret_env':{'TOKEN':'qualification_token'},'secret_grants':['qualification_token']},
                     },
                     {
@@ -128,10 +136,15 @@ class GovernedCapabilityIntegrationTests(unittest.TestCase):
             self.assertFalse(workspace['workspace_retained'])
             self.assertTrue((root/browser['screenshot']).is_file())
             self.assertEqual(browser['browser_network'],'disabled_after_gateway_fetch')
+            self.assertIn(browser['browser_backend'], {'namespace', 'docker'})
             self.assertTrue(
                 'network_namespace' in browser['browser_isolation']
-                or 'chromium_native_sandbox' in browser['browser_isolation']
+                or 'docker_network_none' in browser['browser_isolation']
             )
+            if browser['browser_backend'] == 'docker':
+                self.assertIn('chromium_native_sandbox', browser['browser_isolation'])
+                self.assertIn('playwright_seccomp', browser['browser_isolation'])
+                self.assertTrue(browser['browser_image_id'])
             self.assertIn('http://example.invalid',browser['blocked_origins'])
         finally:
             server.shutdown(); server.server_close(); td.cleanup()

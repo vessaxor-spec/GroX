@@ -14,10 +14,11 @@ import tempfile
 from urllib.parse import urlsplit
 
 from ..contracts import MissionOrder, MissionMode
+from .browser import BrowserRuntime, BrowserUnavailable
 from .mcp import MCPAdapterSpec, MCPError, StdioMCPClient
 from .policy import GatewayPolicy, PolicyError, normalize_origin
 from .secrets import SecretBroker, SecretDenied
-from .workspace import IsolatedWorkspace, WorkspaceUnavailable, namespace_backend_available
+from .workspace import IsolatedWorkspace, WorkspaceUnavailable
 
 
 class ToolDenied(PermissionError):
@@ -48,6 +49,7 @@ class ToolGateway:
         self.secret_broker = secret_broker or SecretBroker()
         self.mcp = StdioMCPClient(mcp_registry)
         self._workspace: IsolatedWorkspace | None = None
+        self._browser = BrowserRuntime(self.root, self.policy)
 
     def _resolve(self, rel: str) -> Path:
         p = (self.root / rel).resolve()
@@ -288,87 +290,18 @@ class ToolGateway:
         content_type = meta["content_type"].lower()
         if "html" not in content_type and "xhtml" not in content_type:
             raise ToolDenied("browser capture requires an HTML response")
-        html = raw.decode("utf-8", errors="replace")
-        capture_dir = self.root / "configs/state/browser" / order.mission_id / order.order_id
-        capture_dir.mkdir(parents=True, exist_ok=True)
-        screenshot = capture_dir / "capture.png"
-        with tempfile.TemporaryDirectory(prefix="grox-browser-") as td:
-            scratch = Path(td)
-            os.chmod(scratch, 0o777)
-            worker_shot = scratch / "capture.png"
-            request = {
-                "html": html,
-                "timeout_ms": self.policy.browser_timeout_seconds * 1000,
-                "screenshot": str(worker_shot),
-            }
-            source_root = Path(__file__).resolve().parents[2]
-            env = {
-                "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
-                "PYTHONPATH": str(source_root),
-                "HOME": str(scratch),
-                "LANG": "C.UTF-8",
-                "LC_ALL": "C.UTF-8",
-                "TERM": "dumb",
-            }
-            unshare = shutil.which("unshare")
-            namespace_backend = bool(unshare and namespace_backend_available())
-            request["outer_namespace"] = namespace_backend
-            if namespace_backend:
-                argv = [unshare, "--user", "--map-root-user", "--pid", "--fork", "--net", sys.executable, "-m", "grox.tools.browser_worker"]
-                worker_identity = "user_namespace_root"
-                browser_isolation = [
-                    "user_namespace", "pid_namespace", "network_namespace",
-                    "playwright_request_abort", "offline_gateway_content",
-                ]
-            else:
-                if os.geteuid() == 0:
-                    raise ToolDenied(
-                        "browser capture requires either usable user/PID/network namespaces or a non-root host for the native Chromium sandbox"
-                    )
-                argv = [sys.executable, "-m", "grox.tools.browser_worker"]
-                worker_identity = f"host_uid:{os.geteuid()}"
-                browser_isolation = [
-                    "chromium_native_sandbox", "playwright_request_abort",
-                    "offline_gateway_content", "host_resolver_block", "dead_proxy",
-                ]
-            proc = subprocess.Popen(
-                argv, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                cwd=scratch, env=env, start_new_session=True,
+        try:
+            result = self._browser.capture(
+                raw.decode("utf-8", errors="replace"), order.mission_id, order.order_id
             )
-            try:
-                stdout, stderr = proc.communicate(json.dumps(request), timeout=self.policy.browser_timeout_seconds + 10)
-            except subprocess.TimeoutExpired as exc:
-                try: os.killpg(proc.pid, signal.SIGKILL)
-                except ProcessLookupError: pass
-                proc.wait()
-                raise TimeoutError(f"browser capture exceeded {self.policy.browser_timeout_seconds}s") from exc
-            finally:
-                # Chromium may leave helper descendants after the worker exits. The
-                # dedicated process group is A5-private and is always reaped here.
-                try: os.killpg(proc.pid, signal.SIGKILL)
-                except ProcessLookupError: pass
-            if proc.returncode != 0:
-                raise ToolDenied(f"browser worker failed: {stderr[-2000:]}")
-            if not worker_shot.exists():
-                raise ToolDenied("browser worker returned without screenshot evidence")
-            try:
-                result = json.loads(stdout)
-            except json.JSONDecodeError as exc:
-                raise ToolDenied("browser worker returned invalid evidence") from exc
-            shot = worker_shot.read_bytes()
-        screenshot.write_bytes(shot)
+        except BrowserUnavailable as exc:
+            raise ToolDenied(str(exc)) from exc
         result.update({
             "source_url": meta["url"],
             "origin": meta["origin"],
             "source_status": meta["status"],
             "source_sha256": meta["sha256"],
             "source_bytes": meta["bytes"],
-            "screenshot": str(screenshot.relative_to(self.root)),
-            "screenshot_sha256": hashlib.sha256(shot).hexdigest(),
-            "screenshot_bytes": len(shot),
-            "worker_identity": worker_identity,
-            "browser_isolation": browser_isolation,
-            "browser_network": "disabled_after_gateway_fetch",
         })
         return result
 

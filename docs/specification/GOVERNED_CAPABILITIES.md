@@ -120,17 +120,19 @@ The browser does not receive independent network authority.
 
 `browser_capture` first retrieves the approved HTML through the same `net_fetch` origin gate. GroX then renders that captured HTML offline in real Chromium/Chrome through Playwright. Browser-originated HTTP(S) requests are aborted.
 
-Where the host supports the full A5 namespace set, the browser worker also runs inside user, PID, and network namespaces. Where user namespaces are blocked but the process is non-root, GroX instead requires Chromium's native sandbox and adds deny-at-resolution and dead-proxy controls. A root host without the outer namespace boundary is denied. This keeps network authority in the Gateway rather than silently falling back to an unsandboxed root browser.
+Where the host supports the full A5 namespace set, the browser worker runs inside user, PID, and network namespaces. Where that namespace set is blocked, GroX requires a separately commissioned Docker browser image. That image is built from the Playwright v1.62.0 Noble base pinned by registry digest, installs the matching Python Playwright package, and runs the worker as a dedicated non-root `groxbrowser` user with Chromium's native sandbox enabled. The Docker path uses the Playwright seccomp profile pinned to the v1.62.0 source commit, `network=none`, dropped Linux capabilities, `no-new-privileges`, a read-only root, bounded resources, private tmpfs/shared memory, and only an ephemeral screenshot scratch directory mounted writable. Runtime uses `--pull never` and never builds or downloads the image or seccomp profile.
+
+If neither the outer namespace path nor the pre-provisioned Docker browser boundary is available, browser capture is denied. This keeps network authority in the Gateway rather than silently falling back to an unsandboxed host browser.
 
 Evidence includes:
 
 - approved source origin and response hash;
 - rendered-document hash;
 - screenshot path, size, and SHA-256;
-- selected browser isolation controls and Chromium sandbox mode;
+- selected browser backend, isolation controls, Chromium sandbox mode, and container image ID when Docker is used;
 - blocked origins observed during rendering.
 
-Browser evidence lives under the private `configs/state/browser/` path and is excluded from source control.
+Browser evidence lives under the private `configs/state/browser/` path and is excluded from source control. Host commissioning for the Docker fallback is explicit through `scripts/commission-a5-browser.sh`; the resulting image and seccomp profile are host/private operational assets rather than command authority or Vessel memory.
 
 This A5 path qualifies bounded browser rendering and evidence capture. It does not grant an unrestricted interactive desktop or arbitrary browser automation surface.
 
