@@ -8,6 +8,7 @@
 **A2 status:** QUALIFIED; durable Mission Graph and bounded replanning proven
 **A3 status:** QUALIFIED; Living Company memory, performance history, experienced routing, and bounded context proven
 **A4 status:** QUALIFIED; durable same-Mission resume, executive exception consultation/replan, cancellation, idempotency, and compensation proven
+**A5 status:** QUALIFIED; governed workspace, secret, network, browser-evidence, and MCP capability paths proven without widening Crew authority
 
 ## Definition
 
@@ -32,15 +33,16 @@ Apex is a demonstrated operating standard, not a title.
 - Durable Mission Graph state now preserves committed work across process interruption, supports bounded same-Mission resume/cancellation, and records execution checkpoints.
 - Executive exception policy now consults relevant eligible Crew before ordinary recoverable replans while reserving critical, irreversible, and material-intent decisions for the Commander.
 - Supported text Repair is atomic and privately journaled for idempotent replay, bounded compensation, and fail-closed divergence handling.
+- Tool Gateway v2 now mediates isolated workspace execution, memory-only secret aliases, exact-origin HTTP(S), offline browser evidence capture, and pre-registered stdio MCP adapters through deny-wins Mission Order and host-policy grants.
+- A5 host isolation is portable: user/PID/network namespaces are preferred; a pre-provisioned, digest-pinned Docker boundary is the fail-closed fallback where hosted kernels deny user-namespace mapping.
 
 ## Proven gaps
 
 1. **Cognition is project-hosted, not an autonomous daemon.** GPT-5.6 Sol occupies the Pilot cognition seat when a capable project session is active; deterministic control remains the safe fallback.
 2. **Synthesis depth is incomplete.** A2 provides Pilot-owned structural synthesis, but GorXu does not yet semantically reconcile contradictory specialist judgments, rank competing evidence, or construct calibrated executive conclusions from disagreement.
-3. **Tool power is intentionally narrow.** No governed shell, network, browser/computer-use, MCP tool plane, secret brokerage, or isolated execution workspace exists yet.
-4. **Orchestration evaluation is incomplete.** A3 records per-Crew/task-class performance, evidence quality, verification, latency, cost, and risk, but there is not yet a replayable evaluation corpus, trajectory scoring, statistical improvement gate, or evidence-driven self-improvement proposal loop.
-5. **No external-agent interoperability layer.** Standing Crew are native dossiers only; external opaque agents cannot yet be discovered or delegated to through a standard adapter.
-6. **No apex qualification gauntlet.** The Vessel has not yet passed the full adversarial, long-horizon, multi-domain, recovery, contradiction, and irreversible-decision gauntlet.
+3. **Orchestration evaluation is incomplete.** A3 records per-Crew/task-class performance, evidence quality, verification, latency, cost, and risk, but there is not yet a replayable evaluation corpus, trajectory scoring, statistical improvement gate, or evidence-driven self-improvement proposal loop.
+4. **No external-agent interoperability layer.** Standing Crew are native dossiers only; external opaque agents cannot yet be discovered or delegated to through a standard adapter. A5 deliberately did not claim its optional A2A seam merely to close a checklist.
+5. **No apex qualification gauntlet.** The Vessel has not yet passed the full adversarial, long-horizon, multi-domain, recovery, contradiction, and irreversible-decision gauntlet.
 
 ## Evolution sequence
 
@@ -153,7 +155,7 @@ GorXu earns Apex status only after passing a formal gauntlet covering:
 
 ## Current priority
 
-**A5 - Governed Capability Expansion is the current critical stage.** A1 cognition, A2 Mission Graph Orchestration, A3 Living Company Intelligence, and A4 Durable Operations are qualified for the current project-hosted operating model.
+**A6 - Orchestration Intelligence and Self-Improvement is the current critical stage.** A1 cognition, A2 Mission Graph Orchestration, A3 Living Company Intelligence, A4 Durable Operations, and A5 Governed Capability Expansion are qualified for the current project-hosted operating model.
 
 A1 foundation now present:
 
@@ -243,4 +245,30 @@ Evidence:
 
 **A4 status: QUALIFIED.**
 
-Next critical stage: **A5 - Governed Capability Expansion**.
+Next critical stage after A4 was **A5 - Governed Capability Expansion**.
+
+### A5 live qualification: PASSED
+
+A5 extends the existing Tool Gateway rather than creating another execution plane. Privileged action remains attributable to Commander intent, a Pilot-owned Mission Order, eligible Crew capability, host policy, evidence, and the independent verification path.
+
+Qualification Mission: `MSN-5c3b646ce6be`.
+
+Evidence:
+- fresh GitHub-hosted Ubuntu 24.04 / Python 3.12 qualification passed **65/65** tests on qualified source head `b1975209752bde569a063276cf6f968440641f16`;
+- the hosted runner denied the preferred user-namespace `uid_map` operation and then proved the governed Docker fallback instead of bypassing the red canary;
+- Docker workspace confinement retained `network=none`, dropped Linux capabilities, `no-new-privileges`, read-only root, resource limits, a digest-pinned pre-provisioned image, and only an ephemeral writable `/work`;
+- the separately commissioned browser fallback retained an outer non-root Docker sandbox, Docker built-in seccomp, no network, dropped capabilities, `no-new-privileges`, read-only root, bounded resources, and runtime `--pull never`;
+- the restored private A4 snapshot re-verified before A5 activation and private SQLite integrity remained `ok`;
+- live Mission `MSN-5c3b646ce6be` used `devops-engineer`, `researcher`, `platform-engineer`, and `independent-verifier` across five governed graph nodes;
+- workspace secret output was `[REDACTED]`, the ephemeral workspace was removed, and the qualification secret was absent from both the serialized Mission and the complete SQLite dump;
+- network access was exact-origin gated, browser networking was disabled after Gateway fetch, `http://example.invalid` was blocked during rendering, and screenshot/hash evidence was captured;
+- a pre-registered read-only stdio MCP tool completed through its explicit adapter/tool grant;
+- every privileged node carried the required explicit Mission Order action grant;
+- final synthesis recorded **0 replans**, **0 exceptions**, **0 resumes**, and independent verification **PASS**;
+- all **82** Standing Crew remained present and SQLite integrity remained `ok`.
+
+A5 intentionally leaves unrestricted interactive desktop automation, arbitrary third-party MCP processes, networked MCP transports, and optional A2A external-agent delegation outside the qualified boundary.
+
+**A5 status: QUALIFIED.**
+
+Next critical stage: **A6 - Orchestration Intelligence and Self-Improvement**.
