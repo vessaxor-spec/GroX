@@ -1,0 +1,33 @@
+name: A5 Outer Browser Alignment
+
+on:
+  push:
+    branches:
+      - a5/governed-capabilities
+
+permissions:
+  contents: write
+
+jobs:
+  align:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: a5/governed-capabilities
+          fetch-depth: 1
+      - name: Align tests and specification
+        shell: bash
+        run: |
+          set -euo pipefail
+          python .github/a5-outer-wire.py
+          rm -f .github/a5-outer-wire.py
+          rm -f .github/workflows/a5-outer-wire.yml
+          python -m compileall -q src tests
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Align A5 browser outer-sandbox evidence'
+          git push origin HEAD:a5/governed-capabilities
