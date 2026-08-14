@@ -42,6 +42,12 @@ class FullCompanyTest(unittest.TestCase):
         self.assertIn('architect',files)
         self.assertNotIn('systems-architect',files)
 
+    def test_roster_catalogue_load_does_not_require_state_store(self):
+        from grox.crew.roster import CrewRoster
+        roster=CrewRoster(DOS)
+        self.assertEqual(len(roster.all()),82)
+        self.assertIsNone(roster.store)
+
 class CompanyRoutingTest(unittest.TestCase):
     def test_domain_specialists_win_domain_routing(self):
         from grox.crew.roster import CrewRoster
