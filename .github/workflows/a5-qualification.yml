@@ -22,10 +22,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Diagnose qualified isolation backends
+      - name: Commission a qualified isolation backend
         shell: bash
         run: |
-          set -u
+          set -euo pipefail
           command -v unshare
           command -v chroot
           command -v prlimit
@@ -35,19 +35,25 @@ jobs:
           if unshare --user --map-root-user --pid --fork --mount-proc --net /bin/sh -c 'true'; then
             echo 'A5_ISOLATION_BACKEND=namespace' | tee -a "$GITHUB_ENV"
           else
-            echo 'Namespace backend unavailable; checking Docker daemon.'
+            echo 'Namespace backend unavailable; commissioning governed Docker fallback.'
             command -v docker
             docker version
-            docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges --read-only --pids-limit 32 --memory 128m --cpus 0.5 alpine:3.20 /bin/sh -c 'test ! -e /host && echo docker-isolation-ok'
+            IMAGE='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
+            docker pull "$IMAGE"
+            docker run --rm --pull never --network none --cap-drop ALL --security-opt no-new-privileges --read-only --pids-limit 32 --memory 128m --memory-swap 128m --cpus 0.5 "$IMAGE" /bin/sh -c 'test ! -e /host && echo docker-isolation-ok'
             echo 'A5_ISOLATION_BACKEND=docker' | tee -a "$GITHUB_ENV"
-            echo 'Docker fallback is available, but candidate source does not yet implement it.'
-            exit 1
           fi
+          test "$(id -u)" -ne 0 || test "$A5_ISOLATION_BACKEND" = namespace
       - name: Install Vessel with browser adapter
         run: python -m pip install -e '.[browser]'
       - name: Compile source and tests
         run: python -m compileall -q src tests
       - name: Run complete Vessel suite
+        shell: bash
         env:
           PYTHONPATH: src
-        run: python -m unittest discover -s tests -v
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -v 2>&1 | tee /tmp/a5-tests.log
+          grep -F 'Ran 65 tests' /tmp/a5-tests.log
+          grep -Fx 'OK' /tmp/a5-tests.log
