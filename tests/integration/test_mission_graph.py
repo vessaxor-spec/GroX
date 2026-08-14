@@ -73,6 +73,25 @@ class MissionGraphIntegrationTests(unittest.TestCase):
             self.assertTrue(any(e['kind']=='pilot_synthesis' for e in mission['evidence']))
         finally: td.cleanup()
 
+    def test_graph_repair_requires_explicit_mutation_authority(self):
+        td,root,p=graph_vessel()
+        try:
+            directive='Repair a bounded Vessel file through a Mission Graph.'
+            plan={
+                'commander_intent':directive,
+                'objective':'Prove graph repair cannot self-authorize mutation.',
+                'nodes':[
+                    {'node_id':'repair','objective':'Repair a bounded file','mode':'repair','dependencies':[],
+                     'candidate_crew_ids':['backend-engineer'],'required_capabilities':['repo_read','repo_write'],
+                     'scope':['docs/x.txt'],'parameters':{'operation':'write_text','path':'docs/x.txt','content':'x'}},
+                ],
+            }
+            r=p.command_graph(directive,plan=plan,plan_source='test-cognition')
+            self.assertEqual(r['status'],'needs_pilot_decision')
+            self.assertIn('explicit Pilot mutation authorization',r['summary'])
+            self.assertFalse((root/'docs/x.txt').exists())
+        finally: td.cleanup()
+
     def test_injected_crew_failure_is_replanned_without_commander(self):
         td,root,p=graph_vessel()
         try:
@@ -88,15 +107,11 @@ class MissionGraphIntegrationTests(unittest.TestCase):
             self.assertEqual(len(replans),1)
             nodes={n['node_id']:n for n in mission['graph_nodes']}
             self.assertEqual(nodes['research']['status'],'replanned')
-            recovery=[ˆ›Üˆˆ[ˆ›Ù\ÈYˆ‹œİ\İÚ]
-	Ü™\ÙX\˜Ú×Ü™\[‰ÊWBˆÙ[‹˜\ÜÙ\\]X[
-[Š™XÛİ™\JKJBˆÙ[‹˜\ÜÙ\\]X[
-›Ù\ÖÜ™XÛİ™\VÌWVÉÜİ]\É×K	ØÛÛ\]Y	ÊBˆš[˜[Nˆ˜ÛX[\
-
-B‚ˆYˆ\İÙÜ˜\Ü™\Z\—Ü™\]Z\™\×Ù^XÚ]Û]]][Û—Ø]]Üš]JÙ[ŠN‚ˆ›ÛİYÜ˜\İ™\ÜÙ[
-
-BˆN‚ˆ\™Xİ]™OIÔ™\Z\ˆH›İ[™Y™XÛÜ™›İYÚHZ\ÜÚ[ÛˆÜ˜\‰Âˆ[^Âˆ	ØÛÛ[X[™\—Ú[[	Î™\™Xİ]™K	ÛØš™Xİ]™IÎ‰Ü™\Z\‰Ë	Û›Ù\ÉÎ–ŞÂˆ	Û›ÙWÚY	Î‰Ü™\Z\‰Ë	ÛØš™Xİ]™IÎ‰Ü™\Z\ˆ™XÛÜ™	Ë	Û[ÙIÎ‰Ü™\Z\‰Ë	Ù\[™[˜ÚY\ÉÎ–×Kˆ	ØØ[™Y]WØÜ™]×ÚYÉÎ–ÉØ˜XÚÙ[™Y[™Ú[™Y\‰×K	Ü™\]Z\™YØØ\Xš[]Y\ÉÎ–ÉÜ™\×Ü™XY	Ë	Ü™\×İÜš]I×Kˆ	ÜØÛÜIÎ–ÉÔ‘PQQK›Y	×K	Ü\˜[Y]\œÉÎÉÛÜ\˜][Û‰Î‰İÜš]Wİ^	Ë	Ü]	Î‰Ô‘PQQK›Y	Ë	ØÛÛ[	Î‰Ş	ßBˆWBˆBˆ\˜ÛÛ[X[™ÙÜ˜\
-\™Xİ]™K[\[ŠBˆÙ[‹˜\ÜÙ\\]X[
-–ÉÜİ]\É×K	Û™YY×Ü[İÙXÚ\Ú[Û‰ÊBˆÙ[‹˜\ÜÙ\[Š	Ù^XÚ][İ]]][Ûˆ]]Üš^˜][Û‰Ë–ÉÜİ[[X\I×JBˆš[˜[Nˆ˜ÛX[\
-
-B
+            recovery=[node_id for node_id in nodes if node_id.startswith('research__replan')]
+            self.assertEqual(len(recovery),1)
+            replacement_id=recovery[0]
+            self.assertEqual(nodes[replacement_id]['status'],'completed')
+            verify_dependencies=json.loads(nodes['verify']['dependencies'])
+            self.assertIn(replacement_id,verify_dependencies)
+            self.assertNotIn('research',verify_dependencies)
+        finally: td.cleanup()

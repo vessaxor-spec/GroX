@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX now has a runnable native Vessel, a full standing company, project/session-bound GorXu cognition, private operational-state recovery, and durable source synchronization to GitHub.
+GroX now has a runnable native Vessel, a full standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2 Apex stages.
 
 The command architecture is native to the Vessel:
 
@@ -23,28 +23,30 @@ The command architecture is native to the Vessel:
 - SQLite Mission/Order/Evidence/Crew persistence implemented
 - Three-plane persistence architecture implemented
 - A1 Cognitive Pilot session-qualified with GPT-5.6 Sol
+- A2 Mission Graph Orchestration qualified with durable graph state, parallel-ready scheduling, bounded replanning, independent verification, and Pilot-owned synthesis
 
 ## Apex critical path
 
 The Apex run is the Vessel's primary trajectory. Detailed gates are maintained in `APEX_ORCHESTRATOR_PLAN.md`.
 
-### Current stage: A2 — Mission Graph Orchestration
+### Current stage: A3 — Living Company Intelligence
 
-A2 must add:
+A3 must turn the standing company from a mostly static roster into an experienced organization without indiscriminate context growth.
 
-- durable task decomposition into bounded Mission Orders;
-- dependency graph and parallelizable branches;
-- Crew selection per node;
-- explicit budgets and stop conditions;
-- dynamic re-planning from intermediate evidence;
-- Pilot-owned synthesis;
-- injected-failure recovery without unnecessary Commander intervention.
+Required outcomes:
 
-A2 is complete only when GorXu coordinates at least five different Crew across a multi-stage Mission and adapts after an injected failure while preserving all authority invariants.
+- Crew episodic retrieval;
+- semantic and procedural memory;
+- Vessel-wide organizational memory;
+- performance history by Crew and task class;
+- routing informed by competence, evidence quality, reliability, uncertainty, load, cost, latency, and risk;
+- context-isolated Crew tours with selective relevant memory injection;
+- measurable improvement across repeated Missions.
+
+A3 is complete only when repeated Missions demonstrate improved routing and execution while preserving bounded context, authority separation, evidence quality, and GorXu's sole orchestration role.
 
 ## Later Apex stages
 
-- A3 Living Company Intelligence
 - A4 Executive Exception Loop and Durable Operations
 - A5 Governed Capability Expansion
 - A6 Orchestration Intelligence and Self-Improvement
