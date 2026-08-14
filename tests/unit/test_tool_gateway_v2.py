@@ -21,7 +21,6 @@ FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "mcp_echo_server.py
 HAS_BROWSER = importlib.util.find_spec("playwright") is not None and any(shutil.which(x) for x in ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable"))
 DOCKER_IMAGE = "alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc"
 BROWSER_DOCKER_IMAGE = os.environ.get("A5_BROWSER_DOCKER_IMAGE")
-BROWSER_SECCOMP_PROFILE = os.environ.get("A5_BROWSER_SECCOMP_PROFILE")
 
 
 class QuietHandler(BaseHTTPRequestHandler):
@@ -123,7 +122,6 @@ class GatewayV2Tests(unittest.TestCase):
                 policy=GatewayPolicy(
                     allowed_origins=frozenset({origin}),
                     browser_docker_image=BROWSER_DOCKER_IMAGE,
-                    browser_docker_seccomp_profile=BROWSER_SECCOMP_PROFILE,
                 ),
             )
             order = self.order(
@@ -139,8 +137,8 @@ class GatewayV2Tests(unittest.TestCase):
                 or "docker_network_none" in result["browser_isolation"]
             )
             if result["browser_backend"] == "docker":
-                self.assertIn("chromium_native_sandbox", result["browser_isolation"])
-                self.assertIn("playwright_seccomp", result["browser_isolation"])
+                self.assertIn("outer_container_sandbox", result["browser_isolation"])
+                self.assertIn("docker_builtin_seccomp", result["browser_isolation"])
                 self.assertTrue(result["browser_image_id"])
             self.assertIn("http://example.invalid", result["blocked_origins"])
             shot = self.root / result["screenshot"]
