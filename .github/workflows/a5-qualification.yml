@@ -33,7 +33,7 @@ jobs:
           test -n "$BROWSER_BIN"
           echo "Browser: $BROWSER_BIN"
           if unshare --user --map-root-user --pid --fork --mount-proc --net /bin/sh -c 'true'; then
-            echo 'A5_ISOLATION_BACKEND=namespace' | tee -a "$GITHUB_ENV"
+            BACKEND=namespace
           else
             echo 'Namespace backend unavailable; commissioning governed Docker fallback.'
             command -v docker
@@ -41,9 +41,10 @@ jobs:
             IMAGE='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
             docker pull "$IMAGE"
             docker run --rm --pull never --network none --cap-drop ALL --security-opt no-new-privileges --read-only --pids-limit 32 --memory 128m --memory-swap 128m --cpus 0.5 "$IMAGE" /bin/sh -c 'test ! -e /host && echo docker-isolation-ok'
-            echo 'A5_ISOLATION_BACKEND=docker' | tee -a "$GITHUB_ENV"
+            BACKEND=docker
           fi
-          test "$(id -u)" -ne 0 || test "$A5_ISOLATION_BACKEND" = namespace
+          echo "A5_ISOLATION_BACKEND=$BACKEND" | tee -a "$GITHUB_ENV"
+          test "$(id -u)" -ne 0 || test "$BACKEND" = namespace
       - name: Install Vessel with browser adapter
         run: python -m pip install -e '.[browser]'
       - name: Compile source and tests
