@@ -172,6 +172,7 @@ class MissionGraphRunner:
         used_crew: set[str],
         replan_count: int,
         plan: MissionGraphPlan,
+        global_risk: RiskClass,
     ) -> tuple[str | None, int]:
         exc_type = (failed_result.exception or {}).get("type")
         if exc_type not in _RECOVERABLE_EXCEPTIONS:
@@ -189,7 +190,7 @@ class MissionGraphRunner:
                 failed_spec,
                 exclude={failed_outcome.crew_id},
                 dependency_crew=set(),
-                risk=failed_spec.risk_class,
+                risk=self._effective_risk(global_risk, failed_spec.risk_class),
             )
             replacement = replacement_decision.crew
         except LookupError:
@@ -397,6 +398,7 @@ class MissionGraphRunner:
                         used_crew=used_crew,
                         replan_count=replan_count,
                         plan=plan,
+                        global_risk=global_risk,
                     )
                     if replacement_id is None:
                         unresolved_reason = f"node {node_id} failed: {(result.exception or {}).get('type', 'unknown')}"
