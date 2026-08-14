@@ -50,8 +50,10 @@ Authority may narrow as it travels downward. It may not widen without a new deci
 5. **Tool Gateway:** deny-wins capability enforcement and host/Vessel confinement.
 6. **Mission Store:** durable Mission, Order, Evidence, Crew, memory, and performance state.
 7. **Living Company Intelligence:** advisory memory retrieval and experienced eligible-Crew ranking under GorXu.
-8. **Verification:** independent verification path where policy requires it.
-9. **Persistence Manager:** private operational-state snapshots, integrity checking, and confirmation-gated restore.
+8. **Durable Operations:** private graph-run/checkpoint/exception/mutation ledger for safe resume and compensation under GorXu.
+9. **Executive Exception Loop:** deterministic classification and bounded consultation/replan policy under GorXu.
+10. **Verification:** independent verification path where policy requires it.
+11. **Persistence Manager:** private operational-state snapshots, integrity checking, and confirmation-gated restore.
 
 ## Standing Crew model
 
@@ -118,7 +120,15 @@ A Mission is a first-class durable object. The target architecture persists:
 
 A restarted Vessel must determine the last committed Mission state and resume safely rather than reconstructing state from conversational memory.
 
-Current implementation persists Missions, Orders, Evidence, Crew state, and interrupted-state markers in SQLite. Exact workflow replay/resume remains an Apex-stage capability rather than a completed feature.
+Current A4 implementation persists validated graph-run state, checkpoints, exception decisions, bounded resume/cancellation state, and mutation-journal evidence in the private SQLite plane. A fresh Pilot converts in-flight state to `interrupted`, preserves committed nodes without replay, and may resume the same Mission ID from persisted state. Automatic resume is bounded; unknown or divergent mutation state halts rather than being guessed through.
+
+## Durable Operations and executive exceptions
+
+A4 adds a private `DurableState` service under GorXu. It does not command Crew. It records graph-run state, execution checkpoints, exception decisions, cancellation/resume state, and supported Repair mutation journals in the same private SQLite operational plane.
+
+Ordinary recoverable graph exceptions are evaluated by a deterministic Executive Exception Loop. When policy permits recovery, GorXu compares an eligible replacement, issues that Crew a real read-only consultation Order, records the consultation evidence, and only then commits a bounded replan. Critical, irreversible, authority-divergent, or material-intent exceptions require Commander decision. Unknown non-critical exceptions halt with GorXu rather than escalating unnecessarily.
+
+Supported `write_text` Repair is atomic and journaled before mutation. Post-Repair test failure compensates the exact bounded pre-state when it can be proven safe; externally diverged state is never silently overwritten.
 
 ## Tool architecture
 
