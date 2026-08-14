@@ -53,3 +53,15 @@ These are intentionally unordered until the Commander selects direction:
 No candidate vector is automatically next.
 
 The roadmap remains at this gate until the Commander decides where to steer the Vessel.
+
+## Locked persistence foundation
+
+The three-plane persistence architecture is foundational infrastructure for every future GroX stage:
+
+- the ChatGPT project `Space Exploration` is GorXu's current cognitive reconstitution home;
+- GitHub is the durable Vessel source body;
+- private verified checkpoints carry operational Mission and Crew state;
+- sandbox and host compute are replaceable;
+- recovery must pass integrity and test gates before Mission continuation.
+
+This is not a competing roadmap vector. It exists so the Apex run and every later capability can survive model, session, sandbox, and host turnover.
