@@ -24,13 +24,24 @@ def main() -> int:
     outer_namespace = bool(request.get("outer_namespace", False))
     timeout_ms = int(request["timeout_ms"])
     screenshot = Path(request["screenshot"])
-    executable = next((shutil.which(x) for x in ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable") if shutil.which(x)), None)
-    if not executable:
-        raise RuntimeError("no supported Chromium/Chrome executable on host")
     from playwright.sync_api import sync_playwright
     blocked: list[str] = []
     with sync_playwright() as p:
-        args=[
+        bundled = Path(p.chromium.executable_path)
+        system = next(
+            (shutil.which(x) for x in ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable") if shutil.which(x)),
+            None,
+        )
+        if bundled.is_file():
+            executable_path = None
+            browser_source = "playwright_bundled"
+        elif system:
+            executable_path = system
+            browser_source = "host_system"
+        else:
+            raise RuntimeError("no pre-provisioned Playwright Chromium or supported system Chromium/Chrome executable")
+
+        args = [
             "--disable-background-networking", "--disable-component-update",
             "--disable-sync", "--disable-extensions", "--no-first-run",
             "--host-resolver-rules=MAP * ~NOTFOUND",
@@ -41,22 +52,38 @@ def main() -> int:
                 raise RuntimeError("root browser worker requires outer namespace isolation")
             # Root exists only inside the dedicated user/PID/network namespace.
             args.extend(["--no-sandbox", "--disable-dev-shm-usage"])
-        browser = p.chromium.launch(headless=True, executable_path=executable, args=args)
+            sandbox_mode = "outer_namespace"
+            chromium_sandbox = False
+        else:
+            # Playwright disables Chromium sandboxing by default, so A5 opts in
+            # explicitly on the non-root portable path.
+            sandbox_mode = "native"
+            chromium_sandbox = True
+
+        browser = p.chromium.launch(
+            headless=True,
+            executable_path=executable_path,
+            args=args,
+            chromium_sandbox=chromium_sandbox,
+            timeout=timeout_ms,
+        )
         context = browser.new_context(accept_downloads=False, service_workers="block")
         page = context.new_page()
+
         def route_handler(route, req):
-            parsed=urlsplit(req.url)
+            parsed = urlsplit(req.url)
             if parsed.scheme in {"data", "blob", "about"}:
                 route.continue_()
                 return
             o = origin(req.url)
             blocked.append(o or f"scheme:{parsed.scheme or 'unknown'}")
             route.abort()
+
         page.route("**/*", route_handler)
         page.set_content(html, wait_until="load", timeout=timeout_ms)
         page.wait_for_timeout(100)
         screenshot.parent.mkdir(parents=True, exist_ok=True)
-        page.screenshot(path=str(screenshot), full_page=True)
+        page.screenshot(path=str(screenshot), full_page=True, timeout=timeout_ms)
         rendered = page.content().encode("utf-8")
         result = {
             "title": page.title()[:500],
@@ -64,7 +91,8 @@ def main() -> int:
             "rendered_bytes": len(rendered),
             "blocked_origins": sorted(set(blocked)),
             "offline_render": True,
-            "chromium_sandbox": "outer_namespace" if outer_namespace else "native",
+            "chromium_sandbox": sandbox_mode,
+            "browser_source": browser_source,
         }
         browser.close()
     sys.stdout.write(json.dumps(result, sort_keys=True))
