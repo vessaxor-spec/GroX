@@ -41,11 +41,18 @@ class SessionReasonerTest(unittest.TestCase):
         with self.assertRaises(ReasoningError):
             provider.interpret('Check the boundary', roster=[])
 
-    def test_host_failure_is_normalized(self):
-        def broken(directive, roster):
-            raise RuntimeError('host unavailable')
-        provider = SessionReasoningProvider(broken)
+    def test_recoverable_reasoning_error_remains_domain_error(self):
+        def unavailable(directive, roster):
+            raise ReasoningError('provider unavailable')
+        provider = SessionReasoningProvider(unavailable)
         with self.assertRaises(ReasoningError):
+            provider.interpret('Check the boundary', roster=[])
+
+    def test_unexpected_host_defect_is_not_normalized(self):
+        def broken(directive, roster):
+            raise RuntimeError('programming defect sentinel')
+        provider = SessionReasoningProvider(broken)
+        with self.assertRaisesRegex(RuntimeError, 'programming defect sentinel'):
             provider.interpret('Check the boundary', roster=[])
 
 
