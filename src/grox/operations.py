@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from .contracts import RiskClass, TourResult
-from .state import StateStore
+from .durable_state import DurableState
 
 _RECOVERABLE = {"crew_unavailable", "transient_failure", "TimeoutError", "blocker", "better_or_safer_path", "missing_capability"}
 _IRREVERSIBLE = {"irreversible_consequence", "mutation_state_diverged", "authority_violation"}
@@ -29,8 +29,8 @@ class ExecutiveExceptionLoop:
     runtime performs any approved consultation/replan as ordinary Mission Orders.
     """
 
-    def __init__(self, store: StateStore):
-        self.store = store
+    def __init__(self, durable: DurableState):
+        self.store = durable
 
     def decide(self, *, risk: RiskClass, result: TourResult, mutation: bool = False) -> ExceptionDecision:
         exc_type = str((result.exception or {}).get("type") or "unknown")
