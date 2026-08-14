@@ -21,6 +21,10 @@ class GatewayTest(unittest.TestCase):
             allowed_actions=allowed, scope=scope,
         )
 
+    @staticmethod
+    def inject_actions(order, actions):
+        object.__setattr__(order, "allowed_actions", tuple(actions))
+
     def test_path_escape_denied(self):
         order = self.order(MissionMode.inspect, ["fs_read"])
         with self.assertRaises(ToolDenied):
@@ -28,13 +32,13 @@ class GatewayTest(unittest.TestCase):
 
     def test_inspect_write_denied_even_if_listed(self):
         order = self.order(MissionMode.inspect, ["fs_read"])
-        order.allowed_actions.append("fs_write")  # simulate corrupted/deserialized grant
+        self.inject_actions(order, ["fs_read", "fs_write"])  # simulate corrupted/deserialized grant
         with self.assertRaises(ToolDenied):
             self.g.write_text(order, "x", "y")
 
     def test_execute_write_denied_even_if_grant_is_injected(self):
         order = self.order(MissionMode.execute, ["fs_read"])
-        order.allowed_actions.append("fs_write")  # defense-in-depth beyond MissionOrder validation
+        self.inject_actions(order, ["fs_read", "fs_write"])  # defense-in-depth beyond MissionOrder validation
         with self.assertRaisesRegex(ToolDenied, "explicit Repair authority"):
             self.g.write_text(order, "x", "y")
 
