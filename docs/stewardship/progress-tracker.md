@@ -24,7 +24,7 @@ Verified by source, qualification evidence, and automated testing:
 - independent verifier must differ from executor
 - interrupted Crew duty state recovers safely on restart
 - domain-routing contracts added for the expanded company
-- 46 automated contract/unit/integration tests passing
+- 55 automated contract/unit/integration tests passing
 - live Inspect Mission completed successfully
 - live medium-risk Repair Mission completed with independent verification
 
@@ -58,17 +58,18 @@ The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/Gr
 - GorXu cognition is project-hosted through GPT-5.6 Sol when a capable Space Exploration session is active; deterministic control remains the safe fallback when cognition is unavailable.
 - Tool Gateway exposes safe filesystem/list/test operations only; arbitrary shell, network, browser, and credential actuation remain disabled.
 - A3 episodic retrieval plus attributable semantic, procedural, and Vessel-wide memory are live with bounded selective retrieval; autonomous consolidation remains future evolution.
-- Durable Mission Graph nodes/events and crash-safe state exist, but exact idempotent mid-step workflow replay/resume is not yet implemented.
+- A4 durable Mission Graph resume, checkpointing, bounded cancellation/retry, and text-Repair compensation are live; broader external-system compensation remains limited by the intentionally narrow Tool Gateway.
+- Tool Gateway remains limited to bounded filesystem/test operations; shell, network, browser/computer-use, secret brokerage, and broader actuation remain A5 work.
 
 ## Apex Orchestrator readiness
 
 **Current status: NOT YET APEX**
 
-The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot, A2 Mission Graph Orchestration, and A3 Living Company Intelligence have qualified. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, bounded replanning, independent graph verification, attributable organizational memory, per-task Crew performance history, experienced routing, and bounded selective memory injection.
+The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot, A2 Mission Graph Orchestration, A3 Living Company Intelligence, and A4 Executive Exception Loop and Durable Operations have qualified. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, attributable organizational memory, experienced routing, bounded selective memory, same-Mission crash recovery, checkpointed execution, bounded executive consultation/replanning, cancellation, and journaled text-Repair compensation.
 
 The canonical evolution path is recorded in `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md`.
 
-Current critical path: **A4 - Executive Exception Loop and Durable Operations**. GorXu remains **NOT YET APEX** until later stages and the final gauntlet pass.
+Current critical path: **A5 - Governed Capability Expansion**. GorXu remains **NOT YET APEX** until later stages and the final gauntlet pass.
 
 ## Apex critical-path update - A1 Cognitive Pilot
 
@@ -109,7 +110,7 @@ A1 exit gate is closed; the current Apex stage is tracked below.
 - `configs/persistence/project-binding.json` records the active persistence bindings;
 - automated suite: **31 tests passing** after persistence-plane implementation.
 
-The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed; the current Apex critical path is A4 Executive Exception Loop and Durable Operations.
+The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed; the current Apex critical path is A5 Governed Capability Expansion.
 
 ## Durable source synchronization
 
@@ -216,4 +217,40 @@ A3 qualification evidence:
 
 **A3 exit gate: PASSED.** Repeated Missions measurably improve routing while per-tour context remains bounded.
 
-Current Apex stage: **A4 - Executive Exception Loop and Durable Operations**.
+## Apex critical-path update - A4 Executive Exception Loop and Durable Operations
+
+**Status: QUALIFIED**
+
+A4 qualification adds:
+
+- private `DurableState` graph-run, checkpoint, exception-decision, and mutation-journal records in the operational SQLite plane;
+- crash/reopen handling that marks in-flight Mission, Order, and graph-node state interrupted;
+- same-Mission resume from persisted graph state without replaying committed nodes;
+- a three-resume automatic bound plus existing node/Mission replan budgets;
+- real read-only Crew consultation and evidence before ordinary recoverable replans;
+- Commander escalation only for critical, irreversible, authority-divergent, or material-intent exceptions;
+- checkpoint-bound cancellation preventing later resume;
+- atomic supported `write_text` Repair with stable idempotency keys;
+- exact bounded rollback after failed Repair verification;
+- fail-closed handling when a journaled mutation target diverges externally;
+- timeout normalization into governed exception handling;
+- **55 automated tests passing**.
+
+A4 live qualification Mission: `MSN-a62e95886c0a`.
+
+Qualification evidence:
+
+- the A3 private checkpoint re-verified before activation;
+- exact independently qualified A4 branch source was materialized on the active flight computer;
+- SQLite schema migration completed with integrity `ok`;
+- `architect` completed and committed the first node before an injected process interruption occurred on `researcher`;
+- fresh Pilot reopen marked the Mission and in-flight research node interrupted;
+- resume count was **1** and the architecture Order count remained **1**, proving committed work was not replayed;
+- later injected `crew_unavailable` failures on the research and security paths produced **2** persisted exception decisions, each `consult_then_replan` with a real consultation Order;
+- neither ordinary failure required Commander escalation;
+- final synthesis recorded **2 replans**, **2 exceptions**, **1 resume**, and independent verification **PASS**;
+- private SQLite integrity remained `ok`.
+
+**A4 exit gate: PASSED.**
+
+Current Apex stage: **A5 - Governed Capability Expansion**.
