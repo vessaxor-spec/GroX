@@ -73,6 +73,25 @@ class MissionGraphIntegrationTests(unittest.TestCase):
             self.assertTrue(any(e['kind']=='pilot_synthesis' for e in mission['evidence']))
         finally: td.cleanup()
 
+    def test_graph_repair_requires_explicit_mutation_authority(self):
+        td,root,p=graph_vessel()
+        try:
+            directive='Repair a bounded Vessel file through a Mission Graph.'
+            plan={
+                'commander_intent':directive,
+                'objective':'Prove graph repair cannot self-authorize mutation.',
+                'nodes':[
+                    {'node_id':'repair','objective':'Repair a bounded file','mode':'repair','dependencies':[],
+                     'candidate_crew_ids':['backend-engineer'],'required_capabilities':['repo_read','repo_write'],
+                     'scope':['docs/x.txt'],'parameters':{'operation':'write_text','path':'docs/x.txt','content':'x'}},
+                ],
+            }
+            r=p.command_graph(directive,plan=plan,plan_source='test-cognition')
+            self.assertEqual(r['status'],'needs_pilot_decision')
+            self.assertIn('explicit Pilot mutation authorization',r['summary'])
+            self.assertFalse((root/'docs/x.txt').exists())
+        finally: td.cleanup()
+
     def test_injected_crew_failure_is_replanned_without_commander(self):
         td,root,p=graph_vessel()
         try:
