@@ -64,8 +64,8 @@ class ToolGateway:
             raise ToolDenied(f"action explicitly forbidden: {action}")
         if action not in order.allowed_actions:
             raise ToolDenied(f"action not granted by Mission Order: {action}")
-        if order.mode in {MissionMode.inspect, MissionMode.verify} and action in {"fs_write", "mcp_mutate"}:
-            raise ToolDenied(f"{order.mode.value} mode cannot mutate")
+        if action in {"fs_write", "mcp_mutate"} and order.mode is not MissionMode.repair:
+            raise ToolDenied(f"{action} requires explicit Repair authority")
 
     def _origin_grants(self, order: MissionOrder) -> frozenset[str]:
         raw = order.parameters.get("allowed_origins") or []
@@ -320,7 +320,7 @@ class ToolGateway:
             raise ToolDenied(f"MCP adapter is not pre-registered by host policy: {adapter}")
         if tool in spec.mutating_tools:
             self._allowed(order, "mcp_mutate")
-            if order.mode not in {MissionMode.execute, MissionMode.repair}:
+            if order.mode is not MissionMode.repair:
                 raise ToolDenied(f"{order.mode.value} mode cannot invoke mutating MCP tool")
         try:
             return self.mcp.call(
