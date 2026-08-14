@@ -1,0 +1,25 @@
+name: A4 Source Export
+
+on:
+  push:
+    branches:
+      - a4/durable-operations
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout A4 branch
+        uses: actions/checkout@v4
+      - name: Package exact branch source
+        run: tar --exclude=.git --exclude=configs/state -czf GroX-A4-source.tar.gz .
+      - name: Upload source artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: grox-a4-qualified-source
+          path: GroX-A4-source.tar.gz
+          retention-days: 1
