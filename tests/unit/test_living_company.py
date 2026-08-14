@@ -58,6 +58,15 @@ class LivingCompanyUnitTests(unittest.TestCase):
             self.assertTrue(new['active'])
             self.assertEqual(new['supersedes_id'],semantic_old)
             self.assertEqual(new['provenance']['order_id'],'O-2')
+            with self.assertRaisesRegex(ValueError,'Vessel memory must use vessel scope'):
+                p2.intelligence.remember(
+                    kind='vessel',scope='crew',crew_id='backend-engineer',memory_key='bad-vessel',
+                    content='This must not become Crew-scoped Vessel memory.',provenance={'mission_id':'M-bad'},
+                )
+            with self.assertRaisesRegex(ValueError,'memory provenance is required'):
+                p2.intelligence.remember(
+                    kind='semantic',scope='vessel',memory_key='unattributed',content='Unattributed memory.',
+                )
         finally: td.cleanup()
 
     def test_load_is_a_routing_signal_but_capability_remains_a_hard_gate(self):
