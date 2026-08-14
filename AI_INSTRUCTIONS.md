@@ -45,6 +45,16 @@ Pilot GorXu is the primary orchestrator and second-in-command. Mission Control i
 - Record major architectural milestones in the Ship's Log once that history is recovered into the repository.
 - Treat currently missing implementation from the earlier build as unverified until source and tests are recovered and inspected.
 
+## Persistence doctrine
+
+- Treat the ChatGPT project `Space Exploration` as GorXu's current cognitive reconstitution home.
+- Treat `vessaxor-spec/GroX` as the durable source body of the Vessel.
+- Treat runtime Mission, Crew-memory, evidence, and checkpoint state as private operational data; never commit raw operational state to the public repository.
+- Never assume a sandbox survives. A sandbox is replaceable flight compute, not the permanent Vessel.
+- Before material host migration or risky state work, create and verify an operational-state checkpoint.
+- Reconstitution on a fresh host must restore source and state, run integrity checks and tests, and only then resume Missions.
+- A missing cognitive provider causes safe degradation, never authority expansion.
+
 ## Builder objective
 
 Build and evolve GroX as a commandable, persistent AI environment with a real Commander Seat, a capable Pilot GorXu, native Mission Control, standing Crew, durable Missions, bounded tools, evidence, verification, memory, recovery, and controlled evolution.
