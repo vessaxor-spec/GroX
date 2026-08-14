@@ -47,16 +47,23 @@ def main() -> int:
             "--host-resolver-rules=MAP * ~NOTFOUND",
             "--proxy-server=http://127.0.0.1:9",
         ]
-        if os.geteuid() == 0:
+        outer_container = bool(request.get("outer_container", False))
+        if outer_container:
+            # The browser process is already inside the dedicated A5 Docker
+            # security boundary: non-root user, network=none, built-in seccomp,
+            # all capabilities dropped, no-new-privileges and read-only root.
+            # Chromium's nested Linux sandbox is therefore not the authority
+            # boundary on this path.
+            args.extend(["--no-sandbox", "--disable-dev-shm-usage"])
+            sandbox_mode = "outer_container"
+            chromium_sandbox = False
+        elif os.geteuid() == 0:
             if not outer_namespace:
                 raise RuntimeError("root browser worker requires outer namespace isolation")
-            # Root exists only inside the dedicated user/PID/network namespace.
             args.extend(["--no-sandbox", "--disable-dev-shm-usage"])
             sandbox_mode = "outer_namespace"
             chromium_sandbox = False
         else:
-            # Playwright disables Chromium sandboxing by default, so A5 opts in
-            # explicitly on the non-root portable path.
             sandbox_mode = "native"
             chromium_sandbox = True
 
