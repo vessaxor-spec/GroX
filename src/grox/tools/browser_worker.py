@@ -21,6 +21,7 @@ def origin(value: str) -> str:
 def main() -> int:
     request = json.loads(sys.stdin.read())
     html = str(request["html"])
+    outer_namespace = bool(request.get("outer_namespace", False))
     timeout_ms = int(request["timeout_ms"])
     screenshot = Path(request["screenshot"])
     executable = next((shutil.which(x) for x in ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable") if shutil.which(x)), None)
@@ -29,9 +30,16 @@ def main() -> int:
     from playwright.sync_api import sync_playwright
     blocked: list[str] = []
     with sync_playwright() as p:
-        args=["--disable-background-networking", "--disable-component-update", "--disable-sync", "--disable-extensions", "--no-first-run"]
+        args=[
+            "--disable-background-networking", "--disable-component-update",
+            "--disable-sync", "--disable-extensions", "--no-first-run",
+            "--host-resolver-rules=MAP * ~NOTFOUND",
+            "--proxy-server=http://127.0.0.1:9",
+        ]
         if os.geteuid() == 0:
-            # The worker already runs inside a dedicated user/PID/network namespace.
+            if not outer_namespace:
+                raise RuntimeError("root browser worker requires outer namespace isolation")
+            # Root exists only inside the dedicated user/PID/network namespace.
             args.extend(["--no-sandbox", "--disable-dev-shm-usage"])
         browser = p.chromium.launch(headless=True, executable_path=executable, args=args)
         context = browser.new_context(accept_downloads=False, service_workers="block")
@@ -56,6 +64,7 @@ def main() -> int:
             "rendered_bytes": len(rendered),
             "blocked_origins": sorted(set(blocked)),
             "offline_render": True,
+            "chromium_sandbox": "outer_namespace" if outer_namespace else "native",
         }
         browser.close()
     sys.stdout.write(json.dumps(result, sort_keys=True))

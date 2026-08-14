@@ -52,7 +52,9 @@ Host policy is source-controlled in `configs/tool-policy.json` where safe defaul
 
 `workspace_exec` does not run a Crew command in the Vessel root.
 
-The current Linux workspace path requires:
+The Tool Gateway selects one qualified host isolation backend and fails closed when neither is available.
+
+**Namespace backend, preferred when supported:**
 
 - a user namespace;
 - a PID namespace;
@@ -62,9 +64,21 @@ The current Linux workspace path requires:
 - CPU, address-space, file-size, and file-descriptor limits enforced with `prlimit`;
 - an external timeout owned by the Tool Gateway.
 
-The shell receives no host network. It cannot see normal host filesystem paths through the chroot. The workspace is deleted after normal completion. Mission evidence retains only bounded stdout/stderr, isolation metadata, output file paths, sizes, and hashes.
+**Docker backend, host-governed fallback:**
 
-If the host cannot provide the required isolation primitives, the capability is denied rather than downgraded to an unrestricted shell.
+- a host-policy image pinned by digest and pre-provisioned before the Mission;
+- `network=none`;
+- all Linux capabilities dropped;
+- `no-new-privileges`;
+- read-only container root;
+- PID, memory, CPU, file-size, and file-descriptor limits;
+- only the A5-private ephemeral `/work` directory bind-mounted writable;
+- no implicit image pull during Crew execution;
+- container removal and workspace deletion after the tour.
+
+Both backends deny normal host filesystem access and host networking. Mission evidence identifies the selected backend and retains only bounded stdout/stderr, isolation metadata, output file paths, sizes, and hashes.
+
+If the host cannot provide either qualified backend, the capability is denied rather than downgraded to an unrestricted shell.
 
 ## Secret broker
 
@@ -76,7 +90,7 @@ Mission Orders contain secret aliases, never secret values. A Crew member may re
 - the requested alias appears in the Order's `secret_grants`;
 - the private broker currently holds that alias.
 
-For the qualified workspace path, values are injected only into selected environment variables. Known secret values are redacted from captured stdout/stderr. Normal workspace teardown removes files created during the tour, preventing the workspace from becoming a durable secret store.
+For the qualified workspace path, values become only selected shell environment variables. Secret-bearing exports are delivered over the isolated shell's stdin rather than command argv, host process environment, or Docker `Config.Env`. Known secret values are redacted from captured stdout/stderr. Normal workspace teardown removes files created during the tour, preventing the workspace from becoming a durable secret store.
 
 Secret values are not written to Mission Orders, evidence records, Crew memory, or public source by the broker.
 
@@ -104,14 +118,16 @@ An Order cannot widen host origin policy.
 
 The browser does not receive independent network authority.
 
-`browser_capture` first retrieves the approved HTML through the same `net_fetch` origin gate. GroX then launches a real Chromium/Chrome browser through a Playwright worker inside a separate user, PID, and network namespace. The captured HTML is rendered offline. Browser-originated HTTP(S) requests are aborted and the OS network namespace supplies a second denial boundary.
+`browser_capture` first retrieves the approved HTML through the same `net_fetch` origin gate. GroX then renders that captured HTML offline in real Chromium/Chrome through Playwright. Browser-originated HTTP(S) requests are aborted.
+
+Where the host supports the full A5 namespace set, the browser worker also runs inside user, PID, and network namespaces. Where user namespaces are blocked but the process is non-root, GroX instead requires Chromium's native sandbox and adds deny-at-resolution and dead-proxy controls. A root host without the outer namespace boundary is denied. This keeps network authority in the Gateway rather than silently falling back to an unsandboxed root browser.
 
 Evidence includes:
 
 - approved source origin and response hash;
 - rendered-document hash;
 - screenshot path, size, and SHA-256;
-- browser namespace controls;
+- selected browser isolation controls and Chromium sandbox mode;
 - blocked origins observed during rendering.
 
 Browser evidence lives under the private `configs/state/browser/` path and is excluded from source control.
@@ -147,7 +163,7 @@ A5 evidence explicitly marks external content as untrusted where applicable.
 
 A5 is qualified only when a real controlled multi-tool Mission proves all of the following on a fresh host path:
 
-1. an eligible Crew member executes a shell tour inside the required namespace/chroot/resource boundary;
+1. an eligible Crew member executes a shell tour inside a qualified namespace/chroot or Docker isolation boundary with network denial and resource limits;
 2. an ephemeral secret alias is injected without its value appearing in durable Mission evidence;
 3. an exact host-and-Order-approved origin is fetched while an unapproved origin is denied;
 4. approved HTML is rendered by real headless Chromium/Chrome with browser networking disabled and screenshot/hash evidence captured;

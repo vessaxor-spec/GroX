@@ -17,7 +17,7 @@ from ..contracts import MissionOrder, MissionMode
 from .mcp import MCPAdapterSpec, MCPError, StdioMCPClient
 from .policy import GatewayPolicy, PolicyError, normalize_origin
 from .secrets import SecretBroker, SecretDenied
-from .workspace import IsolatedWorkspace, WorkspaceUnavailable
+from .workspace import IsolatedWorkspace, WorkspaceUnavailable, namespace_backend_available
 
 
 class ToolDenied(PermissionError):
@@ -228,6 +228,7 @@ class ToolGateway:
                     timeout_seconds=self.policy.workspace_timeout_seconds,
                     memory_bytes=self.policy.workspace_memory_bytes,
                     file_bytes=self.policy.workspace_file_bytes,
+                    docker_image=self.policy.workspace_docker_image,
                 )
             except WorkspaceUnavailable as exc:
                 raise ToolDenied(str(exc)) from exc
@@ -310,9 +311,26 @@ class ToolGateway:
                 "TERM": "dumb",
             }
             unshare = shutil.which("unshare")
-            if not unshare:
-                raise ToolDenied("browser capture requires user/PID/network namespace support")
-            argv = [unshare, "--user", "--map-root-user", "--pid", "--fork", "--net", sys.executable, "-m", "grox.tools.browser_worker"]
+            namespace_backend = bool(unshare and namespace_backend_available())
+            request["outer_namespace"] = namespace_backend
+            if namespace_backend:
+                argv = [unshare, "--user", "--map-root-user", "--pid", "--fork", "--net", sys.executable, "-m", "grox.tools.browser_worker"]
+                worker_identity = "user_namespace_root"
+                browser_isolation = [
+                    "user_namespace", "pid_namespace", "network_namespace",
+                    "playwright_request_abort", "offline_gateway_content",
+                ]
+            else:
+                if os.geteuid() == 0:
+                    raise ToolDenied(
+                        "browser capture requires either usable user/PID/network namespaces or a non-root host for the native Chromium sandbox"
+                    )
+                argv = [sys.executable, "-m", "grox.tools.browser_worker"]
+                worker_identity = f"host_uid:{os.geteuid()}"
+                browser_isolation = [
+                    "chromium_native_sandbox", "playwright_request_abort",
+                    "offline_gateway_content", "host_resolver_block", "dead_proxy",
+                ]
             proc = subprocess.Popen(
                 argv, text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 cwd=scratch, env=env, start_new_session=True,
@@ -348,8 +366,8 @@ class ToolGateway:
             "screenshot": str(screenshot.relative_to(self.root)),
             "screenshot_sha256": hashlib.sha256(shot).hexdigest(),
             "screenshot_bytes": len(shot),
-            "worker_identity": "user_namespace_root",
-            "browser_isolation": ["user_namespace", "pid_namespace", "network_namespace"],
+            "worker_identity": worker_identity,
+            "browser_isolation": browser_isolation,
             "browser_network": "disabled_after_gateway_fetch",
         })
         return result

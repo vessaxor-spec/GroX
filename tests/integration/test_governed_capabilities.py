@@ -12,10 +12,13 @@ import unittest
 from grox.contracts import RiskClass
 from grox.pilot import PilotGorXu
 from grox.tools.mcp import MCPAdapterSpec
+from grox.tools.policy import GatewayPolicy
+from grox.tools.workspace import docker_backend_available, namespace_backend_available
 from grox.tools.secrets import SecretBroker
 
 
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "mcp_echo_server.py"
+DOCKER_IMAGE = "alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc"
 
 
 class PageHandler(BaseHTTPRequestHandler):
@@ -34,7 +37,7 @@ def write_crew(root: Path, crew_id: str, division: str, caps: list[str], tags: l
 
 
 class GovernedCapabilityIntegrationTests(unittest.TestCase):
-    @unittest.skipUnless(shutil.which("unshare") and shutil.which("chroot"), "Linux namespace workspace required")
+    @unittest.skipUnless(namespace_backend_available() or docker_backend_available(DOCKER_IMAGE), "qualified A5 workspace isolation backend required")
     def test_real_multi_tool_mission_is_order_gated_evidenced_and_independently_verified(self):
         try:
             import playwright  # noqa: F401
@@ -58,6 +61,7 @@ class GovernedCapabilityIntegrationTests(unittest.TestCase):
             mcp_spec=MCPAdapterSpec(argv=(sys.executable,str(FIXTURE)),allowed_tools=frozenset({'echo'}))
             p=PilotGorXu(
                 root, reasoner=None, extra_allowed_origins=[origin],
+                gateway_policy=GatewayPolicy(allowed_origins=frozenset({origin}), workspace_docker_image=DOCKER_IMAGE),
                 secret_broker=SecretBroker({'qualification_token':secret_value}),
                 mcp_registry={'qualification':mcp_spec},
             )
@@ -116,11 +120,18 @@ class GovernedCapabilityIntegrationTests(unittest.TestCase):
             workspace=next(c for k,c in evidence if k=='workspace_execution')
             browser=next(c for k,c in evidence if k=='browser_capture')
             self.assertEqual(workspace['stdout'],'[REDACTED]')
-            self.assertIn('network_namespace',workspace['isolation'])
+            self.assertIn(workspace['isolation_backend'], {'namespace', 'docker'})
+            self.assertTrue(
+                'network_namespace' in workspace['isolation']
+                or 'docker_network_none' in workspace['isolation']
+            )
             self.assertFalse(workspace['workspace_retained'])
             self.assertTrue((root/browser['screenshot']).is_file())
             self.assertEqual(browser['browser_network'],'disabled_after_gateway_fetch')
-            self.assertIn('network_namespace',browser['browser_isolation'])
+            self.assertTrue(
+                'network_namespace' in browser['browser_isolation']
+                or 'chromium_native_sandbox' in browser['browser_isolation']
+            )
             self.assertIn('http://example.invalid',browser['blocked_origins'])
         finally:
             server.shutdown(); server.server_close(); td.cleanup()

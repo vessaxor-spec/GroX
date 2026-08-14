@@ -12,11 +12,13 @@ import unittest
 from grox.contracts import MissionMode, MissionOrder, RiskClass
 from grox.tools.gateway import ToolDenied, ToolGateway
 from grox.tools.mcp import MCPAdapterSpec
+from grox.tools.policy import GatewayPolicy
 from grox.tools.secrets import SecretBroker
 
 
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "mcp_echo_server.py"
 HAS_BROWSER = importlib.util.find_spec("playwright") is not None and any(shutil.which(x) for x in ("chromium", "chromium-browser", "google-chrome", "google-chrome-stable"))
+DOCKER_IMAGE = "alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc"
 
 
 class QuietHandler(BaseHTTPRequestHandler):
@@ -51,7 +53,7 @@ class GatewayV2Tests(unittest.TestCase):
 
     def test_workspace_is_chrooted_network_namespaced_and_secret_output_is_redacted(self):
         secret = "A5-DO-NOT-PERSIST"
-        gateway = ToolGateway(self.root, secret_broker=SecretBroker({"token": secret}))
+        gateway = ToolGateway(self.root, policy=GatewayPolicy(workspace_docker_image=DOCKER_IMAGE), secret_broker=SecretBroker({"token": secret}))
         order = self.order(
             actions=["workspace_exec", "secret_use"],
             parameters={"secret_grants": ["token"]},
@@ -65,14 +67,21 @@ class GatewayV2Tests(unittest.TestCase):
         self.assertEqual(result["stdout"], "[REDACTED]")
         self.assertNotIn(secret, result["stdout"])
         self.assertEqual(result["secret_aliases"], ["token"])
-        self.assertIn("network_namespace", result["isolation"])
-        self.assertIn("chroot", result["isolation"])
+        self.assertIn(result["isolation_backend"], {"namespace", "docker"})
+        if result["isolation_backend"] == "namespace":
+            self.assertIn("network_namespace", result["isolation"])
+            self.assertIn("chroot", result["isolation"])
+        else:
+            self.assertIn("docker_network_none", result["isolation"])
+            self.assertIn("capabilities_dropped", result["isolation"])
+            self.assertIn("no_new_privileges", result["isolation"])
+            self.assertIn("read_only_root", result["isolation"])
         self.assertFalse(result["workspace_retained"])
         self.assertFalse((self.root / "configs/state/workspaces" / result["workspace"]).exists())
         self.assertEqual(result["files"][0]["path"], "result.txt")
 
     def test_secret_alias_must_be_granted_by_order(self):
-        gateway = ToolGateway(self.root, secret_broker=SecretBroker({"token": "value"}))
+        gateway = ToolGateway(self.root, policy=GatewayPolicy(workspace_docker_image=DOCKER_IMAGE), secret_broker=SecretBroker({"token": "value"}))
         order = self.order(actions=["workspace_exec", "secret_use"], parameters={"secret_grants": []})
         with self.assertRaises(ToolDenied):
             gateway.workspace_shell(order, 'printf ok', secret_env={"TOKEN": "token"})
@@ -114,7 +123,10 @@ class GatewayV2Tests(unittest.TestCase):
             result = gateway.browser_capture(order, origin + "/")
             self.assertTrue(result["offline_render"])
             self.assertEqual(result["browser_network"], "disabled_after_gateway_fetch")
-            self.assertIn("network_namespace", result["browser_isolation"])
+            self.assertTrue(
+            "network_namespace" in result["browser_isolation"]
+            or "chromium_native_sandbox" in result["browser_isolation"]
+        )
             self.assertIn("http://example.invalid", result["blocked_origins"])
             shot = self.root / result["screenshot"]
             self.assertTrue(shot.is_file())

@@ -38,6 +38,7 @@ class GatewayPolicy:
     workspace_timeout_seconds: int = 15
     workspace_memory_bytes: int = 268_435_456
     workspace_file_bytes: int = 16_777_216
+    workspace_docker_image: str | None = None
 
     @classmethod
     def from_file(cls, path: Path, *, extra_allowed_origins: tuple[str, ...] | list[str] = ()) -> "GatewayPolicy":
@@ -63,4 +64,5 @@ class GatewayPolicy:
             workspace_timeout_seconds=max(1, min(int(workspace.get("timeout_seconds", 15)), 60)),
             workspace_memory_bytes=max(64 * 1024 * 1024, min(int(workspace.get("memory_bytes", 268_435_456)), 2 * 1024 * 1024 * 1024)),
             workspace_file_bytes=max(1 * 1024 * 1024, min(int(workspace.get("file_bytes", 16_777_216)), 256 * 1024 * 1024)),
+            workspace_docker_image=(str(workspace.get("docker_image") or "").strip() or None),
         )
