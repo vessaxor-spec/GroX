@@ -41,12 +41,40 @@ jobs:
             IMAGE='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
             docker pull "$IMAGE"
             docker run --rm --pull never --network none --cap-drop ALL --security-opt no-new-privileges --read-only --pids-limit 32 --memory 128m --memory-swap 128m --cpus 0.5 "$IMAGE" /bin/sh -c 'test ! -e /host && echo docker-isolation-ok'
+            WORK="$(mktemp -d)"
+            trap 'rm -rf "$WORK"' EXIT
+            docker run --rm -i --pull never \
+              --network none \
+              --cap-drop ALL \
+              --security-opt no-new-privileges \
+              --read-only \
+              --pids-limit 64 \
+              --memory 536870912 \
+              --memory-swap 536870912 \
+              --cpus 1.0 \
+              --ulimit fsize=16777216:16777216 \
+              --ulimit nofile=64:64 \
+              --mount "type=bind,src=$WORK,dst=/work,rw,bind-propagation=rprivate" \
+              --workdir /work \
+              --env HOME=/work \
+              --env TMPDIR=/work \
+              --env LANG=C \
+              --env LC_ALL=C \
+              "$IMAGE" /bin/sh -s <<'EOF'
+          set -eu
+          printf qualified > /work/canary
+          EOF
+            test "$(cat "$WORK/canary")" = qualified
+            echo docker-workspace-command-ok
             BACKEND=docker
           fi
           echo "A5_ISOLATION_BACKEND=$BACKEND" | tee -a "$GITHUB_ENV"
           test "$(id -u)" -ne 0 || test "$BACKEND" = namespace
       - name: Install Vessel with browser adapter
-        run: python -m pip install -e '.[browser]'
+        shell: bash
+        run: |
+          python -m pip install -e '.[browser]'
+          python -m playwright install chromium
       - name: Compile source and tests
         run: python -m compileall -q src tests
       - name: Run complete Vessel suite
