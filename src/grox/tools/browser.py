@@ -31,7 +31,6 @@ class BrowserRuntime:
         screenshot = capture_dir / "capture.png"
         with tempfile.TemporaryDirectory(prefix="grox-browser-") as td:
             scratch = Path(td)
-            os.chmod(scratch, 0o777)
             worker_shot = scratch / "capture.png"
             request = {
                 "html": html,
@@ -123,6 +122,10 @@ class BrowserRuntime:
             raise BrowserUnavailable(
                 "browser capture requires either usable user/PID/network namespaces or a pre-provisioned governed Docker browser image"
             )
+        if os.getuid() == 0:
+            raise BrowserUnavailable(
+                "Docker browser fallback requires a non-root host user so ephemeral scratch ownership remains host-recoverable"
+            )
         inspect = subprocess.run(
             [docker, "image", "inspect", "--format", "{{.Id}}", image],
             text=True,
@@ -141,7 +144,7 @@ class BrowserRuntime:
                 "--cap-drop", "ALL",
                 "--security-opt", "no-new-privileges",
                 "--security-opt", "seccomp=builtin",
-                "--user", "groxbrowser",
+                "--user", f"{os.getuid()}:{os.getgid()}",
                 "--read-only",
                 "--pids-limit", "256",
                 "--memory", "1073741824",
@@ -160,7 +163,7 @@ class BrowserRuntime:
             ],
             None,
             "docker",
-            "docker_user:groxbrowser",
+            f"docker_host_user:{os.getuid()}:{os.getgid()}",
             [
                 "docker_container", "docker_network_none", "capabilities_dropped",
                 "no_new_privileges", "read_only_root", "docker_builtin_seccomp",
