@@ -45,6 +45,18 @@ class StateStore:
         CREATE TABLE IF NOT EXISTS graph_events(
           id INTEGER PRIMARY KEY AUTOINCREMENT, mission_id TEXT NOT NULL, node_id TEXT,
           event_type TEXT NOT NULL, content TEXT NOT NULL, created_at TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS memories(
+          id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL, scope TEXT NOT NULL, crew_id TEXT,
+          task_class TEXT, memory_key TEXT NOT NULL, content TEXT NOT NULL, provenance TEXT NOT NULL,
+          confidence REAL NOT NULL, active INTEGER NOT NULL DEFAULT 1, supersedes_id INTEGER,
+          created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+        CREATE INDEX IF NOT EXISTS idx_memories_active_scope ON memories(active,scope,crew_id,kind,task_class);
+        CREATE TABLE IF NOT EXISTS crew_performance(
+          id INTEGER PRIMARY KEY AUTOINCREMENT, crew_id TEXT NOT NULL, mission_id TEXT NOT NULL,
+          order_id TEXT NOT NULL UNIQUE, task_class TEXT NOT NULL, status TEXT NOT NULL,
+          evidence_quality REAL NOT NULL, verified INTEGER, latency_ms REAL NOT NULL,
+          cost_units REAL NOT NULL, risk TEXT NOT NULL, created_at TEXT NOT NULL);
+        CREATE INDEX IF NOT EXISTS idx_crew_performance_task ON crew_performance(crew_id,task_class,created_at);
         ''')
         # Crash recovery: no Crew remains notionally on duty after process death.
         self.db.execute("UPDATE crew_state SET status='asleep' WHERE status='on_duty'")
@@ -200,3 +212,138 @@ class StateStore:
 
     def crew_states(self):
         return [dict(r) for r in self.db.execute("SELECT * FROM crew_state ORDER BY crew_id")]
+
+    def episodic_notes(self, crew_id: str, limit: int = 20) -> list[dict[str, Any]]:
+        row = self.db.execute("SELECT episodic_notes FROM crew_state WHERE crew_id=?", (crew_id,)).fetchone()
+        if not row:
+            return []
+        limit = max(0, int(limit))
+        if limit == 0:
+            return []
+        notes = json.loads(row['episodic_notes'])
+        return list(reversed(notes[-limit:]))
+
+    def remember(
+        self,
+        *,
+        kind: str,
+        scope: str,
+        crew_id: str | None,
+        task_class: str | None,
+        memory_key: str,
+        content: str,
+        provenance: dict[str, Any],
+        confidence: float = 1.0,
+    ) -> int:
+        if kind not in {'semantic', 'procedural', 'vessel'}:
+            raise ValueError(f"unsupported memory kind: {kind}")
+        if scope not in {'crew', 'vessel'}:
+            raise ValueError(f"unsupported memory scope: {scope}")
+        if scope == 'crew' and not crew_id:
+            raise ValueError("crew-scoped memory requires crew_id")
+        if scope == 'vessel':
+            crew_id = None
+        if not memory_key.strip() or not content.strip():
+            raise ValueError("memory_key and content are required")
+        confidence = float(confidence)
+        if not 0.0 <= confidence <= 1.0:
+            raise ValueError("memory confidence must be between 0 and 1")
+        prior = self.db.execute(
+            """SELECT id FROM memories WHERE active=1 AND kind=? AND scope=? AND COALESCE(crew_id,'')=COALESCE(?, '') AND memory_key=? ORDER BY id DESC LIMIT 1""",
+            (kind, scope, crew_id, memory_key),
+        ).fetchone()
+        t = now()
+        if prior:
+            self.db.execute("UPDATE memories SET active=0, updated_at=? WHERE id=?", (t, prior['id']))
+        cur = self.db.execute(
+            """INSERT INTO memories(kind,scope,crew_id,task_class,memory_key,content,provenance,confidence,active,supersedes_id,created_at,updated_at)
+               VALUES(?,?,?,?,?,?,?,?,1,?,?,?)""",
+            (kind, scope, crew_id, task_class, memory_key, content, json.dumps(provenance, sort_keys=True), confidence, prior['id'] if prior else None, t, t),
+        )
+        self.db.commit()
+        return int(cur.lastrowid)
+
+    def forget_memory(self, memory_id: int) -> None:
+        self.db.execute("UPDATE memories SET active=0, updated_at=? WHERE id=?", (now(), int(memory_id)))
+        self.db.commit()
+
+    def memories_for(self, crew_id: str, *, include_inactive: bool = False) -> list[dict[str, Any]]:
+        where_active = "" if include_inactive else "AND active=1"
+        rows = self.db.execute(
+            f"""SELECT * FROM memories
+                WHERE (scope='vessel' OR (scope='crew' AND crew_id=?)) {where_active}
+                ORDER BY active DESC, updated_at DESC, id DESC""",
+            (crew_id,),
+        ).fetchall()
+        out = []
+        for row in rows:
+            item = dict(row)
+            item['provenance'] = json.loads(item['provenance'])
+            item['active'] = bool(item['active'])
+            out.append(item)
+        return out
+
+    def record_performance(
+        self,
+        *,
+        crew_id: str,
+        mission_id: str,
+        order_id: str,
+        task_class: str,
+        status: str,
+        evidence_quality: float,
+        verified: bool | None,
+        latency_ms: float,
+        cost_units: float,
+        risk: str,
+    ) -> None:
+        self.db.execute(
+            """INSERT INTO crew_performance(crew_id,mission_id,order_id,task_class,status,evidence_quality,verified,latency_ms,cost_units,risk,created_at)
+               VALUES(?,?,?,?,?,?,?,?,?,?,?)
+               ON CONFLICT(order_id) DO UPDATE SET
+                 crew_id=excluded.crew_id, mission_id=excluded.mission_id, task_class=excluded.task_class,
+                 status=excluded.status, evidence_quality=excluded.evidence_quality, verified=COALESCE(excluded.verified,crew_performance.verified),
+                 latency_ms=excluded.latency_ms, cost_units=excluded.cost_units, risk=excluded.risk""",
+            (
+                crew_id, mission_id, order_id, task_class, status,
+                max(0.0, min(1.0, float(evidence_quality))), None if verified is None else int(bool(verified)),
+                max(0.0, float(latency_ms)), max(0.0, float(cost_units)), risk, now(),
+            ),
+        )
+        self.db.commit()
+
+    def mark_performance_verified(self, order_id: str, ok: bool) -> None:
+        self.db.execute("UPDATE crew_performance SET verified=? WHERE order_id=?", (int(bool(ok)), order_id))
+        self.db.commit()
+
+    def performance_history(self, crew_id: str, task_class: str | None = None) -> list[dict[str, Any]]:
+        if task_class is None:
+            rows = self.db.execute("SELECT * FROM crew_performance WHERE crew_id=? ORDER BY id", (crew_id,)).fetchall()
+        else:
+            rows = self.db.execute("SELECT * FROM crew_performance WHERE crew_id=? AND task_class=? ORDER BY id", (crew_id, task_class)).fetchall()
+        out = []
+        for row in rows:
+            item = dict(row)
+            item['verified'] = None if item['verified'] is None else bool(item['verified'])
+            out.append(item)
+        return out
+
+    def performance_summary(self, crew_id: str, task_class: str) -> dict[str, Any]:
+        rows = self.performance_history(crew_id, task_class)
+        if not rows:
+            return {
+                'samples': 0, 'success_rate': 0.0, 'evidence_quality': 0.0,
+                'verified_samples': 0, 'verification_rate': 0.0,
+                'latency_ms': 0.0, 'cost_units': 0.0,
+            }
+        samples = len(rows)
+        verified = [r for r in rows if r['verified'] is not None]
+        return {
+            'samples': samples,
+            'success_rate': sum(1 for r in rows if r['status'] == 'completed') / samples,
+            'evidence_quality': sum(float(r['evidence_quality']) for r in rows) / samples,
+            'verified_samples': len(verified),
+            'verification_rate': (sum(1 for r in verified if r['verified']) / len(verified)) if verified else 0.0,
+            'latency_ms': sum(float(r['latency_ms']) for r in rows) / samples,
+            'cost_units': sum(float(r['cost_units']) for r in rows) / samples,
+        }
