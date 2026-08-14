@@ -95,11 +95,11 @@ Verified in the live sandbox Vessel:
 
 **A1 status: SESSION-QUALIFIED.** The current ChatGPT GPT-5.6 Sol session acts as GorXu's cognitive provider. No API key, OAuth flow, or vendor CLI is required for this operating mode. If the hosting session is unavailable, GorXu degrades to the deterministic control plane rather than widening authority.
 
-Current critical path: **A2 - Mission Graph Orchestration**.
+A1 exit gate is closed; the current Apex stage is tracked below.
 
 ## Persistence foundation
 
-**Status: LOCKED AND IMPLEMED**
+**Status: LOCKED AND IMPLEMENTED**
 
 - cognitive continuity home: ChatGPT project `Space Exploration`;
 - Pilot identity: GorXu; preferred reasoning runtime: GPT-5.6 Sol / high reasoning;
