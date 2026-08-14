@@ -48,9 +48,10 @@ Authority may narrow as it travels downward. It may not widen without a new deci
 3. **Mission Control:** risk, authority, routing, verification, evidence, and advisory policy.
 4. **Standing Crew:** durable organizational identity with fresh mission-specific tours.
 5. **Tool Gateway:** deny-wins capability enforcement and host/Vessel confinement.
-6. **Mission Store:** durable Mission, Order, Evidence, and Crew state.
-7. **Verification:** independent verification path where policy requires it.
-8. **Persistence Manager:** private operational-state snapshots, integrity checking, and confirmation-gated restore.
+6. **Mission Store:** durable Mission, Order, Evidence, Crew, memory, and performance state.
+7. **Living Company Intelligence:** advisory memory retrieval and experienced eligible-Crew ranking under GorXu.
+8. **Verification:** independent verification path where policy requires it.
+9. **Persistence Manager:** private operational-state snapshots, integrity checking, and confirmation-gated restore.
 
 ## Standing Crew model
 
@@ -148,7 +149,9 @@ The target memory system separates:
 
 Memory must support provenance, relevance, consolidation, correction, and bounded forgetting.
 
-Current implementation provides episodic Crew continuity; the remaining memory planes are not yet complete.
+Current A3 implementation provides episodic retrieval plus durable semantic, procedural, and Vessel memory. Durable records require explicit provenance, confidence, scope, and keys; corrections supersede rather than silently rewrite prior active records; records can be deactivated for bounded forgetting. Retrieval is relevance-scored and capped by item/character budgets, with memory-plane diversity preserved where relevant.
+
+A3 also persists per-Crew/task-class performance observations and lets GorXu rank only otherwise-eligible Crew using competence, evidence quality, reliability, load, cost, latency, risk, and prior performance. Memory and performance remain advisory: they cannot grant capability, lower risk, authorize Repair, alter Commander intent, or bypass verifier independence. Autonomous memory consolidation is not yet implemented.
 
 ## Cognitive Pilot
 
