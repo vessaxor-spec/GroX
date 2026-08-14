@@ -51,3 +51,25 @@ class SessionReasonerTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+class SessionGraphReasonerTest(unittest.TestCase):
+    def test_session_graph_responder_is_validated(self):
+        directive='Coordinate a readiness graph'
+        def interpret(directive,roster):
+            return {
+                'commander_intent':directive,'objective':'readiness','ambiguous':False,
+                'ambiguities':[],'assumptions':[],'information_needs':[],
+                'candidate_crew_ids':['backend-engineer'],
+                'options':[{'name':'inspect','rationale':'inspect first','advantages':[],'risks':[],'crew_ids':['backend-engineer']}],
+                'recommended_option':'inspect','confidence':0.8,'proposed_mode':'inspect','proposed_risk':'low'
+            }
+        def graph(directive,roster):
+            return {
+                'commander_intent':directive,'objective':'readiness graph',
+                'nodes':[{'node_id':'inspect','objective':'inspect','mode':'inspect','dependencies':[],
+                          'candidate_crew_ids':['backend-engineer'],'required_capabilities':['repo_read'],'scope':['.']}]
+            }
+        provider=SessionReasoningProvider(interpret,graph_responder=graph)
+        plan=provider.plan_graph(directive,roster=[])
+        self.assertEqual(plan.commander_intent,directive)
+        self.assertEqual(plan.nodes[0].node_id,'inspect')

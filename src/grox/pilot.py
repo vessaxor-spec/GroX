@@ -10,6 +10,8 @@ from .runtime.executor import CrewExecutor
 from .mission_control.core import MissionControl
 from .verification.core import IndependentVerifier
 from .reasoning import ReasoningError, build_reasoner_from_env
+from .graph import MissionGraphPlan
+from .graph.runtime import MissionGraphRunner
 
 _AUTO = object()
 _RISK_RANK = {RiskClass.low:0, RiskClass.medium:1, RiskClass.high:2, RiskClass.critical:3}
@@ -116,6 +118,83 @@ class PilotGorXu:
         except Exception as e:
             self.store.update_mission(mission_id,'needs_pilot_decision',f"GorXu exception: {e}")
             return {'mission_id':mission_id,'mode':mode.value,'risk':risk.value,'status':'needs_pilot_decision','summary':f"GorXu exception: {e}",'exception':{'type':type(e).__name__,'message':str(e)},'cognition':brief.to_dict() if brief else None,'cognition_error':cognition_error}
+
+    def command_graph(
+        self,
+        directive: str,
+        *,
+        plan: MissionGraphPlan | dict | None = None,
+        risk: RiskClass | None = None,
+        allow_repair: bool = False,
+        plan_source: str | None = None,
+    ) -> dict:
+        """Execute a durable, dependency-aware multi-Crew Mission Graph.
+
+        The graph may be supplied by the active project cognition host or by a
+        reasoning provider implementing ``plan_graph``. GroX validates the
+        graph before execution; deterministic authority controls remain in
+        force regardless of plan source.
+        """
+        global_risk = self.mission_control.assess_risk(directive, risk)
+        mission_id = f"MSN-{uuid.uuid4().hex[:12]}"
+        self.store.create_mission(mission_id, directive, 'graph', global_risk.value)
+        try:
+            if plan is None:
+                planner = getattr(self.reasoner, 'plan_graph', None) if self.reasoner else None
+                if not callable(planner):
+                    raise ReasoningError('active cognitive provider does not supply Mission Graph planning')
+                plan = planner(directive, roster=self._roster_summary())
+            if isinstance(plan, dict):
+                plan = MissionGraphPlan.from_mapping(plan, expected_intent=directive)
+            if not isinstance(plan, MissionGraphPlan):
+                raise TypeError('plan must be a MissionGraphPlan or mapping')
+            if plan.commander_intent != directive:
+                raise ValueError('Mission Graph must preserve Commander intent verbatim')
+            plan.validate()
+
+            source = plan_source or (self.cognitive_status if self.reasoner else 'explicit-validated-plan')
+            self.store.add_evidence(
+                mission_id,
+                'GORXU-GRAPH-PLAN',
+                Evidence('mission_graph_plan', {'source': source, **plan.to_dict()}),
+            )
+            runner = MissionGraphRunner(
+                store=self.store, roster=self.roster, executor=self.executor,
+                mission_control=self.mission_control, verifier=self.verifier,
+            )
+            outcomes, synthesis = runner.run(
+                mission_id=mission_id, directive=directive, plan=plan,
+                global_risk=global_risk, allow_repair=allow_repair,
+            )
+            self.store.add_evidence(
+                mission_id,
+                'GORXU-SYNTHESIS',
+                Evidence('pilot_synthesis', synthesis.to_dict()),
+            )
+            self.store.update_mission(mission_id, synthesis.outcome, synthesis.executive_summary)
+            return {
+                'mission_id': mission_id,
+                'mode': 'graph',
+                'risk': global_risk.value,
+                'status': synthesis.outcome,
+                'summary': synthesis.executive_summary,
+                'plan_source': source,
+                'graph': plan.to_dict(),
+                'nodes': {node_id: outcome.to_dict() for node_id, outcome in outcomes.items()},
+                'synthesis': synthesis.to_dict(),
+            }
+        except Exception as exc:
+            summary = f"GorXu graph exception: {exc}"
+            self.store.add_graph_event(
+                mission_id, 'graph_exception',
+                {'type': type(exc).__name__, 'message': str(exc)},
+            )
+            self.store.update_mission(mission_id, 'needs_pilot_decision', summary)
+            return {
+                'mission_id': mission_id, 'mode': 'graph', 'risk': global_risk.value,
+                'status': 'needs_pilot_decision', 'summary': summary,
+                'exception': {'type': type(exc).__name__, 'message': str(exc)},
+            }
 
     def repair_write(self,path:str,content:str,*,risk:RiskClass|None=None,crew_id:str|None=None)->dict:
         return self.command(f"Repair {path} by writing Commander-approved content",mode=MissionMode.repair,risk=risk,crew_id=crew_id,scope=path,parameters={'operation':'write_text','path':path,'content':content})

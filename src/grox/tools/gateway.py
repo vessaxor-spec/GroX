@@ -49,5 +49,6 @@ class ToolGateway:
 
     def run_tests(self, order:MissionOrder):
         self._allowed(order,'test_run')
-        cp=subprocess.run(['python','-m','unittest','discover','-s','tests','-v'],cwd=self.root,text=True,capture_output=True,timeout=90)
+        timeout=max(1,min(90,int(order.parameters.get('_graph_max_seconds',90))))
+        cp=subprocess.run(['python','-m','unittest','discover','-s','tests','-v'],cwd=self.root,text=True,capture_output=True,timeout=timeout)
         return {"returncode":cp.returncode,"stdout":cp.stdout[-16000:],"stderr":cp.stderr[-16000:]}

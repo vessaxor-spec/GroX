@@ -47,6 +47,7 @@ def main(argv=None):
     sh=sp.add_parser('show'); sh.add_argument('mission_id')
     m=sp.add_parser('mission'); m.add_argument('directive'); m.add_argument('--mode',choices=[x.value for x in MissionMode]); m.add_argument('--risk',choices=[x.value for x in RiskClass]); m.add_argument('--crew'); m.add_argument('--scope',default='.')
     r=sp.add_parser('repair-write'); r.add_argument('path'); r.add_argument('content'); r.add_argument('--risk',choices=[x.value for x in RiskClass]); r.add_argument('--crew')
+    gm=sp.add_parser('graph-mission'); gm.add_argument('directive'); gm.add_argument('--plan',required=True); gm.add_argument('--risk',choices=[x.value for x in RiskClass]); gm.add_argument('--allow-repair',action='store_true'); gm.add_argument('--plan-source',default='commander-seat-plan')
     sn=sp.add_parser('snapshot'); sn.add_argument('--label'); sn.add_argument('--out')
     sv=sp.add_parser('verify-snapshot'); sv.add_argument('path')
     sr=sp.add_parser('restore-snapshot'); sr.add_argument('path'); sr.add_argument('--confirm',action='store_true')
@@ -67,5 +68,8 @@ def main(argv=None):
     elif ns.cmd=='show': dump(p.store.mission(ns.mission_id))
     elif ns.cmd=='mission': dump(p.command(ns.directive,mode=MissionMode(ns.mode) if ns.mode else None,risk=RiskClass(ns.risk) if ns.risk else None,crew_id=ns.crew,scope=ns.scope))
     elif ns.cmd=='repair-write': dump(p.repair_write(ns.path,ns.content,risk=RiskClass(ns.risk) if ns.risk else None,crew_id=ns.crew))
+    elif ns.cmd=='graph-mission':
+        plan=json.loads(Path(ns.plan).read_text())
+        dump(p.command_graph(ns.directive,plan=plan,risk=RiskClass(ns.risk) if ns.risk else None,allow_repair=ns.allow_repair,plan_source=ns.plan_source))
 
 if __name__=='__main__': main()

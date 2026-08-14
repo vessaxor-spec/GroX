@@ -1,0 +1,149 @@
+{
+  "commander_intent": "Qualify GorXu A2 by coordinating a multi-stage Vessel inspection across architecture, durable state, authority, security, and operations; independently verify the combined evidence and recover from one injected Crew failure without Commander intervention.",
+  "objective": "Prove durable Mission Graph orchestration across at least five Crew with parallel branches, dependencies, independent verification, Pilot synthesis, and bounded automatic replanning after a recoverable Crew failure.",
+  "rationale": "Start three independent inspection branches in parallel, converge architecture and authority into security review, recover durable-state inspection through an alternate Crew if the primary Crew becomes unavailable, then verify all converged evidence.",
+  "budget": {
+    "max_nodes": 12,
+    "max_parallel": 3,
+    "max_replans": 2
+  },
+  "nodes": [
+    {
+      "node_id": "architecture",
+      "objective": "Inspect GorXu, Mission Control, graph boundaries, and command architecture.",
+      "mode": "inspect",
+      "dependencies": [],
+      "candidate_crew_ids": [
+        "architect"
+      ],
+      "required_capabilities": [
+        "repo_read"
+      ],
+      "scope": [
+        "src/grox"
+      ],
+      "risk_class": "medium",
+      "budget": {
+        "max_attempts": 2,
+        "max_seconds": 120
+      }
+    },
+    {
+      "node_id": "durable-state",
+      "objective": "Inspect database reliability, durable Mission state, SQLite graph persistence, and recovery semantics.",
+      "mode": "inspect",
+      "dependencies": [],
+      "candidate_crew_ids": [
+        "database-reliability-engineer",
+        "distributed-systems-engineer"
+      ],
+      "required_capabilities": [
+        "repo_read"
+      ],
+      "scope": [
+        "src/grox/state.py"
+      ],
+      "risk_class": "high",
+      "budget": {
+        "max_attempts": 2,
+        "max_seconds": 120
+      }
+    },
+    {
+      "node_id": "authority",
+      "objective": "Inspect formal authority invariants, bounded delegation, and non-widening policy semantics.",
+      "mode": "inspect",
+      "dependencies": [],
+      "candidate_crew_ids": [
+        "formal-methods-engineer"
+      ],
+      "required_capabilities": [
+        "repo_read"
+      ],
+      "scope": [
+        "docs/specification"
+      ],
+      "risk_class": "high",
+      "budget": {
+        "max_attempts": 2,
+        "max_seconds": 120
+      }
+    },
+    {
+      "node_id": "security",
+      "objective": "Inspect Tool Gateway and authority boundaries for security regressions after graph orchestration.",
+      "mode": "inspect",
+      "dependencies": [
+        "architecture",
+        "authority"
+      ],
+      "candidate_crew_ids": [
+        "application-security-engineer"
+      ],
+      "required_capabilities": [
+        "repo_read"
+      ],
+      "scope": [
+        "src/grox/tools"
+      ],
+      "risk_class": "critical",
+      "budget": {
+        "max_attempts": 2,
+        "max_seconds": 120
+      }
+    },
+    {
+      "node_id": "operations",
+      "objective": "Inspect runtime operational readiness and recovery behavior after durable-state evidence is available.",
+      "mode": "inspect",
+      "dependencies": [
+        "durable-state"
+      ],
+      "candidate_crew_ids": [
+        "site-reliability-engineer"
+      ],
+      "required_capabilities": [
+        "repo_read"
+      ],
+      "scope": [
+        "src/grox"
+      ],
+      "risk_class": "high",
+      "budget": {
+        "max_attempts": 2,
+        "max_seconds": 120
+      }
+    },
+    {
+      "node_id": "verify",
+      "objective": "Independently verify the converged architecture, authority, security, state, and operations evidence and run the complete Vessel test suite.",
+      "mode": "verify",
+      "dependencies": [
+        "architecture",
+        "durable-state",
+        "authority",
+        "security",
+        "operations"
+      ],
+      "candidate_crew_ids": [
+        "code-reviewer",
+        "independent-verifier"
+      ],
+      "required_capabilities": [
+        "repo_read",
+        "verify"
+      ],
+      "scope": [
+        "."
+      ],
+      "risk_class": "high",
+      "parameters": {
+        "run_tests": true
+      },
+      "budget": {
+        "max_attempts": 2,
+        "max_seconds": 180
+      }
+    }
+  ]
+}

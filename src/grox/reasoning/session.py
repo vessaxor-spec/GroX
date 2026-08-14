@@ -5,32 +5,54 @@ from typing import Any
 
 from .base import ReasoningError
 from .contracts import MissionInterpretation
+from ..graph import MissionGraphPlan
 
 
 SessionResponder = Callable[[str, list[dict[str, Any]]], dict[str, Any]]
+GraphSessionResponder = Callable[[str, list[dict[str, Any]]], dict[str, Any]]
 
 
 class SessionReasoningProvider:
     """Bind GorXu cognition to the currently hosting reasoning session.
 
-    This adapter does not authenticate to an external model service. The host
-    supplies a responder callback for each live reasoning turn. GroX still
-    validates the returned structure and retains deterministic authority,
-    risk, tool, and verification controls.
+    The host may supply separate callbacks for A1 interpretation and A2 Mission
+    Graph planning. GroX validates both outputs and retains deterministic
+    authority, risk, tool, verification, and graph-budget controls.
     """
 
-    def __init__(self, responder: SessionResponder, *, name: str = "gpt-5.6-sol-session-high"):
+    def __init__(
+        self,
+        responder: SessionResponder,
+        *,
+        graph_responder: GraphSessionResponder | None = None,
+        name: str = "gpt-5.6-sol-session-high",
+    ):
         if not callable(responder):
             raise TypeError("responder must be callable")
+        if graph_responder is not None and not callable(graph_responder):
+            raise TypeError("graph_responder must be callable")
         self._responder = responder
+        self._graph_responder = graph_responder
         self.name = name
 
     def interpret(self, directive: str, *, roster: list[dict[str, Any]]) -> MissionInterpretation:
         try:
             raw = self._responder(directive, roster)
-        except Exception as exc:  # host boundary: normalize provider failures
+        except Exception as exc:
             raise ReasoningError(f"session reasoner failed: {exc}") from exc
         try:
             return MissionInterpretation.from_mapping(raw, expected_intent=directive)
         except (TypeError, ValueError) as exc:
             raise ReasoningError(f"invalid session reasoning output: {exc}") from exc
+
+    def plan_graph(self, directive: str, *, roster: list[dict[str, Any]]) -> MissionGraphPlan:
+        if self._graph_responder is None:
+            raise ReasoningError("session reasoner has no Mission Graph responder")
+        try:
+            raw = self._graph_responder(directive, roster)
+        except Exception as exc:
+            raise ReasoningError(f"session graph planner failed: {exc}") from exc
+        try:
+            return MissionGraphPlan.from_mapping(raw, expected_intent=directive)
+        except (TypeError, ValueError) as exc:
+            raise ReasoningError(f"invalid session Mission Graph output: {exc}") from exc
