@@ -40,7 +40,6 @@ class GatewayPolicy:
     workspace_file_bytes: int = 16_777_216
     workspace_docker_image: str | None = None
     browser_docker_image: str | None = None
-    browser_docker_seccomp_profile: str | None = None
 
     @classmethod
     def from_file(cls, path: Path, *, extra_allowed_origins: tuple[str, ...] | list[str] = ()) -> "GatewayPolicy":
@@ -68,5 +67,4 @@ class GatewayPolicy:
             workspace_file_bytes=max(1 * 1024 * 1024, min(int(workspace.get("file_bytes", 16_777_216)), 256 * 1024 * 1024)),
             workspace_docker_image=(str(workspace.get("docker_image") or "").strip() or None),
             browser_docker_image=(str(browser.get("docker_image") or "").strip() or None),
-            browser_docker_seccomp_profile=(str(browser.get("docker_seccomp_profile") or "").strip() or None),
         )
