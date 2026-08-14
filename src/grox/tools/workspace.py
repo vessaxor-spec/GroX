@@ -177,7 +177,7 @@ class IsolatedWorkspace:
             "--cpus", "1.0",
             "--ulimit", f"fsize={self.file_bytes}:{self.file_bytes}",
             "--ulimit", "nofile=64:64",
-            "--mount", f"type=bind,src={work},dst=/work,rw,bind-propagation=rprivate",
+            "--mount", f"type=bind,src={work},dst=/work,bind-propagation=rprivate",
             "--workdir", "/work",
             "--env", "HOME=/work",
             "--env", "TMPDIR=/work",
@@ -186,13 +186,16 @@ class IsolatedWorkspace:
             self.docker_image,
             "/bin/sh", "-s",
         ]
-        return subprocess.run(
+        cp = subprocess.run(
             argv,
             input=self._stdin_script(script, env),
             text=True,
             capture_output=True,
             timeout=self.timeout_seconds + 5,
         )
+        if cp.returncode == 125:
+            raise WorkspaceUnavailable(f"Docker workspace launch failed: {cp.stderr[-2000:]}")
+        return cp
 
     def run(self, mission_id: str, order_id: str, script: str, *, env: dict[str, str] | None = None) -> dict:
         if not isinstance(script, str) or not script.strip():
