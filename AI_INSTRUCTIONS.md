@@ -13,8 +13,6 @@ This repository defines the Vessel. Any AI builder, coding agent, reviewer, or m
 7. Existing code and tests
 8. Builder judgment
 
-Higher authority wins when instructions conflict.
-
 ## Canonical command spine
 
 **Commander → Pilot GorXu → Mission Control → Divisions → Standing Crew**
@@ -26,35 +24,22 @@ Pilot GorXu is the primary orchestrator and second-in-command. Mission Control i
 - Do not introduce an external orchestration system as architectural authority.
 - Do not create a second command spine parallel to GorXu.
 - Do not allow Crew to self-authorize, self-promote, widen scope, or mutate outside a Mission Order.
-- Do not conflate competence with authority. Knowing how to perform an action does not grant permission to perform it.
+- Do not conflate competence with authority.
 - Keep inspection and repair authority separate.
-- Crew encountering blockers, safer alternatives, better methods, missing capability, or elevated risk must stop the affected mutation and report to GorXu.
-- GorXu should resolve ordinary and reversible issues using Mission Control and relevant Crew. Escalate to the Commander only for critical, irreversible, or material intent-changing decisions.
-- Independent verification must remain independent from the executor when required by GroX policy.
-- Significant actions must produce evidence sufficient for audit and verification.
-- Tool access must be capability-gated and constrained to the current Mission Order.
-- Sleeping Crew are logically persistent identities, not necessarily persistent model processes. Fresh working context per tour is preferred over eternal chat context.
-- Recruitment creates durable standing Crew only after a real capability gap is established. Recruitment may not create an orchestration rival to GorXu.
-
-## Working rules
-
-- Recalibrate against repository truth before making material changes.
-- Prefer small, testable changes over speculative redesign.
-- Preserve strict file organization. Put every artifact in its canonical location.
-- Update the progress tracker when a material milestone changes project state.
-- Record major architectural milestones in the Ship's Log once that history is recovered into the repository.
-- Treat currently missing implementation from the earlier build as unverified until source and tests are recovered and inspected.
+- Crew exceptions return to GorXu.
+- GorXu resolves routine and reversible issues; escalate only critical, irreversible, or material intent-changing decisions.
+- Independent verification remains independent when required.
+- Significant actions produce evidence.
+- Tool access is capability-gated and constrained to the current Mission Order.
+- Sleeping Crew are logically persistent identities, not necessarily persistent model processes.
+- Recruitment may not create an orchestration rival to GorXu.
 
 ## Persistence doctrine
 
-- Treat the ChatGPT project `Space Exploration` as GorXu's current cognitive reconstitution home.
+- Treat `Space Exploration` as GorXu's current cognitive reconstitution home.
 - Treat `vessaxor-spec/GroX` as the durable source body of the Vessel.
-- Treat runtime Mission, Crew-memory, evidence, and checkpoint state as private operational data; never commit raw operational state to the public repository.
-- Never assume a sandbox survives. A sandbox is replaceable flight compute, not the permanent Vessel.
-- Before material host migration or risky state work, create and verify an operational-state checkpoint.
-- Reconstitution on a fresh host must restore source and state, run integrity checks and tests, and only then resume Missions.
+- Treat `configs/state/grox.sqlite3` and `.groxstate` archives as private operational state; never commit them to the public repository.
+- Never assume a sandbox survives. Before material host migration or risky state work, create and verify an operational snapshot.
+- Reconstitution on a fresh host must restore source and state, run integrity/tests, and only then resume Missions.
 - A missing cognitive provider causes safe degradation, never authority expansion.
 
-## Builder objective
-
-Build and evolve GroX as a commandable, persistent AI environment with a real Commander Seat, a capable Pilot GorXu, native Mission Control, standing Crew, durable Missions, bounded tools, evidence, verification, memory, recovery, and controlled evolution.

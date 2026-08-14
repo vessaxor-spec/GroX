@@ -1,0 +1,18 @@
+{
+  "crew_id": "independent-verifier",
+  "division": "verification",
+  "title": "Independent Verifier",
+  "capabilities": [
+    "repo_read",
+    "verify",
+    "test_run"
+  ],
+  "tags": [
+    "verify",
+    "verification",
+    "evidence",
+    "audit",
+    "test"
+  ],
+  "verification": true
+}

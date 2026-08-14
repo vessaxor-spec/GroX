@@ -16,7 +16,9 @@
     "role": "durable source of Vessel code, doctrine, Crew dossiers, tests and configuration"
   },
   "operational_state": {
+    "database": "configs/state/grox.sqlite3",
     "snapshot_format": "groxstate-v1",
+    "snapshot_directory": "configs/state/snapshots",
     "public_git_commit": false,
     "classification": "private_runtime_state",
     "role": "missions, orders, evidence, Crew operational continuity and recoverable runtime state"

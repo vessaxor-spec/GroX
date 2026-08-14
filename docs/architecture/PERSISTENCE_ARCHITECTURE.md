@@ -33,11 +33,19 @@ A sandbox is replaceable compute. It may run the Vessel, but it is not repositor
 
 Operational state includes Missions, Mission Orders, evidence, Crew tour state, episodic continuity, and future runtime memory/checkpoints.
 
-Operational state is **private runtime data**. It must not be committed raw to the public GitHub repository. GroX exports recoverable `.groxstate` snapshots whose archives are excluded from public Git.
+The live SQLite database is `configs/state/grox.sqlite3`.
 
-Each snapshot must contain a versioned manifest, integrity evidence, the Vessel source revision where available, and sufficient binding metadata to identify the project and source lineage.
+Operational state is **private runtime data**. It must not be committed raw to the public GitHub repository. GroX exports recoverable `.groxstate` snapshots under `configs/state/snapshots/`, which are ignored by Git.
 
-Restoration requires explicit confirmation and should create a pre-restore checkpoint before replacing live state.
+Each snapshot contains:
+
+- a consistent SQLite backup;
+- a versioned manifest;
+- SHA-256 integrity evidence;
+- the Vessel Git commit when available;
+- the cognitive/source binding metadata required to understand what the snapshot belongs to.
+
+Restoration requires explicit confirmation and creates a pre-restore checkpoint before replacing live state.
 
 ## Reconstitution protocol
 
