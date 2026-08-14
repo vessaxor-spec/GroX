@@ -96,8 +96,8 @@ class MissionGraphRunner:
                 raise GraphExecutionError(
                     f"graph node {spec.node_id} requested {action} without required Crew capability {capability}"
                 )
-            if action == "mcp_mutate" and spec.mode not in {MissionMode.execute, MissionMode.repair}:
-                raise GraphExecutionError(f"graph node {spec.node_id}: mutating MCP action requires execute/repair mode")
+            if action == "mcp_mutate" and spec.mode is not MissionMode.repair:
+                raise GraphExecutionError(f"graph node {spec.node_id}: mutating MCP action requires explicit Repair authority")
             actions.append(action)
         return list(dict.fromkeys(actions))
 
@@ -500,14 +500,14 @@ class MissionGraphRunner:
                     latency_ms = (perf_counter() - started_at[node_id]) * 1000.0
                     try:
                         result = future.result(timeout=spec.budget.max_seconds)
-                    except Exception as exc:  # scheduler boundary; normalized as transient runtime exception
+                    except TimeoutError as exc:
                         result = TourResult(
                             order.order_id,
                             order.assigned_crew,
                             "exception",
-                            f"Graph node runtime failure: {exc}",
+                            f"Graph node runtime timeout: {exc}",
                             [],
-                            {"type": type(exc).__name__, "message": str(exc)},
+                            {"type": "runtime_timeout", "message": str(exc)},
                         )
                     for ev in result.evidence:
                         self.store.add_evidence(mission_id, order.order_id, ev)
