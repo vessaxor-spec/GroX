@@ -159,3 +159,15 @@ GroX is incomplete without a usable Commander Seat. The Commander must be able t
 - review the Vessel's current condition.
 
 CLI may be the initial interface. Other interfaces can be added without changing the command architecture.
+
+## Persistence planes
+
+GroX separates continuity into three planes:
+
+1. **Cognitive continuity:** the ChatGPT project `Space Exploration` is the current reconstitution home for Pilot GorXu, Commander context, architecture decisions, and Apex trajectory. The active reasoning model occupies the Pilot seat when invoked; GorXu is not defined as one eternal model process.
+2. **Vessel source:** `vessaxor-spec/GroX` is the durable body for source code, doctrine, Crew dossiers, tests, source-controlled configuration, and institutional history.
+3. **Operational state:** Mission, evidence, Crew-tour, and runtime-memory state is private operational data. It is restored from verified private checkpoints rather than committed raw to the public source repository.
+
+The active sandbox or host is a replaceable flight computer, not the permanent Vessel. Reconstitution on a new host must restore verified source and state, run integrity checks and tests, reconstitute GorXu, and resume only from the last committed safe Mission state.
+
+The normative persistence and recovery design is defined in `docs/architecture/PERSISTENCE_ARCHITECTURE.md`.
