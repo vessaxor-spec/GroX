@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "cognitive_home": {
+    "type": "chatgpt_project",
+    "project": "Space Exploration",
+    "pilot_identity": "GorXu",
+    "preferred_runtime_model": "GPT-5.6 Sol",
+    "reasoning_profile": "high",
+    "role": "persistent cognitive context and reconstitution home",
+    "fallback": "deterministic GroX control plane"
+  },
+  "vessel_source": {
+    "type": "git",
+    "repository": "vessaxor-spec/GroX",
+    "branch": "main",
+    "role": "durable source of Vessel code, doctrine, Crew dossiers, tests and configuration"
+  },
+  "operational_state": {
+    "snapshot_format": "groxstate-v1",
+    "public_git_commit": false,
+    "classification": "private_runtime_state",
+    "role": "missions, orders, evidence, Crew operational continuity and recoverable runtime state"
+  },
+  "recovery_sequence": [
+    "restore project cognitive context and Pilot identity",
+    "materialize the latest verified Vessel source from GitHub",
+    "restore the latest verified private operational-state snapshot",
+    "run Vessel integrity and automated tests",
+    "reconstitute Pilot GorXu on the active reasoning model",
+    "resume only from the last committed safe Mission state"
+  ]
+}
