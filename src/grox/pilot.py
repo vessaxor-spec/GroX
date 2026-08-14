@@ -1,8 +1,9 @@
 from __future__ import annotations
 from pathlib import Path
 from typing import Any
+from time import perf_counter
 import uuid
-from .contracts import MissionOrder, MissionMode, RiskClass, Evidence
+from .contracts import MissionOrder, MissionMode, RiskClass, Evidence, TourResult
 from .state import StateStore
 from .crew.roster import CrewRoster
 from .tools.gateway import ToolGateway
@@ -12,6 +13,7 @@ from .verification.core import IndependentVerifier
 from .reasoning import ReasoningError, build_reasoner_from_env
 from .graph import MissionGraphPlan
 from .graph.runtime import MissionGraphRunner
+from .intelligence import LivingCompanyIntelligence
 
 _AUTO = object()
 _RISK_RANK = {RiskClass.low:0, RiskClass.medium:1, RiskClass.high:2, RiskClass.critical:3}
@@ -26,6 +28,7 @@ class PilotGorXu:
         self.gateway=ToolGateway(self.root)
         self.executor=CrewExecutor(self.gateway)
         self.verifier=IndependentVerifier()
+        self.intelligence=LivingCompanyIntelligence(self.store,self.roster)
         self.reasoner=build_reasoner_from_env() if reasoner is _AUTO else reasoner
 
     @property
@@ -62,14 +65,12 @@ class PilotGorXu:
         proposed=RiskClass(brief.proposed_risk)
         return proposed if _RISK_RANK[proposed] > _RISK_RANK[policy] else policy
 
-    def _select_crew(self,directive:str,required:list[str],crew_id:str|None,brief):
-        if crew_id: return self.roster.get(crew_id)
-        if brief:
-            for cid in brief.candidate_crew_ids:
-                try: candidate=self.roster.get(cid)
-                except KeyError: continue
-                if set(required).issubset(candidate.capabilities): return candidate
-        return self.roster.select(directive,required)
+    def _select_crew(self,directive:str,required:list[str],crew_id:str|None,brief,risk:RiskClass):
+        if crew_id:
+            return self.roster.get(crew_id), None
+        preferred=brief.candidate_crew_ids if brief else []
+        decision=self.intelligence.route(directive,required,risk=risk,preferred_ids=preferred)
+        return decision.crew, decision
 
     def command(self, directive:str, *, mode:MissionMode|None=None, risk:RiskClass|None=None, crew_id:str|None=None, scope:str='.', parameters:dict|None=None)->dict:
         brief,cognition_error=self._interpret(directive)
@@ -78,7 +79,7 @@ class PilotGorXu:
         mission_id=f"MSN-{uuid.uuid4().hex[:12]}"; self.store.create_mission(mission_id,directive,mode.value,risk.value)
         req=self._required_caps(mode)
         try:
-            crew=self._select_crew(directive,req,crew_id,brief)
+            crew,routing=self._select_crew(directive,req,crew_id,brief,risk)
             if not set(req).issubset(crew.capabilities): raise LookupError(f"Crew {crew.crew_id} lacks required capabilities {req}")
             actions=self.mission_control.default_actions(mode)
             objective=brief.objective if brief else directive
@@ -86,28 +87,47 @@ class PilotGorXu:
                 forbidden_actions=[] if mode is MissionMode.repair else ['fs_write'],scope=[scope],risk_class=risk,
                 verification_requirements=['independent'] if self.mission_control.verification_required(mode,risk) else [],
                 stop_conditions=['blocker','better_or_safer_path','missing_capability','elevated_risk','scope_change','irreversible_consequence'],parameters=parameters or {})
+            memory_meta=self.intelligence.inject_order_context(order,objective)
             self.store.save_order(order)
+            self.store.add_evidence(mission_id,order.order_id,Evidence('routing_decision',routing.to_dict() if routing else {
+                'source':'explicit_crew_assignment','crew_id':crew.crew_id,'task_class':memory_meta['task_class']}))
+            self.store.add_evidence(mission_id,order.order_id,Evidence('memory_selection',memory_meta))
             if brief:
                 self.store.add_evidence(mission_id,order.order_id,Evidence('cognitive_plan',{'provider':self.cognitive_status,**brief.to_dict()}))
             if cognition_error:
                 self.store.add_evidence(mission_id,order.order_id,Evidence('cognition_degraded',{'provider':self.cognitive_status,'error':cognition_error,'fallback':'deterministic control plane'}))
             self.store.crew_on_duty(crew.crew_id,mission_id); self.store.update_order(order.order_id,'running')
+            started=perf_counter()
             result=self.executor.execute(order)
+            elapsed_ms=(perf_counter()-started)*1000.0
             for ev in result.evidence: self.store.add_evidence(mission_id,order.order_id,ev)
             self.store.update_order(order.order_id,result.status); self.store.crew_sleep(crew.crew_id,mission_id,result.summary)
 
             verification=None
             if result.status=='completed' and self.mission_control.verification_required(mode,risk):
-                vcrew=self.roster.select(f"verify {directive}",['repo_read','verify'],exclude=[crew.crew_id],verifier=True)
+                vrouting=self.intelligence.route(f"verify {directive}",['repo_read','verify'],exclude=[crew.crew_id],verifier=True,risk=risk)
+                vcrew=vrouting.crew
                 vorder=MissionOrder.new(mission_id,directive,f"Independently verify order {order.order_id}",MissionMode.verify,vcrew.crew_id,
                     required_capabilities=['repo_read','verify'],allowed_actions=['fs_list','fs_read','test_run'],forbidden_actions=['fs_write'],scope=[scope],risk_class=risk,parent_order_id=order.order_id)
-                self.store.save_order(vorder); self.store.crew_on_duty(vcrew.crew_id,mission_id); self.store.update_order(vorder.order_id,'running')
+                vmemory=self.intelligence.inject_order_context(vorder,vorder.objective)
+                self.store.save_order(vorder)
+                self.store.add_evidence(mission_id,vorder.order_id,Evidence('routing_decision',vrouting.to_dict()))
+                self.store.add_evidence(mission_id,vorder.order_id,Evidence('memory_selection',vmemory))
+                self.store.crew_on_duty(vcrew.crew_id,mission_id); self.store.update_order(vorder.order_id,'running')
+                vstarted=perf_counter()
                 ok,msg=self.verifier.verify(crew.crew_id,vcrew.crew_id,result)
+                vlatency_ms=(perf_counter()-vstarted)*1000.0
                 vev=Evidence('independent_verification',{'ok':ok,'message':msg,'executor':crew.crew_id,'verifier':vcrew.crew_id})
                 self.store.add_evidence(mission_id,vorder.order_id,vev); self.store.update_order(vorder.order_id,'completed' if ok else 'exception'); self.store.crew_sleep(vcrew.crew_id,mission_id,msg)
                 verification={'ok':ok,'message':msg,'verifier':vcrew.crew_id,'order_id':vorder.order_id}
+                vresult=TourResult(vorder.order_id,vcrew.crew_id,'completed' if ok else 'exception',msg,[vev],None if ok else {'type':'verification_failure'})
+                self.intelligence.record_performance(crew_id=vcrew.crew_id,mission_id=mission_id,order_id=vorder.order_id,task_class=vorder.parameters['_task_class'],result=vresult,latency_ms=vlatency_ms,risk=risk,verified=None)
                 if not ok: result.status='exception'
 
+            self.intelligence.record_performance(
+                crew_id=crew.crew_id,mission_id=mission_id,order_id=order.order_id,task_class=order.parameters['_task_class'],
+                result=result,latency_ms=elapsed_ms,risk=risk,verified=verification['ok'] if verification else None,
+            )
             summary=f"GorXu: {result.summary}"
             if brief: summary += f" | Cognitive strategy: {brief.recommended_option or 'structured interpretation'} ({brief.confidence:.2f})"
             if cognition_error: summary += " | Cognitive provider degraded; deterministic fallback used"
@@ -160,7 +180,7 @@ class PilotGorXu:
             )
             runner = MissionGraphRunner(
                 store=self.store, roster=self.roster, executor=self.executor,
-                mission_control=self.mission_control, verifier=self.verifier,
+                mission_control=self.mission_control, verifier=self.verifier, intelligence=self.intelligence,
             )
             outcomes, synthesis = runner.run(
                 mission_id=mission_id, directive=directive, plan=plan,

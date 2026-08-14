@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import replace
+from time import perf_counter
 from typing import Any
 
 from ..contracts import Evidence, MissionMode, MissionOrder, RiskClass, TourResult
@@ -10,6 +11,7 @@ from ..mission_control.core import MissionControl
 from ..runtime.executor import CrewExecutor
 from ..state import StateStore
 from ..verification.core import IndependentVerifier
+from ..intelligence import LivingCompanyIntelligence, RoutingDecision
 from .contracts import GraphNodeOutcome, GraphNodeSpec, MissionGraphPlan, PilotSynthesis
 
 _RISK_RANK = {RiskClass.low: 0, RiskClass.medium: 1, RiskClass.high: 2, RiskClass.critical: 3}
@@ -36,12 +38,14 @@ class MissionGraphRunner:
         executor: CrewExecutor,
         mission_control: MissionControl,
         verifier: IndependentVerifier,
+        intelligence: LivingCompanyIntelligence,
     ):
         self.store = store
         self.roster = roster
         self.executor = executor
         self.mission_control = mission_control
         self.verifier = verifier
+        self.intelligence = intelligence
 
     def _effective_risk(self, global_risk: RiskClass, node_risk: RiskClass) -> RiskClass:
         return node_risk if _RISK_RANK[node_risk] > _RISK_RANK[global_risk] else global_risk
@@ -52,24 +56,16 @@ class MissionGraphRunner:
             required.append("verify")
         return required
 
-    def _select_crew(self, spec: GraphNodeSpec, *, exclude: set[str], dependency_crew: set[str]) -> CrewDossier:
+    def _select_crew(self, spec: GraphNodeSpec, *, exclude: set[str], dependency_crew: set[str], risk: RiskClass) -> RoutingDecision:
         required = self._required_caps(spec)
         verifier = spec.mode is MissionMode.verify
         excluded = set(exclude)
         if verifier:
             excluded |= dependency_crew
-        for crew_id in spec.candidate_crew_ids:
-            if crew_id in excluded:
-                continue
-            try:
-                crew = self.roster.get(crew_id)
-            except KeyError:
-                continue
-            if verifier and not crew.verification:
-                continue
-            if set(required).issubset(crew.capabilities):
-                return crew
-        return self.roster.select(spec.objective, required, exclude=excluded, verifier=verifier)
+        return self.intelligence.route(
+            spec.objective, required, exclude=excluded, verifier=verifier, risk=risk,
+            preferred_ids=spec.candidate_crew_ids,
+        )
 
     def _allowed_actions(self, spec: GraphNodeSpec) -> list[str]:
         actions = self.mission_control.default_actions(spec.mode)
@@ -176,6 +172,7 @@ class MissionGraphRunner:
         used_crew: set[str],
         replan_count: int,
         plan: MissionGraphPlan,
+        global_risk: RiskClass,
     ) -> tuple[str | None, int]:
         exc_type = (failed_result.exception or {}).get("type")
         if exc_type not in _RECOVERABLE_EXCEPTIONS:
@@ -189,11 +186,13 @@ class MissionGraphRunner:
             return None, replan_count
 
         try:
-            replacement = self._select_crew(
+            replacement_decision = self._select_crew(
                 failed_spec,
                 exclude={failed_outcome.crew_id},
                 dependency_crew=set(),
+                risk=self._effective_risk(global_risk, failed_spec.risk_class),
             )
+            replacement = replacement_decision.crew
         except LookupError:
             return None, replan_count
 
@@ -297,7 +296,9 @@ class MissionGraphRunner:
                 spec = specs[node_id]
                 dependency_crew = {outcomes[d].crew_id for d in spec.dependencies if d in outcomes}
                 try:
-                    crew = self._select_crew(spec, exclude=batch_crew, dependency_crew=dependency_crew)
+                    effective_risk = self._effective_risk(global_risk, spec.risk_class)
+                    routing = self._select_crew(spec, exclude=batch_crew, dependency_crew=dependency_crew, risk=effective_risk)
+                    crew = routing.crew
                 except LookupError as exc:
                     statuses[node_id] = "exception"
                     self.store.update_graph_node(mission_id, node_id, "exception", attempt=attempts[node_id])
@@ -307,7 +308,10 @@ class MissionGraphRunner:
                 used_crew.add(crew.crew_id)
                 parent_order = outcomes[spec.dependencies[-1]].order_id if spec.dependencies and spec.dependencies[-1] in outcomes else None
                 order = self._make_order(mission_id, directive, spec, crew, global_risk, parent_order)
+                memory_meta = self.intelligence.inject_order_context(order, spec.objective)
                 self.store.save_order(order)
+                self.store.add_evidence(mission_id, order.order_id, Evidence("routing_decision", routing.to_dict()))
+                self.store.add_evidence(mission_id, order.order_id, Evidence("memory_selection", memory_meta))
                 self.store.crew_on_duty(crew.crew_id, mission_id)
                 self.store.update_order(order.order_id, "running")
                 self.store.update_graph_node(
@@ -324,12 +328,15 @@ class MissionGraphRunner:
             if unresolved_reason:
                 break
             futures = {}
+            started_at: dict[str, float] = {}
             with ThreadPoolExecutor(max_workers=max(1, len(prepared))) as pool:
                 for node_id, (spec, order, dep_results) in prepared.items():
+                    started_at[node_id] = perf_counter()
                     futures[pool.submit(self._execute_prepared, spec, order, dep_results)] = node_id
                 for future in as_completed(futures):
                     node_id = futures[future]
                     spec, order, _ = prepared[node_id]
+                    latency_ms = (perf_counter() - started_at[node_id]) * 1000.0
                     try:
                         result = future.result(timeout=spec.budget.max_seconds)
                     except Exception as exc:  # scheduler boundary; normalized as transient runtime exception
@@ -357,6 +364,17 @@ class MissionGraphRunner:
                     )
                     outcomes[node_id] = outcome
                     tour_results[node_id] = result
+                    self.intelligence.record_performance(
+                        crew_id=order.assigned_crew, mission_id=mission_id, order_id=order.order_id,
+                        task_class=order.parameters.get("_task_class", self.intelligence.task_class(spec.objective)),
+                        result=result, latency_ms=latency_ms, risk=order.risk_class, verified=None,
+                    )
+                    if spec.mode is MissionMode.verify:
+                        for evidence in result.evidence:
+                            if evidence.kind != "graph_verification":
+                                continue
+                            for check in evidence.content.get("checks", []):
+                                self.intelligence.mark_verified(check["order_id"], bool(check["ok"]))
                     if result.status == "completed":
                         statuses[node_id] = "completed"
                         self.store.update_graph_node(mission_id, node_id, "completed")
@@ -380,6 +398,7 @@ class MissionGraphRunner:
                         used_crew=used_crew,
                         replan_count=replan_count,
                         plan=plan,
+                        global_risk=global_risk,
                     )
                     if replacement_id is None:
                         unresolved_reason = f"node {node_id} failed: {(result.exception or {}).get('type', 'unknown')}"

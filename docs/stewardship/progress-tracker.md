@@ -24,7 +24,7 @@ Verified by source, qualification evidence, and automated testing:
 - independent verifier must differ from executor
 - interrupted Crew duty state recovers safely on restart
 - domain-routing contracts added for the expanded company
-- 40 automated contract/unit/integration tests passing
+- 46 automated contract/unit/integration tests passing
 - live Inspect Mission completed successfully
 - live medium-risk Repair Mission completed with independent verification
 
@@ -57,18 +57,18 @@ The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/Gr
 
 - GorXu cognition is project-hosted through GPT-5.6 Sol when a capable Space Exploration session is active; deterministic control remains the safe fallback when cognition is unavailable.
 - Tool Gateway exposes safe filesystem/list/test operations only; arbitrary shell, network, browser, and credential actuation remain disabled.
-- Episodic Crew continuity is live; semantic, procedural, and Vessel-wide memory planes are not yet implemented.
+- A3 episodic retrieval plus attributable semantic, procedural, and Vessel-wide memory are live with bounded selective retrieval; autonomous consolidation remains future evolution.
 - Durable Mission Graph nodes/events and crash-safe state exist, but exact idempotent mid-step workflow replay/resume is not yet implemented.
 
 ## Apex Orchestrator readiness
 
 **Current status: NOT YET APEX**
 
-The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot and A2 Mission Graph Orchestration have qualified. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, parallel scheduling, bounded replanning for recoverable Crew/runtime failure, independent graph verification, and Pilot-owned structural synthesis.
+The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot, A2 Mission Graph Orchestration, and A3 Living Company Intelligence have qualified. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, bounded replanning, independent graph verification, attributable organizational memory, per-task Crew performance history, experienced routing, and bounded selective memory injection.
 
 The canonical evolution path is recorded in `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md`.
 
-Current critical path: **A3 - Living Company Intelligence**. GorXu remains **NOT YET APEX** until later stages and the final gauntlet pass.
+Current critical path: **A4 - Executive Exception Loop and Durable Operations**. GorXu remains **NOT YET APEX** until later stages and the final gauntlet pass.
 
 ## Apex critical-path update - A1 Cognitive Pilot
 
@@ -109,7 +109,7 @@ A1 exit gate is closed; the current Apex stage is tracked below.
 - `configs/persistence/project-binding.json` records the active persistence bindings;
 - automated suite: **31 tests passing** after persistence-plane implementation.
 
-The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed; the current Apex critical path is A3 Living Company Intelligence.
+The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed; the current Apex critical path is A4 Executive Exception Loop and Durable Operations.
 
 ## Durable source synchronization
 
@@ -159,7 +159,7 @@ Qualification evidence:
 
 **A2 exit gate: PASSED.**
 
-Current Apex stage: **A3 - Living Company Intelligence**.
+A2 exit gate is closed; A3 qualification is recorded below.
 
 ## Fresh-session reconstitution and source-integrity recovery
 
@@ -180,3 +180,40 @@ Recovery evidence:
 - the Roadmap was reconciled from stale A2 wording to the actual current stage, A3 Living Company Intelligence.
 
 The recovery repairs restore the qualified A2 baseline; they do not implement A3.
+
+## Apex critical-path update - A3 Living Company Intelligence
+
+**Status: QUALIFIED**
+
+A3 turns Standing Crew from static capability matching into an experienced organization while preserving GorXu as sole orchestrator and keeping authority deterministic.
+
+Implemented and verified:
+
+- existing episodic Crew notes are selectively retrievable;
+- durable semantic, procedural, and Vessel memory records are persisted in private SQLite state;
+- durable memory requires explicit provenance and confidence and supports supersession/correction plus bounded forgetting by deactivation;
+- Vessel memory is constrained to Vessel scope;
+- per-Crew/task-class performance history records outcome, evidence quality, verification, observed latency, attributable cost units, and risk;
+- experienced routing ranks only otherwise-eligible Crew using competence, evidence quality, reliability, load, cost, latency, risk, experience, and bounded validated-candidate preference;
+- capability requirements and verifier independence remain hard gates;
+- each Mission Order receives only a capped relevant-memory slice: at most six items and 3000 content characters by default;
+- memory retrieval preserves relevant memory-plane diversity rather than allowing one large class to crowd out all others;
+- single Missions and Mission Graph nodes use the same Living Company routing/memory service;
+- routing and selected-memory metadata are persisted as Mission evidence;
+- **46 automated tests pass**.
+
+A3 qualification evidence:
+
+- repeated equivalent Missions in a controlled qualification Vessel began with tied eligible backend Crew;
+- an injected failure was recorded for the initial Crew while equivalent successful Missions were recorded for the alternate Crew;
+- the subsequent automatic Mission routed to the better-evidenced eligible Crew;
+- 20 deliberately unrelated memories plus relevant semantic/procedural/Vessel memories were added, yet the selected tour context remained within six items / 3000 characters and excluded unrelated marketing content;
+- graph qualification proved experienced routing, memory injection, performance recording, and independent verification use the same service;
+- fresh GitHub-hosted Ubuntu 24.04 / Python 3.12 qualification passed **46/46** tests on A3 head `21195ca7b758bd7602874911ee6ee6a5ee36b480`;
+- live private-Vessel qualification Mission `MSN-6627085e3cea` ran the complete suite with `code-reviewer`, returned `tests returncode=0`, and independently verified PASS with `independent-verifier`;
+- the private A2 operational state was checkpointed before activation; after A3 schema migration SQLite integrity remained `ok`;
+- two source-backed organizational memories were admitted with explicit provenance; no synthetic qualification memory or test Crew was added to the active Standing Crew roster.
+
+**A3 exit gate: PASSED.** Repeated Missions measurably improve routing while per-tour context remains bounded.
+
+Current Apex stage: **A4 - Executive Exception Loop and Durable Operations**.

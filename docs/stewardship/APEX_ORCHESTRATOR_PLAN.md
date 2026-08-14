@@ -6,6 +6,7 @@
 **Priority:** Apex run is the Vessel critical path
 **A1 status:** SESSION-QUALIFIED with GPT-5.6 Sol; deterministic fallback retained
 **A2 status:** QUALIFIED; durable Mission Graph and bounded replanning proven
+**A3 status:** QUALIFIED; Living Company memory, performance history, experienced routing, and bounded context proven
 
 ## Definition
 
@@ -25,19 +26,19 @@ Apex is a demonstrated operating standard, not a title.
 - Evidence-backed independent verification exists.
 - Tool access is mediated through a Vessel-root Tool Gateway.
 - Domain routing works for the current roster and is covered by tests.
+- Living Company Intelligence provides attributable semantic, procedural, episodic, and Vessel memory with bounded selective retrieval.
+- Crew performance history now informs eligible-Crew routing using evidence quality, reliability, load, cost, latency, and risk without weakening capability or authority gates.
 
 ## Proven gaps
 
 1. **Cognition is project-hosted, not an autonomous daemon.** GPT-5.6 Sol occupies the Pilot cognition seat when a capable project session is active; deterministic control remains the safe fallback.
 2. **Synthesis depth is incomplete.** A2 provides Pilot-owned structural synthesis, but GorXu does not yet semantically reconcile contradictory specialist judgments, rank competing evidence, or construct calibrated executive conclusions from disagreement.
 3. **The executive exception loop is partial.** A2 can boundedly replan recoverable Crew/runtime failures, but broader consult -> investigate -> compare -> decide -> continue handling remains A4 work.
-4. **Routing is shallow.** Selection is still primarily tag/capability scoring and does not yet learn from historical success, evidence quality, uncertainty, load, cost, latency, risk, or Crew performance.
-5. **Memory is incomplete.** Episodic notes exist, but semantic, procedural, Commander, Pilot, and Vessel-wide memory with retrieval and consolidation do not.
-6. **Durability is partial.** Mission Graph nodes/events persist, but exact idempotent mid-step replay/resume after process interruption is not yet implemented.
-7. **Tool power is intentionally narrow.** No governed shell, network, browser/computer-use, MCP tool plane, secret brokerage, or isolated execution workspace exists yet.
-8. **No orchestration telemetry/evals.** There is no trajectory scoring, routing-quality measurement, cost accounting, regression replay, or evidence-driven self-improvement proposal loop.
-9. **No external-agent interoperability layer.** Standing Crew are native dossiers only; external opaque agents cannot yet be discovered or delegated to through a standard adapter.
-10. **No apex qualification gauntlet.** The Vessel has not yet passed the full adversarial, long-horizon, multi-domain, recovery, contradiction, and irreversible-decision gauntlet.
+4. **Durability is partial.** Mission Graph nodes/events persist, but exact idempotent mid-step replay/resume after process interruption is not yet implemented.
+5. **Tool power is intentionally narrow.** No governed shell, network, browser/computer-use, MCP tool plane, secret brokerage, or isolated execution workspace exists yet.
+6. **Orchestration evaluation is incomplete.** A3 records per-Crew/task-class performance, evidence quality, verification, latency, cost, and risk, but there is not yet a replayable evaluation corpus, trajectory scoring, statistical improvement gate, or evidence-driven self-improvement proposal loop.
+7. **No external-agent interoperability layer.** Standing Crew are native dossiers only; external opaque agents cannot yet be discovered or delegated to through a standard adapter.
+8. **No apex qualification gauntlet.** The Vessel has not yet passed the full adversarial, long-horizon, multi-domain, recovery, contradiction, and irreversible-decision gauntlet.
 
 ## Evolution sequence
 
@@ -150,7 +151,7 @@ GorXu earns Apex status only after passing a formal gauntlet covering:
 
 ## Current priority
 
-**A3 - Living Company Intelligence is the current critical stage.** A1 cognition and A2 Mission Graph Orchestration are qualified for the current project-hosted operating model.
+**A4 - Executive Exception Loop and Durable Operations is the current critical stage.** A1 cognition, A2 Mission Graph Orchestration, and A3 Living Company Intelligence are qualified for the current project-hosted operating model.
 
 A1 foundation now present:
 
@@ -198,4 +199,24 @@ Evidence:
 
 **A2 status: QUALIFIED.**
 
-Next critical stage: **A3 - Living Company Intelligence**.
+### A3 live qualification: PASSED
+
+A3 adds a GroX-native Living Company intelligence service under GorXu without creating a new command layer. It persists attributable semantic, procedural, and Vessel memory; retrieves episodic Crew history; records Crew performance by task class; and ranks only otherwise-eligible Crew using competence, evidence quality, reliability, load, cost, latency, and risk. Each tour receives a bounded relevant-memory slice rather than accumulated working context.
+
+Qualification Mission: `MSN-6627085e3cea`.
+
+Evidence:
+- repeated equivalent Missions in the qualification harness changed routing toward the better-evidenced eligible Crew after an injected failure;
+- memory retrieval remained bounded to six items / 3000 content characters after deliberate memory-store growth;
+- semantic, procedural, Vessel, and episodic retrieval persisted across StateStore reopen;
+- corrections preserve supersession history and durable memory now requires explicit provenance;
+- Vessel memory is constrained to Vessel scope;
+- single Missions and Mission Graph nodes use the same experienced-routing and selective-memory service;
+- capability, risk-floor, Repair-authority, and verifier-independence contracts remained green;
+- fresh GitHub-hosted Ubuntu 24.04 / Python 3.12 qualification passed **46/46** tests;
+- the restored private Vessel ran the complete suite with `code-reviewer`, returned `tests returncode=0`, and independent verification passed by `independent-verifier`;
+- private SQLite integrity remained `ok` after the A3 schema migration.
+
+**A3 status: QUALIFIED.**
+
+Next critical stage: **A4 - Executive Exception Loop and Durable Operations**.

@@ -27,7 +27,9 @@ The current native runtime includes:
 - Pilot GorXu orchestration with project/session cognitive-provider support;
 - native Mission Control;
 - 81 specialist-inspired Standing Crew plus one independent verifier;
-- durable Mission, Order, Evidence, and Crew state;
+- durable Mission, Order, Evidence, Crew, memory, and performance state;
+- Living Company Intelligence with attributable semantic/procedural/Vessel memory and bounded selective retrieval;
+- experienced eligible-Crew routing informed by evidence, reliability, load, cost, latency, and risk;
 - bounded filesystem/test Tool Gateway;
 - Inspect/Repair separation;
 - independent verification;
