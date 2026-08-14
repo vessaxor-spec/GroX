@@ -241,6 +241,10 @@ class StateStore:
             raise ValueError(f"unsupported memory scope: {scope}")
         if scope == 'crew' and not crew_id:
             raise ValueError("crew-scoped memory requires crew_id")
+        if kind == 'vessel' and scope != 'vessel':
+            raise ValueError("Vessel memory must use vessel scope")
+        if not isinstance(provenance, dict) or not provenance:
+            raise ValueError("memory provenance is required")
         if scope == 'vessel':
             crew_id = None
         if not memory_key.strip() or not content.strip():
