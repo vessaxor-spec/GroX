@@ -54,7 +54,7 @@ jobs:
               --cpus 1.0 \
               --ulimit fsize=16777216:16777216 \
               --ulimit nofile=64:64 \
-              --mount "type=bind,src=$WORK,dst=/work,rw,bind-propagation=rprivate" \
+              --mount "type=bind,src=$WORK,dst=/work,bind-propagation=rprivate" \
               --workdir /work \
               --env HOME=/work \
               --env TMPDIR=/work \
