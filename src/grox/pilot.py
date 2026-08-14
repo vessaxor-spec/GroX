@@ -5,6 +5,7 @@ from time import perf_counter
 import uuid
 from .contracts import MissionOrder, MissionMode, RiskClass, Evidence, TourResult
 from .state import StateStore
+from .durable_state import DurableState
 from .crew.roster import CrewRoster
 from .tools.gateway import ToolGateway
 from .runtime.executor import CrewExecutor
@@ -14,6 +15,7 @@ from .reasoning import ReasoningError, build_reasoner_from_env
 from .graph import MissionGraphPlan
 from .graph.runtime import MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
+from .operations import ExecutiveExceptionLoop
 
 _AUTO = object()
 _RISK_RANK = {RiskClass.low:0, RiskClass.medium:1, RiskClass.high:2, RiskClass.critical:3}
@@ -23,12 +25,14 @@ class PilotGorXu:
     def __init__(self, vessel_root:Path, *, reasoner:Any=_AUTO):
         self.root=vessel_root.resolve()
         self.store=StateStore(self.root/'configs/state/grox.sqlite3')
+        self.durable=DurableState(self.store)
         self.roster=CrewRoster(self.root/'configs/crew/dossiers',self.store)
         self.mission_control=MissionControl()
         self.gateway=ToolGateway(self.root)
-        self.executor=CrewExecutor(self.gateway)
+        self.executor=CrewExecutor(self.gateway,self.durable)
         self.verifier=IndependentVerifier()
         self.intelligence=LivingCompanyIntelligence(self.store,self.roster)
+        self.exception_loop=ExecutiveExceptionLoop(self.durable)
         self.reasoner=build_reasoner_from_env() if reasoner is _AUTO else reasoner
 
     @property
@@ -54,7 +58,6 @@ class PilotGorXu:
     def _reconcile_mode(self,directive:str,explicit:MissionMode|None,brief)->MissionMode:
         policy=self.mission_control.infer_mode(directive,explicit)
         if explicit or not brief: return policy
-        # The reasoning model may narrow/clarify non-mutating work, never grant mutation authority.
         if policy is MissionMode.execute and brief.proposed_mode=='inspect':
             return MissionMode.inspect
         return policy
@@ -148,13 +151,6 @@ class PilotGorXu:
         allow_repair: bool = False,
         plan_source: str | None = None,
     ) -> dict:
-        """Execute a durable, dependency-aware multi-Crew Mission Graph.
-
-        The graph may be supplied by the active project cognition host or by a
-        reasoning provider implementing ``plan_graph``. GroX validates the
-        graph before execution; deterministic authority controls remain in
-        force regardless of plan source.
-        """
         global_risk = self.mission_control.assess_risk(directive, risk)
         mission_id = f"MSN-{uuid.uuid4().hex[:12]}"
         self.store.create_mission(mission_id, directive, 'graph', global_risk.value)
@@ -173,48 +169,66 @@ class PilotGorXu:
             plan.validate()
 
             source = plan_source or (self.cognitive_status if self.reasoner else 'explicit-validated-plan')
-            self.store.add_evidence(
-                mission_id,
-                'GORXU-GRAPH-PLAN',
-                Evidence('mission_graph_plan', {'source': source, **plan.to_dict()}),
-            )
+            self.store.add_evidence(mission_id,'GORXU-GRAPH-PLAN',Evidence('mission_graph_plan', {'source': source, **plan.to_dict()}))
+            self.durable.save_graph_run(mission_id, plan.to_dict(), global_risk.value, allow_repair)
             runner = MissionGraphRunner(
                 store=self.store, roster=self.roster, executor=self.executor,
                 mission_control=self.mission_control, verifier=self.verifier, intelligence=self.intelligence,
+                exception_loop=self.exception_loop, durable=self.durable,
             )
-            outcomes, synthesis = runner.run(
-                mission_id=mission_id, directive=directive, plan=plan,
-                global_risk=global_risk, allow_repair=allow_repair,
-            )
-            self.store.add_evidence(
-                mission_id,
-                'GORXU-SYNTHESIS',
-                Evidence('pilot_synthesis', synthesis.to_dict()),
-            )
+            outcomes, synthesis = runner.run(mission_id=mission_id, directive=directive, plan=plan,global_risk=global_risk, allow_repair=allow_repair)
+            self.store.add_evidence(mission_id,'GORXU-SYNTHESIS',Evidence('pilot_synthesis', synthesis.to_dict()))
             self.store.update_mission(mission_id, synthesis.outcome, synthesis.executive_summary)
-            return {
-                'mission_id': mission_id,
-                'mode': 'graph',
-                'risk': global_risk.value,
-                'status': synthesis.outcome,
-                'summary': synthesis.executive_summary,
-                'plan_source': source,
-                'graph': plan.to_dict(),
-                'nodes': {node_id: outcome.to_dict() for node_id, outcome in outcomes.items()},
-                'synthesis': synthesis.to_dict(),
-            }
+            return {'mission_id': mission_id,'mode': 'graph','risk': global_risk.value,'status': synthesis.outcome,
+                    'summary': synthesis.executive_summary,'plan_source': source,'graph': plan.to_dict(),
+                    'nodes': {node_id: outcome.to_dict() for node_id, outcome in outcomes.items()},'synthesis': synthesis.to_dict()}
         except Exception as exc:
             summary = f"GorXu graph exception: {exc}"
-            self.store.add_graph_event(
-                mission_id, 'graph_exception',
-                {'type': type(exc).__name__, 'message': str(exc)},
-            )
+            self.store.add_graph_event(mission_id, 'graph_exception',{'type': type(exc).__name__, 'message': str(exc)})
             self.store.update_mission(mission_id, 'needs_pilot_decision', summary)
-            return {
-                'mission_id': mission_id, 'mode': 'graph', 'risk': global_risk.value,
-                'status': 'needs_pilot_decision', 'summary': summary,
-                'exception': {'type': type(exc).__name__, 'message': str(exc)},
-            }
+            return {'mission_id': mission_id, 'mode': 'graph', 'risk': global_risk.value,'status': 'needs_pilot_decision', 'summary': summary,
+                    'exception': {'type': type(exc).__name__, 'message': str(exc)}}
+
+    def resume_graph(self, mission_id: str) -> dict:
+        run=self.durable.graph_run(mission_id)
+        mission=self.store.mission(mission_id)
+        if not run or not mission:
+            return {'mission_id':mission_id,'mode':'graph','status':'needs_pilot_decision','summary':'Unknown durable Mission Graph'}
+        if run['cancelled']:
+            return {'mission_id':mission_id,'mode':'graph','status':'cancelled','summary':'Mission Graph was cancelled and will not resume'}
+        if int(run['resume_count']) >= 3:
+            summary='Durable Mission Graph resume budget exhausted; GorXu requires Pilot review'
+            self.store.update_mission(mission_id,'needs_pilot_decision',summary)
+            return {'mission_id':mission_id,'mode':'graph','status':'needs_pilot_decision','summary':summary,'resume_count':run['resume_count']}
+        directive=mission['mission']['directive']
+        plan=MissionGraphPlan.from_mapping(run['plan'],expected_intent=directive)
+        global_risk=RiskClass(run['global_risk'])
+        resume_count=self.durable.increment_resume(mission_id)
+        self.store.update_mission(mission_id,'running',f'GorXu resuming durable Mission Graph; resume_count={resume_count}')
+        self.store.add_graph_event(mission_id,'mission_resumed',{'resume_count':resume_count})
+        runner=MissionGraphRunner(store=self.store,roster=self.roster,executor=self.executor,mission_control=self.mission_control,
+            verifier=self.verifier,intelligence=self.intelligence,exception_loop=self.exception_loop,durable=self.durable)
+        try:
+            outcomes,synthesis=runner.run(mission_id=mission_id,directive=directive,plan=plan,global_risk=global_risk,allow_repair=run['allow_repair'],resume=True)
+            self.store.add_evidence(mission_id,'GORXU-SYNTHESIS',Evidence('pilot_synthesis',{'resume_count':resume_count,**synthesis.to_dict()}))
+            self.store.update_mission(mission_id,synthesis.outcome,synthesis.executive_summary)
+            return {'mission_id':mission_id,'mode':'graph','risk':global_risk.value,'status':synthesis.outcome,
+                    'summary':synthesis.executive_summary,'resume_count':resume_count,'graph':plan.to_dict(),
+                    'nodes':{node_id:outcome.to_dict() for node_id,outcome in outcomes.items()},'synthesis':synthesis.to_dict()}
+        except Exception as exc:
+            summary=f'GorXu resume exception: {exc}'
+            self.store.add_graph_event(mission_id,'resume_exception',{'type':type(exc).__name__,'message':str(exc)})
+            self.store.update_mission(mission_id,'needs_pilot_decision',summary)
+            return {'mission_id':mission_id,'mode':'graph','risk':global_risk.value,'status':'needs_pilot_decision','summary':summary,
+                    'exception':{'type':type(exc).__name__,'message':str(exc)},'resume_count':resume_count}
+
+    def cancel_graph(self, mission_id: str, reason: str='Cancelled by Commander/Pilot authority') -> dict:
+        run=self.durable.graph_run(mission_id)
+        if not run:
+            return {'mission_id':mission_id,'status':'needs_pilot_decision','summary':'Unknown durable Mission Graph'}
+        self.durable.cancel_graph_run(mission_id,reason)
+        self.store.add_graph_event(mission_id,'mission_cancelled',{'reason':reason})
+        return {'mission_id':mission_id,'status':'cancelled','summary':reason}
 
     def repair_write(self,path:str,content:str,*,risk:RiskClass|None=None,crew_id:str|None=None)->dict:
         return self.command(f"Repair {path} by writing Commander-approved content",mode=MissionMode.repair,risk=risk,crew_id=crew_id,scope=path,parameters={'operation':'write_text','path':path,'content':content})
