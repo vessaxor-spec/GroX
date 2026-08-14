@@ -5,6 +5,11 @@ from tests._support import temp_vessel
 from grox.contracts import MissionMode, RiskClass
 
 
+class BrokenExecutor:
+    def execute(self, order):
+        raise RuntimeError("programming defect sentinel")
+
+
 class PilotTest(unittest.TestCase):
     def test_inspection_routes_and_completes(self):
         td, root, p = temp_vessel()
@@ -43,6 +48,25 @@ class PilotTest(unittest.TestCase):
         finally:
             td.cleanup()
 
+    def test_unexpected_executor_defect_is_distinct_and_evidenced(self):
+        td, root, p = temp_vessel()
+        try:
+            p.executor = BrokenExecutor()
+            result = p.command("Inspect architecture", mode=MissionMode.inspect)
+            self.assertEqual(result["status"], "unexpected_defect")
+            self.assertEqual(result["exception"]["type"], "unexpected_defect")
+            self.assertEqual(result["exception"]["exception_type"], "RuntimeError")
+            self.assertIn("Traceback", result["exception"]["traceback"])
+            self.assertEqual(result["exception"]["context"]["operation"], "command")
+            mission = p.store.mission(result["mission_id"])
+            defect_evidence = [e for e in mission["evidence"] if e["kind"] == "unexpected_defect"]
+            self.assertEqual(len(defect_evidence), 1)
+            content = json.loads(defect_evidence[0]["content"])
+            self.assertEqual(content["exception_type"], "RuntimeError")
+            self.assertIn("programming defect sentinel", content["traceback"])
+        finally:
+            td.cleanup()
+
     def test_persistence_survives_reopen(self):
         td, root, p = temp_vessel()
         try:
@@ -53,7 +77,7 @@ class PilotTest(unittest.TestCase):
         finally:
             td.cleanup()
 
-    def test_missing_capability_returns_to_pilot(self):
+    def test_missing_capability_returns_to_pilot_as_bounded_routing_exception(self):
         td, root, p = temp_vessel()
         try:
             result = p.command(
@@ -64,6 +88,7 @@ class PilotTest(unittest.TestCase):
                 scope="x",
             )
             self.assertEqual(result["status"], "needs_pilot_decision")
+            self.assertEqual(result["exception"]["type"], "routing_exception")
         finally:
             td.cleanup()
 
