@@ -17,14 +17,16 @@ class CrewDossier:
     verification:bool=False
 
 class CrewRoster:
-    def __init__(self, dossier_dir: Path, store: StateStore):
+    def __init__(self, dossier_dir: Path, store: StateStore | None = None):
         self.store=store; self._crew={}
         for p in sorted(dossier_dir.glob('*.json')):
             raw=json.loads(p.read_text())
             cid=raw['crew_id']
             if cid in FORBIDDEN_IDS: raise ValueError(f"forbidden Crew id: {cid}")
             d=CrewDossier(cid,raw['division'],raw['title'],frozenset(raw['capabilities']),frozenset(raw.get('tags',[])),bool(raw.get('verification')))
-            self._crew[cid]=d; store.ensure_crew(cid)
+            self._crew[cid]=d
+            if store is not None:
+                store.ensure_crew(cid)
 
     def get(self, crew_id:str)->CrewDossier:
         return self._crew[crew_id]
