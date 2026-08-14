@@ -30,21 +30,34 @@ The GitHub repository has now been initialized with the GroX-native constitution
 - Tool Gateway target architecture: **defined**
 - Layered memory target architecture: **defined**
 - Recruitment/evolution boundaries: **defined**
+- Three-plane persistence architecture: **locked**
+
+## Persistence foundation
+
+GroX now separates continuity by responsibility:
+
+1. **Cognitive continuity:** ChatGPT project `Space Exploration` is the current reconstitution home for Pilot GorXu and durable project context. The preferred active reasoning runtime is GPT-5.6 Sol with high reasoning.
+2. **Vessel source:** `vessaxor-spec/GroX` is designated as the durable source body for code, doctrine, Crew dossiers, tests, configuration, and source-controlled history.
+3. **Operational state:** Mission, evidence, Crew-tour, and runtime-memory state is private operational data and must not be committed raw to this public repository. Verified private checkpoints carry recoverable state.
+
+A sandbox or host is classified as replaceable flight compute. Recovery must restore source and state, run integrity checks and tests, reconstitute GorXu, and resume only from the last committed safe Mission state.
+
+**Evidence boundary:** the three-plane doctrine and binding metadata are durable on GitHub. The newer live sandbox runtime itself has not yet been fully synchronized to GitHub, so GitHub is not yet a complete copy of the current executable Vessel. That synchronization remains a separate controlled step.
 
 ## Implementation evidence boundary
 
-A prior sandbox build was reported to contain a substantially larger implementation, including a working CLI, Crew roster, persistence, tools, tests, and Ship's Log history. That source tree is not currently present in this GitHub repository and has not been independently inspected here.
+A prior sandbox build was reported to contain a substantially larger implementation, including a working CLI, Crew roster, persistence, tools, tests, and Ship's Log history. That original source tree was not recovered. A new GroX-native live runtime has since been built in the current sandbox, but its complete executable source has not yet been synchronized to GitHub.
 
-Until recovered and reconciled, those implementation claims are treated as historical build reports rather than current repository truth.
+Until that synchronization is completed and verified, repository truth and live-sandbox truth must remain explicitly distinguished.
 
 ## Current milestone
 
 **GroX Independence Baseline: COMPLETE**
 
-The active architecture no longer depends on an external orchestration authority. GroX now owns its command model, Mission Control, Mission Order contract, Crew doctrine, verification principles, and evolutionary boundaries.
+**Three-Plane Persistence Architecture: COMPLETE**
+
+The active architecture no longer depends on an external orchestration authority. GroX owns its command model, Mission Control, Mission Order contract, Crew doctrine, verification principles, evolutionary boundaries, and persistence model.
 
 ## Open checkpoint
 
-**Steering vector intentionally not selected.**
-
-The next build direction will be chosen by the Commander after reviewing this baseline. No implementation trajectory should be assumed before that decision.
+The live Vessel's Apex run is the critical implementation path. Durable source synchronization and private operational-state custody must remain explicit prerequisites for relying on a fresh host as an immediate continuation environment.
