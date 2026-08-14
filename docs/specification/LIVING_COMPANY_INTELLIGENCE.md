@@ -27,7 +27,7 @@ A3 retains existing episodic Crew notes and adds durable records for:
 - **procedural memory**: versionable ways of working;
 - **Vessel memory**: organizational knowledge shared across Crew.
 
-Every durable memory record carries provenance, confidence, scope, task class when known, timestamps, and an active/superseded state. Reusing a memory key supersedes the previous active record rather than silently rewriting history. Records may be explicitly forgotten by deactivation.
+Every durable memory record carries explicit non-empty provenance, confidence, scope, task class when known, timestamps, and an active/superseded state. Unattributed durable memory is rejected. Vessel-memory records may only use Vessel scope. Reusing a memory key supersedes the previous active record rather than silently rewriting history. Records may be explicitly forgotten by deactivation.
 
 Memory is retrieved by relevance. A tour receives only a bounded slice selected for its Crew, objective, and task class. Unrelated memory is not injected and the complete historical memory store is never copied into a tour context.
 
@@ -63,7 +63,7 @@ Eligible Crew are then ranked with an auditable score containing these dimension
 - risk-adjusted experience and verification history;
 - small advisory preference from a validated cognitive/graph candidate list.
 
-Historical performance may change the winner among otherwise eligible Crew. It can never make an ineligible Crew member eligible.
+Historical performance may change the winner among otherwise eligible Crew. It can never make an ineligible Crew member eligible. Replanned graph nodes use the effective Mission/node risk floor when experience affects replacement ranking.
 
 ## Context-isolated tours
 
