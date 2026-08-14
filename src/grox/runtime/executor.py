@@ -75,7 +75,7 @@ class CrewExecutor:
                         self.store.update_mutation(key,'rolled_back')
                         evidence.append(Evidence('mutation_rollback',{'idempotency_key':key,**rb,'status':'rolled_back'}))
                         rollback='completed'
-                    except Exception as exc:
+                    except (ToolDenied, OSError) as exc:
                         evidence.append(Evidence('mutation_rollback',{'idempotency_key':key,'status':'failed','error':str(exc)}))
                         return TourResult(order.order_id,order.assigned_crew,'exception','Repair verification failed and rollback could not safely reconcile target state',evidence,
                                           {'type':'mutation_state_diverged','irreversible':True,'rollback':'failed','recommendation':'Return to GorXu; do not overwrite divergent state'})

@@ -57,6 +57,11 @@ class FailCrewOnce:
         return self.base.execute(order)
 
 
+class BrokenGraphExecutor:
+    def execute(self, order):
+        raise RuntimeError('graph programming defect sentinel')
+
+
 class MissionGraphIntegrationTests(unittest.TestCase):
     def test_coordinates_multi_stage_parallel_graph(self):
         td,root,p=graph_vessel()
@@ -114,4 +119,30 @@ class MissionGraphIntegrationTests(unittest.TestCase):
             verify_dependencies=json.loads(nodes['verify']['dependencies'])
             self.assertIn(replacement_id,verify_dependencies)
             self.assertNotIn('research',verify_dependencies)
+        finally: td.cleanup()
+
+    def test_unexpected_graph_executor_defect_reaches_pilot_containment(self):
+        td,root,p=graph_vessel()
+        try:
+            p.executor=BrokenGraphExecutor()
+            directive='Inspect architecture through a bounded graph.'
+            plan={
+                'commander_intent':directive,
+                'objective':'Exercise graph defect containment.',
+                'nodes':[
+                    {'node_id':'inspect','objective':'Inspect architecture','mode':'inspect','dependencies':[],
+                     'candidate_crew_ids':['systems-architect'],'required_capabilities':['repo_read'],'scope':['.']},
+                ],
+            }
+            r=p.command_graph(directive,plan=plan,plan_source='test-defect')
+            self.assertEqual(r['status'],'unexpected_defect')
+            self.assertEqual(r['exception']['type'],'unexpected_defect')
+            self.assertEqual(r['exception']['exception_type'],'RuntimeError')
+            self.assertIn('graph programming defect sentinel',r['exception']['traceback'])
+            self.assertEqual(r['exception']['context']['operation'],'command_graph')
+            mission=p.store.mission(r['mission_id'])
+            defect=[e for e in mission['evidence'] if e['kind']=='unexpected_defect']
+            self.assertEqual(len(defect),1)
+            events=[e for e in mission['graph_events'] if e['event_type']=='unexpected_defect']
+            self.assertEqual(len(events),1)
         finally: td.cleanup()

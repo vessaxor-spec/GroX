@@ -5,6 +5,8 @@ from typing import Any
 
 from ..contracts import MissionMode, RiskClass
 
+_MUTATING_ACTIONS = frozenset({"fs_write", "mcp_mutate"})
+
 
 @dataclass(slots=True)
 class NodeBudget:
@@ -92,6 +94,11 @@ class GraphNodeSpec:
         ):
             if not isinstance(value, list) or not all(isinstance(x, str) and x for x in value):
                 raise ValueError(f"graph node {node_id}: {field_name} must be non-empty strings")
+        mutation_grants = sorted(set(allowed) & _MUTATING_ACTIONS)
+        if mode is not MissionMode.repair and mutation_grants:
+            raise ValueError(
+                f"graph node {node_id}: mutation actions require explicit Repair authority: {mutation_grants}"
+            )
         parameters = raw.get("parameters") or {}
         if not isinstance(parameters, dict):
             raise ValueError(f"graph node {node_id}: parameters must be an object")
@@ -149,6 +156,11 @@ class MissionGraphPlan:
             raise ValueError("mission graph node IDs must be unique")
         known = set(ids)
         for node in self.nodes:
+            mutation_grants = sorted(set(node.allowed_actions) & _MUTATING_ACTIONS)
+            if node.mode is not MissionMode.repair and mutation_grants:
+                raise ValueError(
+                    f"graph node {node.node_id}: mutation actions require explicit Repair authority: {mutation_grants}"
+                )
             unknown = set(node.dependencies) - known
             if unknown:
                 raise ValueError(f"graph node {node.node_id} has unknown dependencies: {sorted(unknown)}")

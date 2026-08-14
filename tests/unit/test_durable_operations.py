@@ -96,6 +96,18 @@ class DurableOperationsUnitTests(unittest.TestCase):
                     p.gateway.run_tests(order)
         finally: td.cleanup()
 
+    def test_unexpected_rollback_programming_defect_reaches_pilot_boundary(self):
+        td,root,p=temp_vessel()
+        try:
+            target=root/'docs/rollback-defect.txt'
+            with patch.object(p.gateway,'run_tests',return_value={'returncode':1,'stdout':'','stderr':'failure'}), \
+                 patch.object(p.gateway,'rollback_text',side_effect=RuntimeError('rollback programming defect sentinel')):
+                result=p.repair_write('docs/rollback-defect.txt','new content')
+            self.assertEqual(result['status'],'unexpected_defect')
+            self.assertEqual(result['exception']['exception_type'],'RuntimeError')
+            self.assertIn('rollback programming defect sentinel',result['exception']['traceback'])
+        finally: td.cleanup()
+
 
 if __name__=='__main__':
     unittest.main()

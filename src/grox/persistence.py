@@ -78,7 +78,7 @@ class PersistenceManager:
                 timeout=5,
             ).strip()
             return out or None
-        except Exception:
+        except (subprocess.SubprocessError, OSError):
             return None
 
     def _sqlite_backup(self, destination: Path) -> None:

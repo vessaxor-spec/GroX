@@ -18,6 +18,10 @@ class SessionReasoningProvider:
     The host may supply separate callbacks for A1 interpretation and A2 Mission
     Graph planning. GroX validates both outputs and retains deterministic
     authority, risk, tool, verification, and graph-budget controls.
+
+    Recoverable provider failures must be raised by callbacks as ReasoningError.
+    Unexpected callback defects are deliberately allowed to reach GorXu's outer
+    containment boundary so they retain traceback and defect classification.
     """
 
     def __init__(
@@ -36,10 +40,7 @@ class SessionReasoningProvider:
         self.name = name
 
     def interpret(self, directive: str, *, roster: list[dict[str, Any]]) -> MissionInterpretation:
-        try:
-            raw = self._responder(directive, roster)
-        except Exception as exc:
-            raise ReasoningError(f"session reasoner failed: {exc}") from exc
+        raw = self._responder(directive, roster)
         try:
             return MissionInterpretation.from_mapping(raw, expected_intent=directive)
         except (TypeError, ValueError) as exc:
@@ -48,10 +49,7 @@ class SessionReasoningProvider:
     def plan_graph(self, directive: str, *, roster: list[dict[str, Any]]) -> MissionGraphPlan:
         if self._graph_responder is None:
             raise ReasoningError("session reasoner has no Mission Graph responder")
-        try:
-            raw = self._graph_responder(directive, roster)
-        except Exception as exc:
-            raise ReasoningError(f"session graph planner failed: {exc}") from exc
+        raw = self._graph_responder(directive, roster)
         try:
             return MissionGraphPlan.from_mapping(raw, expected_intent=directive)
         except (TypeError, ValueError) as exc:

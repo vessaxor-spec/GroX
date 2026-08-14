@@ -2,6 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 from time import perf_counter
+import traceback
 import uuid
 from .contracts import MissionOrder, MissionMode, RiskClass, Evidence, TourResult
 from .state import StateStore
@@ -13,7 +14,7 @@ from .mission_control.core import MissionControl
 from .verification.core import IndependentVerifier
 from .reasoning import ReasoningError, build_reasoner_from_env
 from .graph import MissionGraphPlan
-from .graph.runtime import MissionGraphRunner
+from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
 from .operations import ExecutiveExceptionLoop
 
@@ -81,6 +82,18 @@ class PilotGorXu:
         decision=self.intelligence.route(directive,required,risk=risk,preferred_ids=preferred)
         return decision.crew, decision
 
+    def _record_unexpected_defect(self, mission_id:str, *, context:dict[str,Any], exc:Exception)->dict[str,Any]:
+        trace=''.join(traceback.format_exception(type(exc),exc,exc.__traceback__))[-12000:]
+        payload={
+            'classification':'unexpected_defect',
+            'exception_type':type(exc).__name__,
+            'message':str(exc),
+            'traceback':trace,
+            'context':context,
+        }
+        self.store.add_evidence(mission_id,'GORXU-FAULT',Evidence('unexpected_defect',payload))
+        return payload
+
     def command(self, directive:str, *, mode:MissionMode|None=None, risk:RiskClass|None=None, crew_id:str|None=None, scope:str='.', parameters:dict|None=None)->dict:
         brief,cognition_error=self._interpret(directive)
         mode=self._reconcile_mode(directive,mode,brief)
@@ -144,9 +157,18 @@ class PilotGorXu:
             if verification: summary += f" | Verification: {'PASS' if verification['ok'] else 'FAIL'} by {verification['verifier']}"
             self.store.update_mission(mission_id,'completed' if result.status=='completed' else 'needs_pilot_decision',summary)
             return {'mission_id':mission_id,'mode':mode.value,'risk':risk.value,'crew':crew.crew_id,'status':result.status,'summary':summary,'verification':verification,'exception':result.exception,'cognition':brief.to_dict() if brief else None,'cognition_error':cognition_error}
-        except Exception as e:
-            self.store.update_mission(mission_id,'needs_pilot_decision',f"GorXu exception: {e}")
-            return {'mission_id':mission_id,'mode':mode.value,'risk':risk.value,'status':'needs_pilot_decision','summary':f"GorXu exception: {e}",'exception':{'type':type(e).__name__,'message':str(e)},'cognition':brief.to_dict() if brief else None,'cognition_error':cognition_error}
+        except LookupError as exc:
+            summary=f"GorXu bounded routing exception: {exc}"
+            self.store.update_mission(mission_id,'needs_pilot_decision',summary)
+            return {'mission_id':mission_id,'mode':mode.value,'risk':risk.value,'status':'needs_pilot_decision','summary':summary,
+                    'exception':{'type':'routing_exception','cause_type':type(exc).__name__,'message':str(exc)},
+                    'cognition':brief.to_dict() if brief else None,'cognition_error':cognition_error}
+        except Exception as exc:
+            defect=self._record_unexpected_defect(mission_id,context={'operation':'command','directive':directive,'mode':mode.value,'risk':risk.value},exc=exc)
+            summary=f"GorXu contained unexpected defect: {defect['exception_type']}: {defect['message']}"
+            self.store.update_mission(mission_id,'unexpected_defect',summary)
+            return {'mission_id':mission_id,'mode':mode.value,'risk':risk.value,'status':'unexpected_defect','summary':summary,
+                    'exception':{'type':'unexpected_defect',**defect},'cognition':brief.to_dict() if brief else None,'cognition_error':cognition_error}
 
     def command_graph(
         self,
@@ -188,12 +210,19 @@ class PilotGorXu:
             return {'mission_id': mission_id,'mode': 'graph','risk': global_risk.value,'status': synthesis.outcome,
                     'summary': synthesis.executive_summary,'plan_source': source,'graph': plan.to_dict(),
                     'nodes': {node_id: outcome.to_dict() for node_id, outcome in outcomes.items()},'synthesis': synthesis.to_dict()}
+        except (ReasoningError,ValueError,TypeError,GraphExecutionError) as exc:
+            summary = f"GorXu rejected bounded Mission Graph: {exc}"
+            self.store.add_graph_event(mission_id,'graph_rejected',{'type':type(exc).__name__,'message':str(exc)})
+            self.store.update_mission(mission_id,'needs_pilot_decision',summary)
+            return {'mission_id':mission_id,'mode':'graph','risk':global_risk.value,'status':'needs_pilot_decision','summary':summary,
+                    'exception':{'type':'graph_rejected','cause_type':type(exc).__name__,'message':str(exc)}}
         except Exception as exc:
-            summary = f"GorXu graph exception: {exc}"
-            self.store.add_graph_event(mission_id, 'graph_exception',{'type': type(exc).__name__, 'message': str(exc)})
-            self.store.update_mission(mission_id, 'needs_pilot_decision', summary)
-            return {'mission_id': mission_id, 'mode': 'graph', 'risk': global_risk.value,'status': 'needs_pilot_decision', 'summary': summary,
-                    'exception': {'type': type(exc).__name__, 'message': str(exc)}}
+            defect=self._record_unexpected_defect(mission_id,context={'operation':'command_graph','directive':directive,'risk':global_risk.value},exc=exc)
+            self.store.add_graph_event(mission_id,'unexpected_defect',{'exception_type':defect['exception_type'],'message':defect['message']})
+            summary=f"GorXu contained unexpected graph defect: {defect['exception_type']}: {defect['message']}"
+            self.store.update_mission(mission_id,'unexpected_defect',summary)
+            return {'mission_id':mission_id,'mode':'graph','risk':global_risk.value,'status':'unexpected_defect','summary':summary,
+                    'exception':{'type':'unexpected_defect',**defect}}
 
     def resume_graph(self, mission_id: str) -> dict:
         run=self.durable.graph_run(mission_id)
@@ -207,26 +236,33 @@ class PilotGorXu:
             self.store.update_mission(mission_id,'needs_pilot_decision',summary)
             return {'mission_id':mission_id,'mode':'graph','status':'needs_pilot_decision','summary':summary,'resume_count':run['resume_count']}
         directive=mission['mission']['directive']
-        plan=MissionGraphPlan.from_mapping(run['plan'],expected_intent=directive)
         global_risk=RiskClass(run['global_risk'])
         resume_count=self.durable.increment_resume(mission_id)
         self.store.update_mission(mission_id,'running',f'GorXu resuming durable Mission Graph; resume_count={resume_count}')
         self.store.add_graph_event(mission_id,'mission_resumed',{'resume_count':resume_count})
-        runner=MissionGraphRunner(store=self.store,roster=self.roster,executor=self.executor,mission_control=self.mission_control,
-            verifier=self.verifier,intelligence=self.intelligence,exception_loop=self.exception_loop,durable=self.durable)
         try:
+            plan=MissionGraphPlan.from_mapping(run['plan'],expected_intent=directive)
+            runner=MissionGraphRunner(store=self.store,roster=self.roster,executor=self.executor,mission_control=self.mission_control,
+                verifier=self.verifier,intelligence=self.intelligence,exception_loop=self.exception_loop,durable=self.durable)
             outcomes,synthesis=runner.run(mission_id=mission_id,directive=directive,plan=plan,global_risk=global_risk,allow_repair=run['allow_repair'],resume=True)
             self.store.add_evidence(mission_id,'GORXU-SYNTHESIS',Evidence('pilot_synthesis',{'resume_count':resume_count,**synthesis.to_dict()}))
             self.store.update_mission(mission_id,synthesis.outcome,synthesis.executive_summary)
             return {'mission_id':mission_id,'mode':'graph','risk':global_risk.value,'status':synthesis.outcome,
                     'summary':synthesis.executive_summary,'resume_count':resume_count,'graph':plan.to_dict(),
                     'nodes':{node_id:outcome.to_dict() for node_id,outcome in outcomes.items()},'synthesis':synthesis.to_dict()}
-        except Exception as exc:
-            summary=f'GorXu resume exception: {exc}'
-            self.store.add_graph_event(mission_id,'resume_exception',{'type':type(exc).__name__,'message':str(exc)})
+        except (ValueError,GraphExecutionError) as exc:
+            summary=f'GorXu rejected durable Mission Graph resume: {exc}'
+            self.store.add_graph_event(mission_id,'resume_rejected',{'type':type(exc).__name__,'message':str(exc)})
             self.store.update_mission(mission_id,'needs_pilot_decision',summary)
             return {'mission_id':mission_id,'mode':'graph','risk':global_risk.value,'status':'needs_pilot_decision','summary':summary,
-                    'exception':{'type':type(exc).__name__,'message':str(exc)},'resume_count':resume_count}
+                    'exception':{'type':'resume_rejected','cause_type':type(exc).__name__,'message':str(exc)},'resume_count':resume_count}
+        except Exception as exc:
+            defect=self._record_unexpected_defect(mission_id,context={'operation':'resume_graph','resume_count':resume_count,'risk':global_risk.value},exc=exc)
+            self.store.add_graph_event(mission_id,'unexpected_defect',{'exception_type':defect['exception_type'],'message':defect['message']})
+            summary=f"GorXu contained unexpected resume defect: {defect['exception_type']}: {defect['message']}"
+            self.store.update_mission(mission_id,'unexpected_defect',summary)
+            return {'mission_id':mission_id,'mode':'graph','risk':global_risk.value,'status':'unexpected_defect','summary':summary,
+                    'exception':{'type':'unexpected_defect',**defect},'resume_count':resume_count}
 
     def cancel_graph(self, mission_id: str, reason: str='Cancelled by Commander/Pilot authority') -> dict:
         run=self.durable.graph_run(mission_id)
