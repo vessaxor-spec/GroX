@@ -9,9 +9,10 @@ This repository defines the Vessel. Any AI builder, coding agent, reviewer, or m
 3. `docs/architecture/ARCHITECTURE.md`
 4. `docs/specification/PRINCIPLES.md`
 5. `docs/specification/MISSION_ORDER.md`
-6. Stewardship documents
-7. Existing code and tests
-8. Builder judgment
+6. `docs/specification/MISSION_GRAPH.md`
+7. Stewardship documents
+8. Existing code and tests
+9. Builder judgment
 
 Higher authority wins when instructions conflict.
 
@@ -19,7 +20,7 @@ Higher authority wins when instructions conflict.
 
 **Commander → Pilot GorXu → Mission Control → Divisions → Standing Crew**
 
-Pilot GorXu is the primary orchestrator and second-in-command. Mission Control is native to GroX and operates under GorXu. No Crew member, Division, verifier, tool, or external system may become a parallel orchestrator.
+Pilot GorXu is the primary orchestrator and second-in-command. Mission Control is native to GroX and operates under GorXu. No Crew member, Division, verifier, tool, scheduler, or external system may become a parallel orchestrator.
 
 ## Hard constraints
 
@@ -35,6 +36,8 @@ Pilot GorXu is the primary orchestrator and second-in-command. Mission Control i
 - Tool access must be capability-gated and constrained to the current Mission Order.
 - Sleeping Crew are logically persistent identities, not necessarily persistent model processes. Fresh working context per tour is preferred over eternal chat context.
 - Recruitment creates durable standing Crew only after a real capability gap is established. Recruitment may not create an orchestration rival to GorXu.
+- Mission Graph scheduling is a mechanical Pilot runtime, not an independent command layer or parallel orchestrator.
+- Graph replanning may recover reversible Crew or runtime failure, but it may not widen authority, change Commander intent, bypass required verification, or silently convert inspection into mutation.
 
 ## Persistence doctrine
 
@@ -57,4 +60,4 @@ Pilot GorXu is the primary orchestrator and second-in-command. Mission Control i
 
 ## Builder objective
 
-Build and evolve GroX as a commandable, persistent AI environment with a real Commander Seat, a capable Pilot GorXu, native Mission Control, standing Crew, durable Missions, bounded tools, evidence, verification, memory, recovery, and controlled evolution.
+Build and evolve GroX as a commandable, persistent AI environment with a real Commander Seat, a capable Pilot GorXu, native Mission Control, standing Crew, durable Missions and Mission Graphs, bounded tools, evidence, verification, memory, recovery, and controlled evolution.
