@@ -18,6 +18,17 @@ jobs:
     steps:
       - name: Checkout A5 branch
         uses: actions/checkout@v4
+      - name: Verify qualification source boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          test ! -e .github/a5-browser-wire.py
+          test ! -e .github/a5-browser-publish
+          test ! -e .github/workflows/a5-browser-publish.yml
+          test ! -e .github/workflows/a5-browser-wire.yml
+          grep -F 'mcr.microsoft.com/playwright/python@sha256:aa81288e738725378becba5b3e06cb0f3a7f012a610e87e8d767a090ea3f740d' docker/a5-browser/Dockerfile
+          grep -F 'e3950d9c140d007bd52853b45813c6274b24e36f' scripts/commission-a5-browser.sh
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
