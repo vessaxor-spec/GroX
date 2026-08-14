@@ -79,3 +79,7 @@ A technically functioning runtime without a usable Commander interface is incomp
 ## 20. GroX owns its architecture
 
 GroX may learn from external systems, research, and prior projects, but no external framework or specification is automatically authoritative. Useful ideas must be evaluated, adapted, and incorporated as native GroX design.
+
+## 21. Persistence is separated by responsibility
+
+Project context carries GorXu's cognitive continuity, Git carries the Vessel body, and private operational checkpoints carry Mission and runtime state. No temporary model process, chat, sandbox, or host may become a single point of continuity.
