@@ -16,8 +16,7 @@
   "browser": {
     "enabled": true,
     "timeout_seconds": 20,
-    "docker_image": null,
-    "docker_seccomp_profile": null
+    "docker_image": null
   },
   "mcp": {
     "enabled": true,
