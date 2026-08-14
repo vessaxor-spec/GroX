@@ -29,7 +29,7 @@ jobs:
           test -e docs/specification/ORCHESTRATION_EVALUATION.md
           grep -F 'Evaluation may recommend. Evaluation may not activate.' docs/specification/ORCHESTRATION_EVALUATION.md
           grep -F 'MappingProxyType' src/grox/intelligence.py
-          grep -F 'activation requires a separately authorized GroX mutation path' src/grox/evaluation.py
+          grep -F 'activation requires a separate GroX authority path and explicit mutation Order' src/grox/evaluation.py
 
       - name: Set up Python
         uses: actions/setup-python@v5
