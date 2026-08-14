@@ -120,9 +120,17 @@ The browser does not receive independent network authority.
 
 `browser_capture` first retrieves the approved HTML through the same `net_fetch` origin gate. GroX then renders that captured HTML offline in real Chromium/Chrome through Playwright. Browser-originated HTTP(S) requests are aborted.
 
-Where the host supports the full A5 namespace set, the browser worker runs inside user, PID, and network namespaces. Where that namespace set is blocked, GroX uses a separately commissioned Docker browser image as the outer sandbox. The image is built from the Playwright v1.62.0 Noble base pinned by registry digest, installs the matching Python Playwright package, and runs as the dedicated non-root `groxbrowser` user. The Docker boundary uses `network=none`, all Linux capabilities dropped, `no-new-privileges`, Docker built-in seccomp, a read-only root, bounded resources, private tmpfs/shared memory, and only an ephemeral screenshot scratch directory mounted writable. Chromium's nested Linux sandbox is disabled only inside this already-isolated Docker boundary because the hosted qualification environment rejects Chromium's `/proc/self/fdinfo` chroot path. Runtime uses `--pull never` and never builds or downloads the image.
+Where the host supports the full A5 namespace set, the browser worker runs inside user, PID, and network namespaces. Where that namespace set is blocked, GroX uses a separately commissioned Docker browser image as the outer sandbox. The image is built from the Playwright v1.62.0 Noble base pinned by registry digest, installs the matching Python Playwright package, and has a dedicated non-root `groxbrowser` default user. At runtime the Docker fallback preserves the calling non-root host UID:GID inside the container so the ephemeral screenshot/cache bind remains host-owned and recoverable; a root host is denied this fallback. The Docker boundary uses `network=none`, all Linux capabilities dropped, `no-new-privileges`, Docker built-in seccomp, a read-only root, bounded resources, private tmpfs/shared memory, and only an ephemeral screenshot scratch directory mounted writable. Chromium's nested Linux sandbox is disabled only inside this already-isolated Docker boundary because the hosted qualification environment rejects Chromium's `/proc/self/fdinfo` chroot path. Runtime uses `--pull never` and never builds or downloads the image.
 
 If neither the outer namespace path nor the pre-provisioned Docker browser boundary is available, browser capture is denied. This keeps network authority in the Gateway rather than silently falling back to an unsandboxed host browser.
+
+Evidence includes:
+
+- approved source origin and response hash;
+- rendered-document hash;
+- screenshot path, size, and SHA-256;
+- selected browser backend, isolation controls, browser sandbox mode, and container image ID when Docker is used;
+- blocked origins observed during rendering.
 
 Browser evidence lives under the private `configs/state/browser/` path and is excluded from source control. Host commissioning for the Docker fallback is explicit through `scripts/commission-a5-browser.sh`; the resulting image is a host operational asset rather than command authority or Vessel memory.
 
