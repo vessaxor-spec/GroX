@@ -1,0 +1,63 @@
+# GroX Persistence Architecture
+
+## Decision
+
+GroX uses three separate persistence planes. No single sandbox, model process, or conversation is the Vessel's permanent home.
+
+## Plane 1: Cognitive continuity
+
+**Current home:** ChatGPT project `Space Exploration`.
+
+The project holds the durable human/AI operating context needed to reconstitute Pilot GorXu: Commander intent, GroX doctrine, architectural decisions, Apex trajectory, relevant history, and continuity across project conversations.
+
+The active reasoning model occupies the Pilot seat when invoked. The current preferred runtime is **GPT-5.6 Sol with high reasoning**. GorXu is therefore a durable project identity, not one eternal model process or chat thread.
+
+If project cognition is unavailable, the Vessel must degrade to the deterministic GroX control plane. Loss of cognition must never widen authority.
+
+## Plane 2: Vessel source
+
+**Durable home:** `vessaxor-spec/GroX` on GitHub.
+
+Git is the authoritative durable body for:
+
+- source code;
+- GroX doctrine and architecture;
+- Crew dossiers and company configuration;
+- tests and evaluation assets;
+- machine-readable governance policy;
+- Ship's Log and stewardship records intended for source control.
+
+A sandbox is replaceable compute. It may run the Vessel, but it is not repository truth.
+
+## Plane 3: Operational state
+
+Operational state includes Missions, Mission Orders, evidence, Crew tour state, episodic continuity, and future runtime memory/checkpoints.
+
+Operational state is **private runtime data**. It must not be committed raw to the public GitHub repository. GroX exports recoverable `.groxstate` snapshots whose archives are excluded from public Git.
+
+Each snapshot must contain a versioned manifest, integrity evidence, the Vessel source revision where available, and sufficient binding metadata to identify the project and source lineage.
+
+Restoration requires explicit confirmation and should create a pre-restore checkpoint before replacing live state.
+
+## Reconstitution protocol
+
+A fresh host or sandbox becomes the active flight computer only after this sequence:
+
+1. Restore the Space Exploration project context and GorXu identity.
+2. Materialize the latest verified GroX source from GitHub.
+3. Restore the latest verified private operational-state snapshot when continuation is required.
+4. Run repository integrity checks and the full automated test suite.
+5. Reconstitute Pilot GorXu on the active reasoning model.
+6. Confirm the Commander Seat, Crew roster, Mission Control, and Tool Gateway are healthy.
+7. Resume only from the last committed safe Mission state.
+
+Failure at any recovery gate leaves the Vessel paused rather than silently reconstructing state from model memory.
+
+## Non-negotiable boundaries
+
+- Project memory is cognitive continuity, not executable authority.
+- GitHub stores the Vessel body, not private raw runtime state.
+- Operational snapshots contain no credentials by design and must be treated as private.
+- A sandbox may disappear without destroying GroX's identity or source.
+- A model may change without replacing GorXu's command role.
+- A host may change without changing Commander sovereignty or GroX doctrine.
