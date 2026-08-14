@@ -2,11 +2,11 @@ from __future__ import annotations
 import hashlib
 from ..contracts import MissionOrder, MissionMode, TourResult, Evidence
 from ..tools.gateway import ToolGateway, ToolDenied
-from ..state import StateStore
+from ..durable_state import DurableState
 
 class CrewExecutor:
-    def __init__(self, gateway:ToolGateway, store:StateStore|None=None):
-        self.gateway=gateway; self.store=store
+    def __init__(self, gateway:ToolGateway, durable:DurableState|None=None):
+        self.gateway=gateway; self.store=durable
 
     def _repair_write_text(self, order:MissionOrder)->TourResult:
         evidence=[]
