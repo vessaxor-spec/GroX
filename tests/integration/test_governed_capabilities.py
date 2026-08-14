@@ -144,6 +144,16 @@ class GovernedCapabilityIntegrationTests(unittest.TestCase):
                 self.assertIn('docker_builtin_seccomp', browser['browser_isolation'])
                 self.assertTrue(browser['browser_image_id'])
             self.assertIn('http://example.invalid',browser['blocked_origins'])
+            captured=p.evaluate_mission(result['mission_id'],suite='a6-live-tool-trace')
+            self.assertTrue(captured['metrics']['trace_complete'])
+            self.assertEqual(captured['invariants'],[])
+            trace_categories={event['category'] for event in captured['trajectory']['events']}
+            self.assertTrue({'plan','delegation','tool_action','verification','telemetry'}.issubset(trace_categories))
+            trace_kinds={event['kind'] for event in captured['trajectory']['events']}
+            self.assertTrue({'workspace_execution','network_fetch','browser_capture','mcp_call','graph_verification'}.issubset(trace_kinds))
+            self.assertNotIn(secret_value,json.dumps(captured,sort_keys=True))
+            replay=p.evaluation.replay_trajectory(captured['case_id'])
+            self.assertEqual(replay['trace_sha256'],captured['trajectory']['trace_sha256'])
         finally:
             server.shutdown(); server.server_close(); td.cleanup()
 
