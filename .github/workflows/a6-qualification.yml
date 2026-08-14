@@ -1,0 +1,114 @@
+name: A6 Orchestration Intelligence Qualification
+
+on:
+  push:
+    branches:
+      - a6/orchestration-intelligence
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  vessel-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout A6 branch
+        uses: actions/checkout@v4
+
+      - name: Verify qualification source boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          test ! -e .github/a6-payload
+          test ! -e .github/workflows/a6-wire.yml
+          test -e src/grox/evaluation.py
+          test -e docs/specification/ORCHESTRATION_EVALUATION.md
+          grep -F 'Evaluation may recommend. Evaluation may not activate.' docs/specification/ORCHESTRATION_EVALUATION.md
+          grep -F 'MappingProxyType' src/grox/intelligence.py
+          grep -F 'activation requires a separately authorized GroX mutation path' src/grox/evaluation.py
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Commission qualified workspace isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v unshare
+          command -v chroot
+          command -v prlimit
+          if unshare --user --map-root-user --pid --fork --mount-proc --net /bin/sh -c 'true'; then
+            BACKEND=namespace
+          else
+            echo 'Namespace backend unavailable; commissioning governed Docker workspace fallback.'
+            command -v docker
+            docker version
+            IMAGE='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
+            docker pull "$IMAGE"
+            docker run --rm --pull never --network none --cap-drop ALL --security-opt no-new-privileges --read-only --pids-limit 32 --memory 128m --memory-swap 128m --cpus 0.5 "$IMAGE" /bin/sh -c 'test ! -e /host && echo docker-isolation-ok'
+            WORK="$(mktemp -d)"
+            trap 'rm -rf "$WORK"' EXIT
+            docker run --rm -i --pull never \
+              --network none \
+              --cap-drop ALL \
+              --security-opt no-new-privileges \
+              --user "$(id -u):$(id -g)" \
+              --read-only \
+              --pids-limit 64 \
+              --memory 536870912 \
+              --memory-swap 536870912 \
+              --cpus 1.0 \
+              --ulimit fsize=16777216:16777216 \
+              --ulimit nofile=64:64 \
+              --mount "type=bind,src=$WORK,dst=/work,bind-propagation=rprivate" \
+              --workdir /work \
+              --env HOME=/work \
+              --env TMPDIR=/work \
+              --env LANG=C \
+              --env LC_ALL=C \
+              "$IMAGE" /bin/sh -s <<'EOF'
+          set -eu
+          test ! -e /host
+          printf qualified > /work/canary
+          EOF
+            test "$(cat "$WORK/canary")" = qualified
+            echo docker-workspace-command-ok
+            BACKEND=docker
+          fi
+          echo "A5_ISOLATION_BACKEND=$BACKEND" | tee -a "$GITHUB_ENV"
+          test "$(id -u)" -ne 0 || test "$BACKEND" = namespace
+
+      - name: Commission governed browser isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(id -u)" -ne 0
+          bash scripts/commission-a5-browser.sh
+          test "$(docker image inspect --format '{{.Config.User}}' grox-a5-browser:qualification)" = groxbrowser
+          docker image inspect grox-a5-browser:qualification
+          echo 'A5_BROWSER_DOCKER_IMAGE=grox-a5-browser:qualification' >> "$GITHUB_ENV"
+
+      - name: Install Vessel with browser adapter
+        shell: bash
+        run: |
+          python -m pip install -e '.[browser]'
+          command -v chromium || command -v chromium-browser || command -v google-chrome || command -v google-chrome-stable
+
+      - name: Compile source and tests
+        run: python -m compileall -q src tests
+
+      - name: Run complete Vessel suite
+        shell: bash
+        env:
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -v 2>&1 | tee /tmp/a6-tests.log
+          grep -F 'Ran 77 tests' /tmp/a6-tests.log
+          grep -Fx 'OK' /tmp/a6-tests.log
