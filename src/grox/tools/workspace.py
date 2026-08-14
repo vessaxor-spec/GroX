@@ -170,6 +170,7 @@ class IsolatedWorkspace:
             "--network", "none",
             "--cap-drop", "ALL",
             "--security-opt", "no-new-privileges",
+            "--user", f"{os.getuid()}:{os.getgid()}",
             "--read-only",
             "--pids-limit", "64",
             "--memory", str(self.memory_bytes),
@@ -238,7 +239,7 @@ class IsolatedWorkspace:
                 if self.backend == "namespace"
                 else [
                     "docker_container", "docker_network_none", "capabilities_dropped",
-                    "no_new_privileges", "read_only_root", "resource_limits",
+                    "no_new_privileges", "non_root_host_user", "read_only_root", "resource_limits",
                 ]
             )
             return {
