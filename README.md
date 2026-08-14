@@ -33,7 +33,11 @@ The current native runtime includes:
 - A4 durable Mission Graph resume with committed-step preservation, checkpointed execution, and bounded cancellation/resume controls;
 - executive exception handling with real bounded Crew consultation before ordinary recoverable replans;
 - atomic journaled `write_text` Repair with idempotent replay, compensation, and fail-closed divergence handling;
-- bounded filesystem/test Tool Gateway;
+- Tool Gateway v2 with deny-wins action authorization;
+- governed isolated workspace execution with namespace-first and commissioned Docker fallback isolation;
+- memory-only secret aliases with explicit grants and output redaction;
+- exact-origin bounded HTTP(S) fetch plus offline Chromium screenshot/hash evidence capture;
+- pre-registered stdio MCP adapters with separately gated mutation authority;
 - Inspect/Repair separation;
 - independent verification;
 - private integrity-checked `.groxstate` snapshot/restore support.
