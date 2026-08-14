@@ -2,9 +2,9 @@
 
 GroX is an independent, persistent AI command environment built around a clear chain of command:
 
-**Commander → Pilot GorXu → Mission Control → Divisions → Standing Crew**
+**Commander → Pilot GorXu → Divisions → Standing Crew**
 
-The Commander provides intent and retains final authority over critical, irreversible, or intent-changing decisions. Pilot GorXu is the primary orchestrator and second-in-command. Mission Control is a GroX-native command system used by GorXu for governance, risk analysis, routing support, verification policy, and operational intelligence. Standing Crew execute bounded Mission Orders under explicit authority and evidence requirements.
+The Commander provides intent and retains final authority over critical, irreversible, or intent-changing decisions. Pilot GorXu is the primary orchestrator and second-in-command. Mission Control is a GroX-native policy/advisory service used by GorXu for governance, risk analysis, routing support, verification policy, and operational intelligence; it is not a command layer. Standing Crew execute bounded Mission Orders under explicit authority and evidence requirements.
 
 GroX is not a wrapper around an external orchestration system. Its governance, mission control, crew model, memory, verification, tool policy, and evolutionary mechanisms are native parts of the Vessel.
 
@@ -33,7 +33,11 @@ The current native runtime includes:
 - A4 durable Mission Graph resume with committed-step preservation, checkpointed execution, and bounded cancellation/resume controls;
 - executive exception handling with real bounded Crew consultation before ordinary recoverable replans;
 - atomic journaled `write_text` Repair with idempotent replay, compensation, and fail-closed divergence handling;
-- bounded filesystem/test Tool Gateway;
+- Tool Gateway v2 with deny-wins action authorization;
+- governed isolated workspace execution with namespace-first and commissioned Docker fallback isolation;
+- memory-only secret aliases with explicit grants and output redaction;
+- exact-origin bounded HTTP(S) fetch plus offline Chromium screenshot/hash evidence capture;
+- pre-registered stdio MCP adapters with separately gated mutation authority;
 - Inspect/Repair separation;
 - independent verification;
 - private integrity-checked `.groxstate` snapshot/restore support.

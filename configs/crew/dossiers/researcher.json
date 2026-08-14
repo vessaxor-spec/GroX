@@ -4,6 +4,8 @@
   "title": "Researcher",
   "capabilities": [
     "analysis",
+    "browser_capture",
+    "net_fetch",
     "repo_read",
     "synthesis"
   ],

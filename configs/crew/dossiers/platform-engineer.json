@@ -4,6 +4,7 @@
   "title": "Platform Engineer",
   "capabilities": [
     "analysis",
+    "mcp_call",
     "repo_read",
     "repo_write",
     "test_run"

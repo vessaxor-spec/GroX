@@ -22,13 +22,19 @@ _RISK_RANK = {RiskClass.low:0, RiskClass.medium:1, RiskClass.high:2, RiskClass.c
 
 class PilotGorXu:
     """GroX's sole operational orchestrator."""
-    def __init__(self, vessel_root:Path, *, reasoner:Any=_AUTO):
+    def __init__(
+        self, vessel_root:Path, *, reasoner:Any=_AUTO, gateway_policy=None,
+        extra_allowed_origins=(), secret_broker=None, mcp_registry=None,
+    ):
         self.root=vessel_root.resolve()
         self.store=StateStore(self.root/'configs/state/grox.sqlite3')
         self.durable=DurableState(self.store)
         self.roster=CrewRoster(self.root/'configs/crew/dossiers',self.store)
         self.mission_control=MissionControl()
-        self.gateway=ToolGateway(self.root)
+        self.gateway=ToolGateway(
+            self.root, policy=gateway_policy, extra_allowed_origins=extra_allowed_origins,
+            secret_broker=secret_broker, mcp_registry=mcp_registry,
+        )
         self.executor=CrewExecutor(self.gateway,self.durable)
         self.verifier=IndependentVerifier()
         self.intelligence=LivingCompanyIntelligence(self.store,self.roster)

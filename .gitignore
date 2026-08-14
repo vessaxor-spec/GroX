@@ -6,3 +6,5 @@ configs/state/*.sqlite3
 configs/state/*.sqlite3-*
 configs/state/snapshots/
 *.groxstate
+configs/state/workspaces/
+configs/state/browser/

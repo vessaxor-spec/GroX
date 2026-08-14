@@ -18,6 +18,14 @@ from ..operations import ExecutiveExceptionLoop, ExceptionDecision
 from .contracts import GraphNodeOutcome, GraphNodeSpec, MissionGraphPlan, PilotSynthesis
 
 _RISK_RANK = {RiskClass.low: 0, RiskClass.medium: 1, RiskClass.high: 2, RiskClass.critical: 3}
+_A5_ACTION_CAPABILITY = {
+    "workspace_exec": "workspace_exec",
+    "secret_use": "secret_use",
+    "net_fetch": "net_fetch",
+    "browser_capture": "browser_capture",
+    "mcp_call": "mcp_call",
+    "mcp_mutate": "mcp_mutate",
+}
 
 
 class GraphExecutionError(RuntimeError):
@@ -79,7 +87,19 @@ class MissionGraphRunner:
         # requested. Verification nodes retain test execution by default.
         if spec.mode is MissionMode.inspect and not spec.parameters.get("run_tests"):
             actions = [x for x in actions if x != "test_run"]
-        return actions
+        required = set(self._required_caps(spec))
+        for action in spec.allowed_actions:
+            capability = _A5_ACTION_CAPABILITY.get(action)
+            if capability is None:
+                raise GraphExecutionError(f"graph node {spec.node_id} requested unsupported explicit action: {action}")
+            if capability not in required:
+                raise GraphExecutionError(
+                    f"graph node {spec.node_id} requested {action} without required Crew capability {capability}"
+                )
+            if action == "mcp_mutate" and spec.mode not in {MissionMode.execute, MissionMode.repair}:
+                raise GraphExecutionError(f"graph node {spec.node_id}: mutating MCP action requires execute/repair mode")
+            actions.append(action)
+        return list(dict.fromkeys(actions))
 
     def _make_order(
         self,

@@ -4,7 +4,7 @@
 
 The first GroX-native live Vessel was commissioned in the ChatGPT sandbox.
 
-Verified operational chain: Commander -> Pilot GorXu -> Mission Control -> Standing Crew.
+Verified operational chain: Commander -> Pilot GorXu -> Divisions -> Standing Crew. Mission Control operates as a GorXu-owned policy/advisory service outside the command spine.
 
 Commissioning gates:
 - package runnable

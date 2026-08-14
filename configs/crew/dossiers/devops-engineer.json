@@ -6,7 +6,9 @@
     "analysis",
     "repo_read",
     "repo_write",
-    "test_run"
+    "secret_use",
+    "test_run",
+    "workspace_exec"
   ],
   "tags": [
     "automation",

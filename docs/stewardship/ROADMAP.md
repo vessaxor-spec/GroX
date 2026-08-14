@@ -2,11 +2,11 @@
 
 ## Current position
 
-GroX now has a runnable native Vessel, a full standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4 Apex stages.
+GroX now has a runnable native Vessel, a full standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5 Apex stages.
 
 The command architecture is native to the Vessel:
 
-**Commander → Pilot GorXu → Mission Control → Divisions → Standing Crew**
+**Commander → Pilot GorXu → Divisions → Standing Crew**
 
 ## Completed foundation
 
@@ -26,26 +26,26 @@ The command architecture is native to the Vessel:
 - A2 Mission Graph Orchestration qualified with durable graph state, parallel-ready scheduling, bounded replanning, independent verification, and Pilot-owned synthesis
 - A3 Living Company Intelligence qualified with attributable memory, per-task performance history, experienced routing, and bounded selective memory injection
 - A4 Executive Exception Loop and Durable Operations qualified with same-Mission resume, committed-step preservation, bounded consultation/replan, cancellation, and journaled Repair compensation
+- A5 Governed Capability Expansion qualified with Tool Gateway v2, governed isolated workspaces, memory-only secret aliases, exact-origin network access, offline browser evidence capture, and pre-registered stdio MCP adapters
 
 ## Apex critical path
 
 The Apex run is the Vessel's primary trajectory. Detailed gates are maintained in `APEX_ORCHESTRATOR_PLAN.md`.
 
-### Current stage: A5 — Governed Capability Expansion
+### Current stage: A6 — Orchestration Intelligence and Self-Improvement
 
-A5 must broaden the Vessel's operational reach without giving Crew raw host power or bypassing Mission authority.
+A6 must make GorXu's orchestration quality measurable and evolvable without allowing evidence-driven improvements to self-authorize.
 
 Required outcomes:
 
-- policy-enforced Tool Gateway v2;
-- isolated shell/code workspaces;
-- network/origin policy;
-- secret broker and least-privilege credentials;
-- browser/computer-use with evidence capture;
-- MCP-compatible tool adapters;
-- optional A2A-compatible external-agent adapter while GorXu retains command.
+- trace every plan, delegation, tool action, exception, and verification decision;
+- success, latency, cost, retry, escalation, and verification metrics;
+- replayable evaluation corpus;
+- adversarial and mutation tests;
+- evidence-backed routing, prompt, skill, memory, or workflow improvement proposals;
+- improvement proposals remain subject to the existing GroX authority path before activation.
 
-A5 is complete only when Crew perform a real multi-tool Mission while every side effect remains attributable to a Mission Order, capability grant, evidence record, and verifier path.
+A6 is complete only when an evaluation run proves statistically better orchestration after an improvement without regression in Commander sovereignty, authority containment, safety, evidence integrity, or verifier independence.
 
 ## Qualified Apex stages
 
@@ -53,12 +53,12 @@ A5 is complete only when Crew perform a real multi-tool Mission while every side
 - **A2 Mission Graph Orchestration:** QUALIFIED
 - **A3 Living Company Intelligence:** QUALIFIED
 - **A4 Executive Exception Loop and Durable Operations:** QUALIFIED
+- **A5 Governed Capability Expansion:** QUALIFIED
 
-A3 qualification is backed by repeated-Mission routing adaptation and bounded memory-context evidence. A4 qualification is backed by the **55-test** Vessel suite and live private-Vessel Mission `MSN-a62e95886c0a`, which survived process interruption, resumed the same Mission without replaying committed work, resolved two ordinary Crew failures through consultation and bounded replanning, and reached independent verification PASS.
+A3 qualification is backed by repeated-Mission routing adaptation and bounded memory-context evidence. A4 qualification is backed by the **55-test** Vessel suite and live private-Vessel Mission `MSN-a62e95886c0a`, which survived process interruption, resumed the same Mission without replaying committed work, resolved two ordinary Crew failures through consultation and bounded replanning, and reached independent verification PASS. A5 qualification is backed by the **65-test** fresh-host Vessel suite plus live private-Vessel Mission `MSN-5c3b646ce6be`, which completed isolated workspace, secret, exact-origin network, offline browser evidence, read-only MCP, and independent-verification nodes with no authority widening and no secret persistence.
 
 ## Later Apex stages
 
-- A6 Orchestration Intelligence and Self-Improvement
 - A7 Apex Qualification Gauntlet
 
 ## Persistence foundation

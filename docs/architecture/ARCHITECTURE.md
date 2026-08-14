@@ -145,7 +145,11 @@ Crew do not receive unrestricted raw host access. Tool use passes through a GroX
 
 The intersection is deny-wins. Host restrictions may narrow authority but never expand it.
 
-The current Tool Gateway exposes bounded filesystem/list/test operations. Shell, network, browser/computer use, secret brokerage, and broader actuation remain intentionally gated for later qualification.
+The A5-qualified Tool Gateway v2 exposes bounded filesystem/list/test operations plus governed isolated workspace execution, memory-only secret aliases, exact-origin read-only HTTP(S), offline browser evidence capture, and pre-registered stdio MCP adapters. Privileged actions require explicit Mission Order grants and operation-specific policy intersections. Workspace and browser isolation prefer user/PID/network namespaces and may use a pre-provisioned, digest-pinned Docker boundary when the host denies namespace mapping. Neither path permits unrestricted raw-host fallback.
+
+A5 browser capture deliberately keeps network authority in the Gateway: approved HTML is fetched through `net_fetch`, then rendered offline while browser-originated HTTP(S) is blocked. MCP process definitions are host/Pilot registered rather than Crew supplied, and mutating MCP tools require a separate mutation action grant. Secret values remain memory-only and are not durable Mission data.
+
+Unrestricted interactive desktop actuation, arbitrary third-party/networked MCP transports, runtime image pulls/builds, and optional external-agent delegation remain outside the A5-qualified boundary.
 
 ## Memory architecture
 
