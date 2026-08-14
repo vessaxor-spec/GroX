@@ -28,7 +28,7 @@ class MissionOrder:
     mode: MissionMode
     assigned_crew: str
     required_capabilities: list[str] = field(default_factory=list)
-    allowed_actions: list[str] = field(default_factory=list)
+    allowed_actions: tuple[str, ...] = field(default_factory=tuple)
     forbidden_actions: list[str] = field(default_factory=list)
     scope: list[str] = field(default_factory=lambda:["."])
     risk_class: RiskClass = RiskClass.low
@@ -39,6 +39,16 @@ class MissionOrder:
     parent_order_id: str | None = None
     status: str = "issued"
     parameters: dict[str, Any] = field(default_factory=dict)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name == "allowed_actions":
+            try:
+                object.__getattribute__(self, name)
+            except AttributeError:
+                object.__setattr__(self, name, tuple(value))
+                return
+            raise AttributeError("allowed_actions is immutable after MissionOrder construction")
+        object.__setattr__(self, name, value)
 
     def __post_init__(self) -> None:
         mutation_grants = sorted(set(self.allowed_actions) & _MUTATING_ACTIONS)
@@ -58,6 +68,7 @@ class MissionOrder:
         d = asdict(self)
         d["mode"] = self.mode.value
         d["risk_class"] = self.risk_class.value
+        d["allowed_actions"] = list(self.allowed_actions)
         return d
 
     def to_json(self) -> str:
