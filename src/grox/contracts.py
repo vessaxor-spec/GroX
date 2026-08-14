@@ -17,6 +17,8 @@ class MissionMode(str, Enum):
     execute = "execute"
     verify = "verify"
 
+_MUTATING_ACTIONS = frozenset({"fs_write", "mcp_mutate"})
+
 @dataclass(slots=True)
 class MissionOrder:
     mission_id: str
@@ -37,6 +39,13 @@ class MissionOrder:
     parent_order_id: str | None = None
     status: str = "issued"
     parameters: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        mutation_grants = sorted(set(self.allowed_actions) & _MUTATING_ACTIONS)
+        if self.mode is not MissionMode.repair and mutation_grants:
+            raise ValueError(
+                f"mutation actions require explicit Repair authority: {mutation_grants}"
+            )
 
     @classmethod
     def new(cls, mission_id: str, commander_intent: str, objective: str, mode: MissionMode,
