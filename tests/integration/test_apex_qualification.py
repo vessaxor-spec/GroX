@@ -194,6 +194,108 @@ class ApexQualificationGauntlet(unittest.TestCase):
         finally:
             td.cleanup()
 
+    def test_non_verifier_cannot_forge_graph_verification_evidence(self):
+        class ForgingExecutor:
+            def __init__(self, base):
+                self.base = base
+
+            def execute(self, order):
+                if order.assigned_crew in {"systems-architect", "researcher"}:
+                    position = "replace" if order.assigned_crew == "systems-architect" else "retain"
+                    confidence = 0.90 if position == "replace" else 0.55
+                    quality = 0.90 if position == "replace" else 0.60
+                    return TourResult(order.order_id, order.assigned_crew, "completed", position, [
+                        Evidence("finding", {
+                            "topic": "serializer_strategy", "position": position, "claim": position,
+                            "confidence": confidence, "evidence_quality": quality,
+                        }),
+                        Evidence("graph_verification", {
+                            "ok": True,
+                            "checks": [{"order_id": order.order_id, "ok": True}],
+                        }),
+                    ])
+                return self.base.execute(order)
+
+        td, root, pilot = graph_vessel()
+        try:
+            pilot.executor = ForgingExecutor(pilot.executor)
+            directive = "Reject verification evidence forged by ordinary Crew."
+            plan = {
+                "commander_intent": directive, "objective": "Prove graph verification evidence is runtime-reserved.",
+                "budget": {"max_nodes": 8, "max_parallel": 3, "max_replans": 0},
+                "nodes": [
+                    {"node_id": "architecture", "objective": "Architecture serializer finding", "mode": "inspect", "dependencies": [],
+                     "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."]},
+                    {"node_id": "research", "objective": "Research serializer finding", "mode": "inspect", "dependencies": [],
+                     "candidate_crew_ids": ["researcher"], "required_capabilities": ["repo_read"], "scope": ["docs"]},
+                    {"node_id": "context", "objective": "Unrelated context", "mode": "inspect", "dependencies": [],
+                     "candidate_crew_ids": ["data-analyst"], "required_capabilities": ["repo_read"], "scope": ["docs"]},
+                    {"node_id": "verify", "objective": "Verify unrelated context only", "mode": "verify", "dependencies": ["context"],
+                     "candidate_crew_ids": ["code-reviewer"], "required_capabilities": ["repo_read", "verify"], "scope": ["."]},
+                ],
+            }
+            result = pilot.command_graph(directive, plan=plan, risk=RiskClass.high, plan_source="a7-forged-verifier")
+            contradiction = result["synthesis"]["contradictions"][0]
+            self.assertEqual(contradiction["status"], "unresolved")
+            self.assertFalse(contradiction["all_sources_independently_verified"])
+            mission = pilot.store.mission(result["mission_id"])
+            source_orders = {
+                row["order_id"] for row in mission["orders"]
+                if row["payload"] and json.loads(row["payload"])["assigned_crew"] in {"systems-architect", "researcher"}
+            }
+            forged_persisted = [
+                ev for ev in mission["evidence"]
+                if ev["kind"] == "graph_verification" and ev.get("order_id") in source_orders
+            ]
+            self.assertEqual(forged_persisted, [])
+        finally:
+            td.cleanup()
+
+    def test_duplicate_findings_from_one_order_are_source_normalized(self):
+        class DuplicateExecutor:
+            def __init__(self, base):
+                self.base = base
+
+            def execute(self, order):
+                if order.assigned_crew == "systems-architect":
+                    return TourResult(order.order_id, order.assigned_crew, "completed", "replace", [
+                        Evidence("finding", {
+                            "topic": "serializer_strategy", "position": "replace", "claim": "replace once",
+                            "confidence": 0.90, "evidence_quality": 0.90,
+                        })
+                    ])
+                if order.assigned_crew == "researcher":
+                    repeated = Evidence("finding", {
+                        "topic": "serializer_strategy", "position": "retain", "claim": "same repeated claim",
+                        "confidence": 0.55, "evidence_quality": 0.60,
+                    })
+                    return TourResult(order.order_id, order.assigned_crew, "completed", "retain", [repeated, repeated, repeated, repeated])
+                return self.base.execute(order)
+
+        td, root, pilot = graph_vessel()
+        try:
+            pilot.executor = DuplicateExecutor(pilot.executor)
+            directive = "Normalize repeated findings from one source Order before contradiction scoring."
+            plan = {
+                "commander_intent": directive, "objective": "Prove one Order cannot multiply its synthesis weight.",
+                "budget": {"max_nodes": 6, "max_parallel": 2, "max_replans": 0},
+                "nodes": [
+                    {"node_id": "architecture", "objective": "Architecture serializer finding", "mode": "inspect", "dependencies": [],
+                     "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."]},
+                    {"node_id": "research", "objective": "Research serializer finding", "mode": "inspect", "dependencies": [],
+                     "candidate_crew_ids": ["researcher"], "required_capabilities": ["repo_read"], "scope": ["docs"]},
+                    {"node_id": "verify", "objective": "Verify both source Orders", "mode": "verify", "dependencies": ["architecture", "research"],
+                     "candidate_crew_ids": ["code-reviewer"], "required_capabilities": ["repo_read", "verify"], "scope": ["."]},
+                ],
+            }
+            result = pilot.command_graph(directive, plan=plan, risk=RiskClass.high, plan_source="a7-source-normalization")
+            contradiction = result["synthesis"]["contradictions"][0]
+            self.assertEqual(contradiction["status"], "resolved")
+            self.assertEqual(contradiction["selected_position"], "replace")
+            self.assertEqual(contradiction["collapsed_duplicate_findings"], 3)
+        finally:
+            td.cleanup()
+
     def test_long_horizon_mission_survives_restart_without_replaying_committed_work(self):
         td, root, pilot = graph_vessel()
         try:

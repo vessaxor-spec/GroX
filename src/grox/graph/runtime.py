@@ -142,6 +142,9 @@ class MissionGraphRunner:
         dependency_results: list[TourResult],
     ) -> TourResult:
         result = self.executor.execute(order)
+        # `graph_verification` is reserved runtime evidence. Crew output cannot
+        # manufacture verifier authority, including on a real verification node.
+        result.evidence = [evidence for evidence in result.evidence if evidence.kind != "graph_verification"]
         if spec.mode is not MissionMode.verify or result.status != "completed":
             return result
 
@@ -431,12 +434,22 @@ class MissionGraphRunner:
         return total
 
     def _reconcile_contradictions(
-        self, tour_results: dict[str, TourResult], *, verification_passed: bool,
+        self,
+        tour_results: dict[str, TourResult],
+        *,
+        verification_passed: bool,
+        trusted_verification_orders: set[str],
     ) -> list[dict[str, Any]]:
         verified_orders: set[str] = set()
         for result in tour_results.values():
+            if result.order_id not in trusted_verification_orders:
+                continue
             for evidence in result.evidence:
-                if evidence.kind != 'graph_verification' or not isinstance(evidence.content, dict):
+                if (
+                    evidence.kind != 'graph_verification'
+                    or not isinstance(evidence.content, dict)
+                    or evidence.content.get('ok') is not True
+                ):
                     continue
                 for check in evidence.content.get('checks', []):
                     if isinstance(check, dict) and check.get('ok') is True and isinstance(check.get('order_id'), str):
@@ -470,7 +483,17 @@ class MissionGraphRunner:
 
         reconciled: list[dict[str, Any]] = []
         for topic in sorted(grouped):
-            sources = grouped[topic]
+            raw_sources = grouped[topic]
+            # One source Order receives at most one weight contribution per
+            # position. Repeated or differently worded same-position findings
+            # cannot multiply that Order's synthesis authority.
+            normalized: dict[tuple[str, str], dict[str, Any]] = {}
+            for source in raw_sources:
+                key = (source['order_id'], source['position'])
+                current = normalized.get(key)
+                if current is None or source['weight'] > current['weight']:
+                    normalized[key] = source
+            sources = list(normalized.values())
             positions = sorted({source['position'] for source in sources})
             if len(positions) < 2:
                 continue
@@ -494,7 +517,8 @@ class MissionGraphRunner:
                 'sources': sorted(sources, key=lambda source: (source['position'], source['crew_id'], source['order_id'])),
                 'verified_source_orders': sorted(source_order_ids & verified_orders),
                 'all_sources_independently_verified': directly_verified,
-                'basis': 'eligible Crew finding evidence ranked by confidence x evidence_quality; every source Order requires independent verification',
+                'collapsed_duplicate_findings': len(raw_sources) - len(sources),
+                'basis': 'eligible Crew finding evidence source-normalized by Order and position, ranked by confidence x evidence_quality; every source Order requires independent verification',
             })
         return reconciled
 
@@ -715,7 +739,16 @@ class MissionGraphRunner:
             statuses.get(node_id) in {"completed", "replanned"} for node_id in verification_nodes
         )
         evidence_kinds = sorted({kind for outcome in outcomes.values() for kind in outcome.evidence_kinds})
-        contradictions = self._reconcile_contradictions(tour_results, verification_passed=verification_passed)
+        trusted_verification_orders = {
+            outcomes[node_id].order_id
+            for node_id in verification_nodes
+            if node_id in outcomes and outcomes[node_id].status == 'completed'
+        }
+        contradictions = self._reconcile_contradictions(
+            tour_results,
+            verification_passed=verification_passed,
+            trusted_verification_orders=trusted_verification_orders,
+        )
         spent_cost = self._committed_cost(mission_id)
         decisions = self.durable.exception_decisions(mission_id)
         commander_required = any(d['requires_commander'] for d in decisions)
