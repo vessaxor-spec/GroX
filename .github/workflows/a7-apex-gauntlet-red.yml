@@ -1,0 +1,37 @@
+name: A7 Apex Qualification Red Baseline
+
+on:
+  push:
+    branches:
+      - verification/a7-apex-gauntlet-red
+
+permissions:
+  contents: read
+
+jobs:
+  gauntlet:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact red gauntlet head
+        uses: actions/checkout@v4
+        with:
+          ref: 6a4718a527b402727a27d4a88023015305c84a52
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependency
+        run: python -m pip install '.[test]'
+      - name: Commission governed A5 workspace fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          image='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
+          docker pull "$image"
+          docker image inspect "$image" >/dev/null
+      - name: Run A7 red gauntlet
+        env:
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          python -m pytest -q tests/integration/test_apex_qualification.py
