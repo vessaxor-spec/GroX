@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+import math
 from dataclasses import replace
 from time import perf_counter
 from typing import Any
@@ -141,6 +142,9 @@ class MissionGraphRunner:
         dependency_results: list[TourResult],
     ) -> TourResult:
         result = self.executor.execute(order)
+        # `graph_verification` is reserved runtime evidence. Crew output cannot
+        # manufacture verifier authority, including on a real verification node.
+        result.evidence = [evidence for evidence in result.evidence if evidence.kind != "graph_verification"]
         if spec.mode is not MissionMode.verify or result.status != "completed":
             return result
 
@@ -175,6 +179,7 @@ class MissionGraphRunner:
         failed_order_id: str,
         crew: CrewDossier,
         risk: RiskClass,
+        cost_units: float = 0.0,
     ) -> tuple[str | None, TourResult]:
         objective = f"Consult bounded recovery evidence for: {spec.objective}"
         order = MissionOrder.new(
@@ -187,6 +192,11 @@ class MissionGraphRunner:
         )
         memory_meta = self.intelligence.inject_order_context(order, objective)
         self.store.save_order(order)
+        if cost_units > 0.0:
+            self.store.add_graph_event(mission_id, 'cost_committed', {
+                'kind': 'recovery_consultation', 'node_id': spec.node_id, 'order_id': order.order_id,
+                'attempt': None, 'cost_units': cost_units,
+            }, node_id=spec.node_id)
         self.store.add_evidence(mission_id, order.order_id, Evidence('exception_consultation', {
             'failed_order_id': failed_order_id, 'failed_node': spec.node_id, 'consulted_crew': crew.crew_id,
         }))
@@ -204,7 +214,7 @@ class MissionGraphRunner:
         self.intelligence.record_performance(
             crew_id=crew.crew_id, mission_id=mission_id, order_id=order.order_id,
             task_class=order.parameters.get('_task_class', 'general'), result=result,
-            latency_ms=latency_ms, risk=risk, verified=None,
+            latency_ms=latency_ms, risk=risk, verified=None, cost_units=cost_units,
         )
         self.durable.checkpoint(
             mission_id, 'exception_consultation', result.status, node_id=spec.node_id,
@@ -347,9 +357,25 @@ class MissionGraphRunner:
                 'exception_type': exc_type,
             }),
         )
+        consultation_cost = max(0.0, float(failed_spec.budget.cost_units))
+        spent_cost = self._committed_cost(mission_id)
+        if spent_cost + consultation_cost > plan.budget.max_cost_units + 1e-12:
+            reason = 'Mission cost budget exhausted before recovery consultation'
+            self.store.add_graph_event(mission_id, 'cost_budget_exhausted', {
+                'spent_cost_units': spent_cost, 'max_cost_units': plan.budget.max_cost_units,
+                'blocked_node': failed_spec.node_id, 'required_cost_units': consultation_cost,
+                'phase': 'recovery_consultation',
+            }, node_id=failed_spec.node_id)
+            halted = ExceptionDecision('pilot_halt', reason)
+            self.exception_loop.persist(
+                mission_id=mission_id, node_id=failed_spec.node_id, order_id=failed_outcome.order_id,
+                exception_type=exc_type, risk=effective_risk, decision=halted,
+            )
+            return None, replan_count
         consultation_order_id, consultation = self._consult_recovery(
             mission_id=mission_id, directive=directive, spec=failed_spec,
             failed_order_id=failed_outcome.order_id, crew=replacement, risk=effective_risk,
+            cost_units=consultation_cost,
         )
         if consultation.status != 'completed':
             halted = ExceptionDecision('pilot_halt', 'bounded recovery consultation failed; do not continue automatically')
@@ -393,6 +419,109 @@ class MissionGraphRunner:
         )
         return replacement_id, replan_count
 
+    def _committed_cost(self, mission_id: str) -> float:
+        total = 0.0
+        for event in self.store.graph_events(mission_id):
+            if event['event_type'] != 'cost_committed':
+                continue
+            try:
+                payload = json.loads(event['content'])
+                value = float(payload.get('cost_units', 0.0))
+            except (TypeError, ValueError, json.JSONDecodeError):
+                continue
+            if math.isfinite(value) and value > 0.0:
+                total += value
+        return total
+
+    def _reconcile_contradictions(
+        self,
+        tour_results: dict[str, TourResult],
+        *,
+        verification_passed: bool,
+        trusted_verification_orders: set[str],
+    ) -> list[dict[str, Any]]:
+        verified_orders: set[str] = set()
+        for result in tour_results.values():
+            if result.order_id not in trusted_verification_orders:
+                continue
+            for evidence in result.evidence:
+                if (
+                    evidence.kind != 'graph_verification'
+                    or not isinstance(evidence.content, dict)
+                    or evidence.content.get('ok') is not True
+                ):
+                    continue
+                for check in evidence.content.get('checks', []):
+                    if isinstance(check, dict) and check.get('ok') is True and isinstance(check.get('order_id'), str):
+                        verified_orders.add(check['order_id'])
+
+        grouped: dict[str, list[dict[str, Any]]] = {}
+        for result in tour_results.values():
+            for evidence in result.evidence:
+                if evidence.kind != 'finding' or not isinstance(evidence.content, dict):
+                    continue
+                topic = evidence.content.get('topic')
+                position = evidence.content.get('position')
+                claim = evidence.content.get('claim')
+                if not all(isinstance(value, str) and value.strip() for value in (topic, position, claim)):
+                    continue
+                try:
+                    confidence = float(evidence.content.get('confidence', 0.0))
+                    quality = float(evidence.content.get('evidence_quality', 0.0))
+                except (TypeError, ValueError):
+                    continue
+                if not math.isfinite(confidence) or not math.isfinite(quality):
+                    continue
+                confidence = min(1.0, max(0.0, confidence))
+                quality = min(1.0, max(0.0, quality))
+                weight = confidence * quality
+                grouped.setdefault(topic.strip(), []).append({
+                    'order_id': result.order_id, 'crew_id': result.crew_id,
+                    'position': position.strip(), 'claim': claim.strip(),
+                    'confidence': confidence, 'evidence_quality': quality, 'weight': weight,
+                })
+
+        reconciled: list[dict[str, Any]] = []
+        for topic in sorted(grouped):
+            raw_sources = grouped[topic]
+            # One source Order receives at most one weight contribution per
+            # position. Repeated or differently worded same-position findings
+            # cannot multiply that Order's synthesis authority.
+            normalized: dict[tuple[str, str], dict[str, Any]] = {}
+            for source in raw_sources:
+                key = (source['order_id'], source['position'])
+                current = normalized.get(key)
+                if current is None or source['weight'] > current['weight']:
+                    normalized[key] = source
+            sources = list(normalized.values())
+            positions = sorted({source['position'] for source in sources})
+            if len(positions) < 2:
+                continue
+            scores = {position: 0.0 for position in positions}
+            for source in sources:
+                scores[source['position']] += source['weight']
+            ranked = sorted(scores.items(), key=lambda item: (-item[1], item[0]))
+            total = sum(scores.values())
+            unique_winner = len(ranked) == 1 or not math.isclose(ranked[0][1], ranked[1][1], rel_tol=0.0, abs_tol=1e-12)
+            source_order_ids = {source['order_id'] for source in sources}
+            directly_verified = bool(source_order_ids) and source_order_ids.issubset(verified_orders)
+            resolved = verification_passed and directly_verified and total > 0.0 and unique_winner
+            selected = ranked[0][0] if resolved else None
+            calibrated = (ranked[0][1] / total) if resolved and total > 0.0 else 0.0
+            reconciled.append({
+                'topic': topic,
+                'status': 'resolved' if resolved else 'unresolved',
+                'selected_position': selected,
+                'confidence': calibrated,
+                'position_scores': {key: scores[key] for key in sorted(scores)},
+                'sources': sorted(sources, key=lambda source: (source['position'], source['crew_id'], source['order_id'])),
+                'verified_source_orders': sorted(source_order_ids & verified_orders),
+                'all_sources_independently_verified': directly_verified,
+                'collapsed_duplicate_findings': len(raw_sources) - len(sources),
+                'basis': 'eligible Crew finding evidence source-normalized by Order and position, ranked by confidence x evidence_quality; every source Order requires independent verification',
+            })
+        return reconciled
+
     def run(
         self,
         *,
@@ -428,6 +557,7 @@ class MissionGraphRunner:
             )
             self.durable.checkpoint(mission_id, 'graph_started', 'committed', payload={'nodes': len(plan.nodes)})
         verification_nodes: set[str] = {node_id for node_id,spec in specs.items() if spec.mode is MissionMode.verify}
+        spent_cost = self._committed_cost(mission_id)
 
         unresolved_reason: str | None = None
         while True:
@@ -445,7 +575,23 @@ class MissionGraphRunner:
             if not ready:
                 unresolved_reason = "graph has no runnable nodes; dependency chain is unresolved"
                 break
-            batch = ready[: plan.budget.max_parallel]
+            batch: list[str] = []
+            reserved_cost = 0.0
+            for node_id in ready:
+                if len(batch) >= plan.budget.max_parallel:
+                    break
+                node_cost = max(0.0, float(specs[node_id].budget.cost_units))
+                if spent_cost + reserved_cost + node_cost <= plan.budget.max_cost_units + 1e-12:
+                    batch.append(node_id)
+                    reserved_cost += node_cost
+            if not batch:
+                required = min(max(0.0, float(specs[node_id].budget.cost_units)) for node_id in ready)
+                unresolved_reason = 'Mission cost budget exhausted'
+                self.store.add_graph_event(mission_id, 'cost_budget_exhausted', {
+                    'spent_cost_units': spent_cost, 'max_cost_units': plan.budget.max_cost_units,
+                    'ready_nodes': ready, 'minimum_required_cost_units': required, 'phase': 'node_execution',
+                })
+                break
             self.store.add_graph_event(mission_id, "batch_started", {"nodes": batch, "parallel_width": len(batch)})
             prepared: dict[str, tuple[GraphNodeSpec, MissionOrder, list[TourResult]]] = {}
             batch_crew: set[str] = set()
@@ -471,6 +617,12 @@ class MissionGraphRunner:
                 order = self._make_order(mission_id, directive, spec, crew, global_risk, parent_order, attempt=attempts[node_id])
                 memory_meta = self.intelligence.inject_order_context(order, spec.objective)
                 self.store.save_order(order)
+                node_cost = max(0.0, float(spec.budget.cost_units))
+                self.store.add_graph_event(mission_id, 'cost_committed', {
+                    'kind': 'graph_node', 'node_id': node_id, 'order_id': order.order_id,
+                    'attempt': attempts[node_id], 'cost_units': node_cost,
+                }, node_id=node_id)
+                spent_cost += node_cost
                 self.store.add_evidence(mission_id, order.order_id, Evidence("routing_decision", routing.to_dict()))
                 self.store.add_evidence(mission_id, order.order_id, Evidence("memory_selection", memory_meta))
                 self.store.crew_on_duty(crew.crew_id, mission_id)
@@ -539,6 +691,7 @@ class MissionGraphRunner:
                         crew_id=order.assigned_crew, mission_id=mission_id, order_id=order.order_id,
                         task_class=order.parameters.get("_task_class", self.intelligence.task_class(spec.objective)),
                         result=result, latency_ms=latency_ms, risk=order.risk_class, verified=None,
+                        cost_units=spec.budget.cost_units,
                     )
                     if spec.mode is MissionMode.verify:
                         for evidence in result.evidence:
@@ -574,6 +727,7 @@ class MissionGraphRunner:
                         plan=plan,
                         global_risk=global_risk,
                     )
+                    spent_cost = self._committed_cost(mission_id)
                     if replacement_id is None:
                         unresolved_reason = f"node {node_id} failed: {(result.exception or {}).get('type', 'unknown')}"
             if unresolved_reason:
@@ -585,6 +739,17 @@ class MissionGraphRunner:
             statuses.get(node_id) in {"completed", "replanned"} for node_id in verification_nodes
         )
         evidence_kinds = sorted({kind for outcome in outcomes.values() for kind in outcome.evidence_kinds})
+        trusted_verification_orders = {
+            outcomes[node_id].order_id
+            for node_id in verification_nodes
+            if node_id in outcomes and outcomes[node_id].status == 'completed'
+        }
+        contradictions = self._reconcile_contradictions(
+            tour_results,
+            verification_passed=verification_passed,
+            trusted_verification_orders=trusted_verification_orders,
+        )
+        spent_cost = self._committed_cost(mission_id)
         decisions = self.durable.exception_decisions(mission_id)
         commander_required = any(d['requires_commander'] for d in decisions)
         run_state = self.durable.graph_run(mission_id)
@@ -597,7 +762,8 @@ class MissionGraphRunner:
         summary = (
             f"GorXu coordinated {len(completed)} completed graph nodes across {len(used_crew)} Crew; "
             f"replans={replan_count}; exceptions={len(decisions)}; "
-            f"resumes={(run_state or {}).get('resume_count',0)}; verification={'PASS' if verification_passed else 'NOT PROVEN'}"
+            f"resumes={(run_state or {}).get('resume_count',0)}; cost={spent_cost:.3f}/{plan.budget.max_cost_units:.3f}; "
+            f"contradictions={len(contradictions)}; verification={'PASS' if verification_passed else 'NOT PROVEN'}"
         )
         if unresolved_reason:
             summary += f"; unresolved: {unresolved_reason}"
@@ -610,6 +776,9 @@ class MissionGraphRunner:
             replans=replan_count,
             verification_passed=verification_passed,
             evidence_kinds=evidence_kinds,
+            contradictions=contradictions,
+            cost_units=spent_cost,
+            cost_budget=plan.budget.max_cost_units,
         )
         self.store.add_graph_event(mission_id, "pilot_synthesis", synthesis.to_dict())
         self.durable.checkpoint(mission_id, 'pilot_synthesis', synthesis.outcome, payload=synthesis.to_dict())

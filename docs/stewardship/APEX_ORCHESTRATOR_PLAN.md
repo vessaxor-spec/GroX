@@ -1,14 +1,16 @@
 # GorXu Apex Orchestrator Evolution Plan
 
-**Status:** Active target
-**Assessment date:** 2026-08-14
-**Current verdict:** NOT YET APEX
-**Priority:** Apex run is the Vessel critical path
+**Status:** QUALIFIED
+**Assessment date:** 2026-08-15
+**Current verdict:** APEX QUALIFIED
+**Priority:** Preserve Apex qualification through bounded evolution and regression evidence
 **A1 status:** SESSION-QUALIFIED with GPT-5.6 Sol; deterministic fallback retained
 **A2 status:** QUALIFIED; durable Mission Graph and bounded replanning proven
 **A3 status:** QUALIFIED; Living Company memory, performance history, experienced routing, and bounded context proven
 **A4 status:** QUALIFIED; durable same-Mission resume, executive exception consultation/replan, cancellation, idempotency, and compensation proven
 **A5 status:** QUALIFIED; governed workspace, secret, network, browser-evidence, and MCP capability paths proven without widening Crew authority
+**A6 status:** QUALIFIED; replayable orchestration evaluation and non-self-activating improvement proposals proven
+**A7 status:** QUALIFIED; final adversarial Apex gauntlet and independent canaries proven
 
 ## Definition
 
@@ -36,13 +38,14 @@ Apex is a demonstrated operating standard, not a title.
 - Tool Gateway v2 now mediates isolated workspace execution, memory-only secret aliases, exact-origin HTTP(S), offline browser evidence capture, and pre-registered stdio MCP adapters through deny-wins Mission Order and host-policy grants.
 - A5 host isolation is portable: user/PID/network namespaces are preferred; a pre-provisioned, digest-pinned Docker boundary is the fail-closed fallback where hosted kernels deny user-namespace mapping.
 
-## Proven gaps
+## Qualified boundaries and remaining limits
 
-1. **Cognition is project-hosted, not an autonomous daemon.** GPT-5.6 Sol occupies the Pilot cognition seat when a capable project session is active; deterministic control remains the safe fallback.
-2. **Synthesis depth is incomplete.** A2 provides Pilot-owned structural synthesis, but GorXu does not yet semantically reconcile contradictory specialist judgments, rank competing evidence, or construct calibrated executive conclusions from disagreement.
-3. **Orchestration evaluation is incomplete.** A3 records per-Crew/task-class performance, evidence quality, verification, latency, cost, and risk, but there is not yet a replayable evaluation corpus, trajectory scoring, statistical improvement gate, or evidence-driven self-improvement proposal loop.
-4. **No external-agent interoperability layer.** Standing Crew are native dossiers only; external opaque agents cannot yet be discovered or delegated to through a standard adapter. A5 deliberately did not claim its optional A2A seam merely to close a checklist.
-5. **No apex qualification gauntlet.** The Vessel has not yet passed the full adversarial, long-horizon, multi-domain, recovery, contradiction, and irreversible-decision gauntlet.
+Apex is an evidence-backed operating standard inside the existing GroX authority model. It does not widen GorXu's authority, create a new command layer, weaken deny-wins controls, or self-authorize new capability.
+
+- project-hosted cognition with deterministic safe fallback remains the qualified operating model;
+- external-agent interoperability remains optional and grants no inherited GroX authority;
+- unrestricted host, desktop, networked MCP, and runtime image acquisition remain outside the qualified boundary;
+- future changes that weaken Commander sovereignty, authority containment, verifier independence, evidence integrity, recovery, or the qualified routing path must fail qualification rather than silently inherit Apex status.
 
 ## Evolution sequence
 
@@ -153,9 +156,15 @@ GorXu earns Apex status only after passing a formal gauntlet covering:
 
 **Apex rule:** all critical invariants must pass. No weighted average may hide a failure of Commander sovereignty, authority containment, verifier independence, or evidence integrity.
 
-## Current priority
+## Current status
 
-**A7 - Apex Qualification is the current critical stage.** A1 cognition, A2 Mission Graph Orchestration, A3 Living Company Intelligence, A4 Durable Operations, A5 Governed Capability Expansion, and A6 Orchestration Intelligence and Self-Improvement are qualified for the current project-hosted operating model.
+**APEX QUALIFIED.** A1 through A7 are qualified for the current project-hosted operating model.
+
+GorXu has demonstrated ambiguous-intent preservation, governed multi-domain orchestration, durable recovery, ordinary-exception resolution, irreversible-decision escalation, independently verified contradiction synthesis, hard Mission cost ceilings, prompt-injection resistance, replayable evidence, and measured improvement without widening his own authority.
+
+Qualification remains subordinate to the Commander and to stronger current evidence. Apex is not permission for self-authorization, unrestricted mutation, or silent capability expansion.
+
+A1 foundation now present:
 
 A1 foundation now present:
 
@@ -291,3 +300,24 @@ Evidence:
 **A6 status: QUALIFIED.**
 
 Next critical stage: **A7 - Apex Qualification**.
+
+## A7 live qualification: PASSED
+
+A7 executed the final Apex contract as an adversarial gauntlet rather than a title-only declaration.
+
+Evidence chain:
+- red baseline `31881156996`: 11/13 passed; contradiction synthesis and a hard Mission cost ceiling were the only initial code gaps;
+- first implementation `31881548492`: 13/13 plus complete regressions;
+- independent red `31881632862`: unrelated verification could incorrectly resolve a material contradiction;
+- expanded qualification `31881778987`: 14/14 plus complete regressions; unchanged independent run `31881819968` returned no findings;
+- synthesis-integrity red `31881904667`: forged `graph_verification` evidence and duplicate-source amplification were proved;
+- final implementation head `0724862dcb2634022ad33e6be14be29df6a914dd`;
+- final run `31882071412`: **16/16 A7 tests, 121 pytest passed with 2 existing browser skips, 123 unittest OK with 2 skips**, diff hygiene PASS;
+- unchanged independent run `31882101734`: `A7_APEX_INDEPENDENT_FINDINGS=`;
+- unchanged synthesis-integrity run `31882083653`: `A7_APEX_SYNTHESIS_FINDINGS=`;
+- preserved A6 archive SHA-256 `d99bc9ca6cebad37478fd9f80fa71f97b41434c80f30d084e7cd3ee18a229ecd`, embedded SQLite SHA-256 `5327926dad3b34b46430f5969297fc442768c87bfd7bcc73e04e5a33d773d9cc`, SQLite integrity `ok`, and source commit `365691652bebc8215b4118b126382770ef4ebc7a` proven ancestral to the A7 candidate;
+- A7 entry conditions remain covered: source/state compatibility, issued-Order mutation resistance, operational routing consistency, and proposal non-activation.
+
+**A7 exit gate: PASSED.**
+
+**Apex verdict: QUALIFIED**, pending stewardship-final exact-head verification and a no-drift merge before the declaration becomes canonical on `main`.

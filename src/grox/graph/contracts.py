@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+import math
 from typing import Any
 
 from ..contracts import MissionMode, RiskClass
@@ -12,17 +13,21 @@ _MUTATING_ACTIONS = frozenset({"fs_write", "mcp_mutate"})
 class NodeBudget:
     max_attempts: int = 2
     max_seconds: int = 120
+    cost_units: float = 1.0
 
     @classmethod
     def from_mapping(cls, raw: dict[str, Any] | None) -> "NodeBudget":
         raw = raw or {}
         max_attempts = int(raw.get("max_attempts", 2))
         max_seconds = int(raw.get("max_seconds", 120))
+        cost_units = float(raw.get("cost_units", 1.0))
         if not 1 <= max_attempts <= 5:
             raise ValueError("node max_attempts must be between 1 and 5")
         if not 1 <= max_seconds <= 3600:
             raise ValueError("node max_seconds must be between 1 and 3600")
-        return cls(max_attempts=max_attempts, max_seconds=max_seconds)
+        if not math.isfinite(cost_units) or not 0.0 <= cost_units <= 1_000_000.0:
+            raise ValueError("node cost_units must be finite and between 0 and 1000000")
+        return cls(max_attempts=max_attempts, max_seconds=max_seconds, cost_units=cost_units)
 
 
 @dataclass(slots=True)
@@ -30,6 +35,7 @@ class MissionBudget:
     max_nodes: int = 20
     max_parallel: int = 4
     max_replans: int = 3
+    max_cost_units: float = 100.0
 
     @classmethod
     def from_mapping(cls, raw: dict[str, Any] | None) -> "MissionBudget":
@@ -37,13 +43,21 @@ class MissionBudget:
         max_nodes = int(raw.get("max_nodes", 20))
         max_parallel = int(raw.get("max_parallel", 4))
         max_replans = int(raw.get("max_replans", 3))
+        max_cost_units = float(raw.get("max_cost_units", 100.0))
         if not 1 <= max_nodes <= 100:
             raise ValueError("mission max_nodes must be between 1 and 100")
         if not 1 <= max_parallel <= 16:
             raise ValueError("mission max_parallel must be between 1 and 16")
         if not 0 <= max_replans <= 20:
             raise ValueError("mission max_replans must be between 0 and 20")
-        return cls(max_nodes=max_nodes, max_parallel=max_parallel, max_replans=max_replans)
+        if not math.isfinite(max_cost_units) or not 0.0 <= max_cost_units <= 100_000_000.0:
+            raise ValueError("mission max_cost_units must be finite and between 0 and 100000000")
+        return cls(
+            max_nodes=max_nodes,
+            max_parallel=max_parallel,
+            max_replans=max_replans,
+            max_cost_units=max_cost_units,
+        )
 
 
 @dataclass(slots=True)
@@ -220,6 +234,9 @@ class PilotSynthesis:
     replans: int
     verification_passed: bool
     evidence_kinds: list[str]
+    contradictions: list[dict[str, Any]] = field(default_factory=list)
+    cost_units: float = 0.0
+    cost_budget: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

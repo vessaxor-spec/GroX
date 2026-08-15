@@ -64,13 +64,13 @@ The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/Gr
 
 ## Apex Orchestrator readiness
 
-**Current status: NOT YET APEX**
+**Current status: APEX QUALIFIED**
 
 The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot, A2 Mission Graph Orchestration, A3 Living Company Intelligence, A4 Executive Exception Loop and Durable Operations, A5 Governed Capability Expansion, and A6 Orchestration Intelligence and Self-Improvement have qualified. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, attributable organizational memory, experienced routing, bounded selective memory, same-Mission crash recovery, checkpointed execution, bounded executive consultation/replanning, cancellation, journaled text-Repair compensation, governed multi-tool execution through Tool Gateway v2, and replayable evidence-backed orchestration evaluation whose proposals cannot self-activate.
 
 The canonical evolution path is recorded in `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md`.
 
-Current critical path: **A7 - Apex Qualification Gauntlet**. GorXu remains **NOT YET APEX** until the final A7 gauntlet passes.
+Apex critical path: **COMPLETE**. A1 through A7 are qualified; future changes must preserve the qualification invariants rather than inherit Apex automatically.
 
 ## Apex critical-path update - A1 Cognitive Pilot
 
@@ -347,3 +347,27 @@ The bounded pre-A7 hardening response is limited to proved findings:
 - the A7 gauntlet must include source/state mismatch, post-issuance Order mutation, routing-path consistency, and non-activation of evaluation proposals before Apex can be considered.
 
 Local pre-publication regression on the hardening candidate: **107 pytest tests passed** and **107 unittest tests passed**. This local result is not the independent completion gate; GitHub-hosted and independent verification remain required before merge.
+
+## Apex critical-path update - A7 Apex Qualification Gauntlet
+
+**Status: QUALIFIED**
+
+A7 closed only after every discovered evidence/recovery defect was remediated and independently reverified.
+
+- `31881156996`: red baseline, 11/13;
+- `31881548492`: first 13/13 plus complete regressions;
+- `31881632862`: independent red on unrelated contradiction verification;
+- `31881778987`: 14/14 plus regressions; `31881819968`: unchanged independent canary empty;
+- `31881904667`: independent red on forged verifier evidence and duplicate-source amplification;
+- final head `0724862dcb2634022ad33e6be14be29df6a914dd`;
+- `31882071412`: **16/16 A7, 121 pytest passed with 2 skips, 123 unittest OK with 2 skips**, diff hygiene PASS;
+- `31882101734`: `A7_APEX_INDEPENDENT_FINDINGS=`;
+- `31882083653`: `A7_APEX_SYNTHESIS_FINDINGS=`;
+- private A6 state hashes and SQLite integrity reverified; source ancestry proved;
+- A7 entry-hardening conditions remain covered.
+
+A7 adds crash-persistent hard cost ceilings and source-normalized, independently verified contradiction synthesis. Ordinary Crew cannot manufacture runtime verifier evidence, ties remain unresolved, and duplicate findings from one Order cannot multiply its synthesis weight.
+
+**A7 exit gate: PASSED.**
+
+**Apex operating verdict: QUALIFIED**, pending only stewardship-final exact-head verification and no-drift merge before canonicalization on `main`.
