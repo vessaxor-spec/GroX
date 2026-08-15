@@ -15,7 +15,7 @@ jobs:
       - name: Checkout exact A7 candidate
         uses: actions/checkout@v4
         with:
-          ref: 7b4e0a5f9428d2b55127a201b71d5b8804b99c96
+          ref: 0724862dcb2634022ad33e6be14be29df6a914dd
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -98,7 +98,6 @@ jobs:
                   ],
               }
 
-          # Canary 1: unrelated verification must not convert contradictory findings into a resolved conclusion.
           td, root, pilot = graph_vessel()
           try:
               pilot.executor = FindingsExecutor(pilot.executor)
@@ -117,7 +116,6 @@ jobs:
           finally:
               td.cleanup()
 
-          # Canary 2: equal weighted evidence must remain explicitly unresolved even when both sources are verified.
           td, root, pilot = graph_vessel()
           try:
               pilot.executor = FindingsExecutor(pilot.executor, tie=True)
@@ -134,7 +132,6 @@ jobs:
           finally:
               td.cleanup()
 
-          # Canary 3: cost committed before a crash must remain consumed after restart.
           td, root, pilot = graph_vessel()
           try:
               directive = 'Attempt one cost-bounded node and preserve consumed budget across a process crash.'
@@ -176,7 +173,6 @@ jobs:
           finally:
               td.cleanup()
 
-          # Canary 4: recovery consultation may not overspend a depleted Mission budget.
           td, root, pilot = graph_vessel()
           try:
               directive = 'Inject one recoverable Crew failure but prohibit recovery work once the hard cost ceiling is spent.'
@@ -206,7 +202,6 @@ jobs:
           finally:
               td.cleanup()
 
-          # Canary 5: parallel preparation must reserve the aggregate batch budget rather than overcommit it.
           td, root, pilot = graph_vessel()
           try:
               directive = 'Run parallel eligible work without reserving more than the fixed Mission cost ceiling.'
