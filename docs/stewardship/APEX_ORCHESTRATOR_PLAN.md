@@ -166,8 +166,6 @@ Qualification remains subordinate to the Commander and to stronger current evide
 
 A1 foundation now present:
 
-A1 foundation now present:
-
 - provider-neutral reasoning contract;
 - structured Mission Interpretation schema;
 - intent-preservation validation;

@@ -111,7 +111,7 @@ A1 exit gate is closed; the current Apex stage is tracked below.
 - `configs/persistence/project-binding.json` records the active persistence bindings;
 - automated suite: **31 tests passing** after persistence-plane implementation.
 
-The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed; the current Apex critical path is A7 Apex Qualification Gauntlet.
+The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed. The Apex critical path is complete; future evolution must preserve the qualified Apex invariants.
 
 ## Durable source synchronization
 
