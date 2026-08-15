@@ -35,6 +35,12 @@ A Crew member may use only the intersection of:
 
 If any layer denies an action, the action is denied.
 
+## Issuance immutability
+
+A Mission Order is an immutable issued authority contract. Authority-bearing scalar and list fields are snapshotted at construction, including required capabilities, allowed and forbidden actions, scope, evidence and verification requirements, stop conditions, risk, mode, and assigned Crew. Operation parameters are deep-copied at construction, may receive bounded pre-issuance context, and are deep-frozen when the Order is persisted or first used by the Tool Gateway.
+
+Runtime code must not widen a sealed Order in place. A broader scope, different grant, changed verifier requirement, or altered parameter envelope requires a newly issued bounded Order through GorXu. Serialization preserves the external JSON list/object shapes even though the sealed in-memory authority envelope is immutable.
+
 ## Inspect mode
 
 Inspect mode is read-and-report by default.

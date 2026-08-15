@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import tempfile
+from unittest.mock import patch
 import unittest
 from pathlib import Path
 
@@ -45,14 +46,16 @@ class PersistencePlaneTests(unittest.TestCase):
             store.create_mission('MSN-original','original','inspect','low')
             store.update_mission('MSN-original','completed','original complete')
             pm = PersistenceManager(root)
-            snap = Path(pm.create_snapshot(label='original').path)
+            with patch.object(pm, '_git_commit', return_value='exact-source-commit'):
+                snap = Path(pm.create_snapshot(label='original').path)
             store.create_mission('MSN-later','later','inspect','low')
             store.update_mission('MSN-later','completed','later complete')
             store.db.close()
 
             with self.assertRaises(PermissionError):
                 pm.restore_snapshot(snap)
-            result = pm.restore_snapshot(snap, confirm=True)
+            with patch.object(pm, '_git_commit', return_value='exact-source-commit'):
+                result = pm.restore_snapshot(snap, confirm=True)
             self.assertTrue(result['restored'])
 
             db = sqlite3.connect(root / 'configs/state/grox.sqlite3')
@@ -61,6 +64,67 @@ class PersistencePlaneTests(unittest.TestCase):
             self.assertIn('MSN-original', ids)
             self.assertNotIn('MSN-later', ids)
             self.assertTrue(result['pre_restore_snapshot'])
+        finally:
+            td.cleanup()
+
+    def test_persisting_order_seals_nested_authority_parameters(self):
+        from grox.contracts import MissionMode, MissionOrder
+        td, root, store = self.make_root()
+        try:
+            store.create_mission('MSN-order','order sealing','execute','low')
+            order = MissionOrder.new(
+                'MSN-order','intent','objective',MissionMode.execute,'researcher',
+                allowed_actions=['net_fetch'],
+                parameters={'allowed_origins':['https://example.com']},
+            )
+            self.assertFalse(order.sealed)
+            store.save_order(order)
+            self.assertTrue(order.sealed)
+            self.assertEqual(order.parameters['allowed_origins'], ('https://example.com',))
+            with self.assertRaises(TypeError):
+                order.parameters['allowed_origins'] += ('https://evil.example',)
+        finally:
+            td.cleanup()
+
+    def test_restore_rejects_source_mismatch_without_explicit_ancestor_allowance(self):
+        td, root, store = self.make_root()
+        try:
+            store.create_mission('MSN-original','original','inspect','low')
+            store.update_mission('MSN-original','completed','done')
+            pm = PersistenceManager(root)
+            with patch.object(pm, '_git_commit', return_value='older-source'):
+                snap = Path(pm.create_snapshot(label='older').path)
+            store.db.close()
+
+            with patch.object(pm, '_git_commit', return_value='newer-source'), \
+                 patch('grox.persistence.subprocess.run') as ancestry:
+                ancestry.return_value.returncode = 0
+                with self.assertRaisesRegex(ValueError, 'allow_ancestor=True'):
+                    pm.restore_snapshot(snap, confirm=True)
+
+            with patch.object(pm, '_git_commit', return_value='newer-source'), \
+                 patch('grox.persistence.subprocess.run') as ancestry:
+                ancestry.return_value.returncode = 0
+                result = pm.restore_snapshot(snap, confirm=True, allow_ancestor=True)
+                self.assertTrue(result['restored'])
+        finally:
+            td.cleanup()
+
+    def test_restore_rejects_non_ancestor_source_even_with_ancestor_allowance(self):
+        td, root, store = self.make_root()
+        try:
+            store.create_mission('MSN-original','original','inspect','low')
+            store.update_mission('MSN-original','completed','done')
+            pm = PersistenceManager(root)
+            with patch.object(pm, '_git_commit', return_value='unrelated-source'):
+                snap = Path(pm.create_snapshot(label='unrelated').path)
+            store.db.close()
+
+            with patch.object(pm, '_git_commit', return_value='current-source'), \
+                 patch('grox.persistence.subprocess.run') as ancestry:
+                ancestry.return_value.returncode = 1
+                with self.assertRaisesRegex(ValueError, 'not compatible'):
+                    pm.restore_snapshot(snap, confirm=True, allow_ancestor=True)
         finally:
             td.cleanup()
 

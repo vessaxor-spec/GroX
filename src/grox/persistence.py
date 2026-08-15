@@ -81,6 +81,31 @@ class PersistenceManager:
         except (subprocess.SubprocessError, OSError):
             return None
 
+    def _source_binding_error(self, manifest: dict[str, Any], *, allow_ancestor: bool) -> str | None:
+        snapshot_commit = manifest.get("vessel_git_commit")
+        if not snapshot_commit:
+            return "snapshot source commit is missing"
+        current_commit = self._git_commit()
+        if not current_commit:
+            return "current Vessel source commit is unavailable"
+        if snapshot_commit == current_commit:
+            return None
+        try:
+            ancestor = subprocess.run(
+                ["git", "-C", str(self.root), "merge-base", "--is-ancestor", str(snapshot_commit), current_commit],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=5,
+                check=False,
+            )
+        except (subprocess.SubprocessError, OSError):
+            return "unable to establish snapshot/source ancestry"
+        if ancestor.returncode == 0:
+            if allow_ancestor:
+                return None
+            return "snapshot source is an ancestor of current Vessel source; explicit allow_ancestor=True required"
+        return "snapshot source commit is not compatible with current Vessel source"
+
     def _sqlite_backup(self, destination: Path) -> None:
         if not self.state_db.exists():
             raise FileNotFoundError(f"Operational state database not found: {self.state_db}")
@@ -125,7 +150,13 @@ class PersistenceManager:
 
         return self.verify_snapshot(target)
 
-    def verify_snapshot(self, snapshot: Path) -> SnapshotReport:
+    def verify_snapshot(
+        self,
+        snapshot: Path,
+        *,
+        enforce_source_binding: bool = False,
+        allow_ancestor: bool = False,
+    ) -> SnapshotReport:
         snapshot = snapshot.resolve()
         errors: list[str] = []
         manifest: dict[str, Any] = {}
@@ -160,14 +191,28 @@ class PersistenceManager:
                             errors.append("SQLite integrity_check failed")
                     except sqlite3.DatabaseError as exc:
                         errors.append(f"invalid SQLite state: {exc}")
+                if enforce_source_binding and not errors:
+                    source_error = self._source_binding_error(manifest, allow_ancestor=allow_ancestor)
+                    if source_error:
+                        errors.append(source_error)
         except (zipfile.BadZipFile, json.JSONDecodeError, UnicodeDecodeError) as exc:
             errors.append(f"invalid snapshot: {exc}")
         return SnapshotReport(str(snapshot), not errors, manifest, errors)
 
-    def restore_snapshot(self, snapshot: Path, *, confirm: bool = False) -> dict[str, Any]:
+    def restore_snapshot(
+        self,
+        snapshot: Path,
+        *,
+        confirm: bool = False,
+        allow_ancestor: bool = False,
+    ) -> dict[str, Any]:
         if not confirm:
             raise PermissionError("restore requires explicit confirm=True")
-        report = self.verify_snapshot(snapshot)
+        report = self.verify_snapshot(
+            snapshot,
+            enforce_source_binding=True,
+            allow_ancestor=allow_ancestor,
+        )
         if not report.valid:
             raise ValueError(f"snapshot verification failed: {report.errors}")
 
