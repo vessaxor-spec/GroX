@@ -1,4 +1,4 @@
-name: Apply Bounded A7 Runtime Implementation
+name: A7 Apex Qualification Candidate
 
 on:
   push:
@@ -6,108 +6,41 @@ on:
       - verification/a7-apex-gauntlet-red
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  implement:
+  qualification:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout exact A7 product branch
+      - name: Checkout exact A7 candidate
         uses: actions/checkout@v4
         with:
-          ref: a7/apex-qualification
-          fetch-depth: 0
-      - name: Apply deterministic runtime patch
+          ref: 197c447a30130e507c4ead6a45413d9c036420c3
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependency
+        run: python -m pip install '.[test]'
+      - name: Commission governed A5 workspace fallback
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path('src/grox/graph/runtime.py')
-          text = path.read_text()
-
-          replacements = []
-          replacements.append((
-              'import json\nfrom dataclasses import replace\n',
-              'import json\nimport math\nfrom dataclasses import replace\n',
-          ))
-          replacements.append((
-              "        risk: RiskClass,\n    ) -> tuple[str | None, TourResult]:\n",
-              "        risk: RiskClass,\n        cost_units: float = 0.0,\n    ) -> tuple[str | None, TourResult]:\n",
-          ))
-          replacements.append((
-              "        self.store.save_order(order)\n        self.store.add_evidence(mission_id, order.order_id, Evidence('exception_consultation', {\n",
-              "        self.store.save_order(order)\n        if cost_units > 0.0:\n            self.store.add_graph_event(mission_id, 'cost_committed', {\n                'kind': 'recovery_consultation', 'node_id': spec.node_id, 'order_id': order.order_id,\n                'attempt': None, 'cost_units': cost_units,\n            }, node_id=spec.node_id)\n        self.store.add_evidence(mission_id, order.order_id, Evidence('exception_consultation', {\n",
-          ))
-          replacements.append((
-              "            latency_ms=latency_ms, risk=risk, verified=None,\n        )\n",
-              "            latency_ms=latency_ms, risk=risk, verified=None, cost_units=cost_units,\n        )\n",
-          ))
-          replacements.append((
-              "        consultation_order_id, consultation = self._consult_recovery(\n            mission_id=mission_id, directive=directive, spec=failed_spec,\n            failed_order_id=failed_outcome.order_id, crew=replacement, risk=effective_risk,\n        )\n",
-              "        consultation_cost = max(0.0, float(failed_spec.budget.cost_units))\n        spent_cost = self._committed_cost(mission_id)\n        if spent_cost + consultation_cost > plan.budget.max_cost_units + 1e-12:\n            reason = 'Mission cost budget exhausted before recovery consultation'\n            self.store.add_graph_event(mission_id, 'cost_budget_exhausted', {\n                'spent_cost_units': spent_cost, 'max_cost_units': plan.budget.max_cost_units,\n                'blocked_node': failed_spec.node_id, 'required_cost_units': consultation_cost,\n                'phase': 'recovery_consultation',\n            }, node_id=failed_spec.node_id)\n            halted = ExceptionDecision('pilot_halt', reason)\n            self.exception_loop.persist(\n                mission_id=mission_id, node_id=failed_spec.node_id, order_id=failed_outcome.order_id,\n                exception_type=exc_type, risk=effective_risk, decision=halted,\n            )\n            return None, replan_count\n        consultation_order_id, consultation = self._consult_recovery(\n            mission_id=mission_id, directive=directive, spec=failed_spec,\n            failed_order_id=failed_outcome.order_id, crew=replacement, risk=effective_risk,\n            cost_units=consultation_cost,\n        )\n",
-          ))
-
-          helper = '''        return replacement_id, replan_count\n\n    def _committed_cost(self, mission_id: str) -> float:\n        total = 0.0\n        for event in self.store.graph_events(mission_id):\n            if event['event_type'] != 'cost_committed':\n                continue\n            try:\n                payload = json.loads(event['content'])\n                value = float(payload.get('cost_units', 0.0))\n            except (TypeError, ValueError, json.JSONDecodeError):\n                continue\n            if math.isfinite(value) and value > 0.0:\n                total += value\n        return total\n\n    def _reconcile_contradictions(\n        self, tour_results: dict[str, TourResult], *, verification_passed: bool,\n    ) -> list[dict[str, Any]]:\n        grouped: dict[str, list[dict[str, Any]]] = {}\n        for result in tour_results.values():\n            for evidence in result.evidence:\n                if evidence.kind != 'finding' or not isinstance(evidence.content, dict):\n                    continue\n                topic = evidence.content.get('topic')\n                position = evidence.content.get('position')\n                claim = evidence.content.get('claim')\n                if not all(isinstance(value, str) and value.strip() for value in (topic, position, claim)):\n                    continue\n                try:\n                    confidence = float(evidence.content.get('confidence', 0.0))\n                    quality = float(evidence.content.get('evidence_quality', 0.0))\n                except (TypeError, ValueError):\n                    continue\n                if not math.isfinite(confidence) or not math.isfinite(quality):\n                    continue\n                confidence = min(1.0, max(0.0, confidence))\n                quality = min(1.0, max(0.0, quality))\n                weight = confidence * quality\n                grouped.setdefault(topic.strip(), []).append({\n                    'order_id': result.order_id, 'crew_id': result.crew_id,\n                    'position': position.strip(), 'claim': claim.strip(),\n                    'confidence': confidence, 'evidence_quality': quality, 'weight': weight,\n                })\n\n        reconciled: list[dict[str, Any]] = []\n        for topic in sorted(grouped):\n            sources = grouped[topic]\n            positions = sorted({source['position'] for source in sources})\n            if len(positions) < 2:\n                continue\n            scores = {position: 0.0 for position in positions}\n            for source in sources:\n                scores[source['position']] += source['weight']\n            ranked = sorted(scores.items(), key=lambda item: (-item[1], item[0]))\n            total = sum(scores.values())\n            unique_winner = len(ranked) == 1 or not math.isclose(ranked[0][1], ranked[1][1], rel_tol=0.0, abs_tol=1e-12)\n            resolved = verification_passed and total > 0.0 and unique_winner\n            selected = ranked[0][0] if resolved else None\n            calibrated = (ranked[0][1] / total) if resolved and total > 0.0 else 0.0\n            reconciled.append({\n                'topic': topic,\n                'status': 'resolved' if resolved else 'unresolved',\n                'selected_position': selected,\n                'confidence': calibrated,\n                'position_scores': {key: scores[key] for key in sorted(scores)},\n                'sources': sorted(sources, key=lambda source: (source['position'], source['crew_id'], source['order_id'])),\n                'basis': 'eligible Crew finding evidence ranked by confidence x evidence_quality; independent verification required',\n            })\n        return reconciled\n\n    def run(\n'''
-          replacements.append((
-              "        return replacement_id, replan_count\n\n    def run(\n",
-              helper,
-          ))
-          replacements.append((
-              "        verification_nodes: set[str] = {node_id for node_id,spec in specs.items() if spec.mode is MissionMode.verify}\n\n        unresolved_reason: str | None = None\n",
-              "        verification_nodes: set[str] = {node_id for node_id,spec in specs.items() if spec.mode is MissionMode.verify}\n        spent_cost = self._committed_cost(mission_id)\n\n        unresolved_reason: str | None = None\n",
-          ))
-          replacements.append((
-              "            batch = ready[: plan.budget.max_parallel]\n            self.store.add_graph_event(mission_id, \"batch_started\", {\"nodes\": batch, \"parallel_width\": len(batch)})\n",
-              "            batch: list[str] = []\n            reserved_cost = 0.0\n            for node_id in ready:\n                if len(batch) >= plan.budget.max_parallel:\n                    break\n                node_cost = max(0.0, float(specs[node_id].budget.cost_units))\n                if spent_cost + reserved_cost + node_cost <= plan.budget.max_cost_units + 1e-12:\n                    batch.append(node_id)\n                    reserved_cost += node_cost\n            if not batch:\n                required = min(max(0.0, float(specs[node_id].budget.cost_units)) for node_id in ready)\n                unresolved_reason = 'Mission cost budget exhausted'\n                self.store.add_graph_event(mission_id, 'cost_budget_exhausted', {\n                    'spent_cost_units': spent_cost, 'max_cost_units': plan.budget.max_cost_units,\n                    'ready_nodes': ready, 'minimum_required_cost_units': required, 'phase': 'node_execution',\n                })\n                break\n            self.store.add_graph_event(mission_id, \"batch_started\", {\"nodes\": batch, \"parallel_width\": len(batch)})\n",
-          ))
-          replacements.append((
-              "                self.store.save_order(order)\n                self.store.add_evidence(mission_id, order.order_id, Evidence(\"routing_decision\", routing.to_dict()))\n",
-              "                self.store.save_order(order)\n                node_cost = max(0.0, float(spec.budget.cost_units))\n                self.store.add_graph_event(mission_id, 'cost_committed', {\n                    'kind': 'graph_node', 'node_id': node_id, 'order_id': order.order_id,\n                    'attempt': attempts[node_id], 'cost_units': node_cost,\n                }, node_id=node_id)\n                spent_cost += node_cost\n                self.store.add_evidence(mission_id, order.order_id, Evidence(\"routing_decision\", routing.to_dict()))\n",
-          ))
-          replacements.append((
-              "                        result=result, latency_ms=latency_ms, risk=order.risk_class, verified=None,\n                    )\n",
-              "                        result=result, latency_ms=latency_ms, risk=order.risk_class, verified=None,\n                        cost_units=spec.budget.cost_units,\n                    )\n",
-          ))
-          replacements.append((
-              "                    if replacement_id is None:\n                        unresolved_reason = f\"node {node_id} failed: {(result.exception or {}).get('type', 'unknown')}\"\n",
-              "                    spent_cost = self._committed_cost(mission_id)\n                    if replacement_id is None:\n                        unresolved_reason = f\"node {node_id} failed: {(result.exception or {}).get('type', 'unknown')}\"\n",
-          ))
-          replacements.append((
-              "        evidence_kinds = sorted({kind for outcome in outcomes.values() for kind in outcome.evidence_kinds})\n        decisions = self.durable.exception_decisions(mission_id)\n",
-              "        evidence_kinds = sorted({kind for outcome in outcomes.values() for kind in outcome.evidence_kinds})\n        contradictions = self._reconcile_contradictions(tour_results, verification_passed=verification_passed)\n        spent_cost = self._committed_cost(mission_id)\n        decisions = self.durable.exception_decisions(mission_id)\n",
-          ))
-          replacements.append((
-              "            f\"resumes={(run_state or {}).get('resume_count',0)}; verification={'PASS' if verification_passed else 'NOT PROVEN'}\"\n",
-              "            f\"resumes={(run_state or {}).get('resume_count',0)}; cost={spent_cost:.3f}/{plan.budget.max_cost_units:.3f}; \"\n            f\"contradictions={len(contradictions)}; verification={'PASS' if verification_passed else 'NOT PROVEN'}\"\n",
-          ))
-          replacements.append((
-              "            verification_passed=verification_passed,\n            evidence_kinds=evidence_kinds,\n        )\n",
-              "            verification_passed=verification_passed,\n            evidence_kinds=evidence_kinds,\n            contradictions=contradictions,\n            cost_units=spent_cost,\n            cost_budget=plan.budget.max_cost_units,\n        )\n",
-          ))
-
-          for old, new in replacements:
-              count = text.count(old)
-              if count != 1:
-                  raise SystemExit(f'expected exactly one runtime patch target, found {count}: {old[:100]!r}')
-              text = text.replace(old, new, 1)
-
-          path.write_text(text)
-          PY
-      - name: Validate syntax and patch scope
-        shell: bash
+          image='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
+          docker pull "$image"
+          docker image inspect "$image" >/dev/null
+      - name: Run A7 gauntlet
+        env:
+          PYTHONPATH: src
         run: |
           set -euo pipefail
-          python -m compileall -q src/grox/graph
-          git diff --check
-          git diff -- src/grox/graph/runtime.py
-      - name: Commit bounded implementation
-        shell: bash
+          python -m pytest -q tests/integration/test_apex_qualification.py
+      - name: Run complete regression suites
+        env:
+          PYTHONPATH: src
         run: |
           set -euo pipefail
-          git config user.name 'GroX Qualification Runner'
-          git config user.email 'grox-qualification@users.noreply.github.com'
-          git add src/grox/graph/runtime.py
-          git commit -m 'Implement A7 contradiction synthesis and hard cost budgets'
-          git push origin HEAD:a7/apex-qualification
+          python -m pytest -q
+          python -m unittest discover -s tests -q
+      - name: Check repository diff hygiene
+        run: git diff --check
