@@ -1,5 +1,7 @@
 # GroX Mission Graph
 
+**Qualification status:** **A2 QUALIFIED**, extended by A4 durability and A7 Apex synthesis/budget controls in GroX `v0.7.0`.
+
 A Mission Graph is Pilot GorXu's durable execution structure for work that cannot be represented safely or effectively as one Mission Order.
 
 ## Authority
@@ -25,6 +27,7 @@ Every graph must contain:
 - explicit scope;
 - node attempt/time budgets;
 - Mission node/parallel/replan budgets;
+- a hard Mission cost ceiling through `MissionBudget.max_cost_units`, with bounded per-node `cost_units`;
 - stop conditions;
 - explicit verification nodes where verification is required.
 
@@ -95,12 +98,20 @@ After the graph converges, GorXu produces and persists the Mission synthesis. Th
 - replan count;
 - verification state;
 - evidence classes;
-- an executive summary.
+- an executive summary;
+- contradiction state and whether material conflicts were independently resolved;
+- consumed cost units and the hard Mission cost budget.
 
 Crew reports are inputs to synthesis. No Crew member owns the final Mission conclusion.
 
-## Current A2 boundary
+## Qualified Apex boundary
 
-A2 implements dependency-aware decomposition, parallel scheduling, bounded replanning for recoverable Crew/runtime failures, explicit verification nodes, graph persistence, and structural Pilot synthesis.
+A2 established dependency-aware decomposition, parallel scheduling, bounded replanning for recoverable Crew/runtime failures, explicit verification nodes, graph persistence, and Pilot-owned synthesis. Later qualified stages extend that same Pilot-owned graph rather than replacing it:
 
-Deeper semantic reconciliation of contradictory specialist judgments, learned routing, generalized exception investigation, and exact crash-resume workflow replay remain later Apex stages unless separately promoted by evidence.
+- A3 supplies experienced eligible-Crew routing and bounded relevant-memory injection;
+- A4 supplies durable same-Mission resume, checkpoints, bounded consultation/replan, cancellation, and recovery semantics;
+- A7 supplies a hard crash-persistent Mission cost ceiling and independently verified contradiction synthesis.
+
+For A7 synthesis, contradictory `finding` evidence remains attributable to its source Order. A contradiction may be marked resolved only when the contributing source Orders satisfy the required independent verification path. Runtime `graph_verification` evidence is trusted only when it comes from the actual verification-node Order. Repeated findings from one Order are normalized rather than allowed to amplify that source, and equal-weight conflicts remain unresolved.
+
+For A7 budgeting, `MissionBudget.max_cost_units` is enforced as a hard ceiling. Node cost commitments are persisted before execution and aggregate parallel reservations are checked against remaining Mission budget, so crash/restart, recovery consultation, or parallel work cannot reset or silently overcommit the budget.

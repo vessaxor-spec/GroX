@@ -1,5 +1,7 @@
 # GroX Persistence Architecture
 
+**Qualified baseline:** `v0.7.0` / `main@71ffd60769d81b5b249dac4eca56333ff27e26d0`. Snapshot source binding, ancestor compatibility control, and fail-closed unrelated-source restore are part of the Apex regression boundary.
+
 ## Decision
 
 GroX uses three separate persistence planes. No single sandbox, model process, or conversation is the Vessel's permanent home.
@@ -31,7 +33,7 @@ A sandbox is replaceable compute. It may run the Vessel, but it is not repositor
 
 ## Plane 3: Operational state
 
-Operational state includes Missions, Mission Orders, evidence, Crew tour state, episodic continuity, and future runtime memory/checkpoints.
+Operational state includes Missions, Mission Orders, evidence, Crew tour state, episodic continuity, durable memory, graph checkpoints, exception/recovery state, evaluation state, and cost commitments.
 
 The live SQLite database is `configs/state/grox.sqlite3`.
 

@@ -1,5 +1,7 @@
 # GroX Principles
 
+**Qualified baseline:** these principles remain authoritative in GroX `v0.7.0`. Apex qualification changes no principle and grants no additional authority.
+
 ## 1. The Commander holds final sovereignty
 
 The Commander defines intent and retains final authority over critical, irreversible, and material intent-changing decisions.

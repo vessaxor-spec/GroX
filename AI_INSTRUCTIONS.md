@@ -1,5 +1,9 @@
 # AI Instructions for GroX
 
+**Current qualified baseline:** `v0.7.0` / `main@71ffd60769d81b5b249dac4eca56333ff27e26d0` / **APEX QUALIFIED** / **82 Standing Crew**.
+
+Apex qualification is a regression boundary, not inherited permission. Any consequential future change that touches Commander sovereignty, GorXu's sole-orchestrator role, Mission Order authority, verifier independence, evidence integrity, recovery, source/state compatibility, routing, or governed tool execution must preserve those invariants through appropriate tests and independent verification.
+
 This repository defines the Vessel. Any AI builder, coding agent, reviewer, or maintainer working here must preserve the command architecture unless the Commander explicitly changes it.
 
 ## Authority hierarchy

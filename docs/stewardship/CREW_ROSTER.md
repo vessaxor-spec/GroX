@@ -1,10 +1,12 @@
 # Standing Crew Roster
 
+**Current baseline:** GroX `v0.7.0` / `main@71ffd60769d81b5b249dac4eca56333ff27e26d0` / **82 Standing Crew**.
+
 ## Company model
 
 GroX operates a standing-company model. Crew are durable organizational identities that sleep between Missions and wake into fresh tour context under bounded Mission Orders from Pilot GorXu.
 
-The current company contains **81 domain-specialist Crew** plus **1 native independent verifier**, for **82 standing dossiers**.
+The current company contains **81 specialist-inspired domain Crew** plus **1 native independent verifier**, for **82 standing dossiers**.
 
 ## Command boundary
 
