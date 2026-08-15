@@ -15,7 +15,7 @@ jobs:
       - name: Checkout exact A7 candidate
         uses: actions/checkout@v4
         with:
-          ref: 0724862dcb2634022ad33e6be14be29df6a914dd
+          ref: 6c47349e36339e78406728b4a2a459583e875eab
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
