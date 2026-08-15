@@ -1,0 +1,169 @@
+name: A7 Entry Hardening Independent Canary
+
+on:
+  push:
+    branches:
+      - verification/a7-entry-hardening-canary
+
+permissions:
+  contents: read
+
+jobs:
+  verifier:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact hardening candidate
+        uses: actions/checkout@v4
+        with:
+          ref: 2bec6a61dfe4c4cbae26f4ae6a0ddbc93248d6ce
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependency
+        run: python -m pip install '.[test]'
+      - name: Run complete regression suites
+        env:
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          python -m pytest -q
+          python -m unittest discover -s tests -q
+      - name: Run independent authority and recovery canary
+        shell: bash
+        env:
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import subprocess
+          import tempfile
+          from pathlib import Path
+
+          from grox.contracts import MissionMode, MissionOrder
+          from grox.persistence import PersistenceManager
+          from grox.state import StateStore
+          from tests._support import temp_vessel
+
+          findings = []
+
+          # 1. Issued authority fields must snapshot caller inputs and deny widening.
+          scope = ['docs']
+          forbidden = ['mcp_mutate']
+          params = {
+              'allowed_origins': ['https://example.com'],
+              'mcp_grants': {'adapter': ['read']},
+          }
+          order = MissionOrder.new(
+              'MSN-CANARY', 'intent', 'objective', MissionMode.repair, 'backend-engineer',
+              allowed_actions=['fs_read', 'fs_write'],
+              forbidden_actions=forbidden,
+              scope=scope,
+              parameters=params,
+          )
+          scope[:] = ['.']
+          forbidden.clear()
+          params['allowed_origins'].append('https://evil.example')
+          params['mcp_grants']['adapter'].append('mutate')
+          if order.scope != ('docs',) or order.forbidden_actions != ('mcp_mutate',):
+              findings.append('authority_list_alias_widened_order')
+          if order.parameters['allowed_origins'] != ['https://example.com']:
+              findings.append('parameter_alias_widened_order')
+          try:
+              order.scope = ('.',)
+          except AttributeError:
+              pass
+          else:
+              findings.append('scope_reassignment_widened_order')
+
+          # 2. Persistence and first Gateway use must seal nested parameter grants.
+          td, root, pilot = temp_vessel()
+          try:
+              direct = MissionOrder.new(
+                  'MSN-DIRECT', 'intent', 'inspect', MissionMode.inspect, 'researcher',
+                  allowed_actions=['fs_list'],
+                  parameters={'mcp_grants': {'adapter': ['read']}},
+              )
+              pilot.gateway.list_path(direct, '.')
+              if not direct.sealed:
+                  findings.append('gateway_did_not_seal_order')
+              try:
+                  direct.parameters = {'mcp_grants': {'adapter': ['mutate']}}
+              except AttributeError:
+                  pass
+              else:
+                  findings.append('sealed_parameters_reassigned')
+              try:
+                  direct.parameters['mcp_grants']['adapter'] += ('mutate',)
+              except TypeError:
+                  pass
+              else:
+                  findings.append('sealed_nested_grant_mutated')
+          finally:
+              td.cleanup()
+
+          # 3. Restore must enforce exact/ancestor/unrelated source compatibility using real Git ancestry.
+          with tempfile.TemporaryDirectory(prefix='grox-source-canary-') as td_name:
+              root = Path(td_name)
+              (root / 'configs/state').mkdir(parents=True)
+              (root / 'configs/persistence').mkdir(parents=True)
+              binding = {
+                  'cognitive_home': {'type': 'test', 'project': 'canary', 'pilot_identity': 'GorXu'},
+                  'vessel_source': {'type': 'git', 'repository': 'canary/GroX', 'branch': 'main'},
+              }
+              (root / 'configs/persistence/project-binding.json').write_text(json.dumps(binding))
+              subprocess.run(['git', 'init', '-q', str(root)], check=True)
+              subprocess.run(['git', '-C', str(root), 'config', 'user.name', 'Verifier'], check=True)
+              subprocess.run(['git', '-C', str(root), 'config', 'user.email', 'verifier@example.invalid'], check=True)
+              (root / 'marker.txt').write_text('old\n')
+              subprocess.run(['git', '-C', str(root), 'add', 'marker.txt', 'configs/persistence/project-binding.json'], check=True)
+              subprocess.run(['git', '-C', str(root), 'commit', '-q', '-m', 'old source'], check=True)
+
+              store = StateStore(root / 'configs/state/grox.sqlite3')
+              store.create_mission('MSN-STATE', 'state', 'inspect', 'low')
+              store.update_mission('MSN-STATE', 'completed', 'done')
+              pm = PersistenceManager(root)
+              snapshot = Path(pm.create_snapshot(label='canary').path)
+              old_commit = subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
+
+              (root / 'marker.txt').write_text('new\n')
+              subprocess.run(['git', '-C', str(root), 'add', 'marker.txt'], check=True)
+              subprocess.run(['git', '-C', str(root), 'commit', '-q', '-m', 'new source'], check=True)
+              new_commit = subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
+              if old_commit == new_commit:
+                  findings.append('git_ancestry_fixture_invalid')
+
+              try:
+                  pm.restore_snapshot(snapshot, confirm=True)
+              except ValueError as exc:
+                  if 'allow_ancestor=True' not in str(exc):
+                      findings.append('ancestor_restore_failed_for_wrong_reason')
+              else:
+                  findings.append('ancestor_restore_allowed_without_explicit_override')
+
+              try:
+                  result = pm.restore_snapshot(snapshot, confirm=True, allow_ancestor=True)
+                  if not result.get('restored'):
+                      findings.append('explicit_ancestor_restore_not_completed')
+              except Exception:
+                  findings.append('explicit_ancestor_restore_rejected')
+
+              subprocess.run(['git', '-C', str(root), 'checkout', '--orphan', 'unrelated'], check=True, stdout=subprocess.DEVNULL)
+              subprocess.run(['git', '-C', str(root), 'rm', '-rf', '--cached', '.'], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+              (root / 'unrelated.txt').write_text('unrelated\n')
+              subprocess.run(['git', '-C', str(root), 'add', 'unrelated.txt'], check=True)
+              subprocess.run(['git', '-C', str(root), 'commit', '-q', '-m', 'unrelated source'], check=True)
+              try:
+                  pm.restore_snapshot(snapshot, confirm=True, allow_ancestor=True)
+              except ValueError as exc:
+                  if 'not compatible' not in str(exc):
+                      findings.append('unrelated_restore_failed_for_wrong_reason')
+              else:
+                  findings.append('unrelated_source_restore_allowed')
+              store.close()
+
+          print('A7_ENTRY_HARDENING_CANARY_FINDINGS=' + ','.join(findings))
+          if findings:
+              raise SystemExit(1)
+          PY
