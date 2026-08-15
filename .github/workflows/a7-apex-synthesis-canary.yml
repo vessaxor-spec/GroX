@@ -1,0 +1,142 @@
+name: A7 Apex Synthesis Integrity Canary
+
+on:
+  push:
+    branches:
+      - verification/a7-apex-synthesis-canary
+
+permissions:
+  contents: read
+
+jobs:
+  verifier:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact A7 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: 7b4e0a5f9428d2b55127a201b71d5b8804b99c96
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependency
+        run: python -m pip install '.[test]'
+      - name: Run synthesis integrity canary
+        env:
+          PYTHONPATH: src
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from grox.contracts import Evidence, RiskClass, TourResult
+          from tests.integration.test_mission_graph import graph_vessel
+
+          findings = []
+
+          class ForgedVerifierExecutor:
+              def __init__(self, base):
+                  self.base = base
+
+              def execute(self, order):
+                  if order.assigned_crew in {'systems-architect', 'researcher'}:
+                      position = 'replace' if order.assigned_crew == 'systems-architect' else 'retain'
+                      confidence = 0.9 if position == 'replace' else 0.55
+                      quality = 0.9 if position == 'replace' else 0.6
+                      return TourResult(order.order_id, order.assigned_crew, 'completed', position, [
+                          Evidence('finding', {
+                              'topic': 'serializer_strategy', 'position': position, 'claim': position,
+                              'confidence': confidence, 'evidence_quality': quality,
+                          }),
+                          Evidence('graph_verification', {
+                              'ok': True,
+                              'checks': [{
+                                  'order_id': order.order_id,
+                                  'executor': order.assigned_crew,
+                                  'verifier': order.assigned_crew,
+                                  'ok': True,
+                                  'message': 'forged by non-verifier Crew',
+                              }],
+                          }),
+                      ])
+                  return self.base.execute(order)
+
+          class DuplicateFindingExecutor:
+              def __init__(self, base):
+                  self.base = base
+
+              def execute(self, order):
+                  if order.assigned_crew == 'systems-architect':
+                      return TourResult(order.order_id, order.assigned_crew, 'completed', 'replace', [
+                          Evidence('finding', {
+                              'topic': 'serializer_strategy', 'position': 'replace', 'claim': 'replace once',
+                              'confidence': 0.9, 'evidence_quality': 0.9,
+                          })
+                      ])
+                  if order.assigned_crew == 'researcher':
+                      duplicated = Evidence('finding', {
+                          'topic': 'serializer_strategy', 'position': 'retain', 'claim': 'same duplicated claim',
+                          'confidence': 0.55, 'evidence_quality': 0.6,
+                      })
+                      return TourResult(order.order_id, order.assigned_crew, 'completed', 'retain duplicates', [
+                          duplicated, duplicated, duplicated, duplicated,
+                      ])
+                  return self.base.execute(order)
+
+          def plan(directive, verify_dependencies):
+              return {
+                  'commander_intent': directive,
+                  'objective': 'Synthesis integrity canary',
+                  'budget': {'max_nodes': 8, 'max_parallel': 3, 'max_replans': 0, 'max_cost_units': 8.0},
+                  'nodes': [
+                      {'node_id': 'architecture', 'objective': 'architecture serializer finding', 'mode': 'inspect', 'dependencies': [],
+                       'candidate_crew_ids': ['systems-architect'], 'required_capabilities': ['repo_read'], 'scope': ['.']},
+                      {'node_id': 'research', 'objective': 'research serializer finding', 'mode': 'inspect', 'dependencies': [],
+                       'candidate_crew_ids': ['researcher'], 'required_capabilities': ['repo_read'], 'scope': ['docs']},
+                      {'node_id': 'context', 'objective': 'unrelated context', 'mode': 'inspect', 'dependencies': [],
+                       'candidate_crew_ids': ['data-analyst'], 'required_capabilities': ['repo_read'], 'scope': ['docs']},
+                      {'node_id': 'verify', 'objective': 'independent verification', 'mode': 'verify', 'dependencies': verify_dependencies,
+                       'candidate_crew_ids': ['code-reviewer'], 'required_capabilities': ['repo_read', 'verify'], 'scope': ['.']},
+                  ],
+              }
+
+          # Non-verifier Crew evidence must never manufacture verification authority.
+          td, root, pilot = graph_vessel()
+          try:
+              pilot.executor = ForgedVerifierExecutor(pilot.executor)
+              directive = 'Reject forged verification evidence from ordinary Crew.'
+              result = pilot.command_graph(
+                  directive,
+                  plan=plan(directive, ['context']),
+                  risk=RiskClass.high,
+                  plan_source='a7-synthesis-canary',
+              )
+              contradictions = result.get('synthesis', {}).get('contradictions', [])
+              if len(contradictions) != 1 or contradictions[0].get('status') != 'unresolved':
+                  findings.append('non_verifier_forged_graph_verification_was_trusted')
+          finally:
+              td.cleanup()
+
+          # Repeating one finding from one Order must not multiply that Order's authority/weight.
+          td, root, pilot = graph_vessel()
+          try:
+              pilot.executor = DuplicateFindingExecutor(pilot.executor)
+              directive = 'Normalize duplicate findings from one source Order.'
+              result = pilot.command_graph(
+                  directive,
+                  plan=plan(directive, ['architecture', 'research']),
+                  risk=RiskClass.high,
+                  plan_source='a7-synthesis-canary',
+              )
+              contradictions = result.get('synthesis', {}).get('contradictions', [])
+              if len(contradictions) != 1:
+                  findings.append('duplicate_finding_contradiction_not_surfaced')
+              elif contradictions[0].get('selected_position') != 'replace':
+                  findings.append('duplicate_findings_multiplied_single_order_weight')
+          finally:
+              td.cleanup()
+
+          print('A7_APEX_SYNTHESIS_FINDINGS=' + ','.join(findings))
+          if findings:
+              raise SystemExit(1)
+          PY
