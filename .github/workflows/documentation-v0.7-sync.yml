@@ -37,6 +37,12 @@ jobs:
       - name: Reconcile current-facing documentation
         run: python scripts/docs_sync_v070.py
 
+      - name: Normalize generated Markdown whitespace
+        shell: bash
+        run: |
+          set -euo pipefail
+          sed -i 's/[[:space:]]\+$//' README.md docs/stewardship/SANDBOX_COMMISSIONING.md
+
       - name: Remove temporary reconciliation harness
         shell: bash
         run: |
