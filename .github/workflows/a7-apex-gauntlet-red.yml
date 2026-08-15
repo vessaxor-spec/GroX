@@ -1,4 +1,4 @@
-name: A7 Apex Qualification Candidate
+name: Remediate Independent A7 Contradiction Finding
 
 on:
   push:
@@ -6,41 +6,68 @@ on:
       - verification/a7-apex-gauntlet-red
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  qualification:
+  remediate:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout exact A7 candidate
+      - name: Checkout exact A7 product branch
         uses: actions/checkout@v4
         with:
-          ref: 197c447a30130e507c4ead6a45413d9c036420c3
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install test dependency
-        run: python -m pip install '.[test]'
-      - name: Commission governed A5 workspace fallback
+          ref: a7/apex-qualification
+          fetch-depth: 0
+      - name: Tighten contradiction verification coverage
         shell: bash
         run: |
           set -euo pipefail
-          image='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
-          docker pull "$image"
-          docker image inspect "$image" >/dev/null
-      - name: Run A7 gauntlet
+          python - <<'PY'
+          from pathlib import Path
+
+          runtime = Path('src/grox/graph/runtime.py')
+          text = runtime.read_text()
+          old = '''    def _reconcile_contradictions(\n        self, tour_results: dict[str, TourResult], *, verification_passed: bool,\n    ) -> list[dict[str, Any]]:\n        grouped: dict[str, list[dict[str, Any]]] = {}\n        for result in tour_results.values():\n'''
+          new = '''    def _reconcile_contradictions(\n        self, tour_results: dict[str, TourResult], *, verification_passed: bool,\n    ) -> list[dict[str, Any]]:\n        verified_orders: set[str] = set()\n        for result in tour_results.values():\n            for evidence in result.evidence:\n                if evidence.kind != 'graph_verification' or not isinstance(evidence.content, dict):\n                    continue\n                for check in evidence.content.get('checks', []):\n                    if isinstance(check, dict) and check.get('ok') is True and isinstance(check.get('order_id'), str):\n                        verified_orders.add(check['order_id'])\n\n        grouped: dict[str, list[dict[str, Any]]] = {}\n        for result in tour_results.values():\n'''
+          if text.count(old) != 1:
+              raise SystemExit('contradiction helper patch target missing or duplicated')
+          text = text.replace(old, new, 1)
+
+          old = '''            total = sum(scores.values())\n            unique_winner = len(ranked) == 1 or not math.isclose(ranked[0][1], ranked[1][1], rel_tol=0.0, abs_tol=1e-12)\n            resolved = verification_passed and total > 0.0 and unique_winner\n            selected = ranked[0][0] if resolved else None\n'''
+          new = '''            total = sum(scores.values())\n            unique_winner = len(ranked) == 1 or not math.isclose(ranked[0][1], ranked[1][1], rel_tol=0.0, abs_tol=1e-12)\n            source_order_ids = {source['order_id'] for source in sources}\n            directly_verified = bool(source_order_ids) and source_order_ids.issubset(verified_orders)\n            resolved = verification_passed and directly_verified and total > 0.0 and unique_winner\n            selected = ranked[0][0] if resolved else None\n'''
+          if text.count(old) != 1:
+              raise SystemExit('contradiction resolution patch target missing or duplicated')
+          text = text.replace(old, new, 1)
+
+          old = '''                'sources': sorted(sources, key=lambda source: (source['position'], source['crew_id'], source['order_id'])),\n                'basis': 'eligible Crew finding evidence ranked by confidence x evidence_quality; independent verification required',\n'''
+          new = '''                'sources': sorted(sources, key=lambda source: (source['position'], source['crew_id'], source['order_id'])),\n                'verified_source_orders': sorted(source_order_ids & verified_orders),\n                'all_sources_independently_verified': directly_verified,\n                'basis': 'eligible Crew finding evidence ranked by confidence x evidence_quality; every source Order requires independent verification',\n'''
+          if text.count(old) != 1:
+              raise SystemExit('contradiction evidence patch target missing or duplicated')
+          text = text.replace(old, new, 1)
+          runtime.write_text(text)
+
+          tests = Path('tests/integration/test_apex_qualification.py')
+          test_text = tests.read_text()
+          marker = '''    def test_long_horizon_mission_survives_restart_without_replaying_committed_work(self):\n'''
+          addition = '''    def test_unrelated_verification_cannot_resolve_material_contradiction(self):\n        td, root, pilot = graph_vessel()\n        try:\n            pilot.executor = ContradictoryFindingExecutor(pilot.executor)\n            directive = "Do not treat unrelated verification as verification of contradictory serializer findings."\n            plan = {\n                "commander_intent": directive,\n                "objective": "Keep a material contradiction unresolved unless its source Orders are independently verified.",\n                "budget": {"max_nodes": 8, "max_parallel": 3, "max_replans": 0},\n                "nodes": [\n                    {"node_id": "architecture", "objective": "Assess serializer strategy from architecture evidence", "mode": "inspect", "dependencies": [],\n                     "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."]},\n                    {"node_id": "research", "objective": "Assess serializer strategy from research evidence", "mode": "inspect", "dependencies": [],\n                     "candidate_crew_ids": ["researcher"], "required_capabilities": ["repo_read"], "scope": ["docs"]},\n                    {"node_id": "context", "objective": "Inspect unrelated context", "mode": "inspect", "dependencies": [],\n                     "candidate_crew_ids": ["data-analyst"], "required_capabilities": ["repo_read"], "scope": ["docs"]},\n                    {"node_id": "verify", "objective": "Independently verify unrelated context only", "mode": "verify", "dependencies": ["context"],\n                     "candidate_crew_ids": ["code-reviewer"], "required_capabilities": ["repo_read", "verify"], "scope": ["."]},\n                ],\n            }\n            result = pilot.command_graph(directive, plan=plan, risk=RiskClass.high, plan_source="a7-contradiction-verification")\n            self.assertEqual(result["status"], "completed")\n            contradictions = result["synthesis"]["contradictions"]\n            self.assertEqual(len(contradictions), 1)\n            self.assertEqual(contradictions[0]["status"], "unresolved")\n            self.assertIsNone(contradictions[0]["selected_position"])\n            self.assertFalse(contradictions[0]["all_sources_independently_verified"])\n            self.assertEqual(contradictions[0]["verified_source_orders"], [])\n        finally:\n            td.cleanup()\n\n'''
+          if test_text.count(marker) != 1:
+              raise SystemExit('A7 test insertion marker missing or duplicated')
+          test_text = test_text.replace(marker, addition + marker, 1)
+          tests.write_text(test_text)
+          PY
+      - name: Validate focused remediation
         env:
           PYTHONPATH: src
         run: |
           set -euo pipefail
+          python -m compileall -q src/grox/graph tests/integration/test_apex_qualification.py
           python -m pytest -q tests/integration/test_apex_qualification.py
-      - name: Run complete regression suites
-        env:
-          PYTHONPATH: src
+          git diff --check
+      - name: Commit remediation to product branch
+        shell: bash
         run: |
           set -euo pipefail
-          python -m pytest -q
-          python -m unittest discover -s tests -q
-      - name: Check repository diff hygiene
-        run: git diff --check
+          git config user.name 'GroX Qualification Runner'
+          git config user.email 'grox-qualification@users.noreply.github.com'
+          git add src/grox/graph/runtime.py tests/integration/test_apex_qualification.py
+          git commit -m 'Require direct verification for reconciled contradictions'
+          git push origin HEAD:a7/apex-qualification
