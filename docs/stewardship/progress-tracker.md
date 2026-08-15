@@ -66,11 +66,11 @@ The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/Gr
 
 **Current status: NOT YET APEX**
 
-The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot, A2 Mission Graph Orchestration, A3 Living Company Intelligence, A4 Executive Exception Loop and Durable Operations, and A5 Governed Capability Expansion have qualified. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, attributable organizational memory, experienced routing, bounded selective memory, same-Mission crash recovery, checkpointed execution, bounded executive consultation/replanning, cancellation, journaled text-Repair compensation, and governed multi-tool execution through Tool Gateway v2.
+The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot, A2 Mission Graph Orchestration, A3 Living Company Intelligence, A4 Executive Exception Loop and Durable Operations, A5 Governed Capability Expansion, and A6 Orchestration Intelligence and Self-Improvement have qualified. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, attributable organizational memory, experienced routing, bounded selective memory, same-Mission crash recovery, checkpointed execution, bounded executive consultation/replanning, cancellation, journaled text-Repair compensation, governed multi-tool execution through Tool Gateway v2, and replayable evidence-backed orchestration evaluation whose proposals cannot self-activate.
 
 The canonical evolution path is recorded in `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md`.
 
-Current critical path: **A6 - Orchestration Intelligence and Self-Improvement**. GorXu remains **NOT YET APEX** until A6 and the final A7 gauntlet pass.
+Current critical path: **A7 - Apex Qualification Gauntlet**. GorXu remains **NOT YET APEX** until the final A7 gauntlet passes.
 
 ## Apex critical-path update - A1 Cognitive Pilot
 
@@ -297,4 +297,36 @@ Qualification evidence:
 
 A5 deliberately does not claim unrestricted interactive desktop automation, arbitrary third-party/networked MCP transports, runtime image acquisition, or the optional A2A external-agent seam.
 
-Current Apex stage: **A6 - Orchestration Intelligence and Self-Improvement**.
+Current Apex stage after A5 was **A6 - Orchestration Intelligence and Self-Improvement**.
+
+## Apex critical-path update - A6 Orchestration Intelligence and Self-Improvement
+
+**Status: QUALIFIED**
+
+A6 qualification adds:
+
+- privacy-minimized replayable Mission trajectories built from canonical Mission, Order, evidence, graph, exception, and Crew-performance records;
+- deterministic success, latency, cost, retry, resume, escalation, verification, evidence-quality, authority, capability, and trace-completeness grading;
+- SHA-256-bound evaluation cases, runs, proposals, and creation chronology;
+- immutable production routing weights with candidate weights confined to evaluation;
+- paired routing evaluation across sequential and parallel cases with family-wise statistical control;
+- evidence-backed routing, prompt, skill, memory, and workflow proposals that remain `proposed`;
+- explicit denial of proposal activation through the A6 evaluation boundary;
+- adversarial coverage for tampering, eligibility, verification, trace completeness, authority, multiple comparisons, and replay integrity.
+
+Qualification evidence:
+
+- GitHub-hosted remediation run `31874649364` passed **102/102** unittest tests and **102 pytest** tests with governed A5 isolation and browser dependencies commissioned;
+- the 24-case controlled routing suite improved from **12/24** baseline passes to **24/24** candidate passes, with **12 wins, 0 losses, p=0.000244140625**, family-wise alpha **0.0125**, and **0 invariant regressions**;
+- the generated improvement remained `proposed`, and an activation attempt was denied;
+- independent canary run `31874579460` first proved five evaluator weaknesses, and unchanged rerun `31874767065` closed with `A6_INDEPENDENT_CANARY_FINDINGS=` after remediation;
+- preserved private-Vessel Mission `MSN-f09179526ad7` used `devops-engineer`, `researcher`, `platform-engineer`, and `independent-verifier` across governed workspace, exact-origin network, offline browser, read-only MCP, and verification nodes;
+- Mission synthesis recorded **0 replans** and independent verification **PASS**;
+- evaluation case `EVC-10573b245e54` was complete with **0 invariants** and replayed the identical trace SHA-256 `e6e0b564eee693d43f50e45fbab6dd33c9c1a0943b320f2f68e54dde5e864d5c`;
+- the private `.groxstate` snapshot verified before and after independent restore, SQLite integrity remained `ok`, all **82** Standing Crew were present, and the generated qualification secret was absent from durable SQLite state.
+
+**A6 exit gate: PASSED.**
+
+A6 does not grant proposals authority to mutate the Vessel. Accepted future improvements must still traverse the ordinary GroX authority path with explicit mutation authority and required verification.
+
+Current Apex stage: **A7 - Apex Qualification Gauntlet**.

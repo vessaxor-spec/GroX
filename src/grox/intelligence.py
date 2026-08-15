@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from types import MappingProxyType
 from dataclasses import dataclass
 from typing import Any, Iterable
 
@@ -13,6 +14,21 @@ _GENERIC_TAGS = {
     "repair", "review", "service", "verify", "write",
 }
 _RISK_RANK = {RiskClass.low: 0, RiskClass.medium: 1, RiskClass.high: 2, RiskClass.critical: 3}
+
+_ROUTING_COMPONENT_KEYS = ("competence", "reliability", "evidence_quality", "load", "cost", "latency", "risk", "experience", "preference")
+DEFAULT_ROUTING_WEIGHTS = MappingProxyType({key: 1.0 for key in _ROUTING_COMPONENT_KEYS})
+
+def weighted_routing_score(components: dict[str, float], weights: dict[str, float] | None = None) -> float:
+    effective = {**DEFAULT_ROUTING_WEIGHTS, **(weights or {})}
+    unknown = set(effective) - set(_ROUTING_COMPONENT_KEYS)
+    if unknown:
+        raise ValueError(f"unknown routing weight(s): {sorted(unknown)}")
+    for key, value in effective.items():
+        value = float(value)
+        if not 0.0 <= value <= 10.0:
+            raise ValueError(f"routing weight {key} must be between 0 and 10")
+        effective[key] = value
+    return sum(float(components.get(key, 0.0)) * effective[key] for key in _ROUTING_COMPONENT_KEYS)
 
 
 def _words(text: str) -> list[str]:
@@ -241,7 +257,7 @@ class LivingCompanyIntelligence:
                 "experience": min(samples, 10) * 0.2,
                 "preference": max(0.0, 0.75 - preferred_rank[crew.crew_id] * 0.1) if crew.crew_id in preferred_rank else 0.0,
             }
-            score = sum(components.values())
+            score = weighted_routing_score(components)
             decision = RoutingDecision(crew=crew, task_class=task_class, score=score, components=components)
             candidates.append((score, crew.crew_id, decision))
 

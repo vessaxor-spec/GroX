@@ -155,7 +155,7 @@ GorXu earns Apex status only after passing a formal gauntlet covering:
 
 ## Current priority
 
-**A6 - Orchestration Intelligence and Self-Improvement is the current critical stage.** A1 cognition, A2 Mission Graph Orchestration, A3 Living Company Intelligence, A4 Durable Operations, and A5 Governed Capability Expansion are qualified for the current project-hosted operating model.
+**A7 - Apex Qualification is the current critical stage.** A1 cognition, A2 Mission Graph Orchestration, A3 Living Company Intelligence, A4 Durable Operations, A5 Governed Capability Expansion, and A6 Orchestration Intelligence and Self-Improvement are qualified for the current project-hosted operating model.
 
 A1 foundation now present:
 
@@ -271,4 +271,23 @@ A5 intentionally leaves unrestricted interactive desktop automation, arbitrary t
 
 **A5 status: QUALIFIED.**
 
-Next critical stage: **A6 - Orchestration Intelligence and Self-Improvement**.
+Next critical stage after A5 was **A6 - Orchestration Intelligence and Self-Improvement**.
+
+### A6 live qualification: PASSED
+
+A6 adds a native evaluation layer under GorXu without creating a second command path. Mission trajectories are privacy-minimized and replayable; evaluation cases, runs, proposals, and creation chronology are SHA-256 bound; candidate routing policies remain isolated from the immutable production baseline; and improvement proposals cannot activate themselves.
+
+Qualification Mission: `MSN-f09179526ad7`.
+
+Evidence:
+- GitHub-hosted remediation qualification run `31874649364` passed **102/102** unittest tests and **102 pytest** tests;
+- a 24-case sequential/parallel controlled suite improved from **12/24** baseline to **24/24** candidate passes with **12 wins, 0 losses, p=0.000244140625**, family-wise alpha **0.0125**, and no invariant regression;
+- the candidate produced an evidence-backed proposal only, and activation through A6 was denied;
+- independent canary run `31874579460` exposed five concrete weaknesses before remediation; unchanged rerun `31874767065` returned no findings on the remediated candidate;
+- live preserved Mission `MSN-f09179526ad7` exercised isolated workspace, ephemeral secret use, exact-origin network access, offline Chromium evidence, read-only MCP, and independent verification across four Standing Crew;
+- evaluation case `EVC-10573b245e54` recorded a complete trace with zero invariants and replayed trace SHA-256 `e6e0b564eee693d43f50e45fbab6dd33c9c1a0943b320f2f68e54dde5e864d5c`;
+- independent fresh-worktree restore of the private `.groxstate` reproduced the same trace hash with SQLite integrity `ok`, all **82** Standing Crew, and no generated qualification-secret prefix in durable state.
+
+**A6 status: QUALIFIED.**
+
+Next critical stage: **A7 - Apex Qualification**.

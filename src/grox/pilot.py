@@ -17,6 +17,7 @@ from .graph import MissionGraphPlan
 from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
 from .operations import ExecutiveExceptionLoop
+from .evaluation import OrchestrationEvaluator
 
 _AUTO = object()
 _RISK_RANK = {RiskClass.low:0, RiskClass.medium:1, RiskClass.high:2, RiskClass.critical:3}
@@ -40,6 +41,7 @@ class PilotGorXu:
         self.verifier=IndependentVerifier()
         self.intelligence=LivingCompanyIntelligence(self.store,self.roster)
         self.exception_loop=ExecutiveExceptionLoop(self.durable)
+        self.evaluation=OrchestrationEvaluator(self.store,self.durable,self.roster)
         self.reasoner=build_reasoner_from_env() if reasoner is _AUTO else reasoner
 
     @property
@@ -123,6 +125,8 @@ class PilotGorXu:
             result=self.executor.execute(order)
             elapsed_ms=(perf_counter()-started)*1000.0
             for ev in result.evidence: self.store.add_evidence(mission_id,order.order_id,ev)
+            if result.exception:
+                self.store.add_evidence(mission_id,order.order_id,Evidence('crew_exception',dict(result.exception)))
             self.store.update_order(order.order_id,result.status); self.store.crew_sleep(crew.crew_id,mission_id,result.summary)
 
             verification=None
@@ -159,6 +163,10 @@ class PilotGorXu:
             return {'mission_id':mission_id,'mode':mode.value,'risk':risk.value,'crew':crew.crew_id,'status':result.status,'summary':summary,'verification':verification,'exception':result.exception,'cognition':brief.to_dict() if brief else None,'cognition_error':cognition_error}
         except LookupError as exc:
             summary=f"GorXu bounded routing exception: {exc}"
+            self.store.add_graph_event(
+                mission_id,'routing_exception',
+                {'cause_type':type(exc).__name__,'message':str(exc),'operation':'command'},
+            )
             self.store.update_mission(mission_id,'needs_pilot_decision',summary)
             return {'mission_id':mission_id,'mode':mode.value,'risk':risk.value,'status':'needs_pilot_decision','summary':summary,
                     'exception':{'type':'routing_exception','cause_type':type(exc).__name__,'message':str(exc)},
@@ -271,6 +279,18 @@ class PilotGorXu:
         self.durable.cancel_graph_run(mission_id,reason)
         self.store.add_graph_event(mission_id,'mission_cancelled',{'reason':reason})
         return {'mission_id':mission_id,'status':'cancelled','summary':reason}
+
+    def evaluate_mission(self, mission_id:str, *, suite:str='operational-history')->dict:
+        return self.evaluation.capture_mission(mission_id,suite=suite)
+
+    def find_routing_improvement(self, suite:str)->dict:
+        return self.evaluation.find_routing_improvement(suite)
+
+    def propose_improvement(self, *, proposal_type:str, target:str, proposed_change:dict, rationale:str, evidence:dict)->str:
+        return self.evaluation.propose(proposal_type=proposal_type,target=target,proposed_change=proposed_change,rationale=rationale,evidence=evidence)
+
+    def activate_improvement(self, proposal_id:str)->None:
+        self.evaluation.activate_proposal(proposal_id)
 
     def repair_write(self,path:str,content:str,*,risk:RiskClass|None=None,crew_id:str|None=None)->dict:
         return self.command(f"Repair {path} by writing Commander-approved content",mode=MissionMode.repair,risk=risk,crew_id=crew_id,scope=path,parameters={'operation':'write_text','path':path,'content':content})

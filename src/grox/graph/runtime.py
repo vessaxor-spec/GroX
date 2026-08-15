@@ -459,6 +459,10 @@ class MissionGraphRunner:
                 except LookupError as exc:
                     statuses[node_id] = "exception"
                     self.store.update_graph_node(mission_id, node_id, "exception", attempt=attempts[node_id])
+                    self.store.add_graph_event(
+                        mission_id, "crew_selection_exception",
+                        {"type": type(exc).__name__, "message": str(exc), "attempt": attempts[node_id]}, node_id=node_id,
+                    )
                     unresolved_reason = str(exc)
                     break
                 batch_crew.add(crew.crew_id)
@@ -511,6 +515,8 @@ class MissionGraphRunner:
                         )
                     for ev in result.evidence:
                         self.store.add_evidence(mission_id, order.order_id, ev)
+                    if result.exception:
+                        self.store.add_evidence(mission_id, order.order_id, Evidence("crew_exception", dict(result.exception)))
                     self.store.update_order(order.order_id, result.status)
                     self.store.crew_sleep(order.assigned_crew, mission_id, result.summary)
                     self.durable.checkpoint(
