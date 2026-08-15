@@ -1,6 +1,6 @@
 # GroX Progress Tracker
 
-**Status date:** 2026-08-14
+**Status date:** 2026-08-15
 
 ## Verified Vessel baseline
 
@@ -25,7 +25,7 @@ Verified by source, qualification evidence, and automated testing:
 - independent verifier must differ from executor
 - interrupted Crew duty state recovers safely on restart
 - domain-routing contracts added for the expanded company
-- 65 automated contract/unit/integration tests passing
+- A6 external audit independently collected 102 tests (`pytest`: 100 passed, 2 environment-dependent browser skips; `unittest`: 102 ran OK, 2 skips)
 - live Inspect Mission completed successfully
 - live medium-risk Repair Mission completed with independent verification
 
@@ -111,7 +111,7 @@ A1 exit gate is closed; the current Apex stage is tracked below.
 - `configs/persistence/project-binding.json` records the active persistence bindings;
 - automated suite: **31 tests passing** after persistence-plane implementation.
 
-The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed; the current Apex critical path is A6 Orchestration Intelligence and Self-Improvement.
+The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed; the current Apex critical path is A7 Apex Qualification Gauntlet.
 
 ## Durable source synchronization
 
@@ -330,3 +330,20 @@ Qualification evidence:
 A6 does not grant proposals authority to mutate the Vessel. Accepted future improvements must still traverse the ordinary GroX authority path with explicit mutation authority and required verification.
 
 Current Apex stage: **A7 - Apex Qualification Gauntlet**.
+
+## A7 entry hardening - external audit response
+
+**Status: PRE-GAUNTLET HARDENING**
+
+An external independent audit of `main@481d83e422119d94759685560b61bfccd9e532da` returned **PASS WITH CONDITIONS** for A7 entry. It independently reproduced the A6 private-state hashes, SQLite integrity, 82-Crew state, preserved Mission `MSN-f09179526ad7`, evaluation case `EVC-10573b245e54`, exact replay trace, zero invariants, verifier separation, authority/risk controls, and proposal activation denial.
+
+The bounded pre-A7 hardening response is limited to proved findings:
+
+- source/state restore compatibility is now enforced: exact source matches are accepted, compatible ancestor state requires explicit allowance, and unrelated or unprovable source state fails closed;
+- issued Mission Orders are immutable across authority-bearing fields and nested parameters, preventing ordinary post-issuance scope/grant/verification widening;
+- Living Company memory context remains a bounded pre-issuance preparation; persistence or first Tool Gateway use seals the Order against later widening;
+- current stewardship/test-count drift is reconciled while historical stage-specific qualification counts remain historical evidence;
+- dual routing entry points remain tracked for the A7 gauntlet rather than being removed without proof, because the static catalogue selector is not used by the live Pilot/Graph routing path and premature removal changed established routing-test behavior;
+- the A7 gauntlet must include source/state mismatch, post-issuance Order mutation, routing-path consistency, and non-activation of evaluation proposals before Apex can be considered.
+
+Local pre-publication regression on the hardening candidate: **107 pytest tests passed** and **107 unittest tests passed**. This local result is not the independent completion gate; GitHub-hosted and independent verification remain required before merge.

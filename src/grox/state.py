@@ -107,6 +107,7 @@ class StateStore:
         self.db.commit()
 
     def save_order(self, order: MissionOrder, status: str = 'issued'):
+        order.seal()
         t = now()
         self.db.execute(
             "INSERT OR REPLACE INTO orders VALUES(?,?,?,?,?,?,?,?)",

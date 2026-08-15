@@ -45,7 +45,7 @@ Each snapshot contains:
 - the Vessel Git commit when available;
 - the cognitive/source binding metadata required to understand what the snapshot belongs to.
 
-Restoration requires explicit confirmation and creates a pre-restore checkpoint before replacing live state.
+Restoration requires explicit confirmation, verifies the snapshot source binding against the active Vessel source, and creates a pre-restore checkpoint before replacing live state. Exact source matches restore normally. A snapshot from a proven ancestor source requires explicit `allow_ancestor=True`; unrelated or unprovable source histories fail closed.
 
 ## Reconstitution protocol
 
@@ -53,7 +53,7 @@ A fresh host or sandbox becomes the active flight computer only after this seque
 
 1. Restore the Space Exploration project context and GorXu identity.
 2. Materialize the latest verified GroX source from GitHub.
-3. Restore the latest verified private operational-state snapshot when continuation is required.
+3. Verify source/state compatibility and restore the latest verified private operational-state snapshot when continuation is required; ancestor-source restoration requires an explicit compatibility allowance.
 4. Run repository integrity checks and the full automated test suite.
 5. Reconstitute Pilot GorXu on the active reasoning model.
 6. Confirm the Commander Seat, Crew roster, Mission Control, and Tool Gateway are healthy.

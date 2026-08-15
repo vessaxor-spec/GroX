@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from collections.abc import Mapping
 import hashlib
 import http.client
 import json
@@ -60,6 +61,7 @@ class ToolGateway:
         return p
 
     def _allowed(self, order: MissionOrder, action: str) -> None:
+        order.seal()
         if action in order.forbidden_actions:
             raise ToolDenied(f"action explicitly forbidden: {action}")
         if action not in order.allowed_actions:
@@ -68,9 +70,9 @@ class ToolGateway:
             raise ToolDenied(f"{action} requires explicit Repair authority")
 
     def _origin_grants(self, order: MissionOrder) -> frozenset[str]:
-        raw = order.parameters.get("allowed_origins") or []
-        if not isinstance(raw, list) or not all(isinstance(x, str) and x for x in raw):
-            raise ToolDenied("allowed_origins must be a list of non-empty strings")
+        raw = order.parameters.get("allowed_origins") or ()
+        if not isinstance(raw, (list, tuple)) or not all(isinstance(x, str) and x for x in raw):
+            raise ToolDenied("allowed_origins must be a sequence of non-empty strings")
         try:
             requested = frozenset(normalize_origin(x) for x in raw)
         except PolicyError as exc:
@@ -310,10 +312,10 @@ class ToolGateway:
         if not self.policy.mcp_enabled:
             raise ToolDenied("MCP adapters disabled by host policy")
         grants = order.parameters.get("mcp_grants") or {}
-        if not isinstance(grants, dict):
+        if not isinstance(grants, Mapping):
             raise ToolDenied("mcp_grants must be an object")
-        tools = grants.get(adapter) or []
-        if not isinstance(tools, list) or tool not in tools:
+        tools = grants.get(adapter) or ()
+        if not isinstance(tools, (list, tuple)) or tool not in tools:
             raise ToolDenied(f"MCP tool not granted by Mission Order: {adapter}/{tool}")
         spec = self.mcp.registry.get(adapter)
         if spec is None:
