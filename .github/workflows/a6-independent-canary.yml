@@ -1,0 +1,129 @@
+name: A6 Independent Verifier Canary
+
+on:
+  push:
+    branches:
+      - verification/a6-v2-canary
+
+permissions:
+  contents: read
+
+jobs:
+  verifier:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact A6 candidate
+        uses: actions/checkout@v4
+        with:
+          ref: 0dfe516dd278e8209beaea5d9cfdab044137c366
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run independent adversarial canary
+        shell: bash
+        env:
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from tests._support import temp_vessel
+          from tests.unit.test_orchestration_evaluation import components
+          from grox.contracts import RiskClass
+
+          failures = []
+          td, root, p = temp_vessel()
+          try:
+              # 1. A completed low-risk Mission with no delegation/evidence must not be trace-complete.
+              p.store.create_mission('MSN-A6-EMPTY', 'empty completed canary', 'execute', 'low')
+              p.store.update_mission('MSN-A6-EMPTY', 'completed', 'canary')
+              trajectory = p.evaluation.trajectory.build('MSN-A6-EMPTY')
+              metrics, invariants = p.evaluation.trajectory.metrics(trajectory)
+              if metrics['trace_complete']:
+                  failures.append('completed_empty_mission_accepted_as_trace_complete')
+
+              # 2. Graph Repair requires independent verification even at low risk.
+              graph_repair = {
+                  'schema': 'grox-trajectory-v1',
+                  'mission_id': 'MSN-A6-GRAPH-REPAIR',
+                  'mode': 'graph', 'risk': 'low', 'status': 'completed',
+                  'directive_sha256': '0' * 64,
+                  'events': [{
+                      'at': '2026-08-15T00:00:00+00:00', 'category': 'delegation', 'kind': 'mission_order',
+                      'source_id': 'ORD-1', 'source_table': 'orders',
+                      'payload': {'crew_id': 'canary', 'mode': 'repair', 'required_capabilities': [], 'allowed_actions': [], 'risk_class': 'low'},
+                  }],
+                  'source_counts': {
+                      'orders': 1, 'evidence': 0, 'plan_evidence': 0, 'tool_evidence': 0,
+                      'verification_evidence': 0, 'exception_evidence': 0, 'exception_decisions': 0,
+                      'graph_nodes': 0, 'graph_events': 0, 'performance': 0,
+                  },
+              }
+              _, graph_invariants = p.evaluation.trajectory.metrics(graph_repair)
+              if 'required_verification_missing' not in graph_invariants:
+                  failures.append('low_risk_graph_repair_missing_verification_not_detected')
+
+              # 3. Creation time is audit chronology and must be covered by the record digest.
+              pid = p.propose_improvement(
+                  proposal_type='routing', target='canary', proposed_change={'risk': 2.0},
+                  rationale='timestamp binding canary', evidence={'source': 'independent_verifier'},
+              )
+              p.store.db.execute("UPDATE improvement_proposals SET created_at='2099-01-01T00:00:00+00:00' WHERE proposal_id=?", (pid,))
+              p.store.db.commit()
+              try:
+                  p.evaluation.ledger.proposal(pid)
+              except ValueError:
+                  pass
+              else:
+                  failures.append('proposal_created_at_not_digest_bound')
+
+              # 4. Four searched profiles require family-wise alpha control. Five wins / zero losses gives p=0.03125:
+              # significant at 0.05 individually, but not at Bonferroni alpha 0.0125 for four searched profiles.
+              suite = 'a6-multiple-comparison-canary'
+              for i in range(5):
+                  p.evaluation.add_routing_case(
+                      suite=suite, case_id=f'EVC-MC-H-{i:02d}', task_id=f'high-{i}', risk=RiskClass.high,
+                      topology='parallel' if i % 2 else 'sequential',
+                      candidates=[
+                          {'crew_id': 'reliable', 'eligible': True, 'components': components(competence=3.0, reliability=0.5, evidence_quality=0.5, risk=2.0)},
+                          {'crew_id': 'surface', 'eligible': True, 'components': components(competence=8.0, reliability=0.5, evidence_quality=0.5, risk=-1.5)},
+                      ], expected_crew_id='reliable', provenance={'source': 'independent_verifier'},
+                  )
+              for i in range(15):
+                  p.evaluation.add_routing_case(
+                      suite=suite, case_id=f'EVC-MC-L-{i:02d}', task_id=f'low-{i}', risk=RiskClass.low,
+                      topology='sequential' if i % 2 else 'parallel',
+                      candidates=[
+                          {'crew_id': 'efficient', 'eligible': True, 'components': components(competence=6.0, reliability=0.5, evidence_quality=0.5, cost=-0.25, latency=-0.25)},
+                          {'crew_id': 'slower', 'eligible': True, 'components': components(competence=4.0, reliability=0.25, evidence_quality=0.25, cost=-0.5, latency=-0.5)},
+                      ], expected_crew_id='efficient', provenance={'source': 'independent_verifier'},
+                  )
+              searched = p.find_routing_improvement(suite)
+              if searched['qualified']:
+                  failures.append('multiple_profile_search_uses_unadjusted_alpha')
+
+              # 5. Retries and resumes are separate metrics; resumes must not inflate retry count.
+              resume_only = {
+                  'schema': 'grox-trajectory-v1', 'mission_id': 'MSN-A6-RESUME', 'mode': 'graph', 'risk': 'low',
+                  'status': 'needs_pilot_decision', 'directive_sha256': '0' * 64,
+                  'events': [{
+                      'at': '2026-08-15T00:00:00+00:00', 'category': 'control', 'kind': 'graph_run',
+                      'source_id': 'MSN-A6-RESUME', 'source_table': 'graph_runs',
+                      'payload': {'resume_count': 2, 'cancelled': False},
+                  }],
+                  'source_counts': {
+                      'orders': 0, 'evidence': 0, 'plan_evidence': 0, 'tool_evidence': 0,
+                      'verification_evidence': 0, 'exception_evidence': 0, 'exception_decisions': 0,
+                      'graph_nodes': 0, 'graph_events': 0, 'performance': 0,
+                  },
+              }
+              resume_metrics, _ = p.evaluation.trajectory.metrics(resume_only)
+              if resume_metrics['retries'] != 0 or resume_metrics['resumes'] != 2:
+                  failures.append('resume_count_is_double_counted_as_retry')
+          finally:
+              td.cleanup()
+
+          print('A6_INDEPENDENT_CANARY_FINDINGS=' + ','.join(failures))
+          if failures:
+              raise SystemExit(1)
+          PY
