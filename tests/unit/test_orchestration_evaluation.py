@@ -192,6 +192,118 @@ class OrchestrationEvaluationUnitTests(unittest.TestCase):
         finally:
             td.cleanup()
 
+    def test_completed_trace_requires_minimum_operational_evidence_and_graph_repair_verification(self):
+        td, root, p = temp_vessel()
+        try:
+            p.store.create_mission("MSN-A6-EMPTY-COMPLETED", "empty completed", "execute", "low")
+            p.store.update_mission("MSN-A6-EMPTY-COMPLETED", "completed", "controlled")
+            trajectory = p.evaluation.trajectory.build("MSN-A6-EMPTY-COMPLETED")
+            metrics, invariants = p.evaluation.trajectory.metrics(trajectory)
+            self.assertFalse(metrics["trace_complete"])
+            self.assertTrue({
+                "required_delegation_missing", "required_plan_missing",
+                "required_tool_evidence_missing", "required_telemetry_missing",
+            }.issubset(set(invariants)))
+
+            graph_repair = {
+                "schema": "grox-trajectory-v1", "mission_id": "MSN-A6-GRAPH-REPAIR",
+                "mode": "graph", "risk": "low", "status": "completed", "directive_sha256": "0" * 64,
+                "events": [{
+                    "at": "2026-08-15T00:00:00+00:00", "category": "delegation", "kind": "mission_order",
+                    "source_id": "ORD-1", "source_table": "orders",
+                    "payload": {"crew_id": "canary", "mode": "repair", "required_capabilities": [], "allowed_actions": [], "risk_class": "low"},
+                }],
+                "source_counts": {
+                    "orders": 1, "evidence": 0, "plan_evidence": 0, "tool_evidence": 0,
+                    "verification_evidence": 0, "exception_evidence": 0, "exception_decisions": 0,
+                    "graph_nodes": 0, "graph_events": 0, "performance": 0,
+                },
+            }
+            _, graph_invariants = p.evaluation.trajectory.metrics(graph_repair)
+            self.assertIn("required_verification_missing", graph_invariants)
+        finally:
+            td.cleanup()
+
+    def test_evaluation_record_creation_timestamps_are_digest_bound(self):
+        td, root, p = temp_vessel()
+        try:
+            result = p.command("Inspect timestamp binding", risk=RiskClass.high)
+            captured = p.evaluate_mission(result["mission_id"], suite="timestamp-case")
+            p.store.db.execute("UPDATE evaluation_cases SET created_at='2099-01-01T00:00:00+00:00' WHERE case_id=?", (captured["case_id"],))
+            p.store.db.commit()
+            with self.assertRaisesRegex(ValueError, "case digest mismatch"):
+                p.evaluation.ledger.case(captured["case_id"])
+
+            suite = add_balanced_routing_suite(p, "timestamp-run")
+            run = p.evaluation.run_routing_suite(suite, policy_name="baseline", weights=DEFAULT_ROUTING_WEIGHTS)
+            p.store.db.execute("UPDATE evaluation_runs SET created_at='2099-01-01T00:00:00+00:00' WHERE run_id=?", (run["run_id"],))
+            p.store.db.commit()
+            with self.assertRaisesRegex(ValueError, "run digest mismatch"):
+                p.evaluation.ledger.run(run["run_id"])
+
+            proposal_id = p.propose_improvement(
+                proposal_type="routing", target="timestamp", proposed_change={"risk": 2.0},
+                rationale="timestamp binding", evidence={"source": "test"},
+            )
+            p.store.db.execute("UPDATE improvement_proposals SET created_at='2099-01-01T00:00:00+00:00' WHERE proposal_id=?", (proposal_id,))
+            p.store.db.commit()
+            with self.assertRaisesRegex(ValueError, "proposal digest mismatch"):
+                p.evaluation.ledger.proposal(proposal_id)
+        finally:
+            td.cleanup()
+
+    def test_profile_search_controls_family_wise_false_positive_rate(self):
+        td, root, p = temp_vessel()
+        try:
+            suite = "multiple-comparison-regression"
+            for index in range(5):
+                p.evaluation.add_routing_case(
+                    suite=suite, case_id=f"EVC-MC-H-{index:02d}", task_id=f"high-{index}", risk=RiskClass.high,
+                    topology="parallel" if index % 2 else "sequential",
+                    candidates=[
+                        {"crew_id": "reliable", "eligible": True, "components": components(competence=3.0, reliability=0.5, evidence_quality=0.5, risk=2.0)},
+                        {"crew_id": "surface", "eligible": True, "components": components(competence=8.0, reliability=0.5, evidence_quality=0.5, risk=-1.5)},
+                    ], expected_crew_id="reliable", provenance={"source": "regression_test"},
+                )
+            for index in range(15):
+                p.evaluation.add_routing_case(
+                    suite=suite, case_id=f"EVC-MC-L-{index:02d}", task_id=f"low-{index}", risk=RiskClass.low,
+                    topology="sequential" if index % 2 else "parallel",
+                    candidates=[
+                        {"crew_id": "efficient", "eligible": True, "components": components(competence=6.0, reliability=0.5, evidence_quality=0.5, cost=-0.25, latency=-0.25)},
+                        {"crew_id": "slower", "eligible": True, "components": components(competence=4.0, reliability=0.25, evidence_quality=0.25, cost=-0.5, latency=-0.5)},
+                    ], expected_crew_id="efficient", provenance={"source": "regression_test"},
+                )
+            result = p.find_routing_improvement(suite)
+            self.assertFalse(result["qualified"])
+            self.assertTrue(all(c["alpha"] == 0.0125 for c in result["comparisons"]))
+            self.assertTrue(any(c["p_value"] == 0.03125 for c in result["comparisons"]))
+        finally:
+            td.cleanup()
+
+    def test_resumes_are_not_counted_as_retries(self):
+        td, root, p = temp_vessel()
+        try:
+            trajectory = {
+                "schema": "grox-trajectory-v1", "mission_id": "MSN-A6-RESUME", "mode": "graph", "risk": "low",
+                "status": "needs_pilot_decision", "directive_sha256": "0" * 64,
+                "events": [{
+                    "at": "2026-08-15T00:00:00+00:00", "category": "control", "kind": "graph_run",
+                    "source_id": "MSN-A6-RESUME", "source_table": "graph_runs",
+                    "payload": {"resume_count": 2, "cancelled": False},
+                }],
+                "source_counts": {
+                    "orders": 0, "evidence": 0, "plan_evidence": 0, "tool_evidence": 0,
+                    "verification_evidence": 0, "exception_evidence": 0, "exception_decisions": 0,
+                    "graph_nodes": 0, "graph_events": 0, "performance": 0,
+                },
+            }
+            metrics, _ = p.evaluation.trajectory.metrics(trajectory)
+            self.assertEqual(metrics["retries"], 0)
+            self.assertEqual(metrics["resumes"], 2)
+        finally:
+            td.cleanup()
+
     def test_high_risk_trace_without_verification_is_flagged(self):
         td, root, p = temp_vessel()
         try:

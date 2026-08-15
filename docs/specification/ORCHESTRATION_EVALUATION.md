@@ -67,7 +67,7 @@ A6 adds three private SQLite record classes:
 - `evaluation_runs` — evaluator configuration, case results, metrics, and invariant results;
 - `improvement_proposals` — evidence-backed proposals with status `proposed`.
 
-Cases, runs, and proposals are individually SHA-256 bound. Reads verify the stored record before using it. A case ID may be reused only when its complete normalized content is identical.
+Cases, runs, and proposals are individually SHA-256 bound, including their creation timestamps. Reads verify the stored record before using it. A case ID may be reused only when its complete normalized content is identical.
 
 Every evaluation case requires attributable provenance containing a non-empty `source`.
 
@@ -91,7 +91,7 @@ The initial deterministic trajectory grader records:
 - authority violations;
 - trace completeness.
 
-A completed Mission is not automatically a good trajectory. Authority, verification, evidence, and trace invariants are graded independently from outcome success.
+A completed Mission is not automatically a good trajectory. A completed trajectory must contain attributable plan, delegation, governed tool-action, and telemetry evidence; required verification remains additional. Authority, verification, evidence, and trace invariants are graded independently from outcome success.
 
 ## Routing replay cases
 
@@ -126,7 +126,7 @@ A routing candidate qualifies for an improvement proposal only when all of the f
 
 The gate is intentionally stricter than a higher aggregate score. No weighted average may hide an authority, eligibility, or verification failure.
 
-The current bounded search profiles may test risk, reliability, evidence-quality, cost, and latency weight changes. These are candidate profiles, not production settings.
+The current bounded search profiles may test risk, reliability, evidence-quality, cost, and latency weight changes. When multiple profiles are searched on the same suite, the family-wise alpha is controlled across the profile set before any proposal may qualify. These are candidate profiles, not production settings.
 
 ## Controlled qualification versus operational evidence
 

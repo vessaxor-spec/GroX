@@ -131,9 +131,10 @@ class EvaluationLedger:
         encoded = _canonical(payload)
         expected_encoded = _canonical(expected)
         provenance_encoded = _canonical(provenance)
+        created_at = now()
         record = {
             "case_id": cid, "suite": suite, "case_type": case_type, "source_mission_id": source_mission_id,
-            "payload": payload, "expected": expected, "provenance": provenance,
+            "payload": payload, "expected": expected, "provenance": provenance, "created_at": created_at,
         }
         digest = _sha(record)
         existing = self.db.execute("SELECT case_sha256 FROM evaluation_cases WHERE case_id=?", (cid,)).fetchone()
@@ -144,7 +145,7 @@ class EvaluationLedger:
         self.db.execute(
             """INSERT INTO evaluation_cases(case_id,suite,case_type,source_mission_id,payload,expected,provenance,case_sha256,created_at)
                VALUES(?,?,?,?,?,?,?,?,?)""",
-            (cid, suite, case_type, source_mission_id, encoded, expected_encoded, provenance_encoded, digest, now()),
+            (cid, suite, case_type, source_mission_id, encoded, expected_encoded, provenance_encoded, digest, created_at),
         )
         self.db.commit()
         return cid
@@ -159,7 +160,7 @@ class EvaluationLedger:
         actual = _sha({
             "case_id": out["case_id"], "suite": out["suite"], "case_type": out["case_type"],
             "source_mission_id": out["source_mission_id"], "payload": out["payload"],
-            "expected": out["expected"], "provenance": out["provenance"],
+            "expected": out["expected"], "provenance": out["provenance"], "created_at": out["created_at"],
         })
         if actual != out["case_sha256"]:
             raise ValueError(f"evaluation case digest mismatch: {case_id}")
@@ -186,14 +187,16 @@ class EvaluationLedger:
         case_results: list[dict[str, Any]],
     ) -> str:
         run_id = f"EVR-{uuid.uuid4().hex[:12]}"
+        created_at = now()
         record = {"run_id": run_id, "suite": suite, "evaluator": evaluator, "policy_name": policy_name,
-                  "config": config, "metrics": metrics, "invariants": invariants, "case_results": case_results}
+                  "config": config, "metrics": metrics, "invariants": invariants, "case_results": case_results,
+                  "created_at": created_at}
         digest = _sha(record)
         self.db.execute(
             """INSERT INTO evaluation_runs(run_id,suite,evaluator,policy_name,config,metrics,invariants,case_results,run_sha256,created_at)
                VALUES(?,?,?,?,?,?,?,?,?,?)""",
             (run_id, suite, evaluator, policy_name, _canonical(config), _canonical(metrics), _canonical(invariants),
-             _canonical(case_results), digest, now()),
+             _canonical(case_results), digest, created_at),
         )
         self.db.commit()
         return run_id
@@ -207,7 +210,7 @@ class EvaluationLedger:
             out[key] = json.loads(out[key])
         actual = _sha({"run_id": out["run_id"], "suite": out["suite"], "evaluator": out["evaluator"],
                        "policy_name": out["policy_name"], "config": out["config"], "metrics": out["metrics"],
-                       "invariants": out["invariants"], "case_results": out["case_results"]})
+                       "invariants": out["invariants"], "case_results": out["case_results"], "created_at": out["created_at"]})
         if actual != out["run_sha256"]:
             raise ValueError(f"evaluation run digest mismatch: {run_id}")
         return out
@@ -228,15 +231,17 @@ class EvaluationLedger:
         if not target.strip() or not rationale.strip() or not evidence:
             raise ValueError("target, rationale, and evidence are required for improvement proposals")
         proposal_id = f"IMP-{uuid.uuid4().hex[:12]}"
+        created_at = now()
         record = {"proposal_id": proposal_id, "proposal_type": proposal_type, "target": target,
                   "proposed_change": proposed_change, "rationale": rationale, "evidence": evidence,
-                  "baseline_run_id": baseline_run_id, "candidate_run_id": candidate_run_id, "status": "proposed"}
+                  "baseline_run_id": baseline_run_id, "candidate_run_id": candidate_run_id, "status": "proposed",
+                  "created_at": created_at}
         digest = _sha(record)
         self.db.execute(
             """INSERT INTO improvement_proposals(proposal_id,proposal_type,target,proposed_change,rationale,evidence,
                baseline_run_id,candidate_run_id,status,proposal_sha256,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)""",
             (proposal_id, proposal_type, target, _canonical(proposed_change), rationale, _canonical(evidence),
-             baseline_run_id, candidate_run_id, "proposed", digest, now()),
+             baseline_run_id, candidate_run_id, "proposed", digest, created_at),
         )
         self.db.commit()
         return proposal_id
@@ -250,7 +255,8 @@ class EvaluationLedger:
         out["evidence"] = json.loads(out["evidence"])
         actual = _sha({"proposal_id": out["proposal_id"], "proposal_type": out["proposal_type"], "target": out["target"],
                        "proposed_change": out["proposed_change"], "rationale": out["rationale"], "evidence": out["evidence"],
-                       "baseline_run_id": out["baseline_run_id"], "candidate_run_id": out["candidate_run_id"], "status": out["status"]})
+                       "baseline_run_id": out["baseline_run_id"], "candidate_run_id": out["candidate_run_id"], "status": out["status"],
+                       "created_at": out["created_at"]})
         if actual != out["proposal_sha256"]:
             raise ValueError(f"improvement proposal digest mismatch: {proposal_id}")
         return out
@@ -502,7 +508,6 @@ class TrajectoryBuilder:
 
         retries = sum(max(0, int(e["payload"].get("attempt") or 0) - 1) for e in node_states)
         resumes = max([int(e["payload"].get("resume_count") or 0) for e in graph_runs] or [0])
-        retries += resumes
         escalations = sum(1 for e in exceptions if bool(e["payload"].get("requires_commander")))
         verification_failures = 0
         independence_violations = 0
@@ -541,6 +546,15 @@ class TrajectoryBuilder:
                 critical_escalation_violations += 1
 
         trace_failures: list[str] = []
+        if trajectory.get("status") == "completed":
+            if source["orders"] < 1:
+                trace_failures.append("required_delegation_missing")
+            if source["plan_evidence"] < 1:
+                trace_failures.append("required_plan_missing")
+            if source["tool_evidence"] < 1:
+                trace_failures.append("required_tool_evidence_missing")
+            if source["performance"] < 1:
+                trace_failures.append("required_telemetry_missing")
         if category_counts.get("delegation", 0) != source["orders"]:
             trace_failures.append("delegation_trace_incomplete")
         if category_counts.get("tool_action", 0) != source["tool_evidence"]:
@@ -564,7 +578,10 @@ class TrajectoryBuilder:
         if raw_mode == "graph":
             verification_required = (
                 risk in {RiskClass.medium, RiskClass.high, RiskClass.critical}
-                or any(e["payload"].get("mode") == MissionMode.verify.value for e in events if e["category"] == "delegation")
+                or any(
+                    e["payload"].get("mode") in {MissionMode.repair.value, MissionMode.verify.value}
+                    for e in events if e["category"] == "delegation"
+                )
             )
         else:
             try:
@@ -783,9 +800,10 @@ class OrchestrationEvaluator:
             "efficiency-guarded": {"cost": 1.5, "latency": 1.5},
         }
         candidates = []
+        search_alpha = 0.05 / len(profiles)
         for name, override in profiles.items():
             run = self.run_routing_suite(suite, policy_name=name, weights=override)
-            comparison = self.compare_routing_runs(baseline["run_id"], run["run_id"])
+            comparison = self.compare_routing_runs(baseline["run_id"], run["run_id"], alpha=search_alpha)
             candidates.append((comparison.statistically_better, run["metrics"]["accuracy"], -comparison.p_value, name, override, run, comparison))
         qualified = [item for item in candidates if item[0]]
         if not qualified:
