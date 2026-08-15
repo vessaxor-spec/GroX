@@ -1,4 +1,4 @@
-name: GroX v0.7.0 Release
+name: Release GroX v0.7.0
 
 on:
   push:
@@ -11,90 +11,43 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-24.04
-    env:
-      TARGET_SHA: 71ffd60769d81b5b249dac4eca56333ff27e26d0
-      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Checkout exact stabilized Apex baseline
+      - name: Checkout exact stabilized baseline
         uses: actions/checkout@v4
         with:
           ref: 71ffd60769d81b5b249dac4eca56333ff27e26d0
           fetch-depth: 0
 
-      - name: Verify release target
+      - name: Verify target
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
+          test "$(git rev-parse HEAD)" = "71ffd60769d81b5b249dac4eca56333ff27e26d0"
           grep -q 'version = "0.7.0"' pyproject.toml
-          grep -q '^\*\*Current verdict:\*\* APEX QUALIFIED$' docs/stewardship/APEX_ORCHESTRATOR_PLAN.md
-          grep -q '^\*\*Current status: APEX QUALIFIED\*\*$' docs/stewardship/progress-tracker.md
-          test "$(find crew -type f 2>/dev/null | wc -l || true)" -ge 0
-          ! gh release view v0.7.0 >/dev/null 2>&1
+          grep -q 'Current verdict:\*\* APEX QUALIFIED' docs/stewardship/APEX_ORCHESTRATOR_PLAN.md
+          grep -q 'Current status: APEX QUALIFIED' docs/stewardship/progress-tracker.md
 
-      - name: Create release notes
-        shell: bash
-        run: |
-          cat > /tmp/release-notes.md <<'EOF'
-          # GroX v0.7.0 — Apex Qualified
-
-          This release freezes the first canonical post-Apex GroX baseline.
-
-          ## Baseline
-
-          - canonical source commit: `71ffd60769d81b5b249dac4eca56333ff27e26d0`
-          - A7 Apex qualification merge: `419cc73950f573c3e201106f7949c6bf7829f2af`
-          - A1 through A7: qualified for the current project-hosted operating model
-          - GorXu operating standard: **APEX QUALIFIED**
-          - Standing Crew: **82 total** — 81 specialist-inspired Crew plus 1 native independent verifier
-          - package: `grox-vessel 0.7.0`
-
-          ## Qualification evidence
-
-          Final exact-head A7 verification run `31882589081` proved:
-
-          - permanent Apex gauntlet: **16/16 passed**
-          - pytest: **121 passed, 2 existing environment-dependent browser skips**
-          - unittest: **123 tests OK, 2 skips**
-          - independent recovery/budget/contradiction canary: no findings
-          - independent synthesis-integrity canary: no findings
-          - exact-head and diff hygiene checks: PASS
-
-          Post-Apex stewardship stabilization run `31909761968` then re-ran the complete regression suites after documentation reconciliation:
-
-          - pytest: **121 passed, 2 skipped**
-          - unittest: **123 tests OK, 2 skipped**
-          - documentation-only scope and diff checks: PASS
-
-          ## Authority boundary
-
-          Apex qualification does not widen GorXu's authority.
-
-          - Commander sovereignty remains absolute.
-          - GorXu remains the sole operational orchestrator.
-          - Commander → GorXu → Divisions → Crew remains the command relationship.
-          - deny-wins authority, Inspect/Repair separation, verifier independence, evidence integrity, recovery controls, and source/state compatibility remain mandatory.
-          - A6 improvement proposals still cannot self-activate.
-          - future evolution must preserve Apex qualification through evidence and regression verification rather than inherit it automatically.
-
-          ## Privacy and persistence
-
-          Private SQLite and `.groxstate` operational state are intentionally excluded from this public release.
-          EOF
-
-      - name: Publish immutable v0.7.0 baseline
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
+          if gh release view v0.7.0 >/dev/null 2>&1; then
+            echo 'v0.7.0 already exists'
+            exit 1
+          fi
           gh release create v0.7.0 \
-            --target "$TARGET_SHA" \
-            --title 'GroX v0.7.0 — Apex Qualified' \
-            --notes-file /tmp/release-notes.md
+            --target 71ffd60769d81b5b249dac4eca56333ff27e26d0 \
+            --title 'GroX v0.7.0 - Apex Qualified' \
+            --notes 'First canonical post-Apex GroX baseline. A1 through A7 are qualified. GorXu is APEX QUALIFIED within the existing Commander authority model. The Vessel retains 82 Standing Crew: 81 specialist-inspired Crew plus 1 independent verifier. Final A7 evidence: 16/16 Apex cases; 121 pytest passed with 2 existing browser skips; 123 unittest tests OK with 2 skips. Private SQLite and .groxstate operational state remain outside the public release.'
 
-      - name: Verify published tag and release
+      - name: Verify tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           git fetch --tags origin
-          test "$(git rev-list -n 1 v0.7.0)" = "$TARGET_SHA"
+          test "$(git rev-list -n 1 v0.7.0)" = "71ffd60769d81b5b249dac4eca56333ff27e26d0"
           gh release view v0.7.0 --json tagName,targetCommitish,name,isDraft,isPrerelease,url
