@@ -163,6 +163,37 @@ class ApexQualificationGauntlet(unittest.TestCase):
         finally:
             td.cleanup()
 
+    def test_unrelated_verification_cannot_resolve_material_contradiction(self):
+        td, root, pilot = graph_vessel()
+        try:
+            pilot.executor = ContradictoryFindingExecutor(pilot.executor)
+            directive = "Do not treat unrelated verification as verification of contradictory serializer findings."
+            plan = {
+                "commander_intent": directive,
+                "objective": "Keep a material contradiction unresolved unless its source Orders are independently verified.",
+                "budget": {"max_nodes": 8, "max_parallel": 3, "max_replans": 0},
+                "nodes": [
+                    {"node_id": "architecture", "objective": "Assess serializer strategy from architecture evidence", "mode": "inspect", "dependencies": [],
+                     "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."]},
+                    {"node_id": "research", "objective": "Assess serializer strategy from research evidence", "mode": "inspect", "dependencies": [],
+                     "candidate_crew_ids": ["researcher"], "required_capabilities": ["repo_read"], "scope": ["docs"]},
+                    {"node_id": "context", "objective": "Inspect unrelated context", "mode": "inspect", "dependencies": [],
+                     "candidate_crew_ids": ["data-analyst"], "required_capabilities": ["repo_read"], "scope": ["docs"]},
+                    {"node_id": "verify", "objective": "Independently verify unrelated context only", "mode": "verify", "dependencies": ["context"],
+                     "candidate_crew_ids": ["code-reviewer"], "required_capabilities": ["repo_read", "verify"], "scope": ["."]},
+                ],
+            }
+            result = pilot.command_graph(directive, plan=plan, risk=RiskClass.high, plan_source="a7-contradiction-verification")
+            self.assertEqual(result["status"], "completed")
+            contradictions = result["synthesis"]["contradictions"]
+            self.assertEqual(len(contradictions), 1)
+            self.assertEqual(contradictions[0]["status"], "unresolved")
+            self.assertIsNone(contradictions[0]["selected_position"])
+            self.assertFalse(contradictions[0]["all_sources_independently_verified"])
+            self.assertEqual(contradictions[0]["verified_source_orders"], [])
+        finally:
+            td.cleanup()
+
     def test_long_horizon_mission_survives_restart_without_replaying_committed_work(self):
         td, root, pilot = graph_vessel()
         try:

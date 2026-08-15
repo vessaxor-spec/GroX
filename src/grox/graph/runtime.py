@@ -433,6 +433,15 @@ class MissionGraphRunner:
     def _reconcile_contradictions(
         self, tour_results: dict[str, TourResult], *, verification_passed: bool,
     ) -> list[dict[str, Any]]:
+        verified_orders: set[str] = set()
+        for result in tour_results.values():
+            for evidence in result.evidence:
+                if evidence.kind != 'graph_verification' or not isinstance(evidence.content, dict):
+                    continue
+                for check in evidence.content.get('checks', []):
+                    if isinstance(check, dict) and check.get('ok') is True and isinstance(check.get('order_id'), str):
+                        verified_orders.add(check['order_id'])
+
         grouped: dict[str, list[dict[str, Any]]] = {}
         for result in tour_results.values():
             for evidence in result.evidence:
@@ -471,7 +480,9 @@ class MissionGraphRunner:
             ranked = sorted(scores.items(), key=lambda item: (-item[1], item[0]))
             total = sum(scores.values())
             unique_winner = len(ranked) == 1 or not math.isclose(ranked[0][1], ranked[1][1], rel_tol=0.0, abs_tol=1e-12)
-            resolved = verification_passed and total > 0.0 and unique_winner
+            source_order_ids = {source['order_id'] for source in sources}
+            directly_verified = bool(source_order_ids) and source_order_ids.issubset(verified_orders)
+            resolved = verification_passed and directly_verified and total > 0.0 and unique_winner
             selected = ranked[0][0] if resolved else None
             calibrated = (ranked[0][1] / total) if resolved and total > 0.0 else 0.0
             reconciled.append({
@@ -481,7 +492,9 @@ class MissionGraphRunner:
                 'confidence': calibrated,
                 'position_scores': {key: scores[key] for key in sorted(scores)},
                 'sources': sorted(sources, key=lambda source: (source['position'], source['crew_id'], source['order_id'])),
-                'basis': 'eligible Crew finding evidence ranked by confidence x evidence_quality; independent verification required',
+                'verified_source_orders': sorted(source_order_ids & verified_orders),
+                'all_sources_independently_verified': directly_verified,
+                'basis': 'eligible Crew finding evidence ranked by confidence x evidence_quality; every source Order requires independent verification',
             })
         return reconciled
 
