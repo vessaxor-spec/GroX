@@ -1,7 +1,7 @@
 # Sandbox Commissioning
 
 **Record type:** historical commissioning checkpoint.
-**Current released baseline:** GroX `v0.7.0` / `main@71ffd60769d81b5b249dac4eca56333ff27e26d0` / **APEX QUALIFIED** / **82 Standing Crew**.
+**Current released baseline:** GroX `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0` / **APEX QUALIFIED** / **82 Standing Crew**. Canonical source continues on `main`.
 
 The commissioning facts below are intentionally preserved as the state of the first live Vessel on 2026-08-14; later qualification is recorded in the Apex plan, Roadmap, Progress Tracker, release, and Ship's Log.
 

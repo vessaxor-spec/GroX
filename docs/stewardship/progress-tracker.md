@@ -2,7 +2,8 @@
 
 **Status date:** 2026-08-15
 **Canonical release:** `v0.7.0`
-**Canonical source:** `main@71ffd60769d81b5b249dac4eca56333ff27e26d0`
+**Canonical source branch:** `main`
+**Released qualified source:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED**
 **Standing Crew:** **82**
@@ -382,7 +383,7 @@ A7 adds crash-persistent hard cost ceilings and source-normalized, independently
 
 - PR #12 reconciled post-Apex stewardship wording without runtime changes;
 - stabilization run `31909761968` passed documentation scope/diff checks plus **121 pytest passed, 2 skipped** and **123 unittest OK, 2 skipped**;
-- release `v0.7.0` is published from canonical `main@71ffd60769d81b5b249dac4eca56333ff27e26d0`;
+- release `v0.7.0` is pinned to `71ffd60769d81b5b249dac4eca56333ff27e26d0` and canonical source continues on `main`;
 - the released company remains **82 Standing Crew**;
 - A1 through A7 remain qualified;
 - future evolution must re-prove affected Apex invariants rather than silently inheriting qualification;

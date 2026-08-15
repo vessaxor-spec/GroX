@@ -1,6 +1,6 @@
 # GroX Architecture
 
-**Qualified baseline:** GroX `v0.7.0` at `main@71ffd60769d81b5b249dac4eca56333ff27e26d0`. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. A1–A7 are qualified for the current project-hosted operating model.
+**Qualified release baseline:** GroX `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`. Canonical source continues on `main`. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. A1–A7 are qualified for the current project-hosted operating model.
 
 ## Purpose
 
