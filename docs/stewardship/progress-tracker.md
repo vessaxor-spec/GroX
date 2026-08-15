@@ -1,6 +1,13 @@
 # GroX Progress Tracker
 
 **Status date:** 2026-08-15
+**Canonical release:** `v0.7.0`
+**Canonical source branch:** `main`
+**Released qualified source:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
+**Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
+**Current operating verdict:** **APEX QUALIFIED**
+**Standing Crew:** **82**
+**Current verified regression:** pytest **121 passed, 2 skipped**; unittest **123 OK, 2 skipped**
 
 ## Verified Vessel baseline
 
@@ -329,11 +336,11 @@ Qualification evidence:
 
 A6 does not grant proposals authority to mutate the Vessel. Accepted future improvements must still traverse the ordinary GroX authority path with explicit mutation authority and required verification.
 
-Current Apex stage: **A7 - Apex Qualification Gauntlet**.
+Next Apex stage after A6 was **A7 - Apex Qualification Gauntlet**.
 
 ## A7 entry hardening - external audit response
 
-**Status: PRE-GAUNTLET HARDENING**
+**Status: PRE-GAUNTLET HARDENING (historical checkpoint)**
 
 An external independent audit of `main@481d83e422119d94759685560b61bfccd9e532da` returned **PASS WITH CONDITIONS** for A7 entry. It independently reproduced the A6 private-state hashes, SQLite integrity, 82-Crew state, preserved Mission `MSN-f09179526ad7`, evaluation case `EVC-10573b245e54`, exact replay trace, zero invariants, verifier separation, authority/risk controls, and proposal activation denial.
 
@@ -370,4 +377,14 @@ A7 adds crash-persistent hard cost ceilings and source-normalized, independently
 
 **A7 exit gate: PASSED.**
 
-**Apex operating verdict: QUALIFIED**, pending only stewardship-final exact-head verification and no-drift merge before canonicalization on `main`.
+**Apex operating verdict: CANONICAL — APEX QUALIFIED.** Stewardship-final exact-head run `31882589081` passed the 16/16 A7 gauntlet, 121 pytest tests with 2 existing browser skips, 123 unittest tests with 2 skips, both historically pinned independent canaries, and stewardship/diff assertions. PR #11 merged as `419cc73950f573c3e201106f7949c6bf7829f2af` with zero tree drift from the qualified head.
+
+## Post-Apex release baseline
+
+- PR #12 reconciled post-Apex stewardship wording without runtime changes;
+- stabilization run `31909761968` passed documentation scope/diff checks plus **121 pytest passed, 2 skipped** and **123 unittest OK, 2 skipped**;
+- release `v0.7.0` is pinned to `71ffd60769d81b5b249dac4eca56333ff27e26d0` and canonical source continues on `main`;
+- the released company remains **82 Standing Crew**;
+- A1 through A7 remain qualified;
+- future evolution must re-prove affected Apex invariants rather than silently inheriting qualification;
+- no A8 is currently defined: operational Mission evidence should determine the next evolution.

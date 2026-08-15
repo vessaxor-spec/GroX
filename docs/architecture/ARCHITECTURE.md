@@ -1,5 +1,7 @@
 # GroX Architecture
 
+**Qualified release baseline:** GroX `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`. Canonical source continues on `main`. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. A1–A7 are qualified for the current project-hosted operating model.
+
 ## Purpose
 
 GroX is an independent persistent AI command environment. The running system is the Vessel. The human Commander directs the Vessel through Pilot GorXu, the primary orchestrator and second-in-command.
@@ -105,7 +107,7 @@ Verification should evaluate the evidence package, requested outcome, authority 
 
 ## Mission durability
 
-A Mission is a first-class durable object. The target architecture persists:
+A Mission is a first-class durable object. The qualified architecture persists:
 
 - Commander directive;
 - GorXu plan;
@@ -120,11 +122,11 @@ A Mission is a first-class durable object. The target architecture persists:
 
 A restarted Vessel must determine the last committed Mission state and resume safely rather than reconstructing state from conversational memory.
 
-Current A4 implementation persists validated graph-run state, checkpoints, exception decisions, bounded resume/cancellation state, and mutation-journal evidence in the private SQLite plane. A fresh Pilot converts in-flight state to `interrupted`, preserves committed nodes without replay, and may resume the same Mission ID from persisted state. Automatic resume is bounded; unknown or divergent mutation state halts rather than being guessed through.
+The qualified Durable Operations implementation persists validated graph-run state, checkpoints, exception decisions, bounded resume/cancellation state, mutation-journal evidence, and hard Mission cost commitments in the private SQLite plane. A fresh Pilot converts in-flight state to `interrupted`, preserves committed nodes without replay, and may resume the same Mission ID from persisted state. Automatic resume is bounded; unknown or divergent mutation state halts rather than being guessed through.
 
 ## Durable Operations and executive exceptions
 
-A4 adds a private `DurableState` service under GorXu. It does not command Crew. It records graph-run state, execution checkpoints, exception decisions, cancellation/resume state, and supported Repair mutation journals in the same private SQLite operational plane.
+The qualified runtime includes a private `DurableState` service under GorXu. It does not command Crew. It records graph-run state, execution checkpoints, exception decisions, cancellation/resume state, and supported Repair mutation journals in the same private SQLite operational plane.
 
 Ordinary recoverable graph exceptions are evaluated by a deterministic Executive Exception Loop. When policy permits recovery, GorXu compares an eligible replacement, issues that Crew a real read-only consultation Order, records the consultation evidence, and only then commits a bounded replan. Critical, irreversible, authority-divergent, or material-intent exceptions require Commander decision. Unknown non-critical exceptions halt with GorXu rather than escalating unnecessarily.
 
@@ -153,7 +155,7 @@ Unrestricted interactive desktop actuation, arbitrary third-party/networked MCP 
 
 ## Memory architecture
 
-The target memory system separates:
+The qualified memory architecture separates:
 
 1. Working memory: current tour context.
 2. Episodic memory: what happened on prior tours.
@@ -163,9 +165,9 @@ The target memory system separates:
 
 Memory must support provenance, relevance, consolidation, correction, and bounded forgetting.
 
-Current A3 implementation provides episodic retrieval plus durable semantic, procedural, and Vessel memory. Durable records require explicit provenance, confidence, scope, and keys; corrections supersede rather than silently rewrite prior active records; records can be deactivated for bounded forgetting. Retrieval is relevance-scored and capped by item/character budgets, with memory-plane diversity preserved where relevant.
+The qualified Living Company implementation provides episodic retrieval plus durable semantic, procedural, and Vessel memory. Durable records require explicit provenance, confidence, scope, and keys; corrections supersede rather than silently rewrite prior active records; records can be deactivated for bounded forgetting. Retrieval is relevance-scored and capped by item/character budgets, with memory-plane diversity preserved where relevant.
 
-A3 also persists per-Crew/task-class performance observations and lets GorXu rank only otherwise-eligible Crew using competence, evidence quality, reliability, load, cost, latency, risk, and prior performance. Memory and performance remain advisory: they cannot grant capability, lower risk, authorize Repair, alter Commander intent, or bypass verifier independence. Autonomous memory consolidation is not yet implemented.
+Living Company Intelligence also persists per-Crew/task-class performance observations and lets GorXu rank only otherwise-eligible Crew using competence, evidence quality, reliability, load, cost, latency, risk, and prior performance. Memory and performance remain advisory: they cannot grant capability, lower risk, authorize Repair, alter Commander intent, or bypass verifier independence. Autonomous memory consolidation is not yet implemented.
 
 ## Cognitive Pilot
 
@@ -209,3 +211,18 @@ GroX is incomplete without a usable Commander Seat. The Commander must be able t
 - review the Vessel's current condition.
 
 CLI is the initial interface. Other interfaces can be added without changing the command architecture.
+
+## Apex synthesis and budget integrity
+
+The A7-qualified Mission Graph extends structural synthesis with attributable contradiction reconciliation and a hard Mission cost ceiling.
+
+- `MissionBudget.max_cost_units` is a hard Mission limit; each node declares bounded `cost_units`.
+- Cost commitments are persisted before execution so a crash or resume cannot reset consumed budget.
+- Parallel-ready work is reserved against the aggregate remaining budget before execution.
+- Contradictory `finding` evidence is reconciled only from attributable source Orders.
+- Any source Order contributing to a resolved contradiction must itself be independently verified.
+- Runtime verifier evidence is accepted only from the actual verification path; ordinary Crew cannot manufacture verifier authority.
+- Repeated findings from one Order are normalized so duplicate output cannot multiply one source's weight.
+- Equal-weight conflict remains unresolved rather than manufacturing certainty.
+
+These controls improve orchestration quality without changing the command relationship or granting new authority.

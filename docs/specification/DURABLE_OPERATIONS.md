@@ -1,6 +1,8 @@
 # GroX Durable Operations and Executive Exception Loop
 
-A4 makes long-running Mission Graphs resumable and gives GorXu a bounded executive exception loop without creating another command layer.
+**Qualification status:** **A4 QUALIFIED** in GroX `v0.7.0`. Same-Mission crash recovery, bounded executive exception handling, cancellation, idempotency, and journaled text-Repair compensation remain Apex regression boundaries.
+
+A4 established resumable long-running Mission Graphs and a bounded executive exception loop under GorXu without creating another command layer.
 
 ## Authority boundary
 
@@ -19,7 +21,7 @@ Durable Operations and the Executive Exception Loop are native services under Go
 
 ## Durable Mission Graph state
 
-Every A4 Mission Graph persists:
+Qualified durable Mission Graph execution persists:
 
 - the validated graph plan and Commander directive binding;
 - global risk and whether Repair was explicitly authorized;
@@ -89,9 +91,9 @@ If post-Repair tests fail, GroX restores the exact journaled pre-state when the 
 
 Mutation journal state is private operational state and remains outside public Git.
 
-## A4 qualification
+## Qualified A4 gate
 
-A4 is qualified only when all of the following are demonstrated:
+A4 qualification was established by demonstrating all of the following:
 
 1. a multi-stage Mission is interrupted after at least one committed node;
 2. a fresh Pilot instance marks running state interrupted and resumes the same Mission ID;
@@ -106,3 +108,5 @@ A4 is qualified only when all of the following are demonstrated:
 11. all A1-A3 authority, persistence, memory, routing, Tool Gateway, and verification tests remain green.
 
 **Exit gate:** a long-running Mission survives process interruption plus multiple injected exceptions, resumes safely, and reaches independently verified closure without unnecessary Commander escalation.
+
+**Current status:** QUALIFIED. A7 additionally makes Mission cost consumption crash-persistent; that extension does not weaken the A4 recovery contract.

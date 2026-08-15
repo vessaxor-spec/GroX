@@ -1,5 +1,7 @@
 # Orchestration Evaluation and Self-Improvement
 
+**Qualification status:** **A6 QUALIFIED** in GroX `v0.7.0`. Evaluation remains advisory after Apex qualification: proposals cannot self-activate and controlled evaluator improvement is not equivalent to production-policy activation.
+
 ## Purpose
 
 A6 gives GorXu a native way to measure orchestration quality, replay prior Missions, compare bounded alternatives, and file evidence-backed improvement proposals without granting the evaluation system authority to change the Vessel.
@@ -120,7 +122,7 @@ A routing candidate qualifies for an improvement proposal only when all of the f
 2. the suite contains at least 20 paired cases;
 3. the candidate passes more cases than baseline;
 4. candidate-only wins exceed baseline-only wins;
-5. an exact one-sided paired sign test returns `p <= 0.05`;
+5. an exact one-sided paired sign test meets the effective significance threshold: `0.05` for one predeclared profile, or the family-wise adjusted alpha when multiple profiles are searched;
 6. the candidate has zero invariant failures;
 7. invariant failures do not regress relative to baseline.
 
@@ -174,9 +176,9 @@ A6 qualification must include at least:
 - production default routing remains behavior-equivalent and immutable during evaluation;
 - a real governed multi-tool Mission can be captured and replayed without leaking its secret value.
 
-## Qualification gate
+## Qualified A6 gate
 
-A6 qualifies only when:
+A6 qualification was established when:
 
 1. a real preserved Mission is reconstructed and replayed from canonical private state;
 2. required plan/delegation/tool/exception/verification/telemetry evidence is traceable and invariants pass;
@@ -187,4 +189,4 @@ A6 qualifies only when:
 7. production routing remains unchanged;
 8. adversarial/tamper and complete Vessel regression suites pass independently.
 
-Passing A6 authorizes advancement to A7 qualification work. It does not itself qualify GorXu as Apex.
+A6 passed this gate and later advanced through A7. In the released Apex baseline, the A6 non-self-activation rule remains mandatory: evaluation evidence can support a future authorized change, but can never create its own mutation authority.

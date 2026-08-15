@@ -1,5 +1,7 @@
 # Cognitive Pilot Contract
 
+**Qualification status:** **A1 SESSION-QUALIFIED** in GroX `v0.7.0`. Project-hosted cognition may occupy the Pilot reasoning seat; deterministic authority remains authoritative and safe fallback remains mandatory.
+
 ## Purpose
 
 The Cognitive Pilot layer gives Pilot GorXu model-backed interpretation and strategy formation without transferring command authority to the model.
@@ -57,9 +59,9 @@ The runtime exposes a provider-neutral `ReasoningProvider` contract. Provider ad
 
 The first implemented adapter uses the OpenAI Responses API with structured JSON output and disables response storage at the request level. No provider key is stored in the Vessel repository.
 
-## A1 exit condition
+## Qualified A1 boundary
 
-A1 is complete only after a real configured reasoning model, not a test double, demonstrates all of the following against novel Commander directives:
+A1 qualification was established with a real configured reasoning model, not a test double, demonstrating all of the following against novel Commander directives:
 
 1. exact intent preservation;
 2. useful ambiguity detection;
@@ -68,3 +70,5 @@ A1 is complete only after a real configured reasoning model, not a test double, 
 5. risk cannot be lowered below Mission Control policy;
 6. mutation authority cannot be self-granted;
 7. structured reasoning evidence is persisted and independently inspectable.
+
+**Current status:** SESSION-QUALIFIED. Loss of the project/session cognitive provider degrades to deterministic control and never widens authority.

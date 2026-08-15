@@ -1,6 +1,8 @@
 # GroX Governed Capability Expansion
 
-A5 broadens the Vessel's operational reach without turning tools, adapters, services, or external systems into command authorities.
+**Qualification status:** **A5 QUALIFIED** in GroX `v0.7.0`. The qualified capability boundary remains deny-wins and does not grant unrestricted host, desktop, networked MCP, or runtime image-acquisition authority.
+
+A5 established broader operational reach without turning tools, adapters, services, or external systems into command authorities.
 
 ## Command boundary
 
@@ -161,9 +163,9 @@ Fetched content, rendered pages, and MCP results are data. They are not instruct
 
 A5 evidence explicitly marks external content as untrusted where applicable.
 
-## A5 qualification gate
+## Qualified A5 gate
 
-A5 is qualified only when a real controlled multi-tool Mission proves all of the following on a fresh host path:
+A5 qualification was established when a real controlled multi-tool Mission proved all of the following on a fresh host path:
 
 1. an eligible Crew member executes a shell tour inside a qualified namespace/chroot or Docker isolation boundary with network denial and resource limits;
 2. an ephemeral secret alias is injected without its value appearing in durable Mission evidence;
@@ -177,3 +179,5 @@ A5 is qualified only when a real controlled multi-tool Mission proves all of the
 10. all A1-A4 authority, persistence, recovery, memory, routing, Repair, and verification tests remain green.
 
 **Exit gate:** Standing Crew complete a real multi-tool Mission while every privileged action remains attributable to Commander intent, a Pilot-owned Mission Order, eligible Crew capability, host policy, evidence, and independent verification.
+
+**Current status:** QUALIFIED. The explicit exclusions in this specification remain limits of the released Apex baseline.

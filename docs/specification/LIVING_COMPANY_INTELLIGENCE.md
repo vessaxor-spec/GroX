@@ -1,6 +1,8 @@
 # GroX Living Company Intelligence
 
-A3 turns Standing Crew from a static roster into an experienced organization without changing GroX command authority.
+**Qualification status:** **A3 QUALIFIED** in GroX `v0.7.0`. Memory and experience remain advisory to GorXu and can never grant eligibility, authority, Repair permission, or verifier independence.
+
+A3 established the Standing Crew as an experienced organization without changing GroX command authority.
 
 ## Authority boundary
 
@@ -75,9 +77,9 @@ Every Mission Order remains a fresh bounded tour. Living Company Intelligence ad
 
 The memory context is bounded by item count and character budget. This preserves continuity without accumulating prior working context indefinitely.
 
-## A3 qualification
+## Qualified A3 gate
 
-A3 is qualified only when all of the following are demonstrated:
+A3 qualification was established by demonstrating all of the following:
 
 1. episodic, semantic, procedural, and Vessel memory survive StateStore reopen;
 2. memory correction preserves provenance and supersession history;
@@ -89,3 +91,5 @@ A3 is qualified only when all of the following are demonstrated:
 8. the complete Vessel suite passes after an injected Crew failure and routing adaptation.
 
 **Exit gate:** repeated Missions measurably improve routing and execution without indiscriminate context growth.
+
+**Current status:** QUALIFIED. Autonomous memory consolidation remains outside the released Apex baseline until separately evidenced and governed.
