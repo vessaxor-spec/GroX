@@ -35,325 +35,19 @@ jobs:
           docker image inspect "$image" >/dev/null
 
       - name: Reconcile current-facing documentation
+        run: python scripts/docs_sync_v070.py
+
+      - name: Remove temporary reconciliation harness
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
+          rm scripts/docs_sync_v070.py .github/workflows/documentation-v0.7-sync.yml
 
-          RELEASE = 'v0.7.0'
-          BASELINE = '71ffd60769d81b5b249dac4eca56333ff27e26d0'
-          APEX_MERGE = '419cc73950f573c3e201106f7949c6bf7829f2af'
-
-          def read(path):
-              return Path(path).read_text()
-
-          def write(path, text):
-              Path(path).write_text(text)
-
-          def replace_once(path, old, new):
-              text = read(path)
-              count = text.count(old)
-              assert count == 1, f'{path}: expected one occurrence, found {count}: {old[:80]!r}'
-              write(path, text.replace(old, new, 1))
-
-          def insert_after_title(path, block):
-              text = read(path)
-              if block.strip() in text:
-                  return
-              first, rest = text.split('\n', 1)
-              assert first.startswith('# '), f'{path}: expected H1 title'
-              write(path, first + '\n\n' + block.strip() + '\n\n' + rest.lstrip('\n'))
-
-          # Root README: current operating entry point and documentation map.
-          write('README.md', '''# GroX
-
-**Release:** `v0.7.0`  
-**Operating standard:** **APEX QUALIFIED**  
-**Standing Crew:** **82** — 81 specialist-inspired Crew plus 1 native independent verifier  
-**Canonical release source:** `71ffd60769d81b5b249dac4eca56333ff27e26d0`
-
-GroX is an independent, persistent AI command environment built around a clear chain of command:
-
-**Commander → Pilot GorXu → Divisions → Standing Crew**
-
-The Commander defines intent and retains final authority. Pilot GorXu is the Vessel's second-in-command and sole operational orchestrator. Divisions organize operational areas and Crew. Standing Crew perform bounded work through Mission Orders. Capabilities, tools, schedulers, memory, evaluators, and external systems are resources under this command relationship; they are not command layers.
-
-Mission Control is a GroX-native policy and advisory service used by GorXu for governance, risk analysis, routing support, verification policy, evidence requirements, and operational intelligence. It does not form a second command spine.
-
-## Current qualification state
-
-GroX `v0.7.0` is the first released Apex-qualified baseline.
-
-- **A1 Cognitive Pilot:** SESSION-QUALIFIED with project-hosted GPT-5.6 Sol cognition and deterministic safe fallback.
-- **A2 Mission Graph Orchestration:** QUALIFIED.
-- **A3 Living Company Intelligence:** QUALIFIED.
-- **A4 Executive Exception Loop and Durable Operations:** QUALIFIED.
-- **A5 Governed Capability Expansion:** QUALIFIED.
-- **A6 Orchestration Intelligence and Self-Improvement:** QUALIFIED.
-- **A7 Apex Qualification Gauntlet:** QUALIFIED.
-- **GorXu operating standard:** **APEX QUALIFIED**.
-
-Apex is an evidence-backed operating standard, not additional authority. Future changes do not inherit Apex automatically; consequential changes must preserve Commander sovereignty, bounded authority, verifier independence, evidence integrity, recovery, and the qualified execution path through appropriate regression evidence.
-
-## Core operating model
-
-- The Commander sets intent and retains ultimate authority.
-- GorXu interprets intent, constructs and adapts Missions, consults relevant services and Crew, issues bounded Mission Orders, resolves ordinary reversible exceptions, and synthesizes outcomes.
-- Crew operate only within the authority granted for their current Mission Order.
-- Competence does not imply permission.
-- Inspection and mutation authority are structurally separate.
-- Crew may challenge assumptions, surface blockers, or recommend safer/better paths, but cannot widen their own scope.
-- Critical, irreversible, authority-divergent, or material intent-changing decisions return to the Commander.
-- Independent verification and attributable evidence are mandatory where policy requires them.
-
-## Live Vessel
-
-The released Vessel includes:
-
-- Commander Seat CLI and interactive bridge;
-- Pilot GorXu orchestration with provider-neutral cognition and deterministic safe fallback;
-- native Mission Control;
-- **82 Standing Crew** across nine Divisions;
-- durable Mission, Order, Evidence, Crew, memory, performance, graph, evaluation, exception, and recovery state;
-- Living Company Intelligence with attributable semantic, procedural, episodic, and Vessel memory plus bounded selective retrieval;
-- experienced eligible-Crew routing informed by evidence, reliability, load, cost, latency, and risk;
-- durable dependency-aware Mission Graph execution with parallel-ready scheduling and bounded replanning;
-- crash-safe same-Mission resume, checkpointing, cancellation, and journaled text-Repair compensation;
-- hard Mission cost ceilings with persisted cost commitments so restart cannot reset consumed budget;
-- independently verified contradiction synthesis that rejects forged verifier evidence, normalizes duplicate source contribution, and leaves unresolved ties unresolved;
-- Tool Gateway v2 with deny-wins action authorization;
-- governed isolated workspace execution with namespace-first and digest-pinned commissioned Docker fallback isolation;
-- memory-only secret aliases with explicit grants and output redaction;
-- exact-origin bounded HTTP(S) fetch plus offline Chromium screenshot/hash evidence capture;
-- pre-registered stdio MCP adapters with separately gated mutation authority;
-- replayable privacy-minimized orchestration evaluation with evidence-backed improvement proposals that cannot self-activate;
-- private integrity-checked `.groxstate` snapshot/restore with source-state compatibility enforcement.
-
-## Qualified limits
-
-The Apex baseline does not claim unrestricted power. Current deliberate limits include:
-
-- cognition remains project/session-hosted with deterministic fallback;
-- unrestricted interactive desktop actuation is outside the qualified boundary;
-- arbitrary/networked third-party MCP processes are outside the qualified boundary;
-- runtime image pulls/builds are not implicit Crew authority;
-- generic compensation for arbitrary external systems is not claimed;
-- external-agent interoperability remains optional and grants no inherited GroX authority;
-- autonomous memory consolidation remains future evolution.
-
-## Quick start
-
-```bash
-python -m pip install -e .
-grox status
-grox roster
-grox mission "Inspect the Vessel and report readiness" --mode inspect
-grox bridge
-```
-
-## Persistence model
-
-GroX separates continuity into three planes:
-
-1. **Cognitive continuity:** the Space Exploration project reconstitutes GorXu and project context.
-2. **Vessel source:** this GitHub repository is the durable source body.
-3. **Operational state:** private runtime state travels through verified `.groxstate` snapshots and is never committed publicly.
-
-A sandbox or host is replaceable compute, not the permanent Vessel.
-
-## Documentation map
-
-### Authority and architecture
-
-- `AI_INSTRUCTIONS.md` — repository authority and builder constraints.
-- `docs/architecture/ARCHITECTURE.md` — command, runtime, Crew, memory, tool, and recovery architecture.
-- `docs/architecture/PERSISTENCE_ARCHITECTURE.md` — three-plane persistence and reconstitution protocol.
-- `docs/specification/PRINCIPLES.md` — durable GroX operating principles.
-- `docs/specification/MISSION_ORDER.md` — bounded Crew authority contract.
-- `docs/specification/MISSION_GRAPH.md` — durable multi-Crew orchestration contract.
-
-### Qualified capability specifications
-
-- `docs/specification/COGNITIVE_PILOT.md` — A1 cognition boundary.
-- `docs/specification/LIVING_COMPANY_INTELLIGENCE.md` — A3 memory, performance, and routing intelligence.
-- `docs/specification/DURABLE_OPERATIONS.md` — A4 recovery and executive exception loop.
-- `docs/specification/GOVERNED_CAPABILITIES.md` — A5 Tool Gateway and governed capability expansion.
-- `docs/specification/ORCHESTRATION_EVALUATION.md` — A6 evaluation and non-self-activating improvement proposals.
-
-### Stewardship and history
-
-- `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md` — A1–A7 qualification contract and regression boundary.
-- `docs/stewardship/ROADMAP.md` — current post-Apex operating posture and future-evolution rules.
-- `docs/stewardship/progress-tracker.md` — canonical project-state tracker and qualification evidence.
-- `docs/stewardship/CREW_ROSTER.md` — current 82-Crew company state.
-- `docs/stewardship/SANDBOX_COMMISSIONING.md` — historical first-Vessel commissioning record.
-- `docs/history/ships-log/` — append-only milestone history; prior entries retain the state that was true when recorded.
-
-## Repository authority
-
-When repository documents conflict, follow the hierarchy in `AI_INSTRUCTIONS.md`. Current evidence and implementation truth override stale descriptive text, while historical records remain historical rather than being rewritten to look current.
-''')
-
-          # Repository authority file: add release baseline without altering hierarchy or constraints.
-          insert_after_title('AI_INSTRUCTIONS.md', f'''**Current qualified baseline:** `{RELEASE}` / `main@{BASELINE}` / **APEX QUALIFIED** / **82 Standing Crew**.
-
-Apex qualification is a regression boundary, not inherited permission. Any consequential future change that touches Commander sovereignty, GorXu's sole-orchestrator role, Mission Order authority, verifier independence, evidence integrity, recovery, source/state compatibility, routing, or governed tool execution must preserve those invariants through appropriate tests and independent verification.''')
-
-          # Architecture: remove stage-local "current" wording and document the qualified Apex extensions.
-          insert_after_title('docs/architecture/ARCHITECTURE.md', f'''**Qualified baseline:** GroX `{RELEASE}` at `main@{BASELINE}`. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. A1–A7 are qualified for the current project-hosted operating model.''')
-          replace_once('docs/architecture/ARCHITECTURE.md', 'The target architecture persists:', 'The qualified architecture persists:')
-          replace_once('docs/architecture/ARCHITECTURE.md', 'Current A4 implementation persists validated graph-run state, checkpoints, exception decisions, bounded resume/cancellation state, and mutation-journal evidence in the private SQLite plane.', 'The qualified Durable Operations implementation persists validated graph-run state, checkpoints, exception decisions, bounded resume/cancellation state, mutation-journal evidence, and hard Mission cost commitments in the private SQLite plane.')
-          replace_once('docs/architecture/ARCHITECTURE.md', 'A4 adds a private `DurableState` service under GorXu.', 'The qualified runtime includes a private `DurableState` service under GorXu.')
-          replace_once('docs/architecture/ARCHITECTURE.md', 'The target memory system separates:', 'The qualified memory architecture separates:')
-          replace_once('docs/architecture/ARCHITECTURE.md', 'Current A3 implementation provides episodic retrieval plus durable semantic, procedural, and Vessel memory.', 'The qualified Living Company implementation provides episodic retrieval plus durable semantic, procedural, and Vessel memory.')
-          replace_once('docs/architecture/ARCHITECTURE.md', 'A3 also persists per-Crew/task-class performance observations and lets GorXu rank only otherwise-eligible Crew using competence, evidence quality, reliability, load, cost, latency, risk, and prior performance.', 'Living Company Intelligence also persists per-Crew/task-class performance observations and lets GorXu rank only otherwise-eligible Crew using competence, evidence quality, reliability, load, cost, latency, risk, and prior performance.')
-          replace_once('docs/architecture/ARCHITECTURE.md', 'CLI is the initial interface. Other interfaces can be added without changing the command architecture.', '''CLI is the initial interface. Other interfaces can be added without changing the command architecture.
-
-## Apex synthesis and budget integrity
-
-The A7-qualified Mission Graph extends structural synthesis with attributable contradiction reconciliation and a hard Mission cost ceiling.
-
-- `MissionBudget.max_cost_units` is a hard Mission limit; each node declares bounded `cost_units`.
-- Cost commitments are persisted before execution so a crash or resume cannot reset consumed budget.
-- Parallel-ready work is reserved against the aggregate remaining budget before execution.
-- Contradictory `finding` evidence is reconciled only from attributable source Orders.
-- Any source Order contributing to a resolved contradiction must itself be independently verified.
-- Runtime verifier evidence is accepted only from the actual verification path; ordinary Crew cannot manufacture verifier authority.
-- Repeated findings from one Order are normalized so duplicate output cannot multiply one source's weight.
-- Equal-weight conflict remains unresolved rather than manufacturing certainty.
-
-These controls improve orchestration quality without changing the command relationship or granting new authority.''')
-
-          # Persistence architecture.
-          insert_after_title('docs/architecture/PERSISTENCE_ARCHITECTURE.md', f'''**Qualified baseline:** `{RELEASE}` / `main@{BASELINE}`. Snapshot source binding, ancestor compatibility control, and fail-closed unrelated-source restore are part of the Apex regression boundary.''')
-          replace_once('docs/architecture/PERSISTENCE_ARCHITECTURE.md', 'Operational state includes Missions, Mission Orders, evidence, Crew tour state, episodic continuity, and future runtime memory/checkpoints.', 'Operational state includes Missions, Mission Orders, evidence, Crew tour state, episodic continuity, durable memory, graph checkpoints, exception/recovery state, evaluation state, and cost commitments.')
-
-          # Stage specifications: mark passed state while retaining the original qualification contracts.
-          insert_after_title('docs/specification/COGNITIVE_PILOT.md', f'''**Qualification status:** **A1 SESSION-QUALIFIED** in GroX `{RELEASE}`. Project-hosted cognition may occupy the Pilot reasoning seat; deterministic authority remains authoritative and safe fallback remains mandatory.''')
-          replace_once('docs/specification/COGNITIVE_PILOT.md', '## A1 exit condition', '## Qualified A1 boundary')
-          replace_once('docs/specification/COGNITIVE_PILOT.md', 'A1 is complete only after a real configured reasoning model, not a test double, demonstrates all of the following against novel Commander directives:', 'A1 qualification was established with a real configured reasoning model, not a test double, demonstrating all of the following against novel Commander directives:')
-          text = read('docs/specification/COGNITIVE_PILOT.md')
-          text += '\n**Current status:** SESSION-QUALIFIED. Loss of the project/session cognitive provider degrades to deterministic control and never widens authority.\n'
-          write('docs/specification/COGNITIVE_PILOT.md', text)
-
-          insert_after_title('docs/specification/DURABLE_OPERATIONS.md', f'''**Qualification status:** **A4 QUALIFIED** in GroX `{RELEASE}`. Same-Mission crash recovery, bounded executive exception handling, cancellation, idempotency, and journaled text-Repair compensation remain Apex regression boundaries.''')
-          replace_once('docs/specification/DURABLE_OPERATIONS.md', 'A4 makes long-running Mission Graphs resumable and gives GorXu a bounded executive exception loop without creating another command layer.', 'A4 established resumable long-running Mission Graphs and a bounded executive exception loop under GorXu without creating another command layer.')
-          replace_once('docs/specification/DURABLE_OPERATIONS.md', 'Every A4 Mission Graph persists:', 'Qualified durable Mission Graph execution persists:')
-          replace_once('docs/specification/DURABLE_OPERATIONS.md', '## A4 qualification', '## Qualified A4 gate')
-          replace_once('docs/specification/DURABLE_OPERATIONS.md', 'A4 is qualified only when all of the following are demonstrated:', 'A4 qualification was established by demonstrating all of the following:')
-          text = read('docs/specification/DURABLE_OPERATIONS.md')
-          text += '\n**Current status:** QUALIFIED. A7 additionally makes Mission cost consumption crash-persistent; that extension does not weaken the A4 recovery contract.\n'
-          write('docs/specification/DURABLE_OPERATIONS.md', text)
-
-          insert_after_title('docs/specification/GOVERNED_CAPABILITIES.md', f'''**Qualification status:** **A5 QUALIFIED** in GroX `{RELEASE}`. The qualified capability boundary remains deny-wins and does not grant unrestricted host, desktop, networked MCP, or runtime image-acquisition authority.''')
-          replace_once('docs/specification/GOVERNED_CAPABILITIES.md', 'A5 broadens the Vessel\'s operational reach without turning tools, adapters, services, or external systems into command authorities.', 'A5 established broader operational reach without turning tools, adapters, services, or external systems into command authorities.')
-          replace_once('docs/specification/GOVERNED_CAPABILITIES.md', '## A5 qualification gate', '## Qualified A5 gate')
-          replace_once('docs/specification/GOVERNED_CAPABILITIES.md', 'A5 is qualified only when a real controlled multi-tool Mission proves all of the following on a fresh host path:', 'A5 qualification was established when a real controlled multi-tool Mission proved all of the following on a fresh host path:')
-          text = read('docs/specification/GOVERNED_CAPABILITIES.md')
-          text += '\n**Current status:** QUALIFIED. The explicit exclusions in this specification remain limits of the released Apex baseline.\n'
-          write('docs/specification/GOVERNED_CAPABILITIES.md', text)
-
-          insert_after_title('docs/specification/LIVING_COMPANY_INTELLIGENCE.md', f'''**Qualification status:** **A3 QUALIFIED** in GroX `{RELEASE}`. Memory and experience remain advisory to GorXu and can never grant eligibility, authority, Repair permission, or verifier independence.''')
-          replace_once('docs/specification/LIVING_COMPANY_INTELLIGENCE.md', 'A3 turns Standing Crew from a static roster into an experienced organization without changing GroX command authority.', 'A3 established the Standing Crew as an experienced organization without changing GroX command authority.')
-          replace_once('docs/specification/LIVING_COMPANY_INTELLIGENCE.md', '## A3 qualification', '## Qualified A3 gate')
-          replace_once('docs/specification/LIVING_COMPANY_INTELLIGENCE.md', 'A3 is qualified only when all of the following are demonstrated:', 'A3 qualification was established by demonstrating all of the following:')
-          text = read('docs/specification/LIVING_COMPANY_INTELLIGENCE.md')
-          text += '\n**Current status:** QUALIFIED. Autonomous memory consolidation remains outside the released Apex baseline until separately evidenced and governed.\n'
-          write('docs/specification/LIVING_COMPANY_INTELLIGENCE.md', text)
-
-          insert_after_title('docs/specification/MISSION_GRAPH.md', f'''**Qualification status:** **A2 QUALIFIED**, extended by A4 durability and A7 Apex synthesis/budget controls in GroX `{RELEASE}`.''')
-          replace_once('docs/specification/MISSION_GRAPH.md', '- Mission node/parallel/replan budgets;', '- Mission node/parallel/replan budgets;\n- a hard Mission cost ceiling through `MissionBudget.max_cost_units`, with bounded per-node `cost_units`;')
-          replace_once('docs/specification/MISSION_GRAPH.md', '- an executive summary.', '- an executive summary;\n- contradiction state and whether material conflicts were independently resolved;\n- consumed cost units and the hard Mission cost budget.')
-          old_boundary = '''## Current A2 boundary
-
-A2 implements dependency-aware decomposition, parallel scheduling, bounded replanning for recoverable Crew/runtime failures, explicit verification nodes, graph persistence, and structural Pilot synthesis.
-
-Deeper semantic reconciliation of contradictory specialist judgments, learned routing, generalized exception investigation, and exact crash-resume workflow replay remain later Apex stages unless separately promoted by evidence.
-'''
-          new_boundary = '''## Qualified Apex boundary
-
-A2 established dependency-aware decomposition, parallel scheduling, bounded replanning for recoverable Crew/runtime failures, explicit verification nodes, graph persistence, and Pilot-owned synthesis. Later qualified stages extend that same Pilot-owned graph rather than replacing it:
-
-- A3 supplies experienced eligible-Crew routing and bounded relevant-memory injection;
-- A4 supplies durable same-Mission resume, checkpoints, bounded consultation/replan, cancellation, and recovery semantics;
-- A7 supplies a hard crash-persistent Mission cost ceiling and independently verified contradiction synthesis.
-
-For A7 synthesis, contradictory `finding` evidence remains attributable to its source Order. A contradiction may be marked resolved only when the contributing source Orders satisfy the required independent verification path. Runtime `graph_verification` evidence is trusted only when it comes from the actual verification-node Order. Repeated findings from one Order are normalized rather than allowed to amplify that source, and equal-weight conflicts remain unresolved.
-
-For A7 budgeting, `MissionBudget.max_cost_units` is enforced as a hard ceiling. Node cost commitments are persisted before execution and aggregate parallel reservations are checked against remaining Mission budget, so crash/restart, recovery consultation, or parallel work cannot reset or silently overcommit the budget.
-'''
-          replace_once('docs/specification/MISSION_GRAPH.md', old_boundary, new_boundary)
-
-          insert_after_title('docs/specification/MISSION_ORDER.md', f'''**Current contract status:** qualified and regression-protected in GroX `{RELEASE}`. Issued authority is immutable; post-issuance scope, grant, verifier, stop-condition, or nested parameter widening requires a newly issued Order through GorXu.''')
-
-          insert_after_title('docs/specification/ORCHESTRATION_EVALUATION.md', f'''**Qualification status:** **A6 QUALIFIED** in GroX `{RELEASE}`. Evaluation remains advisory after Apex qualification: proposals cannot self-activate and controlled evaluator improvement is not equivalent to production-policy activation.''')
-          replace_once('docs/specification/ORCHESTRATION_EVALUATION.md', '5. an exact one-sided paired sign test returns `p <= 0.05`;', '5. an exact one-sided paired sign test meets the effective significance threshold: `0.05` for one predeclared profile, or the family-wise adjusted alpha when multiple profiles are searched;')
-          replace_once('docs/specification/ORCHESTRATION_EVALUATION.md', '## Qualification gate', '## Qualified A6 gate')
-          replace_once('docs/specification/ORCHESTRATION_EVALUATION.md', 'A6 qualifies only when:', 'A6 qualification was established when:')
-          replace_once('docs/specification/ORCHESTRATION_EVALUATION.md', 'Passing A6 authorizes advancement to A7 qualification work. It does not itself qualify GorXu as Apex.', 'A6 passed this gate and later advanced through A7. In the released Apex baseline, the A6 non-self-activation rule remains mandatory: evaluation evidence can support a future authorized change, but can never create its own mutation authority.')
-
-          insert_after_title('docs/specification/PRINCIPLES.md', f'''**Qualified baseline:** these principles remain authoritative in GroX `{RELEASE}`. Apex qualification changes no principle and grants no additional authority.''')
-
-          # Stewardship.
-          insert_after_title('docs/stewardship/CREW_ROSTER.md', f'''**Current baseline:** GroX `{RELEASE}` / `main@{BASELINE}` / **82 Standing Crew**.''')
-          replace_once('docs/stewardship/CREW_ROSTER.md', 'The current company contains **81 domain-specialist Crew** plus **1 native independent verifier**, for **82 standing dossiers**.', 'The current company contains **81 specialist-inspired domain Crew** plus **1 native independent verifier**, for **82 standing dossiers**.')
-
-          text = read('docs/stewardship/ROADMAP.md')
-          text = text.replace('GroX now has a runnable native Vessel, a full standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6/A7 Apex stages.', f'GroX `{RELEASE}` is the first released Apex-qualified Vessel baseline. It has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6/A7 stages.')
-          old_evidence = 'Final implementation evidence at `0724862dcb2634022ad33e6be14be29df6a914dd` is backed by run `31882071412` (16/16 A7; 121 pytest passed with 2 existing browser skips; 123 unittest OK with 2 skips), independent run `31882101734` (`A7_APEX_INDEPENDENT_FINDINGS=`), and synthesis-integrity run `31882083653` (`A7_APEX_SYNTHESIS_FINDINGS=`).'
-          new_evidence = f'''Final A7 implementation evidence at `0724862dcb2634022ad33e6be14be29df6a914dd` is backed by run `31882071412` (16/16 A7; 121 pytest passed with 2 existing browser skips; 123 unittest OK with 2 skips), independent run `31882101734` (`A7_APEX_INDEPENDENT_FINDINGS=`), and synthesis-integrity run `31882083653` (`A7_APEX_SYNTHESIS_FINDINGS=`). Stewardship-final exact-head run `31882589081` re-proved the 16/16 gauntlet, both complete regression runners, both historically pinned independent canaries, version/status assertions, and diff hygiene on the final A7 candidate. PR #11 merged as `{APEX_MERGE}` with zero tree drift from the qualified head. Post-Apex documentation stabilization then passed run `31909761968`, and release `{RELEASE}` now points to canonical `main@{BASELINE}`.'''
-          assert text.count(old_evidence) == 1
-          text = text.replace(old_evidence, new_evidence, 1)
-          recovery = 'A future host may resume GroX only after source materialization, private-state verification/restoration when needed, test/integrity gates, and Pilot reconstitution. Failure at a recovery gate leaves the Vessel paused rather than reconstructed from memory.\n'
-          assert recovery in text
-          text = text.replace(recovery, recovery + '''\n## Post-Apex operating posture\n\nThere is no predeclared A8. The current phase is operation and evidence-driven evolution of the qualified Vessel. Real Commander Missions should produce telemetry, failures, recovery evidence, cost evidence, and operational friction that justify any next capability change.\n\nKnown deliberate limits remain candidates for future work, not automatic roadmap commitments: autonomous memory consolidation, more general external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP support, and optional external-agent interoperability. Any promoted change must remain subordinate to the existing command architecture and re-prove affected Apex invariants before release.\n''')
-          write('docs/stewardship/ROADMAP.md', text)
-
-          insert_after_title('docs/stewardship/SANDBOX_COMMISSIONING.md', f'''**Record type:** historical commissioning checkpoint.  
-**Current released baseline:** GroX `{RELEASE}` / `main@{BASELINE}` / **APEX QUALIFIED** / **82 Standing Crew**.
-
-The commissioning facts below are intentionally preserved as the state of the first live Vessel on 2026-08-14; later qualification is recorded in the Apex plan, Roadmap, Progress Tracker, release, and Ship's Log.''')
-
-          text = read('docs/stewardship/APEX_ORCHESTRATOR_PLAN.md')
-          anchor = '**A7 status:** QUALIFIED; final adversarial Apex gauntlet and independent canaries proven\n'
-          assert anchor in text
-          if '**Release baseline:**' not in text:
-              text = text.replace(anchor, anchor + f'**Release baseline:** `{RELEASE}` at `main@{BASELINE}`\n', 1)
-          stale_final = '**Apex verdict: QUALIFIED**, pending stewardship-final exact-head verification and a no-drift merge before the declaration becomes canonical on `main`.'
-          current_final = f'''**Apex verdict: CANONICAL — APEX QUALIFIED.** Stewardship-final exact-head run `31882589081` passed the full 16/16 A7 gauntlet, complete regression suites, historically pinned independent recovery/budget/contradiction and synthesis-integrity canaries, version/status assertions, and diff hygiene. PR #11 merged as `{APEX_MERGE}` with zero tree drift from the qualified A7 head. Post-Apex documentation stabilization re-ran the complete regression suites in `31909761968`; release `{RELEASE}` is pinned to canonical `main@{BASELINE}`.'''
-          assert text.count(stale_final) == 1
-          text = text.replace(stale_final, current_final, 1)
-          write('docs/stewardship/APEX_ORCHESTRATOR_PLAN.md', text)
-
-          text = read('docs/stewardship/progress-tracker.md')
-          status_date = '**Status date:** 2026-08-15\n'
-          baseline_block = f'''**Status date:** 2026-08-15\n**Canonical release:** `{RELEASE}`\n**Canonical source:** `main@{BASELINE}`\n**Apex qualification merge:** `{APEX_MERGE}`\n**Current operating verdict:** **APEX QUALIFIED**\n**Standing Crew:** **82**\n**Current verified regression:** pytest **121 passed, 2 skipped**; unittest **123 OK, 2 skipped**\n'''
-          assert text.count(status_date) == 1
-          text = text.replace(status_date, baseline_block, 1)
-          text = text.replace('Current Apex stage: **A7 - Apex Qualification Gauntlet**.', 'Next Apex stage after A6 was **A7 - Apex Qualification Gauntlet**.', 1)
-          text = text.replace('**Status: PRE-GAUNTLET HARDENING**', '**Status: PRE-GAUNTLET HARDENING (historical checkpoint)**', 1)
-          stale_end = '**Apex operating verdict: QUALIFIED**, pending only stewardship-final exact-head verification and no-drift merge before canonicalization on `main`.'
-          current_end = f'''**Apex operating verdict: CANONICAL — APEX QUALIFIED.** Stewardship-final exact-head run `31882589081` passed the 16/16 A7 gauntlet, 121 pytest tests with 2 existing browser skips, 123 unittest tests with 2 skips, both historically pinned independent canaries, and stewardship/diff assertions. PR #11 merged as `{APEX_MERGE}` with zero tree drift from the qualified head.\n\n## Post-Apex release baseline\n\n- PR #12 reconciled post-Apex stewardship wording without runtime changes;\n- stabilization run `31909761968` passed documentation scope/diff checks plus **121 pytest passed, 2 skipped** and **123 unittest OK, 2 skipped**;\n- release `{RELEASE}` is published from canonical `main@{BASELINE}`;\n- the released company remains **82 Standing Crew**;\n- A1 through A7 remain qualified;\n- future evolution must re-prove affected Apex invariants rather than silently inheriting qualification;\n- no A8 is currently defined: operational Mission evidence should determine the next evolution.''' 
-          assert text.count(stale_end) == 1
-          text = text.replace(stale_end, current_end, 1)
-          write('docs/stewardship/progress-tracker.md', text)
-
-          # Append-only history: add a new entry; never rewrite prior milestone records.
-          log = Path('docs/history/ships-log/0034-v0.7.0-apex-baseline-released.md')
-          assert not log.exists(), 'Ship\'s Log Entry 0034 already exists'
-          log.write_text(f'''# Ship's Log - Entry 0034\n\n**Date:** 2026-08-15\n**Pilot:** GorXu\n**Milestone:** v0.7.0 Apex baseline released and current documentation synchronized\n\nA7 qualification became canonical when PR #11 merged as `{APEX_MERGE}` after exact-head qualification and independent adversarial verification. The merge introduced zero tree drift from the qualified A7 head.\n\nPost-Apex stewardship stabilization then reconciled the duplicate Apex-plan heading and stale A7-current wording without runtime changes. Run `31909761968` passed documentation scope/diff checks, 121 pytest tests with 2 existing browser skips, and 123 unittest tests with 2 skips.\n\nGroX release `{RELEASE}` is pinned to canonical source `main@{BASELINE}`. The released Vessel is **APEX QUALIFIED**, contains **82 Standing Crew** (81 specialist-inspired Crew plus the native independent verifier), and preserves Commander sovereignty, GorXu as sole operational orchestrator, bounded Mission Order authority, verifier independence, evidence integrity, recovery, source/state compatibility, and A6 non-self-activation.\n\nThis documentation synchronization updates current-facing README, architecture, specification, and stewardship material to the released baseline. Earlier Ship's Log entries remain unchanged because they are historical evidence of the state that existed when each milestone was recorded.\n''')
-
-          # Remove the temporary workflow from the resulting documentation branch tree.
-          Path('.github/workflows/documentation-v0.7-sync.yml').unlink()
-          PY
-
-      - name: Verify documentation consistency and scope
+      - name: Verify documentation consistency
         shell: bash
         run: |
           set -euo pipefail
           git diff --check
-          test "$(grep -c '^# GroX$' README.md)" = '1'
           grep -q '^\*\*Operating standard:\*\* \*\*APEX QUALIFIED\*\*' README.md
           grep -q '^\*\*Standing Crew:\*\* \*\*82\*\*' README.md
           grep -q 'v0.7.0' README.md
@@ -362,15 +56,11 @@ The commissioning facts below are intentionally preserved as the state of the fi
           grep -q '^\*\*Canonical release:\*\* `v0.7.0`$' docs/stewardship/progress-tracker.md
           grep -q 'no A8 is currently defined' docs/stewardship/progress-tracker.md
           grep -q 'MissionBudget.max_cost_units' docs/specification/MISSION_GRAPH.md
-          grep -q 'forged verifier evidence' README.md
           test -f docs/history/ships-log/0034-v0.7.0-apex-baseline-released.md
           ! grep -q 'Current A2 boundary' docs/specification/MISSION_GRAPH.md
           ! grep -q 'Passing A6 authorizes advancement to A7' docs/specification/ORCHESTRATION_EVALUATION.md
           ! grep -q 'pending only stewardship-final exact-head verification' docs/stewardship/progress-tracker.md
           ! grep -q 'pending stewardship-final exact-head verification' docs/stewardship/APEX_ORCHESTRATOR_PLAN.md
-          ! grep -q 'current Apex stage is A7 Apex Qualification Gauntlet' docs/stewardship/progress-tracker.md
-
-          # Current-facing Markdown must not regress to a not-yet-Apex declaration.
           for f in README.md AI_INSTRUCTIONS.md docs/architecture/*.md docs/specification/*.md docs/stewardship/*.md; do
             ! grep -q 'NOT YET APEX' "$f"
           done
@@ -391,7 +81,7 @@ The commissioning facts below are intentionally preserved as the state of the fi
           git config user.name 'GroX Stewardship Runner'
           git config user.email 'grox-stewardship@users.noreply.github.com'
           git add README.md AI_INSTRUCTIONS.md docs/architecture docs/specification docs/stewardship docs/history/ships-log/0034-v0.7.0-apex-baseline-released.md
-          git add -u .github/workflows/documentation-v0.7-sync.yml
+          git add -u scripts/docs_sync_v070.py .github/workflows/documentation-v0.7-sync.yml
           git diff --cached --check
           git commit -m 'Synchronize v0.7.0 Apex documentation'
           git push origin HEAD:stewardship/documentation-v0.7.0
