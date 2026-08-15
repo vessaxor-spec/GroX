@@ -17,6 +17,12 @@ jobs:
         with:
           ref: a7/apex-qualification
           fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependency
+        run: python -m pip install '.[test]'
       - name: Tighten contradiction verification coverage
         shell: bash
         run: |
