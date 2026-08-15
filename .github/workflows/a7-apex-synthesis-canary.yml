@@ -17,214 +17,175 @@ jobs:
         with:
           ref: a7/apex-qualification
           fetch-depth: 0
-      - name: Apply stewardship reconciliation
+      - name: Apply bounded stewardship reconciliation
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
 
-          def replace_once(text: str, old: str, new: str, label: str) -> str:
+          def replace_once(text, old, new, label):
               count = text.count(old)
               if count != 1:
-                  raise SystemExit(f'{label}: expected one target, found {count}')
+                  raise SystemExit(f"{label}: expected one target, found {count}")
               return text.replace(old, new, 1)
 
-          def replace_section(text: str, start: str, end: str, replacement: str, label: str) -> str:
-              start_i = text.find(start)
-              end_i = text.find(end, start_i + len(start)) if start_i >= 0 else -1
-              if start_i < 0 or end_i < 0:
-                  raise SystemExit(f'{label}: section boundary missing')
-              return text[:start_i] + replacement.rstrip() + '\n\n' + text[end_i:]
+          def replace_section(text, start, end, lines, label):
+              left = text.find(start)
+              right = text.find(end, left + len(start)) if left >= 0 else -1
+              if left < 0 or right < 0:
+                  raise SystemExit(f"{label}: section boundary missing")
+              replacement = "\n".join(lines).rstrip() + "\n\n"
+              return text[:left] + replacement + text[right:]
 
-          pyproject = Path('pyproject.toml')
-          text = pyproject.read_text()
-          text = replace_once(text, 'version = "0.6.1"', 'version = "0.7.0"', 'pyproject version')
-          pyproject.write_text(text)
+          path = Path("pyproject.toml")
+          path.write_text(replace_once(path.read_text(), 'version = "0.6.1"', 'version = "0.7.0"', "pyproject version"))
 
-          init = Path('src/grox/__init__.py')
-          text = init.read_text()
-          text = replace_once(text, "__version__='0.6.1'", "__version__='0.7.0'", 'package version')
-          init.write_text(text)
+          path = Path("src/grox/__init__.py")
+          path.write_text(replace_once(path.read_text(), "__version__='0.6.1'", "__version__='0.7.0'", "package version"))
 
-          apex = Path('docs/stewardship/APEX_ORCHESTRATOR_PLAN.md')
-          text = apex.read_text()
-          text = replace_once(text, '**Status:** Active target', '**Status:** QUALIFIED', 'apex status')
-          text = replace_once(text, '**Assessment date:** 2026-08-14', '**Assessment date:** 2026-08-15', 'assessment date')
-          text = replace_once(text, '**Current verdict:** NOT YET APEX', '**Current verdict:** APEX QUALIFIED', 'apex verdict')
-          text = replace_once(
-              text,
-              '**Priority:** Apex run is the Vessel critical path',
-              '**Priority:** Preserve Apex qualification through evidence-backed regression, bounded evolution, and continued Commander sovereignty',
-              'apex priority',
-          )
-          a5_line = '**A5 status:** QUALIFIED; governed workspace, secret, network, browser-evidence, and MCP capability paths proven without widening Crew authority'
-          if '**A7 status:** QUALIFIED' not in text:
-              text = replace_once(
-                  text,
-                  a5_line,
-                  a5_line + '\n**A6 status:** QUALIFIED; replayable orchestration evaluation and non-self-activating improvement proposals proven\n**A7 status:** QUALIFIED; final Apex gauntlet, long-horizon recovery, contradiction synthesis, hard cost budgets, and independent adversarial canaries proven',
-                  'A6/A7 header status',
-              )
+          path = Path("docs/stewardship/APEX_ORCHESTRATOR_PLAN.md")
+          text = path.read_text()
+          text = replace_once(text, "**Status:** Active target", "**Status:** QUALIFIED", "Apex plan status")
+          text = replace_once(text, "**Assessment date:** 2026-08-14", "**Assessment date:** 2026-08-15", "Apex plan date")
+          text = replace_once(text, "**Current verdict:** NOT YET APEX", "**Current verdict:** APEX QUALIFIED", "Apex plan verdict")
+          text = replace_once(text, "**Priority:** Apex run is the Vessel critical path", "**Priority:** Preserve Apex qualification through bounded evolution and regression evidence", "Apex plan priority")
+          a5 = "**A5 status:** QUALIFIED; governed workspace, secret, network, browser-evidence, and MCP capability paths proven without widening Crew authority"
+          if "**A7 status:** QUALIFIED" not in text:
+              text = replace_once(text, a5, a5 + "\n**A6 status:** QUALIFIED; replayable orchestration evaluation and non-self-activating improvement proposals proven\n**A7 status:** QUALIFIED; final adversarial Apex gauntlet and independent canaries proven", "A7 header status")
+          text = replace_section(text, "## Proven gaps", "## Evolution sequence", [
+              "## Qualified boundaries and remaining limits",
+              "",
+              "Apex is an evidence-backed operating standard inside the existing GroX authority model. It does not widen GorXu's authority, create a new command layer, weaken deny-wins controls, or self-authorize new capability.",
+              "",
+              "- project-hosted cognition with deterministic safe fallback remains the qualified operating model;",
+              "- external-agent interoperability remains optional and grants no inherited GroX authority;",
+              "- unrestricted host, desktop, networked MCP, and runtime image acquisition remain outside the qualified boundary;",
+              "- future changes that weaken Commander sovereignty, authority containment, verifier independence, evidence integrity, recovery, or the qualified routing path must fail qualification rather than silently inherit Apex status.",
+          ], "qualified-boundaries section")
+          text = replace_section(text, "## Current priority", "A1 foundation now present:", [
+              "## Current status",
+              "",
+              "**APEX QUALIFIED.** A1 through A7 are qualified for the current project-hosted operating model.",
+              "",
+              "GorXu has demonstrated ambiguous-intent preservation, governed multi-domain orchestration, durable recovery, ordinary-exception resolution, irreversible-decision escalation, independently verified contradiction synthesis, hard Mission cost ceilings, prompt-injection resistance, replayable evidence, and measured improvement without widening his own authority.",
+              "",
+              "Qualification remains subordinate to the Commander and to stronger current evidence. Apex is not permission for self-authorization, unrestricted mutation, or silent capability expansion.",
+              "",
+              "A1 foundation now present:",
+          ], "current-status section")
+          if "## A7 live qualification: PASSED" not in text:
+              text += "\n" + "\n".join([
+                  "## A7 live qualification: PASSED",
+                  "",
+                  "A7 executed the final Apex contract as an adversarial gauntlet rather than a title-only declaration.",
+                  "",
+                  "Evidence chain:",
+                  "- red baseline `31881156996`: 11/13 passed; contradiction synthesis and a hard Mission cost ceiling were the only initial code gaps;",
+                  "- first implementation `31881548492`: 13/13 plus complete regressions;",
+                  "- independent red `31881632862`: unrelated verification could incorrectly resolve a material contradiction;",
+                  "- expanded qualification `31881778987`: 14/14 plus complete regressions; unchanged independent run `31881819968` returned no findings;",
+                  "- synthesis-integrity red `31881904667`: forged `graph_verification` evidence and duplicate-source amplification were proved;",
+                  "- final implementation head `0724862dcb2634022ad33e6be14be29df6a914dd`;",
+                  "- final run `31882071412`: **16/16 A7 tests, 121 pytest passed with 2 existing browser skips, 123 unittest OK with 2 skips**, diff hygiene PASS;",
+                  "- unchanged independent run `31882101734`: `A7_APEX_INDEPENDENT_FINDINGS=`;",
+                  "- unchanged synthesis-integrity run `31882083653`: `A7_APEX_SYNTHESIS_FINDINGS=`;",
+                  "- preserved A6 archive SHA-256 `d99bc9ca6cebad37478fd9f80fa71f97b41434c80f30d084e7cd3ee18a229ecd`, embedded SQLite SHA-256 `5327926dad3b34b46430f5969297fc442768c87bfd7bcc73e04e5a33d773d9cc`, SQLite integrity `ok`, and source commit `365691652bebc8215b4118b126382770ef4ebc7a` proven ancestral to the A7 candidate;",
+                  "- A7 entry conditions remain covered: source/state compatibility, issued-Order mutation resistance, operational routing consistency, and proposal non-activation.",
+                  "",
+                  "**A7 exit gate: PASSED.**",
+                  "",
+                  "**Apex verdict: QUALIFIED**, pending stewardship-final exact-head verification and a no-drift merge before the declaration becomes canonical on `main`.",
+                  "",
+              ])
+          path.write_text(text)
 
-          limits = '''## Qualified boundaries and remaining limits
+          path = Path("docs/stewardship/ROADMAP.md")
+          text = path.read_text()
+          text = replace_once(text, "qualified A1/A2/A3/A4/A5/A6 Apex stages", "qualified A1/A2/A3/A4/A5/A6/A7 Apex stages", "Roadmap stage list")
+          a6 = "- A6 Orchestration Intelligence and Self-Improvement qualified with replayable privacy-minimized Mission trajectories, deterministic invariant grading, statistically controlled routing experiments, evidence-backed advisory proposals, and explicit self-activation denial"
+          if "- A7 Apex Qualification qualified" not in text:
+              text = replace_once(text, a6, a6 + "\n- A7 Apex Qualification qualified with long-horizon recovery, independently verified contradiction synthesis, hard Mission cost ceilings, prompt-injection resistance, replayable evidence, and red-to-green adversarial canaries", "Roadmap A7 bullet")
+          text = replace_section(text, "## Apex critical path", "## Qualified Apex stages", [
+              "## Apex critical path",
+              "",
+              "**Status: COMPLETE - APEX QUALIFIED.** `APEX_ORCHESTRATOR_PLAN.md` now serves as the regression boundary for future evolution.",
+              "",
+              "Final implementation evidence at `0724862dcb2634022ad33e6be14be29df6a914dd` is backed by run `31882071412` (16/16 A7; 121 pytest passed with 2 existing browser skips; 123 unittest OK with 2 skips), independent run `31882101734` (`A7_APEX_INDEPENDENT_FINDINGS=`), and synthesis-integrity run `31882083653` (`A7_APEX_SYNTHESIS_FINDINGS=`).",
+              "",
+          ], "Roadmap critical path")
+          if "- **A7 Apex Qualification:** QUALIFIED" not in text:
+              text = replace_once(text, "- **A6 Orchestration Intelligence and Self-Improvement:** QUALIFIED", "- **A6 Orchestration Intelligence and Self-Improvement:** QUALIFIED\n- **A7 Apex Qualification:** QUALIFIED", "Roadmap qualified A7")
+          text = replace_section(text, "## Final Apex stage", "## Persistence foundation", [
+              "## Apex qualification state",
+              "",
+              "- **A7 Apex Qualification Gauntlet: QUALIFIED**",
+              "- **GorXu operating standard: APEX QUALIFIED**",
+              "- Commander sovereignty, bounded authority, verifier independence, evidence integrity, recovery controls, and deny-wins execution remain mandatory boundaries.",
+              "- Apex status does not self-authorize new power; future evolution still requires ordinary GroX authority, evidence, testing, and verification.",
+              "",
+          ], "Roadmap Apex state")
+          path.write_text(text)
 
-Apex qualification is an operating standard inside the existing GroX authority model. It does not widen GorXu's authority, create a new command layer, weaken deny-wins controls, or convert optional capabilities into requirements.
+          path = Path("docs/stewardship/progress-tracker.md")
+          text = path.read_text()
+          if "**Current status: NOT YET APEX**" in text:
+              text = replace_once(text, "**Current status: NOT YET APEX**", "**Current status: APEX QUALIFIED**", "Tracker Apex status")
+          old = "Current critical path: **A7 - Apex Qualification Gauntlet**. GorXu remains **NOT YET APEX** until the final A7 gauntlet passes."
+          if old in text:
+              text = replace_once(text, old, "Apex critical path: **COMPLETE**. A1 through A7 are qualified; future changes must preserve the qualification invariants rather than inherit Apex automatically.", "Tracker critical path")
+          if "## Apex critical-path update - A7 Apex Qualification Gauntlet" not in text:
+              text += "\n" + "\n".join([
+                  "## Apex critical-path update - A7 Apex Qualification Gauntlet",
+                  "",
+                  "**Status: QUALIFIED**",
+                  "",
+                  "A7 closed only after every discovered evidence/recovery defect was remediated and independently reverified.",
+                  "",
+                  "- `31881156996`: red baseline, 11/13;",
+                  "- `31881548492`: first 13/13 plus complete regressions;",
+                  "- `31881632862`: independent red on unrelated contradiction verification;",
+                  "- `31881778987`: 14/14 plus regressions; `31881819968`: unchanged independent canary empty;",
+                  "- `31881904667`: independent red on forged verifier evidence and duplicate-source amplification;",
+                  "- final head `0724862dcb2634022ad33e6be14be29df6a914dd`;",
+                  "- `31882071412`: **16/16 A7, 121 pytest passed with 2 skips, 123 unittest OK with 2 skips**, diff hygiene PASS;",
+                  "- `31882101734`: `A7_APEX_INDEPENDENT_FINDINGS=`;",
+                  "- `31882083653`: `A7_APEX_SYNTHESIS_FINDINGS=`;",
+                  "- private A6 state hashes and SQLite integrity reverified; source ancestry proved;",
+                  "- A7 entry-hardening conditions remain covered.",
+                  "",
+                  "A7 adds crash-persistent hard cost ceilings and source-normalized, independently verified contradiction synthesis. Ordinary Crew cannot manufacture runtime verifier evidence, ties remain unresolved, and duplicate findings from one Order cannot multiply its synthesis weight.",
+                  "",
+                  "**A7 exit gate: PASSED.**",
+                  "",
+                  "**Apex operating verdict: QUALIFIED**, pending only stewardship-final exact-head verification and no-drift merge before canonicalization on `main`.",
+                  "",
+              ])
+          path.write_text(text)
 
-1. **Cognition remains project-hosted for the qualified operating model.** GPT-5.6 Sol occupies the Pilot cognition seat when a capable project session is active; deterministic control remains the safe fallback when cognition is unavailable.
-2. **External-agent interoperability remains optional.** Standing Crew are native GroX identities. No external agent inherits GroX authority, and A2A-style delegation remains outside the qualified boundary until separately justified and governed.
-3. **Unrestricted host or tool power remains outside the qualified boundary.** A5 and A7 prove bounded governed capabilities, not unrestricted desktop control, arbitrary networked MCP processes, runtime image acquisition, or authority outside explicit Mission Orders.
-4. **Apex status is evidence-dependent.** Future changes that weaken Commander sovereignty, authority containment, verifier independence, evidence integrity, recovery, or the qualified orchestration path must fail qualification rather than silently inherit Apex status.'''
-          text = replace_section(text, '## Proven gaps', '## Evolution sequence', limits, 'replace stale gap section')
-
-          current = '''## Current status
-
-**APEX QUALIFIED.** A1 Cognitive Pilot, A2 Mission Graph Orchestration, A3 Living Company Intelligence, A4 Executive Exception Loop and Durable Operations, A5 Governed Capability Expansion, A6 Orchestration Intelligence and Self-Improvement, and A7 Apex Qualification are qualified for the current project-hosted operating model.
-
-Apex qualification means GorXu has demonstrated the ability to preserve ambiguous Commander intent, coordinate multi-domain Crew, manage parallel dependencies, recover from Crew/model/tool/process failure, resolve ordinary reversible exceptions, escalate irreversible decisions, synthesize contradictory independently verified evidence, enforce hard Mission cost ceilings, resist authority-escalation attempts, preserve replayable evidence, and improve orchestration from measured outcomes without widening his own authority.
-
-Qualification remains subordinate to the Commander and to stronger current evidence. Apex is not permission for self-authorization, unrestricted mutation, or silent expansion of capability.'''
-          text = replace_section(text, '## Current priority', 'A1 foundation now present:', current + '\n\nA1 foundation now present:', 'replace current priority')
-
-          a7_section = '''## A7 live qualification: PASSED
-
-A7 closes the formal Apex qualification sequence with an executable adversarial gauntlet rather than a title-only declaration.
-
-Qualification evidence:
-
-- canonical pre-A7 source was `main@d79101eb9bcb9b84d4728f783db0f093c0615d96`;
-- red baseline run `31881156996` proved the existing Vessel already passed 11 of 13 initial A7 cases and isolated exactly two missing capabilities: contradiction synthesis and a hard Mission cost ceiling;
-- the first implementation added crash-persistent cost commitments, aggregate parallel budget reservation, recovery-consultation budget enforcement, and attributable contradiction evidence;
-- candidate run `31881548492` passed the initial 13-case A7 suite and the complete regression suite;
-- independent canary run `31881632862` then correctly remained red because unrelated verification could resolve a material contradiction;
-- direct source-Order verification was required, promoted into the permanent suite, and remediated;
-- run `31881778987` passed the expanded 14-case suite and complete regressions; unchanged independent run `31881819968` returned `A7_APEX_INDEPENDENT_FINDINGS=`;
-- a second independent synthesis-integrity canary `31881904667` remained red and proved two additional evidence-integrity defects: ordinary Crew could forge `graph_verification` evidence, and repeated findings from one Order could multiply that Order's synthesis weight;
-- runtime-generated graph verification was reserved to the verification path, contradiction verification was limited to trusted verification-node Orders, and source contributions were normalized by Order and position;
-- final implementation head `0724862dcb2634022ad33e6be14be29df6a914dd` passed **16/16 A7 cases**, **121 pytest tests with 2 existing environment-dependent browser skips**, and **123 unittest tests OK with 2 skips** in run `31882071412`;
-- unchanged recovery/budget/contradiction canary run `31882101734` returned `A7_APEX_INDEPENDENT_FINDINGS=`;
-- unchanged synthesis-integrity canary run `31882083653` returned `A7_APEX_SYNTHESIS_FINDINGS=`;
-- preserved A6 private-state archive SHA-256 remains `d99bc9ca6cebad37478fd9f80fa71f97b41434c80f30d084e7cd3ee18a229ecd`, embedded SQLite SHA-256 remains `5327926dad3b34b46430f5969297fc442768c87bfd7bcc73e04e5a33d773d9cc`, SQLite integrity remains `ok`, and its recorded source commit `365691652bebc8215b4118b126382770ef4ebc7a` is a proven ancestor of the A7 candidate lineage;
-- all A7 entry-hardening conditions remain covered: source/state compatibility, post-issuance Order mutation resistance, canonical operational routing, and non-activation of evaluation proposals.
-
-**A7 exit gate: PASSED.**
-
-**Apex verdict: QUALIFIED**, subject to the same ordinary rule as every consequential GroX capability: the stewardship-finalized exact head must pass the complete qualification paths before merge, and the merge must introduce no tree drift from that verified head.
-'''
-          if '## A7 live qualification: PASSED' not in text:
-              text = text.rstrip() + '\n\n' + a7_section.rstrip() + '\n'
-          apex.write_text(text)
-
-          roadmap = Path('docs/stewardship/ROADMAP.md')
-          text = roadmap.read_text()
-          text = replace_once(
-              text,
-              'GroX now has a runnable native Vessel, a full standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6 Apex stages.',
-              'GroX now has a runnable native Vessel, a full standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6/A7 Apex stages.',
-              'roadmap current position',
-          )
-          a6_bullet = '- A6 Orchestration Intelligence and Self-Improvement qualified with replayable privacy-minimized Mission trajectories, deterministic invariant grading, statistically controlled routing experiments, evidence-backed advisory proposals, and explicit self-activation denial'
-          if '- A7 Apex Qualification qualified' not in text:
-              text = replace_once(
-                  text,
-                  a6_bullet,
-                  a6_bullet + '\n- A7 Apex Qualification qualified with ambiguous-intent preservation, multi-domain coordination, long-horizon restart, failure containment, independently verified contradiction synthesis, hard Mission cost ceilings, prompt-injection resistance, replayable evidence, and independent red-to-green adversarial canaries',
-                  'roadmap A7 completed bullet',
-              )
-          critical = '''## Apex critical path
-
-**Status: COMPLETE - APEX QUALIFIED.** The detailed qualification contract remains in `APEX_ORCHESTRATOR_PLAN.md` and now serves as a regression boundary for future evolution.
-
-A7 closed the final Apex stage without widening the command spine or authority model. The permanent gauntlet covers ambiguous intent, multi-domain coordination, contradiction synthesis, parallel dependency management, Crew/model/tool/process failure, long-horizon continuation, Commander escalation boundaries, prompt-injection resistance, evidence replay, source/state compatibility, issued-Order immutability, routing consistency, proposal non-activation, and hard cost ceilings.
-
-The final implementation evidence at `0724862dcb2634022ad33e6be14be29df6a914dd` is backed by run `31882071412` (**16/16 A7 cases; 121 pytest passed with 2 existing browser skips; 123 unittest OK with 2 skips**), independent run `31882101734` (`A7_APEX_INDEPENDENT_FINDINGS=`), and synthesis-integrity run `31882083653` (`A7_APEX_SYNTHESIS_FINDINGS=`).'''
-          text = replace_section(text, '## Apex critical path', '## Qualified Apex stages', critical, 'roadmap critical path')
-          if '- **A7 Apex Qualification:** QUALIFIED' not in text:
-              text = replace_once(
-                  text,
-                  '- **A6 Orchestration Intelligence and Self-Improvement:** QUALIFIED',
-                  '- **A6 Orchestration Intelligence and Self-Improvement:** QUALIFIED\n- **A7 Apex Qualification:** QUALIFIED',
-                  'roadmap qualified list',
-              )
-          state = '''## Apex qualification state
-
-- **A7 Apex Qualification Gauntlet: QUALIFIED**
-- **GorXu operating standard: APEX QUALIFIED**
-- Commander sovereignty, bounded authority, verifier independence, evidence integrity, recovery controls, and deny-wins execution remain mandatory qualification boundaries.
-- Future evolution may extend capabilities only through ordinary GroX authority, evidence, testing, and verification paths; Apex status does not self-authorize new power.'''
-          text = replace_section(text, '## Final Apex stage', '## Persistence foundation', state, 'roadmap final stage')
-          roadmap.write_text(text)
-
-          tracker = Path('docs/stewardship/progress-tracker.md')
-          text = tracker.read_text()
-          if '**Current status: NOT YET APEX**' in text:
-              text = replace_once(text, '**Current status: NOT YET APEX**', '**Current status: APEX QUALIFIED**', 'tracker apex status')
-          old_critical = 'Current critical path: **A7 - Apex Qualification Gauntlet**. GorXu remains **NOT YET APEX** until the final A7 gauntlet passes.'
-          if old_critical in text:
-              text = replace_once(
-                  text,
-                  old_critical,
-                  'Apex critical path: **COMPLETE**. A1 through A7 are qualified; future changes must preserve the qualification invariants rather than inheriting Apex status automatically.',
-                  'tracker critical path',
-              )
-          tracker_section = '''## Apex critical-path update - A7 Apex Qualification Gauntlet
-
-**Status: QUALIFIED**
-
-A7 executed the final adversarial qualification contract and closed only after every discovered sovereignty/evidence/recovery defect was remediated and independently reverified.
-
-Evidence chain:
-
-- red baseline `31881156996`: **11/13 passed**, proving contradiction synthesis and hard Mission cost ceilings were the only initial code gaps;
-- first green implementation `31881548492`: initial **13/13** plus complete regression suite;
-- independent red `31881632862`: proved unrelated verification could incorrectly resolve a material contradiction;
-- remediation promoted direct source-Order verification into the permanent gauntlet;
-- run `31881778987`: expanded **14/14** plus complete regressions;
-- unchanged independent run `31881819968`: `A7_APEX_INDEPENDENT_FINDINGS=`;
-- second independent red `31881904667`: proved forged `graph_verification` evidence could be trusted and duplicate findings from one Order could multiply source weight;
-- runtime verification evidence was reserved to the verification path and contradiction sources were normalized by Order/position;
-- final implementation head `0724862dcb2634022ad33e6be14be29df6a914dd`;
-- run `31882071412`: **16/16 A7 tests**, **121 pytest passed with 2 existing browser skips**, **123 unittest OK with 2 skips**, diff hygiene PASS;
-- unchanged independent run `31882101734`: `A7_APEX_INDEPENDENT_FINDINGS=`;
-- unchanged synthesis-integrity run `31882083653`: `A7_APEX_SYNTHESIS_FINDINGS=`;
-- private continuity rechecked: A6 archive SHA-256 `d99bc9ca6cebad37478fd9f80fa71f97b41434c80f30d084e7cd3ee18a229ecd`, embedded SQLite SHA-256 `5327926dad3b34b46430f5969297fc442768c87bfd7bcc73e04e5a33d773d9cc`, SQLite integrity `ok`, and source commit `365691652bebc8215b4118b126382770ef4ebc7a` proven ancestral to the A7 candidate;
-- A7 entry conditions remain proven: source/state mismatch containment, post-issuance Mission Order mutation resistance, operational routing-path consistency, and evaluation proposal non-activation.
-
-A7 adds a hard Mission cost ceiling with crash-persistent accounting and bounded recovery spending. Contradictory specialist findings can now be reconciled only from attributable finding evidence whose source Orders are independently verified; ties remain unresolved, ordinary Crew cannot manufacture runtime verification evidence, and repeated findings from one Order cannot multiply that Order's synthesis weight.
-
-**A7 exit gate: PASSED.**
-
-**Apex operating verdict: QUALIFIED**, pending only the ordinary stewardship-final exact-head verification and no-drift merge gate before this status becomes canonical on `main`.
-'''
-          if '## Apex critical-path update - A7 Apex Qualification Gauntlet' not in text:
-              text = text.rstrip() + '\n\n' + tracker_section.rstrip() + '\n'
-          tracker.write_text(text)
-
-          log = Path('docs/history/ships-log/0033-a7-apex-qualification.md')
+          log = Path("docs/history/ships-log/0033-a7-apex-qualification.md")
           if log.exists():
-              raise SystemExit('Ship\'s Log Entry 0033 already exists')
-          log.write_text('''# Ship's Log - Entry 0033
-
-**Date:** 2026-08-15
-**Pilot:** GorXu
-**Milestone:** A7 Apex Qualification Gauntlet passed
-
-The Vessel entered A7 from canonical `main@d79101eb9bcb9b84d4728f783db0f093c0615d96` after the external A6 audit conditions had been hardened and independently verified. The final stage was treated as an executable adversarial qualification, not a title declaration.
-
-The first A7 baseline remained red by design. Run `31881156996` passed 11 of 13 initial Apex cases and isolated exactly two unqualified capabilities: semantic reconciliation of contradictory specialist evidence and enforcement of a hard Mission cost ceiling. The implementation added durable cost commitments before execution, crash-safe cost reconstruction, aggregate parallel reservation, bounded recovery-consultation spending, and attributable contradiction scoring.
-
-Passing the first gauntlet was not accepted as completion. Independent run `31881632862` proved that an unrelated verification node could still cause a material contradiction to be marked resolved. The Vessel therefore required every source Order contributing to a resolved contradiction to be independently verified. The permanent test suite was expanded before qualification continued.
-
-A second independent synthesis-integrity canary then remained red at run `31881904667`. It proved two further weaknesses: ordinary Crew could forge `graph_verification` evidence that the reconciler trusted, and repeating a finding from one Order could multiply that Order's synthesis weight. Runtime-generated graph verification was therefore reserved to the verification path, only completed verification-node Orders may establish verified source Orders, and source contributions are normalized by Order and position before scoring.
-
-The final implementation head `0724862dcb2634022ad33e6be14be29df6a914dd` passed the complete 16-case Apex gauntlet in run `31882071412`, with 121 pytest tests passing and 2 existing environment-dependent browser skips, 123 unittest tests OK with 2 skips, and clean diff hygiene. The unchanged independent recovery/budget/contradiction canary returned `A7_APEX_INDEPENDENT_FINDINGS=` in run `31882101734`. The unchanged synthesis-integrity canary returned `A7_APEX_SYNTHESIS_FINDINGS=` in run `31882083653`.
-
-Private continuity remained anchored to the preserved A6 Vessel. Archive SHA-256 `d99bc9ca6cebad37478fd9f80fa71f97b41434c80f30d084e7cd3ee18a229ecd` and embedded SQLite SHA-256 `5327926dad3b34b46430f5969297fc442768c87bfd7bcc73e04e5a33d773d9cc` reverified, SQLite integrity remained `ok`, and source commit `365691652bebc8215b4118b126382770ef4ebc7a` was proven ancestral to the A7 candidate lineage.
-
-A7 preserves the existing command relationship and authority doctrine. Commander sovereignty, deny-wins authority, verifier independence, evidence integrity, source/state compatibility, issued-Order immutability, bounded routing, and proposal non-activation remain mandatory. Apex does not grant GorXu permission to widen his own authority or activate new capability without the ordinary GroX path.
-
-The stewardship version advances to **0.7.0**. A1 through A7 are qualified on the candidate. The Apex declaration becomes canonical only after this stewardship-finalized exact head passes the complete qualification paths and merges to `main` without tree drift.
-''')
+              raise SystemExit("Ship's Log Entry 0033 already exists")
+          log.write_text("\n".join([
+              "# Ship's Log - Entry 0033",
+              "",
+              "**Date:** 2026-08-15",
+              "**Pilot:** GorXu",
+              "**Milestone:** A7 Apex Qualification Gauntlet passed",
+              "",
+              "A7 began from canonical `main@d79101eb9bcb9b84d4728f783db0f093c0615d96` and was executed as an adversarial qualification, not a title declaration.",
+              "",
+              "Red baseline `31881156996` passed 11/13 and isolated contradiction synthesis plus hard Mission cost ceilings. After implementation, independent red `31881632862` proved unrelated verification could still resolve a material contradiction. Direct source-Order verification was therefore required and promoted into the permanent suite.",
+              "",
+              "A second independent red canary `31881904667` proved that ordinary Crew could forge `graph_verification` evidence and that repeated findings from one Order could multiply source weight. Runtime verification evidence was reserved to the verification path and source contributions were normalized by Order and position.",
+              "",
+              "Final implementation head `0724862dcb2634022ad33e6be14be29df6a914dd` passed 16/16 Apex tests in run `31882071412`, with 121 pytest passed and 2 existing browser skips, 123 unittest OK with 2 skips, and clean diff hygiene. Unchanged independent run `31882101734` returned `A7_APEX_INDEPENDENT_FINDINGS=`; unchanged synthesis-integrity run `31882083653` returned `A7_APEX_SYNTHESIS_FINDINGS=`.",
+              "",
+              "Private A6 continuity remained intact: archive SHA-256 `d99bc9ca6cebad37478fd9f80fa71f97b41434c80f30d084e7cd3ee18a229ecd`, embedded SQLite SHA-256 `5327926dad3b34b46430f5969297fc442768c87bfd7bcc73e04e5a33d773d9cc`, SQLite integrity `ok`, and source ancestry proved.",
+              "",
+              "Apex preserves Commander sovereignty and does not grant self-authorization. The stewardship version advances to **0.7.0**. The declaration becomes canonical only after the stewardship-final exact head passes all qualification paths and merges to `main` without tree drift.",
+              "",
+          ]))
           PY
       - name: Validate stewardship diff
         shell: bash
@@ -233,10 +194,10 @@ The stewardship version advances to **0.7.0**. A1 through A7 are qualified on th
           git diff --check
           grep -q 'version = "0.7.0"' pyproject.toml
           grep -q "__version__='0.7.0'" src/grox/__init__.py
-          grep -q '\*\*Current verdict:\*\* APEX QUALIFIED' docs/stewardship/APEX_ORCHESTRATOR_PLAN.md
-          grep -q '\*\*A7 status:\*\* QUALIFIED' docs/stewardship/APEX_ORCHESTRATOR_PLAN.md
-          grep -q '\*\*A7 Apex Qualification:\*\* QUALIFIED' docs/stewardship/ROADMAP.md
-          grep -q '\*\*Current status: APEX QUALIFIED\*\*' docs/stewardship/progress-tracker.md
+          grep -q 'Current verdict:\*\* APEX QUALIFIED' docs/stewardship/APEX_ORCHESTRATOR_PLAN.md
+          grep -q 'A7 status:\*\* QUALIFIED' docs/stewardship/APEX_ORCHESTRATOR_PLAN.md
+          grep -q 'A7 Apex Qualification:\*\* QUALIFIED' docs/stewardship/ROADMAP.md
+          grep -q 'Current status: APEX QUALIFIED' docs/stewardship/progress-tracker.md
           test -f docs/history/ships-log/0033-a7-apex-qualification.md
       - name: Commit stewardship candidate
         shell: bash
