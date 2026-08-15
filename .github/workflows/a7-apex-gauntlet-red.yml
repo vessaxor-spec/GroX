@@ -1,4 +1,4 @@
-name: A7 Apex Qualification Candidate
+name: A7 Apex Final Exact-Head Verification
 
 on:
   push:
@@ -12,10 +12,11 @@ jobs:
   qualification:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout exact A7 candidate
+      - name: Checkout exact stewardship-final A7 candidate
         uses: actions/checkout@v4
         with:
           ref: 6c47349e36339e78406728b4a2a459583e875eab
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -29,7 +30,7 @@ jobs:
           image='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
           docker pull "$image"
           docker image inspect "$image" >/dev/null
-      - name: Run A7 gauntlet
+      - name: Run permanent A7 gauntlet
         env:
           PYTHONPATH: src
         run: |
@@ -42,5 +43,57 @@ jobs:
           set -euo pipefail
           python -m pytest -q
           python -m unittest discover -s tests -q
-      - name: Check repository diff hygiene
-        run: git diff --check
+      - name: Materialize unchanged independent verifier scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin verification/a7-apex-independent-canary verification/a7-apex-synthesis-canary
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+
+          def extract(ref, workflow_path, output):
+              text = subprocess.check_output(["git", "show", f"{ref}:{workflow_path}"], text=True)
+              marker = "          python - <<'PY'\n"
+              start = text.index(marker) + len(marker)
+              end = text.index("\n          PY", start)
+              lines = text[start:end].splitlines()
+              script = "\n".join(line[10:] if line.startswith("          ") else line for line in lines) + "\n"
+              Path(output).write_text(script)
+
+          extract(
+              "origin/verification/a7-apex-independent-canary",
+              ".github/workflows/a7-apex-independent-canary.yml",
+              "/tmp/a7-independent.py",
+          )
+          extract(
+              "origin/verification/a7-apex-synthesis-canary",
+              ".github/workflows/a7-apex-synthesis-canary.yml",
+              "/tmp/a7-synthesis.py",
+          )
+          PY
+      - name: Run unchanged recovery-budget-contradiction canary
+        env:
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          python /tmp/a7-independent.py
+      - name: Run unchanged synthesis-integrity canary
+        env:
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          python /tmp/a7-synthesis.py
+      - name: Verify stewardship and diff hygiene
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "6c47349e36339e78406728b4a2a459583e875eab"
+          git diff --check
+          grep -q 'version = "0.7.0"' pyproject.toml
+          grep -q "__version__='0.7.0'" src/grox/__init__.py
+          grep -q 'Current verdict:\*\* APEX QUALIFIED' docs/stewardship/APEX_ORCHESTRATOR_PLAN.md
+          grep -q 'A7 status:\*\* QUALIFIED' docs/stewardship/APEX_ORCHESTRATOR_PLAN.md
+          grep -q 'A7 Apex Qualification:\*\* QUALIFIED' docs/stewardship/ROADMAP.md
+          grep -q 'Current status: APEX QUALIFIED' docs/stewardship/progress-tracker.md
+          test -f docs/history/ships-log/0033-a7-apex-qualification.md
