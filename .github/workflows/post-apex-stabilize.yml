@@ -85,7 +85,8 @@ jobs:
           set -euo pipefail
           git config user.name 'GroX Stewardship Runner'
           git config user.email 'grox-stewardship@users.noreply.github.com'
-          git add -A
+          git add docs/stewardship/APEX_ORCHESTRATOR_PLAN.md docs/stewardship/progress-tracker.md
+          git add -u .github/workflows/post-apex-stabilize.yml
           test "$(git diff --cached --name-only | sort)" = $'.github/workflows/post-apex-stabilize.yml\ndocs/stewardship/APEX_ORCHESTRATOR_PLAN.md\ndocs/stewardship/progress-tracker.md'
           git commit -m 'Stabilize post-Apex stewardship'
           git push origin HEAD:stewardship/post-apex-v0.7.0
