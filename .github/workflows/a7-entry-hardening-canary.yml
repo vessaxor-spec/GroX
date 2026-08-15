@@ -15,7 +15,7 @@ jobs:
       - name: Checkout exact hardening candidate
         uses: actions/checkout@v4
         with:
-          ref: 2bec6a61dfe4c4cbae26f4ae6a0ddbc93248d6ce
+          ref: 6cf1e485727a437d076ae5dc85ba78530dbcc105
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -55,7 +55,6 @@ jobs:
 
           findings = []
 
-          # 1. Issued authority fields must snapshot caller inputs and deny widening.
           scope = ['docs']
           forbidden = ['mcp_mutate']
           params = {
@@ -84,7 +83,6 @@ jobs:
           else:
               findings.append('scope_reassignment_widened_order')
 
-          # 2. Persistence and first Gateway use must seal nested parameter grants.
           td, root, pilot = temp_vessel()
           try:
               direct = MissionOrder.new(
@@ -110,7 +108,6 @@ jobs:
           finally:
               td.cleanup()
 
-          # 3. Restore must enforce exact/ancestor/unrelated source compatibility using real Git ancestry.
           with tempfile.TemporaryDirectory(prefix='grox-source-canary-') as td_name:
               root = Path(td_name)
               (root / 'configs/state').mkdir(parents=True)
