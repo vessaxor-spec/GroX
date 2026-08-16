@@ -1,6 +1,6 @@
 # Post-Apex Operational Evolution Program 001
 
-**Status:** IN EXECUTION — STAGE 0 COMPLETE; STAGE 1 NEXT
+**Status:** IN EXECUTION — STAGES 0-1 COMPLETE; STAGE 2 NEXT
 
 **Planning baseline:** `main@c93015278daf022b1c3d85fc8fb90a6fa52d8160`
 
@@ -52,7 +52,7 @@ The work is deliberately staged so later capabilities depend on trustworthy evid
 
 **Issue:** #29
 
-The lightweight GroX review convention is now defined in `docs/stewardship/EXTERNAL_CAPABILITY_INTAKE.md`.
+The lightweight GroX review convention is defined in `docs/stewardship/EXTERNAL_CAPABILITY_INTAKE.md`.
 
 It establishes:
 
@@ -64,31 +64,62 @@ It establishes:
 
 The convention is exercised against the pinned ClaudX review, including different decisions for independent seams from the same repository and explicit rejection of circular GroX-derived material.
 
-**Exit condition:** PASSED. One canonical convention/template exists and the ClaudX review is represented through it without architectural duplication.
+**Exit condition:** PASSED.
 
-### Stage 1 - Prove the detectors — NEXT
+### Stage 1 - Prove the detectors — COMPLETE
 
 **Issue:** #25
 
-Mutation-challenge the highest-consequence existing health, authority, recovery, identity, verification, bootstrap, and cost-control invariants.
+Stage 1 mutation-challenged the high-consequence restore, command-identity, stale-Crew purge, verification, cost, Repair authority, critical escalation, bootstrap, and CI supply-chain detectors.
 
-Priority order:
+Canonical evidence is recorded in `docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md`.
+
+The proof discipline is now executable in canonical CI through `tests/mutation/run_critical_invariants.py` on the required Python 3.12 regression job. Every selected mutation is applied only to the CI checkout, the targeted detector must go red, exact source bytes are restored, the same detector must return green, and the final mutated-source paths must be Git-clean.
+
+Permanent coverage added in Stage 1 includes:
+
+- direct executor/self-verifier rejection in `tests/unit/test_verification.py`;
+- committed Mission cost reconstruction across restart in `tests/integration/test_cost_recovery.py`.
+
+Preserved red harness evidence:
+
+- PR #34 head `16e893dd9471e01d708096ec030ee6aaa6200568`, run `31950179712`;
+- normal suites green;
+- 11 mutations killed, 0 survived;
+- the CI pin mutation failed closed before mutation because the initial seam was ambiguous (`expected exactly one mutation seam, found 2`);
+- source restoration remained clean.
+
+The harness was corrected by narrowing only that mutation target. No production invariant was changed to clear the red run.
+
+Green qualification evidence:
+
+- PR #34 head `988c97a390a31b5a255385149088ae7e67685fa9`, run `31950265325`;
+- pytest **133 passed, 2 skipped, 19 subtests passed**;
+- unittest **135 OK, 2 skipped**;
+- **12/12 mutations KILLED**;
+- **0 survived**;
+- **0 other mutation-proof failures**;
+- `source_restored_clean=true`;
+- all five canonical CI jobs passed.
+
+The proven mutations cover:
 
 1. source/state restore compatibility;
-2. sole-orchestrator and Crew admission invariants;
-3. stale/retired Crew operational purge;
-4. verifier independence and forged-verifier resistance;
-5. Mission cost commitment/resume accounting;
-6. Repair/authority boundaries and no authority widening;
-7. fail-closed Vessel-root bootstrap;
-8. critical escalation behavior;
-9. protected CI/action-pin contracts where practical.
+2. semantic orchestrator Crew admission;
+3. stale Crew performance-state purge;
+4. verifier self-independence;
+5. forged graph-verification evidence resistance;
+6. hard Mission cost-budget boundary;
+7. committed-cost reconstruction on resume;
+8. graph Repair authorization;
+9. Tool Gateway Repair boundary;
+10. critical Commander escalation;
+11. fail-closed unbound Vessel-root bootstrap;
+12. immutable GitHub Actions pins.
 
-Every selected detector must be observed failing against a deliberate isolated mutation for the intended reason before it is treated as proven.
+**Exit condition:** PASSED. The critical-invariant mutation matrix records production seam, targeted detector, observed red result, restored green result, and the preserved fail-closed harness run.
 
-**Exit condition:** a critical-invariant mutation matrix records mutation, expected red signal, observed red signal, restored green result, and any strengthened tests.
-
-### Stage 2 - Native Vessel health surface
+### Stage 2 - Native Vessel health surface — NEXT
 
 **Issue:** #26
 
