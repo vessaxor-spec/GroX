@@ -43,6 +43,25 @@ jobs:
         run: |
           python -m compileall -q src tests
           git diff --check
+      - name: Vessel health source smoke
+        if: matrix.python-version == '3.12'
+        run: |
+          status=$(git status --porcelain=v1)
+          printf '%s\n' "$status"
+          test -z "$status"
+          test ! -e configs/state/grox.sqlite3
+          python -m grox.cli health --json | tee /tmp/grox-health.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('/tmp/grox-health.json').read_text())
+          assert report['disposition'] == 'HEALTHY', report
+          checks = {item['check_id']: item for item in report['checks']}
+          assert checks['source_repository']['status'] == 'PASS', checks['source_repository']
+          assert checks['command_integrity']['evidence']['standing_crew'] == 82
+          assert checks['recovery_readiness']['status'] == 'PASS'
+          PY
+          test ! -e configs/state/grox.sqlite3
       - name: Pytest regression
         run: python -m pytest -q
       - name: Unittest regression
@@ -50,6 +69,9 @@ jobs:
       - name: Critical invariant mutation proof
         if: matrix.python-version == '3.12'
         run: python tests/mutation/run_critical_invariants.py
+      - name: Vessel health mutation proof
+        if: matrix.python-version == '3.12'
+        run: python tests/mutation/run_health_invariants.py
 
   bootstrap-portability:
     name: Wheel bootstrap portability

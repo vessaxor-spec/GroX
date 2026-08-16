@@ -3,6 +3,7 @@ import argparse, json
 from pathlib import Path
 from .pilot import PilotGorXu
 from .contracts import MissionMode, RiskClass
+from .health import VesselHealth
 from .persistence import PersistenceManager
 from .vessel import resolve_vessel_root
 
@@ -21,6 +22,17 @@ def status(p):
     print(f"Cognitive Pilot: {p.cognitive_status}")
     active=[x for x in states if x['status']=='on_duty']; print(f"Crew on duty: {len(active)}")
     if ms: print(f"Last mission: {ms[0]['mission_id']} [{ms[0]['status']}] {ms[0]['directive']}")
+
+def health(json_output=False):
+    report=VesselHealth(ROOT).collect()
+    if json_output:
+        dump(report.to_dict()); return
+    print(f"GroX Vessel health: {report.disposition}")
+    print(f"Vessel root: {report.vessel_root}")
+    for check in report.checks:
+        marker='!' if check.status=='FAIL' else '-' if check.status in {'WARN','UNKNOWN'} else '+'
+        print(f"{marker} {check.check_id:24} {check.status:7} {check.detail}")
+        if check.recommendation: print(f"  recommendation: {check.recommendation}")
 
 def bridge(p):
     print("GroX Bridge online. Pilot GorXu standing by. /help for commands; /exit to leave.")
@@ -45,6 +57,7 @@ def bridge(p):
 def main(argv=None):
     ap=argparse.ArgumentParser(prog='grox'); sp=ap.add_subparsers(dest='cmd')
     sp.add_parser('status'); sp.add_parser('roster'); sp.add_parser('missions'); sp.add_parser('bridge')
+    he=sp.add_parser('health'); he.add_argument('--json',action='store_true',dest='json_output')
     sh=sp.add_parser('show'); sh.add_argument('mission_id')
     m=sp.add_parser('mission'); m.add_argument('directive'); m.add_argument('--mode',choices=[x.value for x in MissionMode]); m.add_argument('--risk',choices=[x.value for x in RiskClass]); m.add_argument('--crew'); m.add_argument('--scope',default='.')
     r=sp.add_parser('repair-write'); r.add_argument('path'); r.add_argument('content'); r.add_argument('--risk',choices=[x.value for x in RiskClass]); r.add_argument('--crew')
@@ -53,6 +66,7 @@ def main(argv=None):
     sv=sp.add_parser('verify-snapshot'); sv.add_argument('path')
     sr=sp.add_parser('restore-snapshot'); sr.add_argument('path'); sr.add_argument('--confirm',action='store_true')
     ns=ap.parse_args(argv)
+    if ns.cmd=='health': health(ns.json_output); return
     if ns.cmd=='snapshot':
         pm=PersistenceManager(ROOT); dump(pm.create_snapshot(label=ns.label,output=Path(ns.out) if ns.out else None).to_dict()); return
     if ns.cmd=='verify-snapshot':

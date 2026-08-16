@@ -1,6 +1,6 @@
 # Post-Apex Operational Evolution Program 001
 
-**Status:** IN EXECUTION — STAGES 0-1 COMPLETE; STAGE 2 NEXT
+**Status:** IN EXECUTION — STAGES 0-2 COMPLETE; STAGE 3 NEXT
 
 **Planning baseline:** `main@c93015278daf022b1c3d85fc8fb90a6fa52d8160`
 
@@ -74,7 +74,7 @@ Stage 1 mutation-challenged the high-consequence restore, command-identity, stal
 
 Canonical evidence is recorded in `docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md`.
 
-The proof discipline is now executable in canonical CI through `tests/mutation/run_critical_invariants.py` on the required Python 3.12 regression job. Every selected mutation is applied only to the CI checkout, the targeted detector must go red, exact source bytes are restored, the same detector must return green, and the final mutated-source paths must be Git-clean.
+The proof discipline is executable in canonical CI through `tests/mutation/run_critical_invariants.py` on the required Python 3.12 regression job. Every selected mutation is applied only to the CI checkout, the targeted detector must go red, exact source bytes are restored, the same detector must return green, and the final mutated-source paths must be Git-clean.
 
 Permanent coverage added in Stage 1 includes:
 
@@ -102,46 +102,66 @@ Green qualification evidence:
 - `source_restored_clean=true`;
 - all five canonical CI jobs passed.
 
-The proven mutations cover:
+The proven mutations cover source/state restore compatibility, semantic orchestrator admission, stale Crew performance purge, verifier self-independence, forged verification evidence, hard cost budget, committed-cost resume reconstruction, graph Repair authorization, Tool Gateway Repair boundary, critical Commander escalation, fail-closed Vessel binding, and immutable GitHub Actions pins.
 
-1. source/state restore compatibility;
-2. semantic orchestrator Crew admission;
-3. stale Crew performance-state purge;
-4. verifier self-independence;
-5. forged graph-verification evidence resistance;
-6. hard Mission cost-budget boundary;
-7. committed-cost reconstruction on resume;
-8. graph Repair authorization;
-9. Tool Gateway Repair boundary;
-10. critical Commander escalation;
-11. fail-closed unbound Vessel-root bootstrap;
-12. immutable GitHub Actions pins.
+**Exit condition:** PASSED.
 
-**Exit condition:** PASSED. The critical-invariant mutation matrix records production seam, targeted detector, observed red result, restored green result, and the preserved fail-closed harness run.
-
-### Stage 2 - Native Vessel health surface — NEXT
+### Stage 2 - Native Vessel health surface — COMPLETE
 
 **Issue:** #26
 
-Design and implement a unified diagnostic surface, provisionally `grox health`, from services GroX already owns.
+Stage 2 adds `grox health` and `grox health --json` as a read-only diagnostic surface implemented by `src/grox/health.py`.
 
-Required domains:
+The health surface observes existing authoritative evidence across:
 
 - command integrity;
 - operational-state integrity;
-- persistence/source-state compatibility;
-- authority/Tool Gateway condition;
-- memory integrity/provenance condition;
-- source/version binding where available;
-- verification/regression condition;
-- isolation/environment readiness;
-- recovery readiness.
+- persistence readiness and source/state compatibility;
+- authority and Tool Gateway policy condition;
+- memory integrity and provenance;
+- source/package version and local Git condition;
+- verification source readiness;
+- qualified isolation backend readiness;
+- derived recovery readiness.
 
-Health aggregation must preserve individual findings. One malformed checker may fail its own result but may not erase the rest of the health surface. Unknown or stale evidence is not healthy evidence. Health inspection is non-mutating by default and recommendations do not authorize repair.
+Health status is explicit: `PASS`, `WARN`, `FAIL`, or `UNKNOWN`. Unknown evidence is not silently interpreted as healthy. Overall disposition is `HEALTHY`, `DEGRADED`, or `UNHEALTHY`, but individual critical findings remain first-class.
 
-**Exit condition:** production-wiring tests, mutation-proven critical detectors, independent verification, canonical CI, and no authority widening.
+The implementation is deliberately non-mutating:
 
-### Stage 3 - Tiered reconstitution
+- health does not construct `PilotGorXu`;
+- private SQLite is opened through read-only URI mode rather than `StateStore`, whose normal initialization contains crash-recovery writes;
+- an absent operational database is not created;
+- health never restores or creates snapshots, changes policy, wakes/routes Crew, issues Orders, or performs repair.
+
+Detector failures are isolated so one unexpected exception becomes one health finding rather than aborting the report.
+
+Canonical architecture is documented in `docs/architecture/VESSEL_HEALTH.md`; mutation evidence is recorded in `docs/verification/VESSEL_HEALTH_MUTATION_MATRIX.md`.
+
+Preserved Stage 2 red evidence:
+
+- initial PR #35 run `31950827151`;
+- pytest **1 failed, 140 passed, 2 skipped, 19 subtests passed**;
+- the failing source-version test had attempted to replace a string that did not match the actual `pyproject.toml` formatting, so its fixture mutation never occurred;
+- the test was corrected to target the exact source text and now asserts that the fixture mutation changes the file before evaluating the detector.
+
+Green Stage 2 evidence:
+
+- PR #35 run `31951084789`;
+- pytest **143 passed, 2 skipped, 19 subtests passed**;
+- unittest **145 OK, 2 skipped**;
+- Stage 1 critical mutations **12/12 KILLED**;
+- Stage 2 health mutations **7/7 KILLED**;
+- zero mutation survivors;
+- both mutation harnesses restored source cleanly;
+- all five canonical CI jobs passed.
+
+The seven health mutations prove detector isolation, interrupted-state reporting, unsnapshotted-runtime warning, non-Repair authority-widening detection, active-memory provenance validation, source-version drift detection, and fail-closed recovery readiness.
+
+The required Python 3.12 gate also executes a source-checkout `grox health --json` smoke test, requires overall `HEALTHY`, 82 Standing Crew, `recovery_readiness=PASS`, and proves the health command does not create a runtime database.
+
+**Exit condition:** PASSED. The health surface is production-wiring tested, mutation-proven, continuously exercised in protected CI, and has no repair or authority-widening path.
+
+### Stage 3 - Tiered reconstitution — NEXT
 
 **Issue:** #27
 
@@ -175,17 +195,7 @@ The experiment must measure context size/cost/latency where available and separa
 
 Extend existing A6 trajectory evaluation to compare real operational evidence across time without a self-normalizing baseline or self-activation path.
 
-Candidate signals include:
-
-- Mission disposition;
-- evidence quality and trace completeness;
-- verifier failures;
-- authority/capability violations;
-- exception/replan and recovery rates;
-- cost and latency;
-- tool failures;
-- Crew utilization/routing concentration;
-- Commander escalation rate.
+Candidate signals include Mission disposition, evidence quality/trace completeness, verifier failures, authority/capability violations, exception/replan and recovery rates, cost, latency, tool failures, Crew utilization/routing concentration, and Commander escalation rate.
 
 Invariant failures remain first-class and may not be hidden inside a composite score. Controlled qualification corpora and real operational history remain separately attributable. Missing/stale data is unknown rather than pass. Drift produces an investigation or proposal only.
 
