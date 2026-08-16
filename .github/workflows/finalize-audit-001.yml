@@ -42,7 +42,7 @@ jobs:
               if anchor not in text:
                   raise SystemExit('progress tracker insertion anchor missing')
               text = text.replace(anchor, section + anchor, 1)
-          tracker.write_text(text, encoding='utf-8')
+          tracker.write_text(text.rstrip() + '\n', encoding='utf-8')
 
           roadmap = Path('docs/stewardship/ROADMAP.md')
           text = roadmap.read_text(encoding='utf-8')
@@ -57,7 +57,7 @@ jobs:
               if posture not in text:
                   raise SystemExit('roadmap operating-posture anchor missing')
               text = text.replace(posture, posture + '\n' + addition, 1)
-          roadmap.write_text(text, encoding='utf-8')
+          roadmap.write_text(text.rstrip() + '\n', encoding='utf-8')
 
           audit = Path('docs/stewardship/OPERATIONAL_AUDIT_001.md')
           text = audit.read_text(encoding='utf-8')
@@ -67,7 +67,7 @@ jobs:
               text += '\n' + marker + evidence
           elif evidence not in text:
               text = text.replace(marker, marker + evidence, 1)
-          audit.write_text(text, encoding='utf-8')
+          audit.write_text(text.rstrip() + '\n', encoding='utf-8')
 
           log = Path('docs/history/ships-log/0038-post-release-operational-audit.md')
           text = log.read_text(encoding='utf-8')
@@ -77,7 +77,7 @@ jobs:
               'PR #19 candidate CI run `31938365523` passed Python 3.11 through 3.14 and Wheel bootstrap portability; Python 3.12 recorded **131 pytest passed, 2 skipped** and **133 unittest OK, 2 skipped**. Final merge, zero-tree-drift verification, and post-merge canonical CI remain the completion evidence.',
               1,
           )
-          log.write_text(text, encoding='utf-8')
+          log.write_text(text.rstrip() + '\n', encoding='utf-8')
           PY
           git diff --check
       - name: Remove temporary audit harnesses and commit
