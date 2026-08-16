@@ -49,7 +49,10 @@ class CrewDossier:
 
 class CrewRoster:
     def __init__(self, dossier_dir: Path, store: StateStore | None = None):
+        dossier_dir=Path(dossier_dir)
         self.store=store; self._crew={}
+        self._dossier_dir=dossier_dir
+        self._specialist_dir=dossier_dir.parent/'specialists'
         for p in sorted(dossier_dir.glob('*.json')):
             raw=json.loads(p.read_text())
             cid=raw['crew_id']
@@ -68,6 +71,18 @@ class CrewRoster:
 
     def get(self, crew_id:str)->CrewDossier:
         return self._crew[crew_id]
+
+    def craft_card(self, crew_id:str)->str:
+        """Return canonical craft depth for an active Standing Crew identity.
+
+        The dossier remains the machine-readable eligibility/capability source.
+        Reading craft never grants capabilities, Mission authority, or Repair permission.
+        """
+        self.get(crew_id)
+        path=self._specialist_dir/f"{crew_id}.md"
+        if not path.is_file():
+            raise LookupError(f"No specialist craft card for active Crew {crew_id}")
+        return path.read_text(encoding='utf-8')
 
     def all(self)->list[CrewDossier]: return list(self._crew.values())
 
