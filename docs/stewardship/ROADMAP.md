@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.7.1` is the current released post-Apex operational-hardening baseline. `v0.7.0` remains the first released Apex-qualified Vessel baseline. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, persistent canonical CI with immutable action pinning and Python 3.11-3.14 regression coverage, portable fail-closed Vessel binding, protected canonical `main`, qualified A1/A2/A3/A4/A5/A6/A7 stages, and a continuously executable critical-invariant mutation proof on the Python 3.12 CI gate.
+GroX `v0.7.1` is the current released post-Apex operational-hardening baseline. `v0.7.0` remains the first released Apex-qualified Vessel baseline. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, persistent canonical CI with immutable action pinning and Python 3.11-3.14 regression coverage, portable fail-closed Vessel binding, protected canonical `main`, qualified A1/A2/A3/A4/A5/A6/A7 stages, continuous critical-invariant mutation proof, and a native read-only Vessel health surface.
 
 The command architecture is native to the Vessel:
 
@@ -33,6 +33,8 @@ The command architecture is native to the Vessel:
 - Canonical `main` protected by active repository rules requiring pull requests, all five canonical CI gates, strict up-to-date status, blocked deletion/non-fast-forward updates, and no bypass actors
 - External capability intake convention formalized and exercised against the pinned ClaudX comparative review without adding a command layer or duplicate decision store
 - Critical detector mutation proving established for 12 high-consequence restore, command-identity, stale-Crew, verification, cost, authority, escalation, bootstrap, and CI supply-chain invariants
+- Native `grox health` / `grox health --json` surface added with isolated read-only command, operations, persistence, authority, memory, source, verification, environment, and recovery findings
+- Seven critical Vessel-health behaviors mutation-proven continuously in the required Python 3.12 CI gate
 
 ## Apex critical path
 
@@ -89,8 +91,8 @@ Execution tracks:
 
 1. **#29 - External capability intake convention: COMPLETE.** `docs/stewardship/EXTERNAL_CAPABILITY_INTAKE.md` formalizes lightweight `ADOPT | ADAPT | HARVEST | REJECT` classification, evidence distinctions, authority boundaries, and a compact review record. It is exercised against the pinned ClaudX review without adding a command layer or duplicate decision store.
 2. **#25 - Critical detector mutation proving: COMPLETE.** `docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md` records 12/12 killed mutations. Run `31950179712` is preserved as the fail-closed red harness case; run `31950265325` passed all five CI gates with pytest **133 passed, 2 skipped, 19 subtests**, unittest **135 OK, 2 skipped**, 12 killed mutations, zero survivors, and clean source restoration.
-3. **#26 - Native Vessel health surface: NEXT.** Build a unified diagnostic health view from authoritative existing GroX services; inspection remains non-mutating by default and critical health detectors inherit the Stage 1 mutation-proof discipline.
-4. **#27 - Tiered reconstitution.** Add fast/targeted/full reconstitution selection without weakening source/state, recovery, authority, or Mission-resume gates.
+3. **#26 - Native Vessel health surface: COMPLETE.** `src/grox/health.py` and `grox health` provide a read-only isolated diagnostic surface. Run `31950827151` preserves the ineffective-test-fixture red case; run `31951084789` passed with pytest **143 passed, 2 skipped, 19 subtests**, unittest **145 OK, 2 skipped**, Stage 1 mutations 12/12 killed and Stage 2 health mutations 7/7 killed, zero survivors, and clean source restoration. The Python 3.12 CI gate also smoke-tests a source-checkout `HEALTHY` report without creating operational state.
+4. **#27 - Tiered reconstitution: NEXT.** Add fast/targeted/full reconstitution selection without weakening source/state, recovery, authority, or Mission-resume gates; use the Stage 2 health evidence rather than duplicating health truth.
 5. **#30 - Context heat experiment.** Test a GroX-native hot/warm/cold context model and bounded compression against long-horizon Mission/reconstitution evidence; external synthetic token-savings claims are not accepted as proof.
 6. **#28 - A6 longitudinal operational drift analysis.** Extend A6 with protected-baseline trend analysis from real Mission trajectories while preserving non-self-activation and first-class invariant failures.
 7. **#31 - Mission-to-source provenance research.** Threat-model a privacy-safe verifiable link between authorized private Missions and public PR/CI/merge history before any implementation decision.
