@@ -62,6 +62,26 @@ jobs:
           assert checks['recovery_readiness']['status'] == 'PASS'
           PY
           test ! -e configs/state/grox.sqlite3
+      - name: Tiered reconstitution source smoke
+        if: matrix.python-version == '3.12'
+        run: |
+          test ! -e configs/state/grox.sqlite3
+          python -m grox.cli reconstitution-plan --json | tee /tmp/grox-reconstitution-fast.json
+          python -m grox.cli reconstitution-plan --json --fresh-host | tee /tmp/grox-reconstitution-full.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          fast = json.loads(Path('/tmp/grox-reconstitution-fast.json').read_text())
+          full = json.loads(Path('/tmp/grox-reconstitution-full.json').read_text())
+          assert fast['mode'] == 'fast', fast
+          assert fast['planned_surface_count'] == 4, fast
+          assert fast['full_surface_count'] == 10, fast
+          assert fast['structural_reduction_ratio'] == 0.6, fast
+          assert full['mode'] == 'full', full
+          assert full['planned_surface_count'] == 10, full
+          assert full['structural_reduction_ratio'] == 0.0, full
+          PY
+          test ! -e configs/state/grox.sqlite3
       - name: Pytest regression
         run: python -m pytest -q
       - name: Unittest regression
@@ -72,6 +92,9 @@ jobs:
       - name: Vessel health mutation proof
         if: matrix.python-version == '3.12'
         run: python tests/mutation/run_health_invariants.py
+      - name: Tiered reconstitution mutation proof
+        if: matrix.python-version == '3.12'
+        run: python tests/mutation/run_reconstitution_invariants.py
 
   bootstrap-portability:
     name: Wheel bootstrap portability
