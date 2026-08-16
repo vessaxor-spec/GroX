@@ -31,14 +31,29 @@ jobs:
           old_pair = f'v0.7.0@{old_sha}'
           new_pair = f'v0.7.1@{new_sha}'
 
-          current_docs = [
-              p for p in root.rglob('*.md')
-              if 'docs/history/' not in p.as_posix()
-          ]
+          current_docs = [p for p in root.rglob('*.md') if 'docs/history/' not in p.as_posix()]
           for path in current_docs:
               text = path.read_text(encoding='utf-8')
               if old_pair in text:
                   path.write_text(text.replace(old_pair, new_pair), encoding='utf-8')
+
+          spec_paths = [
+              'docs/specification/COGNITIVE_PILOT.md',
+              'docs/specification/DURABLE_OPERATIONS.md',
+              'docs/specification/GOVERNED_CAPABILITIES.md',
+              'docs/specification/LIVING_COMPANY_INTELLIGENCE.md',
+              'docs/specification/MISSION_GRAPH.md',
+              'docs/specification/MISSION_ORDER.md',
+              'docs/specification/ORCHESTRATION_EVALUATION.md',
+              'docs/specification/PRINCIPLES.md',
+          ]
+          for raw in spec_paths:
+              path = Path(raw)
+              text = path.read_text(encoding='utf-8')
+              old = 'GroX `v0.7.0`'
+              if old not in text:
+                  raise SystemExit(f'specification release marker missing: {raw}')
+              path.write_text(text.replace(old, 'GroX `v0.7.1`', 1), encoding='utf-8')
 
           readme = Path('README.md')
           text = readme.read_text(encoding='utf-8')
@@ -55,26 +70,30 @@ jobs:
 
           roadmap = Path('docs/stewardship/ROADMAP.md')
           text = roadmap.read_text(encoding='utf-8')
-          old = ('GroX `v0.7.0` is the first released Apex-qualified Vessel baseline. Current source advances the package to `0.7.1` for post-Apex operational hardening while preserving the released baseline and all qualified authority boundaries. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6/A7 stages.')
-          new = ('GroX `v0.7.1` is the current released post-Apex operational-hardening baseline. `v0.7.0` remains the first released Apex-qualified Vessel baseline. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, persistent canonical CI, portable fail-closed Vessel binding, and qualified A1/A2/A3/A4/A5/A6/A7 stages.')
+          old = 'GroX `v0.7.0` is the first released Apex-qualified Vessel baseline. Current source advances the package to `0.7.1` for post-Apex operational hardening while preserving the released baseline and all qualified authority boundaries. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6/A7 stages.'
+          new = 'GroX `v0.7.1` is the current released post-Apex operational-hardening baseline. `v0.7.0` remains the first released Apex-qualified Vessel baseline. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, persistent canonical CI, portable fail-closed Vessel binding, and qualified A1/A2/A3/A4/A5/A6/A7 stages.'
           if old not in text:
               raise SystemExit('ROADMAP current-position paragraph missing')
           text = text.replace(old, new)
-          old = (f'Post-Apex documentation stabilization then passed run `31909761968`, and release `v0.7.0` is pinned to `{old_sha}` while canonical source continues on `main`.')
-          new = (f'Post-Apex documentation stabilization then passed run `31909761968`; the first Apex-qualified release `v0.7.0` remains pinned to `{old_sha}`. Post-Apex operational hardening and version reconciliation are released as `v0.7.1`, pinned to `{new_sha}`, while canonical source continues on `main`.')
+          old = f'Post-Apex documentation stabilization then passed run `31909761968`, and release `v0.7.0` is pinned to `{old_sha}` while canonical source continues on `main`.'
+          new = f'Post-Apex documentation stabilization then passed run `31909761968`; the first Apex-qualified release `v0.7.0` remains pinned to `{old_sha}`. Post-Apex operational hardening and version reconciliation are released as `v0.7.1`, pinned to `{new_sha}`, while canonical source continues on `main`.'
           if old not in text:
               raise SystemExit('ROADMAP release history sentence missing')
           text = text.replace(old, new)
-          posture_anchor = ('The first post-Apex operational cycle proved that rule in practice: a non-editable CLI launch exposed a Vessel-root portability weakness, the documented source bootstrap completed Mission `MSN-8a86f094509b` with independent verification, and the resulting bounded hardening added persistent CI plus fail-closed portable Vessel binding without widening authority.')
-          posture_new = posture_anchor + f' That hardening is now frozen in release `v0.7.1@{new_sha}`.'
-          if posture_anchor not in text:
+          anchor = 'The first post-Apex operational cycle proved that rule in practice: a non-editable CLI launch exposed a Vessel-root portability weakness, the documented source bootstrap completed Mission `MSN-8a86f094509b` with independent verification, and the resulting bounded hardening added persistent CI plus fail-closed portable Vessel binding without widening authority.'
+          if anchor not in text:
               raise SystemExit('ROADMAP post-Apex posture anchor missing')
-          text = text.replace(posture_anchor, posture_new)
+          text = text.replace(anchor, anchor + f' That hardening is now frozen in release `v0.7.1@{new_sha}`.')
           roadmap.write_text(text, encoding='utf-8')
 
           apex = Path('docs/stewardship/APEX_ORCHESTRATOR_PLAN.md')
           text = apex.read_text(encoding='utf-8')
           text = text.replace('**Assessment date:** 2026-08-15', '**Assessment date:** 2026-08-16')
+          old = f'Post-Apex documentation stabilization re-ran the complete regression suites in `31909761968`; release `v0.7.0` is pinned to `{old_sha}` while canonical source continues on `main`.'
+          new = f'Post-Apex documentation stabilization re-ran the complete regression suites in `31909761968`; `v0.7.0` remains the first Apex-qualified release at `{old_sha}`. Operational hardening is released as `v0.7.1@{new_sha}` while canonical source continues on `main`.'
+          if old not in text:
+              raise SystemExit('APEX verdict release sentence missing')
+          text = text.replace(old, new)
           apex.write_text(text, encoding='utf-8')
 
           tracker = Path('docs/stewardship/progress-tracker.md')
@@ -83,29 +102,28 @@ jobs:
               '**Canonical release:** `v0.7.0`': '**Canonical release:** `v0.7.1`',
               f'**Released qualified source:** `{new_pair}`': f'**Current released source:** `{new_pair}`\n**First Apex-qualified release:** `v0.7.0@{old_sha}`',
               '**Current verified regression:** pytest **128 passed, 2 skipped**; unittest **130 OK, 2 skipped**': '**Current verified regression:** pytest **129 passed, 2 skipped**; unittest **131 OK, 2 skipped**',
+              f'- release `v0.7.0` is pinned to `{old_sha}` and canonical source continues on `main`;': f'- current release `v0.7.1` is pinned to `{new_sha}` and canonical source continues on `main`;',
           }
           for old, new in exact.items():
               if old not in text:
                   raise SystemExit(f'progress-tracker expected text missing: {old}')
               text = text.replace(old, new)
           anchor = '- Vessel-root discovery now supports explicit `GROX_VESSEL_ROOT` binding, current-checkout discovery, editable-source fallback, and fail-closed refusal to construct an unbound 0-Crew Vessel'
-          addition = anchor + '\n- package/source version metadata is synchronized at `0.7.1` and guarded by both pytest and unittest\n- release `v0.7.1` is pinned to the fully verified post-Apex operational-hardening source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`'
           if anchor not in text:
               raise SystemExit('progress-tracker verified-baseline anchor missing')
-          text = text.replace(anchor, addition, 1)
+          text = text.replace(anchor, anchor + '\n- package/source version metadata is synchronized at `0.7.1` and guarded by both pytest and unittest\n- release `v0.7.1` is pinned to the fully verified post-Apex operational-hardening source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`', 1)
           cycle_anchor = '- the wheel path proved three states: current-checkout binding succeeds with 82 Crew, explicit `GROX_VESSEL_ROOT` succeeds outside the checkout, and an unbound installed runtime fails closed rather than starting an empty Vessel.'
-          cycle_add = cycle_anchor + '\n- PR #16 aligned `grox.__version__` with package metadata and added a dual-runner consistency invariant; exact-head run `31935094490` passed with **129 pytest passed, 2 skipped** and **131 unittest OK, 2 skipped**; canonical `main` push run `31935204046` passed all three permanent CI jobs.\n- release workflow run `31935428439` created and verified `v0.7.1` at the exact source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`.'
           if cycle_anchor not in text:
               raise SystemExit('progress-tracker first-cycle anchor missing')
-          text = text.replace(cycle_anchor, cycle_add, 1)
+          text = text.replace(cycle_anchor, cycle_anchor + '\n- PR #16 aligned `grox.__version__` with package metadata and added a dual-runner consistency invariant; exact-head run `31935094490` passed with **129 pytest passed, 2 skipped** and **131 unittest OK, 2 skipped**; canonical `main` push run `31935204046` passed all three permanent CI jobs.\n- release workflow run `31935428439` created and verified `v0.7.1` at the exact source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`.', 1)
           tracker.write_text(text, encoding='utf-8')
 
           log = Path('docs/history/ships-log/0037-v0.7.1-operational-hardening-release.md')
           if log.exists():
               raise SystemExit('Ship log 0037 already exists')
-          log.write_text('''# Ship\'s Log 0037 - v0.7.1 Operational Hardening Release\n\n**Date:** 2026-08-16\n**Status:** RELEASED AND VERIFIED\n\nGroX `v0.7.1` freezes the first post-Apex operational-hardening baseline.\n\n## Released source\n\n- tag: `v0.7.1`\n- exact source commit: `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`\n- package: `grox-vessel 0.7.1`\n- GorXu operating standard: **APEX QUALIFIED**\n- Standing Crew: **82**\n- retired operational Crew: **0**\n- sole operational orchestrator: **GorXu**\n\n## Operational hardening frozen in this release\n\n- persistent least-privilege CI on pull requests and `main`;\n- Python 3.11 and 3.12 regression gates;\n- non-editable wheel/bootstrap portability verification;\n- explicit fail-closed Vessel-root binding;\n- semantic rejection of orchestrator-like Crew identities;\n- retired/archive dossier rejection and stale Crew operational-state purge;\n- package/source version consistency enforced by both regression runners.\n\n## Verification evidence\n\n- PR #14 established the operational-hardening baseline and permanent CI.\n- PR #16 reconciled package/source version metadata.\n- exact-head PR #16 CI run `31935094490`: **SUCCESS**.\n- Python 3.12 regression: **129 pytest passed, 2 skipped**; **131 unittest OK, 2 skipped**.\n- canonical `main` push run `31935204046`: **SUCCESS** across Python 3.11, Python 3.12, and wheel/bootstrap portability.\n- release workflow run `31935428439`: **SUCCESS**.\n- tag `v0.7.1` resolves exactly to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`.\n\n## Authority boundary\n\nThis release does not widen authority. Commander sovereignty, GorXu sole-orchestrator authority, bounded Mission Orders, deny-wins execution, Inspect/Repair separation, verifier independence, hard cost controls, recovery controls, and source/state compatibility remain mandatory.\n\nPrivate SQLite and `.groxstate` operational state remain outside public Git. Historical Mission, Order, and Evidence references may remain as inert audit history but cannot restore retired Crew authority.\n''', encoding='utf-8')
+          log.write_text('''# Ship's Log 0037 - v0.7.1 Operational Hardening Release\n\n**Date:** 2026-08-16\n**Status:** RELEASED AND VERIFIED\n\nGroX `v0.7.1` freezes the first post-Apex operational-hardening baseline.\n\n## Released source\n\n- tag: `v0.7.1`\n- exact source commit: `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`\n- package: `grox-vessel 0.7.1`\n- GorXu operating standard: **APEX QUALIFIED**\n- Standing Crew: **82**\n- retired operational Crew: **0**\n- sole operational orchestrator: **GorXu**\n\n## Operational hardening frozen in this release\n\n- persistent least-privilege CI on pull requests and `main`;\n- Python 3.11 and 3.12 regression gates;\n- non-editable wheel/bootstrap portability verification;\n- explicit fail-closed Vessel-root binding;\n- semantic rejection of orchestrator-like Crew identities;\n- retired/archive dossier rejection and stale Crew operational-state purge;\n- package/source version consistency enforced by both regression runners.\n\n## Verification evidence\n\n- PR #14 established the operational-hardening baseline and permanent CI.\n- PR #16 reconciled package/source version metadata.\n- exact-head PR #16 CI run `31935094490`: **SUCCESS**.\n- Python 3.12 regression: **129 pytest passed, 2 skipped**; **131 unittest OK, 2 skipped**.\n- canonical `main` push run `31935204046`: **SUCCESS** across Python 3.11, Python 3.12, and wheel/bootstrap portability.\n- release workflow run `31935428439`: **SUCCESS**.\n- tag `v0.7.1` resolves exactly to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`.\n\n## Authority boundary\n\nThis release does not widen authority. Commander sovereignty, GorXu sole-orchestrator authority, bounded Mission Orders, deny-wins execution, Inspect/Repair separation, verifier independence, hard cost controls, recovery controls, and source/state compatibility remain mandatory.\n\nPrivate SQLite and `.groxstate` operational state remain outside public Git. Historical Mission, Order, and Evidence references may remain as inert audit history but cannot restore retired Crew authority.\n''', encoding='utf-8')
 
-          allowed_v070 = ('first released', 'first Apex-qualified', 'since v0.7.0', 'v0.7.0 remains')
+          allowed_v070 = ('first released', 'first Apex-qualified', 'since v0.7.0', 'v0.7.0 remains', 'remains the first')
           bad = []
           for path in current_docs:
               text = path.read_text(encoding='utf-8')
@@ -115,7 +133,7 @@ jobs:
           if bad:
               raise SystemExit('Unreconciled current-facing v0.7.0 references:\n' + '\n'.join(bad))
 
-          assert '`v0.7.1`' in Path('README.md').read_text(encoding='utf-8')
+          assert '**Latest release:** `v0.7.1`' in Path('README.md').read_text(encoding='utf-8')
           assert new_pair in Path('docs/stewardship/APEX_ORCHESTRATOR_PLAN.md').read_text(encoding='utf-8')
           assert new_pair in Path('docs/stewardship/ROADMAP.md').read_text(encoding='utf-8')
           assert new_pair in Path('docs/stewardship/progress-tracker.md').read_text(encoding='utf-8')
