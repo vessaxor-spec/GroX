@@ -50,6 +50,9 @@ jobs:
       - name: Critical invariant mutation proof
         if: matrix.python-version == '3.12'
         run: python tests/mutation/run_critical_invariants.py
+      - name: Vessel health mutation proof
+        if: matrix.python-version == '3.12'
+        run: python tests/mutation/run_health_invariants.py
 
   bootstrap-portability:
     name: Wheel bootstrap portability
