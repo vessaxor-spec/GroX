@@ -22,7 +22,7 @@ jobs:
         with:
           ref: agent/restore-standing-crew-craft-depth
       - name: Materialize pinned craft library
-        run: python3 scripts/sync-crew-specialists.py
+        run: python3 scripts/_craft-bootstrap-adapter.py
       - name: Validate bounded output
         run: |
           test "$(find configs/crew/specialists -maxdepth 1 -type f -name '*.md' | wc -l)" -eq 82
