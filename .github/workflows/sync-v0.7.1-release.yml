@@ -123,12 +123,13 @@ jobs:
               raise SystemExit('Ship log 0037 already exists')
           log.write_text('''# Ship's Log 0037 - v0.7.1 Operational Hardening Release\n\n**Date:** 2026-08-16\n**Status:** RELEASED AND VERIFIED\n\nGroX `v0.7.1` freezes the first post-Apex operational-hardening baseline.\n\n## Released source\n\n- tag: `v0.7.1`\n- exact source commit: `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`\n- package: `grox-vessel 0.7.1`\n- GorXu operating standard: **APEX QUALIFIED**\n- Standing Crew: **82**\n- retired operational Crew: **0**\n- sole operational orchestrator: **GorXu**\n\n## Operational hardening frozen in this release\n\n- persistent least-privilege CI on pull requests and `main`;\n- Python 3.11 and 3.12 regression gates;\n- non-editable wheel/bootstrap portability verification;\n- explicit fail-closed Vessel-root binding;\n- semantic rejection of orchestrator-like Crew identities;\n- retired/archive dossier rejection and stale Crew operational-state purge;\n- package/source version consistency enforced by both regression runners.\n\n## Verification evidence\n\n- PR #14 established the operational-hardening baseline and permanent CI.\n- PR #16 reconciled package/source version metadata.\n- exact-head PR #16 CI run `31935094490`: **SUCCESS**.\n- Python 3.12 regression: **129 pytest passed, 2 skipped**; **131 unittest OK, 2 skipped**.\n- canonical `main` push run `31935204046`: **SUCCESS** across Python 3.11, Python 3.12, and wheel/bootstrap portability.\n- release workflow run `31935428439`: **SUCCESS**.\n- tag `v0.7.1` resolves exactly to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`.\n\n## Authority boundary\n\nThis release does not widen authority. Commander sovereignty, GorXu sole-orchestrator authority, bounded Mission Orders, deny-wins execution, Inspect/Repair separation, verifier independence, hard cost controls, recovery controls, and source/state compatibility remain mandatory.\n\nPrivate SQLite and `.groxstate` operational state remain outside public Git. Historical Mission, Order, and Evidence references may remain as inert audit history but cannot restore retired Crew authority.\n''', encoding='utf-8')
 
-          allowed_v070 = ('first released', 'first Apex-qualified', 'since v0.7.0', 'v0.7.0 remains', 'remains the first')
+          allowed_v070 = ('first released', 'first apex-qualified', 'since v0.7.0', 'v0.7.0 remains', 'remains the first')
           bad = []
           for path in current_docs:
               text = path.read_text(encoding='utf-8')
               for lineno, line in enumerate(text.splitlines(), 1):
-                  if 'v0.7.0' in line and not any(token in line for token in allowed_v070):
+                  lower = line.lower()
+                  if 'v0.7.0' in lower and not any(token in lower for token in allowed_v070):
                       bad.append(f'{path}:{lineno}:{line}')
           if bad:
               raise SystemExit('Unreconciled current-facing v0.7.0 references:\n' + '\n'.join(bad))
