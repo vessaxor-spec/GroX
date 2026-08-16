@@ -60,6 +60,13 @@ SPECS = (
         "tests/unit/test_reconstitution.py::ReconstitutionPlannerTests::test_critical_health_failure_forces_full",
     ),
     Spec(
+        "recovery-nonpass-full",
+        "Recovery readiness must be positively PASS before FAST/TARGETED can be selected.",
+        '        if recovery is None or recovery.status != PASS:\n            full_reasons.append(\n',
+        '        if False and (recovery is None or recovery.status != PASS):\n            full_reasons.append(\n',
+        "tests/unit/test_reconstitution.py::ReconstitutionPlannerTests::test_recovery_warning_forces_full",
+    ),
+    Spec(
         "inflight-state-full",
         "Active/interrupted/unresolved Mission state must select FULL recovery.",
         '        if inflight:\n            full_reasons.append(f"{inflight} active/interrupted/unresolved Mission or graph record(s) require full recovery")\n',
@@ -88,11 +95,11 @@ SPECS = (
         "tests/unit/test_reconstitution.py::ReconstitutionPlannerTests::test_missing_mandatory_evidence_defaults_full",
     ),
     Spec(
-        "unknown-source-not-fast",
-        "UNKNOWN source repository evidence must not select FAST.",
+        "missing-source-not-fast",
+        "Missing source repository evidence must never select FAST.",
         '        if source_repo is None or source_repo.status != PASS:\n',
         '        if False and (source_repo is None or source_repo.status != PASS):\n',
-        "tests/unit/test_reconstitution.py::ReconstitutionPlannerTests::test_unknown_source_repository_selects_targeted_not_fast",
+        "tests/unit/test_reconstitution.py::ReconstitutionPlannerTests::test_missing_source_repository_selects_targeted_not_fast",
     ),
 )
 
