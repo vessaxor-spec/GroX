@@ -22,7 +22,7 @@ The initial audit harness produced two preserved red runs because the qualified 
 
 GitHub reports canonical `main` as `protected: false`, and the repository currently has no rulesets. Direct repository settings therefore do not enforce the PR/CI path even though permanent CI exists.
 
-This cannot be repaired from normal repository source or the least-privilege Actions token. Repository administration authority is required. A dedicated issue tracks the external settings action. Until protection is independently verified, CI is evidence but not an enforced merge boundary.
+This cannot be repaired from normal repository source or the least-privilege Actions token. Repository administration authority is required. Issue #18 tracks the external settings action. Until protection is independently verified, CI is evidence but not an enforced merge boundary.
 
 ### F-002 - GitHub Actions used mutable major tags
 
@@ -71,3 +71,5 @@ This audit closes only when the final candidate passes permanent CI on Python 3.
 ## Completion evidence
 
 PR #19 candidate CI run `31938365523` passed all five permanent gates: Python 3.11, 3.12, 3.13, 3.14, and Wheel bootstrap portability. Python 3.12 recorded **131 pytest passed, 2 skipped** and **133 unittest OK, 2 skipped** with pytest 9.1.1.
+
+The net candidate contains only the permanent CI workflow; both temporary Audit 001 workflow harnesses have been removed. Issue #18 is the sole externally gated repository-administration finding and remains open until `main` protection is independently verified.
