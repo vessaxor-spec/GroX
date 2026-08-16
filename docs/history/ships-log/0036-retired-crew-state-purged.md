@@ -36,6 +36,8 @@ The post-Apex operational hardening branch now enforces the same rule during rec
 - historical Mission, Order, and Evidence records remain as inert audit history;
 - GorXu remains the sole operational orchestrator.
 
+The Standing Crew Roster and Progress Tracker were reconciled to make purge-on-reconstitution the canonical stewardship rule rather than treating retired private Crew state as acceptable continuity.
+
 ## Verification
 
 GroX CI run `31933827452` on amendment head `bc1a806b4222c3d5643c846a7ee2f56dcd5ca04b` passed:
