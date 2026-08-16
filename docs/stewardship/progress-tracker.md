@@ -97,7 +97,7 @@ This operational hardening preserves Apex status because it changes bootstrap/ve
 
 ## Post-release Operational Audit 001
 
-**Status: HARDENED AND VERIFIED CANDIDATE**
+**Status: COMPLETE WITH EXTERNAL GOVERNANCE ITEM OPEN**
 
 - native GorXu Inspect Mission `MSN-ac85d2c7192c` completed with `code-reviewer` and independent verification PASS by `independent-verifier` after the qualified digest-pinned workspace fallback was commissioned;
 - two earlier audit harness runs failed closed when the commissioned fallback was absent and are preserved as red environment evidence;
@@ -107,6 +107,7 @@ This operational hardening preserves Apex status because it changes bootstrap/ve
 - weekly Dependabot monitoring covers GitHub Actions and Python dependencies without auto-merge;
 - pytest test/dev constraints now require `>=9.0.3,<10`, removing the audited `PYSEC-2026-1845` exposure from the previous 8.x constraint;
 - repository-level `main` protection remains externally gated and is tracked in issue #18; it is not represented as repaired until GitHub reports protection active.
+- exact final PR #19 CI run `31938508389` passed all five permanent gates; PR #19 merged as `53ecce335af79bfe9676f4467349fd78ebcdfb71` with zero tree drift at tree `087742f06877000fb5be9de80af64e11ddb21592`; canonical `main` CI run `31938672912` then passed all five gates.
 
 The audit preserved the existing command relationship, 82-Crew company, zero-retired-Crew operational state, Inspect/Repair boundary, routing and persistence semantics, and Apex qualification invariants.
 
