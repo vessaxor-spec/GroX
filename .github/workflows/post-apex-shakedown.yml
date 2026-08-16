@@ -1,0 +1,77 @@
+name: Post-Apex Operational Shakedown
+
+on:
+  push:
+    branches:
+      - ops/post-apex-shakedown
+
+permissions:
+  contents: read
+
+jobs:
+  shakedown:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout released Vessel source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install GroX
+        run: python -m pip install -e .
+
+      - name: Verify Commander Seat and standing company
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD
+          grox status | tee /tmp/grox-status-before.txt
+          grox roster | tee /tmp/grox-roster.txt
+          test "$(wc -l < /tmp/grox-roster.txt)" -eq 82
+
+      - name: Execute first post-Apex Inspect Mission
+        shell: bash
+        run: |
+          set -euo pipefail
+          grox mission "Conduct the first post-Apex operational shakedown of this released Vessel. Inspect repository readiness, command integrity, persistence wiring, and report only evidence available through the bounded Inspect path." \
+            --mode inspect --risk high --scope . | tee /tmp/grox-mission.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path('/tmp/grox-mission.json').read_text())
+          assert result['mode']=='inspect', result
+          assert result['risk']=='high', result
+          assert result['status']=='completed', result
+          verification=result.get('verification') or {}
+          assert verification.get('ok') is True, result
+          assert result['crew'] != verification.get('verifier'), result
+          Path('/tmp/mission-id.txt').write_text(result['mission_id'])
+          print('POST_APEX_MISSION='+result['mission_id'])
+          print('EXECUTOR_CREW='+result['crew'])
+          print('VERIFIER_CREW='+verification['verifier'])
+          print('MISSION_STATUS='+result['status'])
+          PY
+
+      - name: Verify durable Mission evidence and snapshot integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          MID="$(cat /tmp/mission-id.txt)"
+          grox show "$MID" | tee /tmp/grox-mission-record.json
+          grox status | tee /tmp/grox-status-after.txt
+          grox snapshot --label post-apex-shakedown --out /tmp/post-apex-shakedown.groxstate | tee /tmp/grox-snapshot.json
+          grox verify-snapshot /tmp/post-apex-shakedown.groxstate | tee /tmp/grox-snapshot-verify.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          record=json.loads(Path('/tmp/grox-mission-record.json').read_text())
+          verify=json.loads(Path('/tmp/grox-snapshot-verify.json').read_text())
+          assert record['status']=='completed', record
+          assert verify['valid'] is True, verify
+          assert verify['sqlite_integrity']=='ok', verify
+          print('SNAPSHOT_VALID=true')
+          print('SQLITE_INTEGRITY=ok')
+          PY
