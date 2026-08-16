@@ -26,6 +26,15 @@ REQUIRED_HEADINGS = (
     "## GroX Operational Binding",
 )
 
+SOURCE_COMMAND_RESIDUE = (
+    "Mission Control",
+    "Verification Team",
+    "Review Team",
+    "Systems Engineering Team",
+    "Research Team",
+    "Platform & Reliability Team",
+)
+
 
 def _frontmatter(text: str) -> dict[str, str]:
     if not text.startswith("---\n"):
@@ -77,6 +86,9 @@ class SpecialistCraftLibraryTest(unittest.TestCase):
                 self.assertGreaterEqual(len(text.splitlines()), 80)
                 self.assertNotIn("## TEO Allocation", text)
                 self.assertNotIn("agents-orchestrator", text.lower())
+                self.assertNotRegex(text, r"\bTEO\b")
+                for residue in SOURCE_COMMAND_RESIDUE:
+                    self.assertNotIn(residue, text)
                 self.assertIn("Pilot GorXu", text)
                 self.assertIn("Mission authority", text)
                 self.assertIn("Repair permission", text)
@@ -123,6 +135,7 @@ class SpecialistCraftLibraryTest(unittest.TestCase):
         self.assertIn("### Evaluation non-activation boundary", text)
         self.assertIn("evaluation cannot self-activate", text.lower())
         self.assertIn("Proposals return to GorXu", text)
+        self.assertNotIn("retains routing and orchestration authority", text)
 
     def test_roster_still_loads_dossiers_and_resolves_craft_additively(self):
         roster = CrewRoster(DOSSIERS)
