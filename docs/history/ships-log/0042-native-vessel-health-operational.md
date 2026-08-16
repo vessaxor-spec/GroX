@@ -37,6 +37,8 @@ Health cannot issue Orders, route or wake Crew, create/restore snapshots, mutate
 
 ## Preserved red evidence
 
+### Ineffective test-fixture challenge
+
 Initial PR #35 CI run:
 
 `31950827151`
@@ -48,7 +50,25 @@ Result:
 
 The test was repaired by targeting the exact source string and asserting that the fixture mutation actually changes the file before evaluating the detector. No health implementation was weakened to clear the run.
 
-## Green qualification evidence
+### Dirty post-regression source smoke
+
+Later PR #35 CI run:
+
+`31951286406`
+
+Result:
+
+- all non-3.12 canonical jobs passed;
+- Python 3.12 pytest **143 passed, 2 skipped, 19 subtests passed**;
+- Python 3.12 unittest **145 OK, 2 skipped**;
+- the health source smoke then correctly returned `DEGRADED` because `source_repository` observed one dirty working-tree entry after the regression suites had run;
+- all other health checks passed, including 82 Standing Crew and `recovery_readiness=PASS`.
+
+The health detector was not weakened to make the smoke green. The source smoke was instead moved before pytest/unittest so that its subject is the clean candidate source. It now explicitly requires `git status --porcelain=v1` to be empty before invoking health. If the candidate is already dirty, the smoke fails before making any health assertion.
+
+This red run is preserved because it proves GroX health reports source dirtiness truthfully rather than matching a predetermined green expectation.
+
+## Green mutation evidence before final stewardship
 
 PR #35 run:
 
@@ -66,7 +86,7 @@ Python 3.12 result:
 
 The health mutation proof covers detector isolation, interrupted operational state, runtime state without snapshot coverage, non-Repair authority widening, invalid active-memory provenance, source/version drift, and fail-closed recovery readiness.
 
-The Python 3.12 protected gate also runs the health CLI against the real source checkout, requires overall `HEALTHY`, 82 Standing Crew, `recovery_readiness=PASS`, and verifies that no operational database is created.
+The final Stage 2 candidate must additionally pass the clean pre-regression health smoke, both full regression runners, both mutation harnesses, and all five protected CI jobs on the same exact head before merge.
 
 Detailed architecture and mutation evidence are recorded in:
 
@@ -79,6 +99,4 @@ Commander sovereignty, GorXu sole-orchestrator authority, Crew membership and ro
 
 ## Program transition
 
-Stage 2 exit gate is satisfied.
-
-The next authorized workstream is **Stage 3 / issue #27: tiered fast, targeted, and full reconstitution without weakening recovery gates**.
+Stage 2 is ready to close only after final exact-head verification succeeds. The next authorized workstream after that gate is **Stage 3 / issue #27: tiered fast, targeted, and full reconstitution without weakening recovery gates**.
