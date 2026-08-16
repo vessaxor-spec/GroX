@@ -1,0 +1,77 @@
+name: Finalize post-Apex operational stewardship
+
+on:
+  push:
+    branches: [operations/post-apex-baseline-hardening]
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v5
+        with:
+          ref: operations/post-apex-baseline-hardening
+      - name: Reconcile canonical stewardship
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p=Path(path); text=p.read_text()
+              if text.count(old) != 1:
+                  raise SystemExit(f'{path}: expected one match for {old!r}, found {text.count(old)}')
+              p.write_text(text.replace(old,new,1))
+
+          replace_once('README.md', '**Release:** `v0.7.0`\n', '**Latest release:** `v0.7.0`\n**Current source package:** `0.7.1`\n')
+          replace_once('README.md', '- Commander Seat CLI and interactive bridge;\n', '- Commander Seat CLI and interactive bridge;\n- persistent least-privilege GitHub Actions CI on pull requests and `main`, including Python 3.11/3.12 regressions and wheel-bootstrap portability checks;\n')
+          replace_once(
+              'README.md',
+              '```bash\npython -m pip install -e .\ngrox status\ngrox roster\ngrox mission "Inspect the Vessel and report readiness" --mode inspect\ngrox bridge\n```\n',
+              '```bash\npython -m pip install -e .\ngrox status\ngrox roster\ngrox mission "Inspect the Vessel and report readiness" --mode inspect\ngrox bridge\n```\n\nVessel-root binding is explicit and fail-closed. GroX resolves `GROX_VESSEL_ROOT` first, then the current checkout ancestry, then the source-module ancestry used by an editable checkout. A non-editable installed CLI may operate from a valid GroX checkout or with `GROX_VESSEL_ROOT` set; outside a bound Vessel it refuses to start rather than constructing an empty company.\n'
+          )
+
+          replace_once(
+              'docs/stewardship/ROADMAP.md',
+              'GroX `v0.7.0` is the first released Apex-qualified Vessel baseline. It has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6/A7 stages.\n',
+              'GroX `v0.7.0` is the first released Apex-qualified Vessel baseline. Current source advances the package to `0.7.1` for post-Apex operational hardening while preserving the released baseline and all qualified authority boundaries. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6/A7 stages.\n'
+          )
+          replace_once(
+              'docs/stewardship/ROADMAP.md',
+              'There is no predeclared A8. The current phase is operation and evidence-driven evolution of the qualified Vessel. Real Commander Missions should produce telemetry, failures, recovery evidence, cost evidence, and operational friction that justify any next capability change.\n',
+              'There is no predeclared A8. The current phase is operation and evidence-driven evolution of the qualified Vessel. Real Commander Missions should produce telemetry, failures, recovery evidence, cost evidence, and operational friction that justify any next capability change. The first post-Apex operational cycle proved that rule in practice: a non-editable CLI launch exposed a Vessel-root portability weakness, the documented source bootstrap completed Mission `MSN-8a86f094509b` with independent verification, and the resulting bounded hardening added persistent CI plus fail-closed portable Vessel binding without widening authority.\n'
+          )
+
+          replace_once('docs/stewardship/progress-tracker.md', '**Status date:** 2026-08-15\n', '**Status date:** 2026-08-16\n')
+          replace_once('docs/stewardship/progress-tracker.md', '**Canonical source branch:** `main`\n', '**Canonical source branch:** `main`\n**Current source package:** `0.7.1`\n')
+          replace_once('docs/stewardship/progress-tracker.md', '**Current verified regression:** pytest **121 passed, 2 skipped**; unittest **123 OK, 2 skipped**\n', '**Current verified regression:** pytest **126 passed, 2 skipped**; unittest **128 OK, 2 skipped**\n')
+          replace_once(
+              'docs/stewardship/progress-tracker.md',
+              '- live medium-risk Repair Mission completed with independent verification\n',
+              '- live medium-risk Repair Mission completed with independent verification\n- first post-Apex operational Inspect Mission `MSN-8a86f094509b` completed on the canonical source with `code-reviewer`, full regression evidence, and independent verification PASS by `independent-verifier`\n- permanent least-privilege CI now exercises Python 3.11/3.12 regressions plus non-editable wheel bootstrap portability on pull requests and `main`\n- Vessel-root discovery now supports explicit `GROX_VESSEL_ROOT` binding, current-checkout discovery, editable-source fallback, and fail-closed refusal to construct an unbound 0-Crew Vessel\n'
+          )
+          marker='The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/GroX` on `main`. Private SQLite and `.groxstate` operational state remain outside public Git by design. Historical private state may contain retired Crew identities that are not part of the active source-defined company.\n'
+          addition='''\n## First post-Apex operational cycle\n\n**Status: HARDENED AND CI-VERIFIED IN CURRENT SOURCE**\n\n- initial operational run `31919127956` used a normal non-editable install and correctly returned a bounded routing failure after the old CLI root assumption resolved into site-packages with 0 Standing Crew;\n- documented editable bootstrap run `31919157280` reconstituted all 82 Standing Crew and completed Inspect Mission `MSN-8a86f094509b`;\n- `code-reviewer` inspected 198 files and executed the full regression path with return code 0;\n- `independent-verifier` independently verified the Mission PASS;\n- no source mutation occurred in either operational observation run;\n- the bounded repair candidate introduced portable, explicit, fail-closed Vessel-root binding and the first persistent canonical CI workflow;\n- CI run `31919583794` passed wheel-bootstrap portability plus Python 3.11 and 3.12 regression jobs; Python 3.12 recorded **126 pytest passed, 2 skipped** and **128 unittest OK, 2 skipped**;\n- the wheel path proved three states: current-checkout binding succeeds with 82 Crew, explicit `GROX_VESSEL_ROOT` succeeds outside the checkout, and an unbound installed runtime fails closed rather than starting an empty Vessel.\n\nThis operational hardening preserves Apex status because it changes bootstrap/verification infrastructure rather than Commander authority, GorXu orchestration authority, Crew organization, routing policy, persistence schema, or capability grants.\n'''
+          replace_once('docs/stewardship/progress-tracker.md', marker, marker + addition)
+
+          log=Path('docs/history/ships-log/0035-first-post-apex-operational-cycle.md')
+          if log.exists():
+              raise SystemExit('Ship log 0035 already exists')
+          log.write_text('''# Ship's Log Entry 0035 - First Post-Apex Operational Cycle\n\n**Date:** 2026-08-16\n**Pilot:** GorXu\n**Vessel:** GroX\n**State:** Apex-qualified; first real operational evidence converted into bounded hardening\n\n## Mission\n\nThe Commander authorized GroX to leave the synthetic qualification path and begin real post-Apex operation. The first operational objective was a bounded Inspect Mission against canonical source: determine whether the released Apex-qualified Vessel could reconstitute, execute its regression path, and return independently verified readiness evidence without source mutation.\n\n## Red operational evidence\n\nRun `31919127956` used a normal non-editable Python installation. The old CLI derived its Vessel root from the installed module location, so it came online under site-packages with **0 Standing Crew** and returned the bounded routing exception `No standing Crew covers required capabilities: ['repo_read']`. GorXu did not invent Crew or widen authority. The failure was preserved as evidence.\n\n## Green operational evidence\n\nRun `31919157280` repeated the objective through the documented editable-source bootstrap on exact canonical source. GroX reconstituted **82 Standing Crew** and completed Mission `MSN-8a86f094509b`:\n\n- mode: Inspect;\n- risk: medium;\n- executor: `code-reviewer`;\n- inventory: 198 files;\n- regression return code: 0;\n- independent verifier: `independent-verifier`;\n- verification: PASS;\n- Mission status: completed;\n- source mutation: none.\n\n## Bounded repair\n\nThe evidence justified two operational changes only:\n\n1. portable, explicit, fail-closed Vessel-root binding;\n2. persistent least-privilege CI on pull requests and `main`.\n\nCurrent source package advances to `0.7.1`. Vessel discovery now prefers explicit `GROX_VESSEL_ROOT`, then current-checkout ancestry, then editable source-module ancestry. A wheel-installed CLI may operate from a valid checkout or explicit binding; outside any bound Vessel it refuses to start rather than fabricating an empty company.\n\nCanonical CI uses GitHub-hosted Ubuntu 24.04, Python 3.11 and 3.12 regression jobs, the existing digest-pinned A5 Docker workspace fallback, and an independent non-editable wheel-bootstrap job. Workflow permissions are read-only for repository contents.\n\nCI run `31919583794` passed all three jobs. Python 3.12 recorded **126 pytest passed, 2 skipped** and **128 unittest OK, 2 skipped**. The wheel job independently proved checkout binding, explicit environment binding, and fail-closed unbound behavior.\n\n## Authority result\n\nNo Commander authority, GorXu orchestration authority, Division/Crew structure, routing policy, persistence schema, or capability grant was widened. Apex remains a regression boundary, not inherited permission for future power.\n''')
+
+          Path('.github/workflows/post-apex-stewardship-finalize.yml').unlink()
+          PY
+          git diff --check
+          changed=$(git status --short | awk '{print $2}' | sort)
+          expected=$(printf '%s\n' README.md docs/history/ships-log/0035-first-post-apex-operational-cycle.md docs/stewardship/ROADMAP.md docs/stewardship/progress-tracker.md .github/workflows/post-apex-stewardship-finalize.yml | sort)
+          test "$changed" = "$expected"
+          git config user.name 'GroX Stewardship'
+          git config user.email 'grox-stewardship@users.noreply.github.com'
+          git add -A
+          git commit -m 'Record first post-Apex operational hardening'
+          git push origin HEAD:operations/post-apex-baseline-hardening
