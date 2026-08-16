@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner/grox-banner.svg" alt="GroX persistent AI command environment banner" width="100%">
+</p>
+
 # GroX
 
 **Release:** `v0.7.0`
