@@ -63,15 +63,18 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import json
           import tomllib
           from grox.crew.roster import CrewRoster
           from grox import __version__
 
           root = Path('.').resolve()
+          dossiers = sorted((root / 'configs/crew/dossiers').glob('*.json'))
+          assert dossiers
+          assert all(json.loads(path.read_text())['status'] == 'standing' for path in dossiers)
           roster = CrewRoster(root / 'configs/crew/dossiers')
           crew = roster.all()
           assert len(crew) == 82, len(crew)
-          assert all(d.status == 'standing' for d in crew)
           forbidden = ('orchestrator', 'gorxu', 'mission control', 'pilot')
           for d in crew:
               ident = f'{d.crew_id} {d.title}'.lower()
