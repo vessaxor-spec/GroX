@@ -9,7 +9,7 @@
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **129 passed, 2 skipped**; unittest **131 OK, 2 skipped**
+**Current verified regression:** pytest **131 passed, 2 skipped**; unittest **133 OK, 2 skipped**
 
 ## Verified Vessel baseline
 
@@ -39,7 +39,7 @@ Verified by source, qualification evidence, and automated testing:
 - live Inspect Mission completed successfully
 - live medium-risk Repair Mission completed with independent verification
 - first post-Apex operational Inspect Mission `MSN-8a86f094509b` completed on the canonical source with `code-reviewer`, full regression evidence, and independent verification PASS by `independent-verifier`
-- permanent least-privilege CI now exercises Python 3.11/3.12 regressions plus non-editable wheel bootstrap portability on pull requests and `main`
+- permanent least-privilege CI now exercises Python 3.11 through 3.14 regressions plus non-editable wheel bootstrap portability on pull requests and `main`; third-party actions are pinned to immutable full commit SHAs
 - Vessel-root discovery now supports explicit `GROX_VESSEL_ROOT` binding, current-checkout discovery, editable-source fallback, and fail-closed refusal to construct an unbound 0-Crew Vessel
 - package/source version metadata is synchronized at `0.7.1` and guarded by both pytest and unittest
 - release `v0.7.1` is pinned to the fully verified post-Apex operational-hardening source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`
@@ -94,6 +94,21 @@ The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/Gr
 - release workflow run `31935428439` created and verified `v0.7.1` at the exact source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`.
 
 This operational hardening preserves Apex status because it changes bootstrap/verification infrastructure rather than Commander authority, GorXu orchestration authority, Crew organization, routing policy, persistence schema, or capability grants.
+
+## Post-release Operational Audit 001
+
+**Status: HARDENED AND VERIFIED CANDIDATE**
+
+- native GorXu Inspect Mission `MSN-ac85d2c7192c` completed with `code-reviewer` and independent verification PASS by `independent-verifier` after the qualified digest-pinned workspace fallback was commissioned;
+- two earlier audit harness runs failed closed when the commissioned fallback was absent and are preserved as red environment evidence;
+- PR #19 candidate CI run `31938365523` passed Python 3.11, 3.12, 3.13, and 3.14 plus Wheel bootstrap portability;
+- Python 3.12 recorded **131 pytest passed, 2 skipped** and **133 unittest OK, 2 skipped** using pytest 9.1.1;
+- third-party GitHub Actions are pinned to full commit SHAs and an executable contract prevents mutable action references from returning;
+- weekly Dependabot monitoring covers GitHub Actions and Python dependencies without auto-merge;
+- pytest test/dev constraints now require `>=9.0.3,<10`, removing the audited `PYSEC-2026-1845` exposure from the previous 8.x constraint;
+- repository-level `main` protection remains externally gated and is tracked in issue #18; it is not represented as repaired until GitHub reports protection active.
+
+The audit preserved the existing command relationship, 82-Crew company, zero-retired-Crew operational state, Inspect/Repair boundary, routing and persistence semantics, and Apex qualification invariants.
 
 ## Known deliberate limits
 

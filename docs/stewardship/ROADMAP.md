@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.7.1` is the current released post-Apex operational-hardening baseline. `v0.7.0` remains the first released Apex-qualified Vessel baseline. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, persistent canonical CI, portable fail-closed Vessel binding, and qualified A1/A2/A3/A4/A5/A6/A7 stages.
+GroX `v0.7.1` is the current released post-Apex operational-hardening baseline. `v0.7.0` remains the first released Apex-qualified Vessel baseline. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, persistent canonical CI with immutable action pinning and Python 3.11-3.14 regression coverage, portable fail-closed Vessel binding, and qualified A1/A2/A3/A4/A5/A6/A7 stages.
 
 The command architecture is native to the Vessel:
 
@@ -70,6 +70,9 @@ The three-plane persistence architecture is foundational infrastructure for ever
 A future host may resume GroX only after source materialization, private-state verification/restoration when needed, test/integrity gates, and Pilot reconstitution. Failure at a recovery gate leaves the Vessel paused rather than reconstructed from memory.
 
 ## Post-Apex operating posture
+
+Operational Audit 001 is the first comprehensive post-release Vessel readiness cycle. Native Mission `MSN-ac85d2c7192c` and PR #19 evidence drove bounded CI supply-chain, dependency, and compatibility hardening without creating a speculative A8 or widening authority. Repository-level `main` protection remains a separately tracked administration requirement in issue #18.
+
 
 There is no predeclared A8. The current phase is operation and evidence-driven evolution of the qualified Vessel. Real Commander Missions should produce telemetry, failures, recovery evidence, cost evidence, and operational friction that justify any next capability change. The first post-Apex operational cycle proved that rule in practice: a non-editable CLI launch exposed a Vessel-root portability weakness, the documented source bootstrap completed Mission `MSN-8a86f094509b` with independent verification, and the resulting bounded hardening added persistent CI plus fail-closed portable Vessel binding without widening authority. That hardening is now frozen in release `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`.
 

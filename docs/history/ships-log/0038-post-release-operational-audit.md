@@ -1,7 +1,7 @@
 # Ship's Log 0038 - Post-release Operational Audit
 
 **Date:** 2026-08-16
-**Status:** IN VERIFICATION
+**Status:** VERIFIED CANDIDATE
 
 GroX began its first comprehensive post-release Vessel operational audit from canonical `main@42639228526c1808c36b9b6798bd2c0964057174` after the `v0.7.1` release cycle closed.
 
@@ -29,4 +29,4 @@ Canonical `main` was observed as unprotected and repository rulesets were empty.
 
 This audit does not alter the GroX command relationship, Crew authority, Mission Orders, routing policy, persistence semantics, Tool Gateway authority, or Apex qualification boundary. GorXu remains the sole operational orchestrator and the operational company remains 82 Standing Crew with no retired Crew.
 
-This entry becomes complete only after exact-head CI, merge, zero-tree-drift verification, and post-merge canonical CI are all green.
+PR #19 candidate CI run `31938365523` passed Python 3.11 through 3.14 and Wheel bootstrap portability; Python 3.12 recorded **131 pytest passed, 2 skipped** and **133 unittest OK, 2 skipped**. Final merge, zero-tree-drift verification, and post-merge canonical CI remain the completion evidence.

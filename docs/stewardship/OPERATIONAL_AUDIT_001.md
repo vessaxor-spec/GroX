@@ -67,3 +67,7 @@ Advisory Ruff inspection reported 142 legacy style/import/modernization findings
 ## Completion criteria
 
 This audit closes only when the final candidate passes permanent CI on Python 3.11, 3.12, 3.13, and 3.14 plus wheel bootstrap portability, the temporary audit workflow is absent from the net tree, documentation is reconciled, and the final merged `main` tree is independently re-verified. Repository-level `main` protection remains an externally gated settings item until GitHub reports it active.
+
+## Completion evidence
+
+PR #19 candidate CI run `31938365523` passed all five permanent gates: Python 3.11, 3.12, 3.13, 3.14, and Wheel bootstrap portability. Python 3.12 recorded **131 pytest passed, 2 skipped** and **133 unittest OK, 2 skipped** with pytest 9.1.1.
