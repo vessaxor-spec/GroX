@@ -1,6 +1,6 @@
 # GroX Mission Graph
 
-**Qualification status:** **A2 QUALIFIED**, extended by A4 durability and A7 Apex synthesis/budget controls in GroX `v0.7.0`.
+**Qualification status:** **A2 QUALIFIED**, extended by A4 durability and A7 Apex synthesis/budget controls in GroX `v0.7.1`.
 
 A Mission Graph is Pilot GorXu's durable execution structure for work that cannot be represented safely or effectively as one Mission Order.
 

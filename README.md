@@ -4,11 +4,11 @@
 
 # GroX
 
-**Latest release:** `v0.7.0`
+**Latest release:** `v0.7.1`
 **Current source package:** `0.7.1`
 **Operating standard:** **APEX QUALIFIED**
 **Standing Crew:** **82** — 81 specialist-inspired Crew plus 1 native independent verifier
-**Canonical release source:** `71ffd60769d81b5b249dac4eca56333ff27e26d0`
+**Canonical release source:** `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`
 
 GroX is an independent, persistent AI command environment built around a clear chain of command:
 
@@ -20,7 +20,7 @@ Mission Control is a GroX-native policy and advisory service used by GorXu for g
 
 ## Current qualification state
 
-GroX `v0.7.0` is the first released Apex-qualified baseline.
+GroX `v0.7.1` is the current released post-Apex operational-hardening baseline. `v0.7.0` remains the first released Apex-qualified baseline.
 
 - **A1 Cognitive Pilot:** SESSION-QUALIFIED with project-hosted GPT-5.6 Sol cognition and deterministic safe fallback.
 - **A2 Mission Graph Orchestration:** QUALIFIED.
