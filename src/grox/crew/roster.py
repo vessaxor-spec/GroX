@@ -7,6 +7,36 @@ from ..state import StateStore
 
 FORBIDDEN_IDS={"gorxu","pilot","mission-control","mission_control","orchestrator","agents-orchestrator"}
 
+
+def _forbidden_command_identity(crew_id: str, title: str) -> bool:
+    cid = crew_id.strip().lower()
+    normalized_title = re.sub(r"[\s_]+", "-", title.strip().lower())
+    if cid in FORBIDDEN_IDS or normalized_title in FORBIDDEN_IDS:
+        return True
+    # GorXu is the sole operational orchestrator. Reject semantic variants such
+    # as retired-orchestrator, backup-orchestrator, or a hidden Orchestrator title.
+    return "orchestrator" in cid or "orchestrator" in normalized_title
+
+
+def _purge_stale_operational_crew(store: StateStore, active_ids: set[str]) -> None:
+    if not active_ids:
+        return
+    rows = store.db.execute("SELECT crew_id FROM crew_state").fetchall()
+    stale_ids = sorted({str(row["crew_id"]) for row in rows} - active_ids)
+    if not stale_ids:
+        return
+    placeholders = ",".join("?" for _ in stale_ids)
+    # Purge operational identity, memory, and adaptive telemetry. Historical
+    # Mission/Order/Evidence rows remain as audit evidence and cannot route Crew.
+    store.db.execute(f"DELETE FROM crew_state WHERE crew_id IN ({placeholders})", stale_ids)
+    store.db.execute(
+        f"DELETE FROM memories WHERE scope='crew' AND crew_id IN ({placeholders})",
+        stale_ids,
+    )
+    store.db.execute(f"DELETE FROM crew_performance WHERE crew_id IN ({placeholders})", stale_ids)
+    store.db.commit()
+
+
 @dataclass(frozen=True, slots=True)
 class CrewDossier:
     crew_id:str
@@ -16,17 +46,25 @@ class CrewDossier:
     tags:frozenset[str]
     verification:bool=False
 
+
 class CrewRoster:
     def __init__(self, dossier_dir: Path, store: StateStore | None = None):
         self.store=store; self._crew={}
         for p in sorted(dossier_dir.glob('*.json')):
             raw=json.loads(p.read_text())
             cid=raw['crew_id']
-            if cid in FORBIDDEN_IDS: raise ValueError(f"forbidden Crew id: {cid}")
-            d=CrewDossier(cid,raw['division'],raw['title'],frozenset(raw['capabilities']),frozenset(raw.get('tags',[])),bool(raw.get('verification')))
+            title=raw['title']
+            status=str(raw.get('status', 'standing')).strip().lower()
+            if status != 'standing':
+                raise ValueError(f"non-standing Crew dossier is not allowed in the active roster: {cid} ({status})")
+            if _forbidden_command_identity(cid, title):
+                raise ValueError(f"forbidden Crew command identity: {cid} / {title}")
+            d=CrewDossier(cid,raw['division'],title,frozenset(raw['capabilities']),frozenset(raw.get('tags',[])),bool(raw.get('verification')))
             self._crew[cid]=d
-            if store is not None:
+        if store is not None:
+            for cid in sorted(self._crew):
                 store.ensure_crew(cid)
+            _purge_stale_operational_crew(store, set(self._crew))
 
     def get(self, crew_id:str)->CrewDossier:
         return self._crew[crew_id]
