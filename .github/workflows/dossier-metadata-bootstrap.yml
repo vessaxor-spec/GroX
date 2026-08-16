@@ -31,13 +31,16 @@ jobs:
 
           stop = {
               'a', 'an', 'and', 'or', 'the', 'of', 'for', 'to', 'in', 'on', 'by',
-              'with', 'from', 'into', 'across', 'via', 'using', 'use'
+              'with', 'from', 'into', 'across', 'via', 'using', 'use', 'any'
           }
           keep_short = {'ai', 'ml', 'ux', 'ui', 'ip', 'qa', 'xr', 'zk'}
           protected_keys = (
               'crew_id', 'division', 'title', 'capabilities', 'verification',
               'risk_posture', 'standing_orders', 'status'
           )
+
+          def clean_value(value: str) -> str:
+              return value.strip().strip('"').strip("'").strip()
 
           def unique(items):
               seen = set()
@@ -62,26 +65,31 @@ jobs:
               domains = []
               active = False
               for line in fm:
+                  inline = re.match(r'^domains:\s*\[(.*)\]\s*$', line)
+                  if inline:
+                      domains.extend(clean_value(item) for item in inline.group(1).split(','))
+                      active = False
+                      continue
                   if re.match(r'^domains:\s*$', line):
                       active = True
                       continue
                   if active:
                       match = re.match(r'^\s+-\s+(.+?)\s*$', line)
                       if match:
-                          value = match.group(1).strip().strip('"').strip("'")
-                          domains.append(value)
+                          domains.append(clean_value(match.group(1)))
                           continue
                       if line and not line.startswith((' ', '\t')):
                           break
+              domains = unique(domains)
               if not domains:
                   raise AssertionError(f'no domains in canonical card: {path}')
-              return unique(domains)
+              return domains
 
           def routing_terms(domains: list[str]) -> list[str]:
               terms = []
               for domain in domains:
                   slug = re.sub(r'[^a-z0-9]+', '-', domain.lower()).strip('-')
-                  if slug:
+                  if slug and slug not in stop:
                       terms.append(slug)
                   for token in re.findall(r'[a-z0-9]+', domain.lower()):
                       if token in stop:
@@ -101,7 +109,8 @@ jobs:
           assert {p.stem for p in dossier_paths} == {p.stem for p in card_paths}
 
           for path in dossier_paths:
-              original = json.loads(path.read_text(encoding='utf-8'))
+              original_text = path.read_text(encoding='utf-8')
+              original = json.loads(original_text)
               protected = {key: original.get(key) for key in protected_keys}
               existing_tags = list(original.get('tags', []))
               existing_skills = list(original.get('skills', []))
@@ -138,7 +147,7 @@ jobs:
               stats.append((path.stem, len(existing_tags), len(tags), len(existing_skills), len(skills), len(domains)))
 
               rendered = json.dumps(reordered, indent=2, ensure_ascii=False) + '\n'
-              if rendered != path.read_text(encoding='utf-8'):
+              if rendered != original_text:
                   path.write_text(rendered, encoding='utf-8')
                   changed += 1
 
