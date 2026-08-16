@@ -1,6 +1,6 @@
 # Post-Apex Operational Evolution Program 001
 
-**Status:** APPROVED FOR EXECUTION PLANNING
+**Status:** IN EXECUTION — STAGE 0 COMPLETE; STAGE 1 NEXT
 
 **Planning baseline:** `main@c93015278daf022b1c3d85fc8fb90a6fa52d8160`
 
@@ -48,15 +48,25 @@ The approved ClaudX review produced the following GroX decisions:
 
 The work is deliberately staged so later capabilities depend on trustworthy evidence rather than being built simultaneously.
 
-### Stage 0 - External capability intake convention
+### Stage 0 - External capability intake convention — COMPLETE
 
 **Issue:** #29
 
-Formalize the adopt/adapt/harvest/reject decision posture as a lightweight GroX review convention. This is process clarification only. It must not create a new command layer, mandatory agent, external dependency, or duplicate decision store.
+The lightweight GroX review convention is now defined in `docs/stewardship/EXTERNAL_CAPABILITY_INTAKE.md`.
 
-**Exit condition:** one canonical convention/template exists and the ClaudX review can be represented through it without architectural duplication.
+It establishes:
 
-### Stage 1 - Prove the detectors
+- per-candidate `ADOPT | ADAPT | HARVEST | REJECT` classification before material implementation from external sources;
+- explicit checks for existing coverage, novelty provenance, duplication, authority/privacy/portability risk, and evidence thresholds;
+- separation of external source facts, external evidence, GroX inference, and GroX-native evidence;
+- a compact review record that lives in existing Mission, issue, research, architecture, or stewardship records rather than a new decisions ledger;
+- explicit preservation of the normal Commander -> GorXu -> Mission/Order -> verification -> protected source path after any intake decision.
+
+The convention is exercised against the pinned ClaudX review, including different decisions for independent seams from the same repository and explicit rejection of circular GroX-derived material.
+
+**Exit condition:** PASSED. One canonical convention/template exists and the ClaudX review is represented through it without architectural duplication.
+
+### Stage 1 - Prove the detectors — NEXT
 
 **Issue:** #25
 
