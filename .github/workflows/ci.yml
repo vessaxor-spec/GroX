@@ -22,16 +22,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11', '3.12']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install test runtime
-        run: python -m pip install -e '.[test]'
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pip check
       - name: Commission qualified workspace fallback
         run: |
           image='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
@@ -52,9 +54,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.12'
       - name: Build non-editable wheel
@@ -62,6 +64,7 @@ jobs:
           python -m pip wheel --no-deps --wheel-dir /tmp/grox-wheel .
           python -m venv /tmp/grox-wheel-env
           /tmp/grox-wheel-env/bin/python -m pip install /tmp/grox-wheel/grox_vessel-*.whl
+          /tmp/grox-wheel-env/bin/python -m pip check
       - name: Installed CLI binds to current Vessel checkout
         run: |
           /tmp/grox-wheel-env/bin/python -m grox.cli status | tee /tmp/grox-wheel-status.txt
