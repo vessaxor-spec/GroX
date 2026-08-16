@@ -70,6 +70,14 @@ This audit closes only when the final candidate passes permanent CI on Python 3.
 
 ## Completion evidence
 
+**Status: COMPLETE WITH EXTERNAL GOVERNANCE ITEM OPEN**
+
+- exact final PR #19 CI run `31938508389`: **SUCCESS** across Python 3.11, 3.12, 3.13, 3.14, and Wheel bootstrap portability;
+- PR #19 squash merge: `53ecce335af79bfe9676f4467349fd78ebcdfb71`;
+- the tested PR merge candidate and canonical squash merge share tree `087742f06877000fb5be9de80af64e11ddb21592`, proving zero tree drift;
+- canonical `main` CI run `31938672912`: **SUCCESS** across all five permanent gates;
+- issue #18 remains the sole externally gated repository-administration item because `main` protection requires GitHub repository administration authority.
+
 PR #19 candidate CI run `31938365523` passed all five permanent gates: Python 3.11, 3.12, 3.13, 3.14, and Wheel bootstrap portability. Python 3.12 recorded **131 pytest passed, 2 skipped** and **133 unittest OK, 2 skipped** with pytest 9.1.1.
 
 The net candidate contains only the permanent CI workflow; both temporary Audit 001 workflow harnesses have been removed. Issue #18 is the sole externally gated repository-administration finding and remains open until `main` protection is independently verified.
