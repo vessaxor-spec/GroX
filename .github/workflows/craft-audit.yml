@@ -1,0 +1,41 @@
+name: Temporary Crew Craft Audit
+
+on:
+  push:
+    branches:
+      - agent/restore-standing-crew-craft-depth
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Repair branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Scan source-era command semantics
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          patterns = {
+              'external_control_name': re.compile(r'\bTEO\b'),
+              'mission_control': re.compile(r'\bMission Control\b', re.I),
+              'team_reference': re.compile(r'\b(?:Verification|Review|Engineering|Research|Security|Data|Platform & Reliability|Mission Control) Team\b', re.I),
+              'allocation': re.compile(r'\b(?:primary team|supporting teams|worker binding|canonical allocation)\b', re.I),
+              'forbidden_identity': re.compile(r'agents-orchestrator', re.I),
+          }
+          cards = sorted(Path('configs/crew/specialists').glob('*.md'))
+          print(f'cards={len(cards)}')
+          for path in cards:
+              for n, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+                  hits = [name for name, pattern in patterns.items() if pattern.search(line)]
+                  if hits:
+                      print(f'{path}:{n}:{",".join(hits)}:{line}')
+          PY
+      - name: Run craft contracts
+        run: |
+          python -m pip install -e '.[test]'
+          pytest -q tests/contracts/test_specialist_craft_library.py
