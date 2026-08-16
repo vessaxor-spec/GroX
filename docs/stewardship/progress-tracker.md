@@ -8,7 +8,7 @@
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **126 passed, 2 skipped**; unittest **128 OK, 2 skipped**
+**Current verified regression:** pytest **128 passed, 2 skipped**; unittest **130 OK, 2 skipped**
 
 ## Verified Vessel baseline
 
@@ -23,6 +23,7 @@ Verified by source, qualification evidence, and automated testing:
 - 81 specialist-inspired Standing Crew recruited as native GroX identities
 - 1 native independent verifier retained, for 82 total standing dossiers
 - former bootstrap `systems-architect` overlap replaced by the canonical `architect` Crew
+- retired, archived, removed, or otherwise stale Crew operational state is purged during roster reconstitution
 - orchestration-role recruitment blocked; orchestration remains Pilot authority
 - fresh Crew tours with persistent tour/episodic state
 - SQLite Mission, Order, Evidence, and Crew state persistence
@@ -49,6 +50,15 @@ Verified by source, qualification evidence, and automated testing:
 - Duplicate Crew IDs: **0**
 - Recruited command/orchestrator roles: **0**
 
+### Crew-state hygiene
+
+- operational Crew membership is defined only by the current source roster;
+- retired and archived dossiers fail closed rather than becoming sleeping Crew;
+- stale Crew state, Crew-scoped memory, and adaptive performance data are purged at roster reconstitution;
+- historical Mission, Order, and Evidence rows remain inert audit history;
+- semantic `orchestrator` identities are rejected by Crew ID and title;
+- CI run `31933827452` verified the hardening with **128 pytest passed, 2 skipped** and **130 unittest OK, 2 skipped**.
+
 ### Division attendance
 
 - Strategy: 17
@@ -63,7 +73,7 @@ Verified by source, qualification evidence, and automated testing:
 
 ## Evidence boundary
 
-The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/GroX` on `main`. Private SQLite and `.groxstate` operational state remain outside public Git by design. Historical private state may contain retired Crew identities that are not part of the active source-defined company.
+The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/GroX` on `main`. Private SQLite and `.groxstate` operational state remain outside public Git by design. Operational reconstitution purges stale Crew identities that are not part of the active source-defined company; retired or archived Crew are not retained as operational state.
 
 ## First post-Apex operational cycle
 
@@ -199,7 +209,7 @@ Recovery evidence:
 
 - live `main` matched the A2 handoff commit before recovery work;
 - the private `GROX-A2-qualified.groxstate` checkpoint passed archive-path, schema, SHA-256, and SQLite integrity verification and was restored through GroX's controlled persistence path;
-- active source-defined company remains 82 Standing Crew; a retired historical `systems-architect` row in private state does not re-enter the active company;
+- active source-defined company remains 82 Standing Crew; the formerly retired `systems-architect` operational row has been purged and current reconstitution removes any stale Crew state not present in the source roster;
 - two source-integrity defects were found before A3: corrupted bytes in the A2 Mission Graph regression test and one mis-indented runtime statement in bounded replanning;
 - both defects were repaired on an isolated recovery branch without changing Mission Graph authority semantics;
 - the lost `test_graph_repair_requires_explicit_mutation_authority` invariant was recovered from A2 qualification evidence;
