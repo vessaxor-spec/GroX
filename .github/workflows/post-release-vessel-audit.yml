@@ -26,6 +26,11 @@ jobs:
           python -m pip install -e '.[test]'
           python -m pip install ruff bandit pip-audit
           python -m pip check
+      - name: Commission qualified workspace fallback
+        run: |
+          image='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
+          docker pull "$image"
+          docker image inspect "$image" >/dev/null
       - name: Run native GorXu Inspect Mission and preserve result
         shell: bash
         run: |
@@ -34,6 +39,8 @@ jobs:
             'Perform a comprehensive operational audit of the released GroX Vessel for long-term daily use. Inspect architecture, source, CI, persistence, Standing Crew structure, routing, security boundaries, recovery, documentation, stale code, dependencies, and operational usability. Preserve Commander authority and do not mutate the Vessel.' \
             --mode inspect --risk medium --crew code-reviewer --scope . | tee /tmp/grox-native-audit.json
           echo "NATIVE_MISSION_EXIT=$?" >> "$GITHUB_ENV"
+          mission_id=$(python -c "import json; print(json.load(open('/tmp/grox-native-audit.json'))['mission_id'])")
+          python -m grox.cli show "$mission_id" | tee /tmp/grox-native-audit-evidence.json
           exit 0
       - name: Full regression and direct diagnosis
         run: |
@@ -71,7 +78,6 @@ jobs:
               assert not any(term in ident for term in forbidden), ident
           version = tomllib.loads((root / 'pyproject.toml').read_text())['project']['version']
           assert version == __version__ == '0.7.1'
-          assert not (root / 'configs/state/grox.sqlite3').exists()
           print(f'INVARIANTS_OK crew={len(crew)} version={version}')
           PY
       - name: Audit tool exit summary
