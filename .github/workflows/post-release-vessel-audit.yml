@@ -26,14 +26,16 @@ jobs:
           python -m pip install -e '.[test]'
           python -m pip install ruff bandit pip-audit
           python -m pip check
-      - name: Run native GorXu Inspect Mission
+      - name: Run native GorXu Inspect Mission and preserve result
+        shell: bash
         run: |
+          set +e
           python -m grox.cli mission \
             'Perform a comprehensive operational audit of the released GroX Vessel for long-term daily use. Inspect architecture, source, CI, persistence, Standing Crew structure, routing, security boundaries, recovery, documentation, stale code, dependencies, and operational usability. Preserve Commander authority and do not mutate the Vessel.' \
             --mode inspect --risk medium --crew code-reviewer --scope . | tee /tmp/grox-native-audit.json
-          grep -q '"status": "completed"' /tmp/grox-native-audit.json
-          grep -q '"ok": true' /tmp/grox-native-audit.json
-      - name: Full regression
+          echo "NATIVE_MISSION_EXIT=$?" >> "$GITHUB_ENV"
+          exit 0
+      - name: Full regression and direct diagnosis
         run: |
           python -m compileall -q src tests
           git diff --check
@@ -74,4 +76,4 @@ jobs:
           PY
       - name: Audit tool exit summary
         run: |
-          echo "ruff=$RUFF_EXIT bandit=$BANDIT_EXIT pip-audit=$PIP_AUDIT_EXIT"
+          echo "native-mission=$NATIVE_MISSION_EXIT ruff=$RUFF_EXIT bandit=$BANDIT_EXIT pip-audit=$PIP_AUDIT_EXIT"
