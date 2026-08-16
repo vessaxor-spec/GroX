@@ -139,8 +139,8 @@ SPECS: tuple[MutationSpec, ...] = (
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
-        old="uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
-        new="uses: actions/checkout@v7",
+        old="        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n      - name: Set up Python\n        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0\n        with:\n          python-version: ${{ matrix.python-version }}\n",
+        new="        uses: actions/checkout@v7 # deliberate mutation\n      - name: Set up Python\n        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0\n        with:\n          python-version: ${{ matrix.python-version }}\n",
         nodeid="tests/contracts/test_ci_supply_chain.py::CISupplyChainTest::test_external_actions_are_pinned_to_full_commit_sha",
     ),
 )
