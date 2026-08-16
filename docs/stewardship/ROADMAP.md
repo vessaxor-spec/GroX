@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.7.0` is the first released Apex-qualified Vessel baseline. It has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6/A7 stages.
+GroX `v0.7.0` is the first released Apex-qualified Vessel baseline. Current source advances the package to `0.7.1` for post-Apex operational hardening while preserving the released baseline and all qualified authority boundaries. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6/A7 stages.
 
 The command architecture is native to the Vessel:
 
@@ -71,6 +71,6 @@ A future host may resume GroX only after source materialization, private-state v
 
 ## Post-Apex operating posture
 
-There is no predeclared A8. The current phase is operation and evidence-driven evolution of the qualified Vessel. Real Commander Missions should produce telemetry, failures, recovery evidence, cost evidence, and operational friction that justify any next capability change.
+There is no predeclared A8. The current phase is operation and evidence-driven evolution of the qualified Vessel. Real Commander Missions should produce telemetry, failures, recovery evidence, cost evidence, and operational friction that justify any next capability change. The first post-Apex operational cycle proved that rule in practice: a non-editable CLI launch exposed a Vessel-root portability weakness, the documented source bootstrap completed Mission `MSN-8a86f094509b` with independent verification, and the resulting bounded hardening added persistent CI plus fail-closed portable Vessel binding without widening authority.
 
 Known deliberate limits remain candidates for future work, not automatic roadmap commitments: autonomous memory consolidation, more general external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP support, and optional external-agent interoperability. Any promoted change must remain subordinate to the existing command architecture and re-prove affected Apex invariants before release.

@@ -4,8 +4,9 @@ from pathlib import Path
 from .pilot import PilotGorXu
 from .contracts import MissionMode, RiskClass
 from .persistence import PersistenceManager
+from .vessel import resolve_vessel_root
 
-ROOT=Path(__file__).resolve().parents[2]
+ROOT=resolve_vessel_root(module_file=__file__)
 
 def pilot(): return PilotGorXu(ROOT)
 
