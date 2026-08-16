@@ -47,6 +47,9 @@ jobs:
         run: python -m pytest -q
       - name: Unittest regression
         run: python -m unittest discover -s tests -v
+      - name: Critical invariant mutation proof
+        if: matrix.python-version == '3.12'
+        run: python tests/mutation/run_critical_invariants.py
 
   bootstrap-portability:
     name: Wheel bootstrap portability
