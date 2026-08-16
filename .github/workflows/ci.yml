@@ -1,0 +1,84 @@
+name: GroX CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grox-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    name: Regression / Python ${{ matrix.python-version }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install test runtime
+        run: python -m pip install -e '.[test]'
+      - name: Commission qualified workspace fallback
+        run: |
+          image='alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc'
+          docker pull "$image"
+          docker image inspect "$image" >/dev/null
+      - name: Compile and diff hygiene
+        run: |
+          python -m compileall -q src tests
+          git diff --check
+      - name: Pytest regression
+        run: python -m pytest -q
+      - name: Unittest regression
+        run: python -m unittest discover -s tests -v
+
+  bootstrap-portability:
+    name: Wheel bootstrap portability
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Build non-editable wheel
+        run: |
+          python -m pip wheel --no-deps --wheel-dir /tmp/grox-wheel .
+          python -m venv /tmp/grox-wheel-env
+          /tmp/grox-wheel-env/bin/python -m pip install /tmp/grox-wheel/grox_vessel-*.whl
+      - name: Installed CLI binds to current Vessel checkout
+        run: |
+          /tmp/grox-wheel-env/bin/python -m grox.cli status | tee /tmp/grox-wheel-status.txt
+          grep -q 'Standing Crew: 82' /tmp/grox-wheel-status.txt
+          grep -q "Vessel root: $GITHUB_WORKSPACE" /tmp/grox-wheel-status.txt
+      - name: Unbound installed CLI fails closed
+        run: |
+          set +e
+          output=$(cd /tmp && /tmp/grox-wheel-env/bin/python -m grox.cli status 2>&1)
+          rc=$?
+          set -e
+          printf '%s\n' "$output"
+          test "$rc" -ne 0
+          grep -q 'No GroX Vessel root found' <<<"$output"
+          grep -q 'Refusing to start an empty Vessel' <<<"$output"
+      - name: Explicit Vessel binding works outside checkout
+        run: |
+          (cd /tmp && GROX_VESSEL_ROOT="$GITHUB_WORKSPACE" /tmp/grox-wheel-env/bin/python -m grox.cli status) | tee /tmp/grox-bound-status.txt
+          grep -q 'Standing Crew: 82' /tmp/grox-bound-status.txt
+          grep -q "Vessel root: $GITHUB_WORKSPACE" /tmp/grox-bound-status.txt
