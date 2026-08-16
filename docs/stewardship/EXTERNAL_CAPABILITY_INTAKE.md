@@ -129,13 +129,14 @@ The ClaudX review demonstrates that intake decisions are made per candidate seam
 | Health/governance detector mutation proving | HARVEST | Retain the test discipline only; apply it to GroX critical invariants under #25. |
 | Tiered fast/targeted/full reconstitution | ADAPT | Useful efficiency pattern, but GroX's stronger recovery gates remain authoritative; implement under #27. |
 | Long-horizon operational drift detection | ADAPT | Build on GroX A6 trajectories and non-self-activation rather than ClaudX's score implementation; track under #28. |
-| Hot/warm/cold context management | HARVEST | Test the principle with GroX-native evidence under #30; ClaudX's synthetic savings figure is not accepted as proof. |
-| Mission-to-source provenance | HARVEST / RESEARCH | Retain the traceability question only; threat-model GroX privacy and squash-merge behavior under #31 before implementation. |
-| GroX-derived command spine, Crew model, memory planes, durable operations, Mission Graph, A6 trajectory concepts | REJECT AS EXTERNAL NOVELTY | These originated from or are already native to GroX; re-import would be circular duplication. |
+| Hot/warm/cold context management | HARVEST | Test the principle with GroX-native evidence under #30; the external synthetic savings result is not accepted as proof. |
+| Mission-to-source provenance | HARVEST | Retain the traceability question only; next action is research under #31 before any implementation decision. |
+| GroX-derived command spine, Crew model, memory planes, durable operations, Mission Graph, A6 trajectory concepts | REJECT | These originated from or are already native to GroX; re-import would be circular duplication. |
 | Separate decisions ledger | REJECT | GroX already has canonical Mission/evidence/stewardship records; another ledger would duplicate truth. |
 | Host-specific `launchd` heartbeat implementation | REJECT | Host-specific architecture conflicts with Vessel portability. The abstract unattended-health idea may inform #26 without importing the implementation. |
 | Sleeping retired Crew identities | REJECT | Conflicts with GroX's canonical purge rule. |
-| Remove `orchestration-evaluation-analyst` because ClaudX removed a similar role | REJECT AS BASIS | GroX role decisions must use actual GroX authority and capability evidence. |
+| ClaudX synthetic 57.4% token-savings claim as GroX proof | REJECT | External synthetic measurement is not GroX qualification evidence; #30 must establish GroX evidence independently. |
+| Remove `orchestration-evaluation-analyst` because ClaudX removed a similar role | REJECT | GroX role decisions must use actual GroX authority and capability evidence. |
 
 ## Completion criterion
 
