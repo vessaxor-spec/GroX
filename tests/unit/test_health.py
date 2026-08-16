@@ -6,13 +6,12 @@ import io
 import json
 from pathlib import Path
 import shutil
-import sqlite3
 import tempfile
 import unittest
 from unittest.mock import patch
 
 from grox import cli
-from grox.health import FAIL, PASS, UNKNOWN, WARN, HealthCheck, VesselHealth
+from grox.health import FAIL, PASS, UNKNOWN, HealthCheck, VesselHealth
 from grox.state import StateStore, now
 
 
@@ -138,7 +137,9 @@ class VesselHealthTests(unittest.TestCase):
         td, root = health_vessel()
         try:
             text = (root / "pyproject.toml").read_text(encoding="utf-8")
-            (root / "pyproject.toml").write_text(text.replace('version="0.7.1"', 'version="9.9.9"'), encoding="utf-8")
+            mutated = text.replace('version = "0.7.1"', 'version = "9.9.9"')
+            self.assertNotEqual(mutated, text, "fixture mutation must actually change package metadata")
+            (root / "pyproject.toml").write_text(mutated, encoding="utf-8")
             result = VesselHealth(root)._check_source_version()
             self.assertEqual(result.status, FAIL)
             self.assertIn("version disagreement", result.detail)
