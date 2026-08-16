@@ -1,6 +1,6 @@
 # GroX Principles
 
-**Qualified baseline:** these principles remain authoritative in GroX `v0.7.0`. Apex qualification changes no principle and grants no additional authority.
+**Qualified baseline:** these principles remain authoritative in GroX `v0.7.1`. Apex qualification changes no principle and grants no additional authority.
 
 ## 1. The Commander holds final sovereignty
 

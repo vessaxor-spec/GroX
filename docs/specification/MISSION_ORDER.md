@@ -1,6 +1,6 @@
 # GroX Mission Order
 
-**Current contract status:** qualified and regression-protected in GroX `v0.7.0`. Issued authority is immutable; post-issuance scope, grant, verifier, stop-condition, or nested parameter widening requires a newly issued Order through GorXu.
+**Current contract status:** qualified and regression-protected in GroX `v0.7.1`. Issued authority is immutable; post-issuance scope, grant, verifier, stop-condition, or nested parameter widening requires a newly issued Order through GorXu.
 
 A Mission Order is the bounded operational contract through which Pilot GorXu assigns work to Crew.
 

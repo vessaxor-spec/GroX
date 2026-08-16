@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.7.0` is the first released Apex-qualified Vessel baseline. Current source advances the package to `0.7.1` for post-Apex operational hardening while preserving the released baseline and all qualified authority boundaries. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, and qualified A1/A2/A3/A4/A5/A6/A7 stages.
+GroX `v0.7.1` is the current released post-Apex operational-hardening baseline. `v0.7.0` remains the first released Apex-qualified Vessel baseline. The Vessel has a full 82-Crew standing company, project/session-bound GorXu cognition, private operational-state recovery, durable source synchronization to GitHub, persistent canonical CI, portable fail-closed Vessel binding, and qualified A1/A2/A3/A4/A5/A6/A7 stages.
 
 The command architecture is native to the Vessel:
 
@@ -34,7 +34,7 @@ The command architecture is native to the Vessel:
 
 **Status: COMPLETE - APEX QUALIFIED.** `APEX_ORCHESTRATOR_PLAN.md` now serves as the regression boundary for future evolution.
 
-Final A7 implementation evidence at `0724862dcb2634022ad33e6be14be29df6a914dd` is backed by run `31882071412` (16/16 A7; 121 pytest passed with 2 existing browser skips; 123 unittest OK with 2 skips), independent run `31882101734` (`A7_APEX_INDEPENDENT_FINDINGS=`), and synthesis-integrity run `31882083653` (`A7_APEX_SYNTHESIS_FINDINGS=`). Stewardship-final exact-head run `31882589081` re-proved the 16/16 gauntlet, both complete regression runners, both historically pinned independent canaries, version/status assertions, and diff hygiene on the final A7 candidate. PR #11 merged as `419cc73950f573c3e201106f7949c6bf7829f2af` with zero tree drift from the qualified head. Post-Apex documentation stabilization then passed run `31909761968`, and release `v0.7.0` is pinned to `71ffd60769d81b5b249dac4eca56333ff27e26d0` while canonical source continues on `main`.
+Final A7 implementation evidence at `0724862dcb2634022ad33e6be14be29df6a914dd` is backed by run `31882071412` (16/16 A7; 121 pytest passed with 2 existing browser skips; 123 unittest OK with 2 skips), independent run `31882101734` (`A7_APEX_INDEPENDENT_FINDINGS=`), and synthesis-integrity run `31882083653` (`A7_APEX_SYNTHESIS_FINDINGS=`). Stewardship-final exact-head run `31882589081` re-proved the 16/16 gauntlet, both complete regression runners, both historically pinned independent canaries, version/status assertions, and diff hygiene on the final A7 candidate. PR #11 merged as `419cc73950f573c3e201106f7949c6bf7829f2af` with zero tree drift from the qualified head. Post-Apex documentation stabilization then passed run `31909761968`; the first Apex-qualified release `v0.7.0` remains pinned to `71ffd60769d81b5b249dac4eca56333ff27e26d0`. Post-Apex operational hardening and version reconciliation are released as `v0.7.1`, pinned to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`, while canonical source continues on `main`.
 
 ## Qualified Apex stages
 
@@ -71,6 +71,6 @@ A future host may resume GroX only after source materialization, private-state v
 
 ## Post-Apex operating posture
 
-There is no predeclared A8. The current phase is operation and evidence-driven evolution of the qualified Vessel. Real Commander Missions should produce telemetry, failures, recovery evidence, cost evidence, and operational friction that justify any next capability change. The first post-Apex operational cycle proved that rule in practice: a non-editable CLI launch exposed a Vessel-root portability weakness, the documented source bootstrap completed Mission `MSN-8a86f094509b` with independent verification, and the resulting bounded hardening added persistent CI plus fail-closed portable Vessel binding without widening authority.
+There is no predeclared A8. The current phase is operation and evidence-driven evolution of the qualified Vessel. Real Commander Missions should produce telemetry, failures, recovery evidence, cost evidence, and operational friction that justify any next capability change. The first post-Apex operational cycle proved that rule in practice: a non-editable CLI launch exposed a Vessel-root portability weakness, the documented source bootstrap completed Mission `MSN-8a86f094509b` with independent verification, and the resulting bounded hardening added persistent CI plus fail-closed portable Vessel binding without widening authority. That hardening is now frozen in release `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`.
 
 Known deliberate limits remain candidates for future work, not automatic roadmap commitments: autonomous memory consolidation, more general external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP support, and optional external-agent interoperability. Any promoted change must remain subordinate to the existing command architecture and re-prove affected Apex invariants before release.

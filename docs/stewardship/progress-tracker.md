@@ -1,14 +1,15 @@
 # GroX Progress Tracker
 
 **Status date:** 2026-08-16
-**Canonical release:** `v0.7.0`
+**Canonical release:** `v0.7.1`
 **Canonical source branch:** `main`
 **Current source package:** `0.7.1`
-**Released qualified source:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
+**Current released source:** `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`
+**First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **128 passed, 2 skipped**; unittest **130 OK, 2 skipped**
+**Current verified regression:** pytest **129 passed, 2 skipped**; unittest **131 OK, 2 skipped**
 
 ## Verified Vessel baseline
 
@@ -40,6 +41,8 @@ Verified by source, qualification evidence, and automated testing:
 - first post-Apex operational Inspect Mission `MSN-8a86f094509b` completed on the canonical source with `code-reviewer`, full regression evidence, and independent verification PASS by `independent-verifier`
 - permanent least-privilege CI now exercises Python 3.11/3.12 regressions plus non-editable wheel bootstrap portability on pull requests and `main`
 - Vessel-root discovery now supports explicit `GROX_VESSEL_ROOT` binding, current-checkout discovery, editable-source fallback, and fail-closed refusal to construct an unbound 0-Crew Vessel
+- package/source version metadata is synchronized at `0.7.1` and guarded by both pytest and unittest
+- release `v0.7.1` is pinned to the fully verified post-Apex operational-hardening source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`
 
 ## Company state
 
@@ -87,6 +90,8 @@ The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/Gr
 - the bounded repair candidate introduced portable, explicit, fail-closed Vessel-root binding and the first persistent canonical CI workflow;
 - CI run `31919583794` passed wheel-bootstrap portability plus Python 3.11 and 3.12 regression jobs; Python 3.12 recorded **126 pytest passed, 2 skipped** and **128 unittest OK, 2 skipped**;
 - the wheel path proved three states: current-checkout binding succeeds with 82 Crew, explicit `GROX_VESSEL_ROOT` succeeds outside the checkout, and an unbound installed runtime fails closed rather than starting an empty Vessel.
+- PR #16 aligned `grox.__version__` with package metadata and added a dual-runner consistency invariant; exact-head run `31935094490` passed with **129 pytest passed, 2 skipped** and **131 unittest OK, 2 skipped**; canonical `main` push run `31935204046` passed all three permanent CI jobs.
+- release workflow run `31935428439` created and verified `v0.7.1` at the exact source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`.
 
 This operational hardening preserves Apex status because it changes bootstrap/verification infrastructure rather than Commander authority, GorXu orchestration authority, Crew organization, routing policy, persistence schema, or capability grants.
 
@@ -412,7 +417,7 @@ A7 adds crash-persistent hard cost ceilings and source-normalized, independently
 
 - PR #12 reconciled post-Apex stewardship wording without runtime changes;
 - stabilization run `31909761968` passed documentation scope/diff checks plus **121 pytest passed, 2 skipped** and **123 unittest OK, 2 skipped**;
-- release `v0.7.0` is pinned to `71ffd60769d81b5b249dac4eca56333ff27e26d0` and canonical source continues on `main`;
+- current release `v0.7.1` is pinned to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` and canonical source continues on `main`;
 - the released company remains **82 Standing Crew**;
 - A1 through A7 remain qualified;
 - future evolution must re-prove affected Apex invariants rather than silently inheriting qualification;

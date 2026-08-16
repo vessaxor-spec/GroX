@@ -1,6 +1,6 @@
 # Cognitive Pilot Contract
 
-**Qualification status:** **A1 SESSION-QUALIFIED** in GroX `v0.7.0`. Project-hosted cognition may occupy the Pilot reasoning seat; deterministic authority remains authoritative and safe fallback remains mandatory.
+**Qualification status:** **A1 SESSION-QUALIFIED** in GroX `v0.7.1`. Project-hosted cognition may occupy the Pilot reasoning seat; deterministic authority remains authoritative and safe fallback remains mandatory.
 
 ## Purpose
 

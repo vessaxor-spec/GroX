@@ -1,7 +1,7 @@
 # GorXu Apex Orchestrator Evolution Plan
 
 **Status:** QUALIFIED
-**Assessment date:** 2026-08-15
+**Assessment date:** 2026-08-16
 **Current verdict:** APEX QUALIFIED
 **Priority:** Preserve Apex qualification through bounded evolution and regression evidence
 **A1 status:** SESSION-QUALIFIED with GPT-5.6 Sol; deterministic fallback retained
@@ -11,7 +11,7 @@
 **A5 status:** QUALIFIED; governed workspace, secret, network, browser-evidence, and MCP capability paths proven without widening Crew authority
 **A6 status:** QUALIFIED; replayable orchestration evaluation and non-self-activating improvement proposals proven
 **A7 status:** QUALIFIED; final adversarial Apex gauntlet and independent canaries proven
-**Release baseline:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`; canonical source continues on `main`
+**Release baseline:** `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`; canonical source continues on `main`
 
 ## Definition
 
@@ -319,4 +319,4 @@ Evidence chain:
 
 **A7 exit gate: PASSED.**
 
-**Apex verdict: CANONICAL — APEX QUALIFIED.** Stewardship-final exact-head run `31882589081` passed the full 16/16 A7 gauntlet, complete regression suites, historically pinned independent recovery/budget/contradiction and synthesis-integrity canaries, version/status assertions, and diff hygiene. PR #11 merged as `419cc73950f573c3e201106f7949c6bf7829f2af` with zero tree drift from the qualified A7 head. Post-Apex documentation stabilization re-ran the complete regression suites in `31909761968`; release `v0.7.0` is pinned to `71ffd60769d81b5b249dac4eca56333ff27e26d0` while canonical source continues on `main`.
+**Apex verdict: CANONICAL — APEX QUALIFIED.** Stewardship-final exact-head run `31882589081` passed the full 16/16 A7 gauntlet, complete regression suites, historically pinned independent recovery/budget/contradiction and synthesis-integrity canaries, version/status assertions, and diff hygiene. PR #11 merged as `419cc73950f573c3e201106f7949c6bf7829f2af` with zero tree drift from the qualified A7 head. Post-Apex documentation stabilization re-ran the complete regression suites in `31909761968`; `v0.7.0` remains the first Apex-qualified release at `71ffd60769d81b5b249dac4eca56333ff27e26d0`. Operational hardening is released as `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` while canonical source continues on `main`.
