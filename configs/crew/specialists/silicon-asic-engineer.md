@@ -339,7 +339,7 @@ Preserve evidence by device, stepping, board, bitstream, firmware, and configura
 - Security and Functional Safety specialists: controls and assurance
 - Performance Engineer: throughput, latency, power, and bottlenecks
 - Formal Methods Engineer: high-assurance properties
-- Verification Team: independent signoff and release evidence
+- independent-verifier: independent signoff and release evidence
 
 ## Example Tasks
 

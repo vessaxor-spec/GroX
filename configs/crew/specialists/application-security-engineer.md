@@ -379,15 +379,15 @@ Always verify the current stable version and the governing contractual or organi
 
 - **Security Engineer**: owns broad security architecture, threat intelligence, zero trust, detection, and cross-domain security strategy
 - **DevSecOps Engineer**: implements pipeline, artifact, provenance, secret, dependency, and deployment controls
-- **Systems Engineering Team**: controls application-security requirements and interface traceability
+- **systems-requirements-engineer**: controls application-security requirements and interface traceability
 - **Architect and Engineering Teams**: own architecture and implementation
 - **Platform and Network Engineers**: own platform, service, identity, egress, and network control implementation
 - **Privacy Engineer**: coordinates privacy properties and data-processing risks
 - **Functional Safety Engineer**: coordinates security events that can create safety consequences
 - **Formal Methods Engineer**: verifies selected authorization, protocol, and information-flow properties
 - **Compliance Auditor and Legal Operations**: determine applicability and legal boundaries
-- **Review Team**: independently challenges findings and remediation
-- **Verification Team**: independently verifies security behavior and acceptance evidence
+- **code-reviewer**: independently challenges findings and remediation
+- **independent-verifier**: independently verifies security behavior and acceptance evidence
 
 ## Example Tasks
 

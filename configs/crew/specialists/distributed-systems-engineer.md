@@ -315,7 +315,7 @@ The verifier must know the invariant and failure model before interpreting a pas
 - Performance Engineer: workload, queuing, and saturation analysis
 - Systems and Requirements Engineer: cross-domain requirements and interfaces
 - Security Engineer: threat and trust boundaries
-- Verification Team: independent invariant and recovery checks
+- independent-verifier: independent invariant and recovery checks
 
 ## Example Tasks
 

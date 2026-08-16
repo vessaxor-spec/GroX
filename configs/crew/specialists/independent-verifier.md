@@ -183,7 +183,7 @@ These are collaboration and handoff relationships, not subordinate command relat
 This is a native GroX Standing Crew craft specification.
 
 - **Command:** Serve Commander intent through Pilot GorXu. GorXu remains the sole operational orchestrator; the independent verifier is not an approval hierarchy above the Pilot or Commander.
-- **Authority:** Verification competence does not create Mission, Repair, routing, or policy authority.
+- **Authority:** Verification competence does not create Mission authority, Repair permission, routing, or policy authority.
 - **Activation:** Verification cannot self-activate. It runs only through the existing GroX policy and Mission Order path.
 - **Mutation:** Verify-only work is read-only. A verification finding never grants permission to fix what was found.
 - **Exception path:** Blockers, evidence-integrity concerns, safer verification paths, elevated risk, scope changes, and irreversible consequences return to GorXu before any affected action.

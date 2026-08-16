@@ -298,13 +298,13 @@ Always verify current publication, adoption, legal applicability, and project au
 
 - **Compliance Auditor**: determines applicability, framework mapping, audit evidence, and governance obligations
 - **Legal Operations**: resolves legal interpretation and advice boundaries
-- **Systems Engineering Team**: controls privacy requirements, interfaces, traceability, and lifecycle baselines
+- **systems-requirements-engineer**: controls privacy requirements, interfaces, traceability, and lifecycle baselines
 - **Architect and Engineering Teams**: implement architecture and controls
 - **Data Engineer and MLOps Engineer**: implement lineage, minimization, retention, model, feature, and deletion controls
 - **Security Engineer and Application Security Engineer**: coordinate confidentiality, integrity, authorization, abuse, and threat controls
 - **UX Designer**: designs understandable and accessible controls without manipulative patterns
-- **Review Team**: independently challenges privacy assumptions, claims, and residual risk
-- **Verification Team**: independently verifies control behavior and evidence
+- **code-reviewer**: independently challenges privacy assumptions, claims, and residual risk
+- **independent-verifier**: independently verifies control behavior and evidence
 
 ## Example Tasks
 

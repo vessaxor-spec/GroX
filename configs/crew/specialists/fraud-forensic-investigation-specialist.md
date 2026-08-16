@@ -197,8 +197,8 @@ Record the verification date. Re-check any fact whose current status could mater
 - **Finance Analyst:** financial reconciliation and quantitative anomalies
 - **Insurance Claims Specialist:** claims-specific facts, evidence gaps, and SIU escalation context
 - **Security Engineer / Malware Analyst:** cyber-enabled fraud, compromise, or malicious infrastructure
-- **Review Team:** independent contradiction challenge and adverse-inference review
-- **Verification Team:** provenance, reproducibility, and evidence-sufficiency checks
+- **code-reviewer:** independent contradiction challenge and adverse-inference review
+- **independent-verifier:** provenance, reproducibility, and evidence-sufficiency checks
 
 ## Example Tasks
 

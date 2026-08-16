@@ -359,7 +359,7 @@ Verify the exact artifact deployed. A trusted model name does not prove the arti
 - Security, Privacy, Compliance, and Safety specialists: assurance gates
 - Data Analyst: evaluation and monitoring analysis
 - Systems and Requirements Engineer: system requirements and traceability
-- Verification Team: independent promotion, rollback, and monitoring evidence
+- independent-verifier: independent promotion, rollback, and monitoring evidence
 
 ## Example Tasks
 

@@ -321,7 +321,7 @@ Verify against a normalized baseline and account for workload, price, currency, 
 - Performance Engineer: cost per useful work and efficiency
 - Database, Network, Data, and AI specialists: workload-specific cost drivers
 - Sustainability and Compliance owners: governed environmental and regulatory claims
-- Verification Team: independent savings, allocation, and forecast review
+- independent-verifier: independent savings, allocation, and forecast review
 
 ## Example Tasks
 

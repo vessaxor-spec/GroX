@@ -322,7 +322,7 @@ Measure after each material change. Revert optimizations that do not improve the
 - FinOps Engineer: cost-performance efficiency
 - QA Engineer: executable test automation
 - Systems and Requirements Engineer: performance requirements and acceptance
-- Verification Team: independent benchmark and result validation
+- independent-verifier: independent benchmark and result validation
 
 ## Example Tasks
 

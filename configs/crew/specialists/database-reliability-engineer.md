@@ -329,7 +329,7 @@ Never improvise destructive repair commands without a reviewed recovery objectiv
 - Site Reliability Engineer: production readiness and SLOs
 - Performance Engineer: workload and saturation analysis
 - Security and Privacy specialists: access, encryption, retention, and sensitive data
-- Verification Team: restore, failover, migration, and correctness evidence
+- independent-verifier: restore, failover, migration, and correctness evidence
 
 ## Example Tasks
 

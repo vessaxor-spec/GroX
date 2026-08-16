@@ -356,7 +356,7 @@ Define:
 - Security and Functional Safety specialists: command, fault, and mission assurance
 - Applied Scientist: mission and payload algorithms
 - Manufacturing Engineer: production and acceptance
-- Verification Team: independent qualification, readiness, commissioning, and operational evidence
+- independent-verifier: independent qualification, readiness, commissioning, and operational evidence
 
 ## Example Tasks
 

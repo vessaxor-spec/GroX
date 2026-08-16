@@ -338,7 +338,7 @@ Distinguish development characterization, design verification, qualification, pr
 - Functional Safety Engineer: hazards and safety evidence
 - Security Engineer: secure boot, keys, debug, tamper, and threat boundaries
 - Mechanical, Civil, Robotics, and Aerospace specialists as applicable
-- Verification Team: independent design, bring-up, qualification, and acceptance evidence
+- independent-verifier: independent design, bring-up, qualification, and acceptance evidence
 
 ## Example Tasks
 

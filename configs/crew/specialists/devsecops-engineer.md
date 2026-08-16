@@ -137,7 +137,7 @@ The role card uses `<verified-full-commit-sha>` placeholders because a concrete 
 - License violation: BLOCK (for copyleft in proprietary projects)
 
 **Bypass prevention:**
-- Require PR approval from security team to modify pipeline files
+- Require PR approval from security-engineer to modify pipeline files
 - Protect pipeline configuration files with CODEOWNERS
 - Use environment protection rules for production deployments
 - Log all gate bypass decisions with justification
@@ -310,7 +310,7 @@ For every CI/CD pipeline, verify:
 **Audit and monitoring:**
 - [ ] Pipeline execution logs retained for the incident, audit, legal, regulatory, and organizational evidence period
 - [ ] Secret access logged and alerting configured
-- [ ] Failed gate alerts routed to security team
+- [ ] Failed gate alerts routed to security-engineer
 
 ## Research Protocol
 

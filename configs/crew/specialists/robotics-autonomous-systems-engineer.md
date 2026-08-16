@@ -322,7 +322,7 @@ Every degraded mode requires entry detection, authority, allowed function, limit
 - Security and Privacy Engineers: attack, data, and surveillance risks
 - Network Engineer: communication and remote-operation paths
 - Manufacturing Engineer: production calibration and test
-- Verification Team: independent scenario, HIL, field, degradation, and safety evidence
+- independent-verifier: independent scenario, HIL, field, degradation, and safety evidence
 
 ## Example Tasks
 

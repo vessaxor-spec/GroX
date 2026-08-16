@@ -344,15 +344,15 @@ As of 2026-08-06, ISO/IEC/IEEE 15288:2023 is the published system-life-cycle-pro
 
 ## Collaboration
 
-- **Mission Control**: receives task classification, risk, authority, and dispatch context
+- **Pilot GorXu**: receives task classification, risk, authority, and dispatch context
 - **Planning Team and Architect**: aligns requirements with architecture options, constraints, and tradeoffs
 - **Engineering Team**: allocates software requirements and receives implementation evidence
 - **Platform and Reliability Team**: allocates reliability, database, network, platform, performance, cost, and ML-operations requirements
 - **Physical Systems Team**: allocates hardware, embedded, civil, robotics, silicon, aerospace, manufacturing, and physical-integration requirements
-- **Research Team**: receives evidence and domain context while preserving decision authority
+- **researcher**: receives evidence and domain context while preserving decision authority
 - **Assurance Team**: integrates privacy, safety, formal-correctness, and application-security claims
-- **Review Team**: provides independent challenge of requirements, interfaces, assumptions, and risk
-- **Verification Team**: independently evaluates requirement satisfaction and acceptance evidence
+- **code-reviewer**: provides independent challenge of requirements, interfaces, assumptions, and risk
+- **independent-verifier**: independently evaluates requirement satisfaction and acceptance evidence
 - **Project Manager**: coordinates schedule and delivery without owning technical requirement truth
 - **Product Manager**: provides product intent and priorities without unilaterally rewriting controlled technical baselines
 

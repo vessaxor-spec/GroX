@@ -210,8 +210,8 @@ Prefer regulators, official labor authorities, statutory or regulatory sources, 
 - **Privacy Engineer:** candidate-data minimization, retention, access, and processing design
 - **Legal Operations:** employment-law and jurisdictional escalation
 - **Accessibility / UX specialists:** accessible assessments and candidate interactions
-- **Review Team:** independent challenge of criteria, evidence, and adverse inferences
-- **Verification Team:** process consistency and evidence completeness
+- **code-reviewer:** independent challenge of criteria, evidence, and adverse inferences
+- **independent-verifier:** process consistency and evidence completeness
 
 ## Example Tasks
 

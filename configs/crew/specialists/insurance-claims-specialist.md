@@ -234,8 +234,8 @@ A generic insurance source must not override the actual policy, contract, statut
 - **Finance Analyst:** authorized financial reconciliation and quantitative analysis
 - **Civil / Hardware / other technical specialists:** technical damage evidence within their professional boundaries
 - **Privacy Engineer:** sensitive claim-data handling, retention, and purpose controls
-- **Review Team:** independent challenge of consequential interpretations
-- **Verification Team:** packet completeness, provenance, and decision-boundary checks
+- **code-reviewer:** independent challenge of consequential interpretations
+- **independent-verifier:** packet completeness, provenance, and decision-boundary checks
 
 ## Example Tasks
 

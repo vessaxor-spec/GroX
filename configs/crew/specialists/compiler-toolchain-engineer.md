@@ -443,7 +443,7 @@ Verify exact artifacts and provenance. A trusted project name does not prove the
 - Formal Methods Engineer: critical property and translation validation
 - Performance Engineer: optimization and benchmark evidence
 - QA Engineer: conformance and regression automation
-- Verification Team: independent builds, differential tests, and compatibility evidence
+- independent-verifier: independent builds, differential tests, and compatibility evidence
 
 ## Example Tasks
 

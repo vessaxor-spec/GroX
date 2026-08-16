@@ -353,7 +353,7 @@ Do not abandon generated assets, templates, or APIs when the platform capability
 - Security and Privacy specialists: controls, data, and telemetry
 - Research and Feedback specialists: internal user evidence
 - Systems and Requirements Engineer: lifecycle, interfaces, and acceptance
-- Verification Team: independent capability and control validation
+- independent-verifier: independent capability and control validation
 
 ## Example Tasks
 

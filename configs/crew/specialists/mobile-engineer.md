@@ -429,7 +429,7 @@ Store approval is not proof of application quality, security, privacy, or compli
 - QA Engineer: test strategy and evidence
 - Performance and Site Reliability Engineers: performance and service behavior
 - Technical Writer and Support: release and user guidance
-- Verification Team: independent device, security, accessibility, migration, and release evidence
+- independent-verifier: independent device, security, accessibility, migration, and release evidence
 
 ## Example Tasks
 

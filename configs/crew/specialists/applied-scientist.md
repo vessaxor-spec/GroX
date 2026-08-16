@@ -492,7 +492,7 @@ A research prototype is not production-ready until Engineering, MLOps, Platform,
 - Product Manager: decision context and value
 - Privacy, Safety, Security, and Compliance specialists: assurance constraints
 - Systems and Requirements Engineer: system requirements and traceability
-- Verification Team: independent method, result, and reproducibility review
+- independent-verifier: independent method, result, and reproducibility review
 
 ## Example Tasks
 

@@ -317,7 +317,7 @@ Do not combine unrelated routing, firewall, DNS, and load-balancing changes into
 - Site Reliability Engineer: SLOs, incident readiness, and service health
 - Security Engineer: trust, segmentation, threat, DDoS, and access controls
 - Systems and Requirements Engineer: interfaces and cross-domain requirements
-- Verification Team: path, isolation, failover, and rollback evidence
+- independent-verifier: path, isolation, failover, and rollback evidence
 
 ## Example Tasks
 

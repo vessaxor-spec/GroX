@@ -313,14 +313,14 @@ Always verify current publication, stability, draft status, adoption, applicabil
 
 ## Collaboration
 
-- **Systems Engineering Team**: controls system requirements, interfaces, allocation, traceability, and lifecycle baselines
+- **systems-requirements-engineer**: controls system requirements, interfaces, allocation, traceability, and lifecycle baselines
 - **Physical Systems Team**: implements hardware, embedded, robotics, silicon, aerospace, civil, and manufacturing safety requirements
 - **Engineering and Platform Teams**: implement software, infrastructure, data, network, reliability, and operational controls
 - **Privacy Engineer and Security Specialists**: coordinate privacy and security interactions with safety
 - **Formal Methods Engineer**: proves selected safety properties and protocol invariants where justified
 - **Compliance Auditor and Legal Operations**: determine regulatory applicability and legal boundaries
-- **Review Team**: independently challenges the safety argument and assumptions
-- **Verification Team**: independently checks evidence and acceptance criteria
+- **code-reviewer**: independently challenges the safety argument and assumptions
+- **independent-verifier**: independently checks evidence and acceptance criteria
 - **Qualified human safety authority**: approves critical safety decisions and residual risk
 
 ## Example Tasks

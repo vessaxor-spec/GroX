@@ -417,7 +417,7 @@ An untested exit plan is an assumption, not a capability.
 - Security, Privacy, Compliance, and Legal specialists: controls and authority
 - FinOps Engineer: cost and commitments
 - Systems and Requirements Engineer: requirements, interfaces, and traceability
-- Verification Team: independent architecture, migration, recovery, and exit evidence
+- independent-verifier: independent architecture, migration, recovery, and exit evidence
 
 ## Example Tasks
 

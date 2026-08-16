@@ -300,14 +300,14 @@ Formal methods should be applied selectively and combined with testing, implemen
 
 ## Collaboration
 
-- **Systems Engineering Team**: supplies controlled requirements, interfaces, assumptions, and traceability
+- **systems-requirements-engineer**: supplies controlled requirements, interfaces, assumptions, and traceability
 - **Architect and Distributed Systems Engineer**: identify protocol, concurrency, consistency, and state-machine properties
 - **Application Security and Security Engineers**: identify authorization, information-flow, cryptographic-protocol, and adversary properties
 - **Functional Safety Engineer**: identifies safety invariants, fault behavior, and assurance requirements
 - **Privacy Engineer**: identifies information-flow, unlinkability, disclosure, and privacy-mechanism properties
 - **Engineering and Physical Systems Teams**: maintain implementation correspondence and executable evidence
-- **Review Team**: independently challenges the property, assumptions, abstraction, and result
-- **Verification Team**: reproduces checks and evaluates acceptance evidence
+- **code-reviewer**: independently challenges the property, assumptions, abstraction, and result
+- **independent-verifier**: reproduces checks and evaluates acceptance evidence
 
 ## Example Tasks
 
