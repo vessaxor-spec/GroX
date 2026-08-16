@@ -8,7 +8,6 @@ root_allowed:
   - LICENSE
   - pyproject.toml
   - .gitignore
-
 directories:
   docs:
     architecture: "Canonical system architecture and structural decisions"
@@ -38,6 +37,9 @@ rules:
   - "Operational state and planning belong under docs/stewardship."
   - "Historical narrative belongs under docs/history."
   - "Runtime code belongs under src/grox."
+  - "Standing Crew routing, eligibility, capability, verification, and active-status metadata belongs under configs/crew/dossiers."
+  - "Standing Crew canonical craft specifications belong under configs/crew/specialists."
+  - "A craft specification may deepen competence but may not grant capabilities, Mission authority, mutation permission, or a parallel command layer."
   - "Tests must mirror the behavior or invariant they verify."
   - "New top-level directories require an architectural reason, not convenience."
   - "Private runtime state under configs/state is not source-controlled."
