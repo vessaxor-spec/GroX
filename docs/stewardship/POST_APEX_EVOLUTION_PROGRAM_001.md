@@ -1,6 +1,6 @@
 # Post-Apex Operational Evolution Program 001
 
-**Status:** APPROVED FOR EXECUTION PLANNING
+**Status:** IN EXECUTION — STAGE 0 COMPLETE; STAGE 1 NEXT
 
 **Planning baseline:** `main@c93015278daf022b1c3d85fc8fb90a6fa52d8160`
 
@@ -26,7 +26,7 @@ The objective is to improve how the qualified Vessel determines its own conditio
 
 ## Source-review classification
 
-The approved ClaudX review produced the following GroX decisions:
+The approved ClaudX review produced the following GroX decisions. The posture column uses only the four canonical intake postures; research and testing are next actions, not additional postures.
 
 | Candidate | Posture | GroX action |
 |---|---|---|
@@ -35,28 +35,38 @@ The approved ClaudX review produced the following GroX decisions:
 | Tiered fast/targeted/full reconstitution | ADAPT | Optimize evidence loading without weakening existing recovery gates. |
 | Long-horizon operational drift detection | ADAPT | Extend A6 using real Mission trajectories and protected baselines. |
 | Adopt/adapt/harvest/reject intake discipline | HARVEST | Formalize a lightweight external-capability review convention. |
-| Hot/warm/cold context management | HARVEST / TEST | Run GroX-native controlled experiments before any runtime adoption. |
-| Mission-to-source provenance | RESEARCH | Threat-model and design before deciding whether to implement. |
-| ClaudX's GroX-derived command spine, Crew, memory, durable ops, Mission Graph, A6 concepts | REJECT AS EXTERNAL NOVELTY | Already native GroX capability; do not re-import or duplicate. |
+| Hot/warm/cold context management | HARVEST | Run GroX-native controlled experiments before any runtime adoption. |
+| Mission-to-source provenance | HARVEST | Retain the traceability question; research and threat-model it before deciding whether to implement. |
+| ClaudX's GroX-derived command spine, Crew, memory, durable ops, Mission Graph, A6 concepts | REJECT | Already native GroX capability; do not re-import or duplicate. |
 | Separate decisions ledger | REJECT | Avoid duplicate source of truth. |
 | Host-specific launchd heartbeat architecture | REJECT | Preserve host portability; only the abstract unattended-health idea may inform design. |
 | Sleeping retired Crew identities | REJECT | Preserve GroX purge rule. |
-| ClaudX's synthetic 57.4% token-savings claim | REJECT AS PROOF | Establish GroX evidence independently. |
-| Removing `orchestration-evaluation-analyst` because ClaudX removed a similar role | REJECT AS BASIS | GroX role decisions require GroX authority/capability evidence. |
+| ClaudX's synthetic 57.4% token-savings claim as GroX proof | REJECT | Establish GroX evidence independently. |
+| Removing `orchestration-evaluation-analyst` because ClaudX removed a similar role | REJECT | GroX role decisions require GroX authority/capability evidence. |
 
 ## Execution sequence
 
 The work is deliberately staged so later capabilities depend on trustworthy evidence rather than being built simultaneously.
 
-### Stage 0 - External capability intake convention
+### Stage 0 - External capability intake convention — COMPLETE
 
 **Issue:** #29
 
-Formalize the adopt/adapt/harvest/reject decision posture as a lightweight GroX review convention. This is process clarification only. It must not create a new command layer, mandatory agent, external dependency, or duplicate decision store.
+The lightweight GroX review convention is now defined in `docs/stewardship/EXTERNAL_CAPABILITY_INTAKE.md`.
 
-**Exit condition:** one canonical convention/template exists and the ClaudX review can be represented through it without architectural duplication.
+It establishes:
 
-### Stage 1 - Prove the detectors
+- per-candidate `ADOPT | ADAPT | HARVEST | REJECT` classification before material implementation from external sources;
+- explicit checks for existing coverage, novelty provenance, duplication, authority/privacy/portability risk, and evidence thresholds;
+- separation of external source facts, external evidence, GroX inference, and GroX-native evidence;
+- a compact review record that lives in existing Mission, issue, research, architecture, or stewardship records rather than a new decisions ledger;
+- explicit preservation of the normal Commander -> GorXu -> Mission/Order -> verification -> protected source path after any intake decision.
+
+The convention is exercised against the pinned ClaudX review, including different decisions for independent seams from the same repository and explicit rejection of circular GroX-derived material.
+
+**Exit condition:** PASSED. One canonical convention/template exists and the ClaudX review is represented through it without architectural duplication.
+
+### Stage 1 - Prove the detectors — NEXT
 
 **Issue:** #25
 

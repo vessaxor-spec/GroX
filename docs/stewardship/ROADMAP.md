@@ -31,6 +31,7 @@ The command architecture is native to the Vessel:
 - A7 Apex Qualification qualified with long-horizon recovery, independently verified contradiction synthesis, hard Mission cost ceilings, prompt-injection resistance, replayable evidence, and red-to-green adversarial canaries
 - Post-release Operational Audit 001 completed with CI supply-chain, dependency, compatibility, and repository-governance hardening
 - Canonical `main` protected by active repository rules requiring pull requests, all five canonical CI gates, strict up-to-date status, blocked deletion/non-fast-forward updates, and no bypass actors
+- External capability intake convention formalized and exercised against the pinned ClaudX comparative review without adding a command layer or duplicate decision store
 
 ## Apex critical path
 
@@ -85,8 +86,8 @@ The Commander approved the full set of actionable findings from the ClaudX compa
 
 Execution tracks:
 
-1. **#29 - External capability intake convention.** Formalize lightweight `adopt | adapt | harvest | reject` classification without adding a command layer or duplicate decision store.
-2. **#25 - Critical detector mutation proving.** Deliberately challenge high-consequence GroX health/governance tests and prove they fail for the intended reason before relying on them.
+1. **#29 - External capability intake convention: COMPLETE.** `docs/stewardship/EXTERNAL_CAPABILITY_INTAKE.md` now formalizes lightweight `ADOPT | ADAPT | HARVEST | REJECT` classification, evidence distinctions, authority boundaries, and a compact review record. It is exercised against the pinned ClaudX review without adding a command layer or duplicate decision store.
+2. **#25 - Critical detector mutation proving: NEXT.** Deliberately challenge high-consequence GroX health/governance tests and prove they fail for the intended reason before relying on them.
 3. **#26 - Native Vessel health surface.** Build a unified diagnostic health view from authoritative existing GroX services; inspection remains non-mutating by default.
 4. **#27 - Tiered reconstitution.** Add fast/targeted/full reconstitution selection without weakening source/state, recovery, authority, or Mission-resume gates.
 5. **#30 - Context heat experiment.** Test a GroX-native hot/warm/cold context model and bounded compression against long-horizon Mission/reconstitution evidence; external synthetic token-savings claims are not accepted as proof.
