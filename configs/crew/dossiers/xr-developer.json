@@ -11,14 +11,36 @@
   "tags": [
     "developer",
     "engineering",
-    "xr"
+    "xr",
+    "visionos",
+    "webxr",
+    "spatial-computing",
+    "spatial",
+    "computing",
+    "metal-rendering",
+    "metal",
+    "rendering",
+    "xr-ux",
+    "ux"
+  ],
+  "domains": [
+    "visionOS",
+    "WebXR",
+    "spatial-computing",
+    "metal-rendering",
+    "xr-ux"
+  ],
+  "skills": [
+    "developer",
+    "xr",
+    "visionOS",
+    "WebXR",
+    "spatial-computing",
+    "metal-rendering",
+    "xr-ux"
   ],
   "verification": false,
   "risk_posture": "medium",
-  "skills": [
-    "developer",
-    "xr"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

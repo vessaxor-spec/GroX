@@ -15,18 +15,40 @@
     "etl",
     "pipeline",
     "schema",
-    "warehouse"
+    "warehouse",
+    "etl-elt",
+    "elt",
+    "data-warehousing",
+    "warehousing",
+    "streaming",
+    "schema-governance",
+    "governance",
+    "database-optimization",
+    "database",
+    "optimization"
   ],
-  "verification": false,
-  "risk_posture": "high",
+  "domains": [
+    "etl-elt",
+    "data-warehousing",
+    "streaming",
+    "schema-governance",
+    "database-optimization"
+  ],
   "skills": [
     "data",
     "engineer",
     "etl",
     "pipeline",
     "schema",
-    "warehouse"
+    "warehouse",
+    "etl-elt",
+    "data-warehousing",
+    "streaming",
+    "schema-governance",
+    "database-optimization"
   ],
+  "verification": false,
+  "risk_posture": "high",
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

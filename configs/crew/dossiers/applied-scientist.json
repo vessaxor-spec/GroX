@@ -10,14 +10,53 @@
   "tags": [
     "applied",
     "intelligence",
-    "scientist"
+    "scientist",
+    "applied-science",
+    "science",
+    "machine-learning-research",
+    "machine",
+    "learning",
+    "research",
+    "experimental-design",
+    "experimental",
+    "design",
+    "statistical-inference",
+    "statistical",
+    "inference",
+    "causal-inference",
+    "causal",
+    "simulation",
+    "algorithm-development",
+    "algorithm",
+    "development",
+    "scientific-reproducibility",
+    "scientific",
+    "reproducibility"
+  ],
+  "domains": [
+    "applied-science",
+    "machine-learning-research",
+    "experimental-design",
+    "statistical-inference",
+    "causal-inference",
+    "simulation",
+    "algorithm-development",
+    "scientific-reproducibility"
+  ],
+  "skills": [
+    "applied",
+    "scientist",
+    "applied-science",
+    "machine-learning-research",
+    "experimental-design",
+    "statistical-inference",
+    "causal-inference",
+    "simulation",
+    "algorithm-development",
+    "scientific-reproducibility"
   ],
   "verification": false,
   "risk_posture": "high",
-  "skills": [
-    "applied",
-    "scientist"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

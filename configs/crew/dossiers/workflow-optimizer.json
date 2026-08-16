@@ -11,14 +11,46 @@
   "tags": [
     "engineering",
     "optimizer",
-    "workflow"
+    "workflow",
+    "process-analysis",
+    "process",
+    "analysis",
+    "bottleneck-identification",
+    "bottleneck",
+    "identification",
+    "automation-roi",
+    "automation",
+    "roi",
+    "tool-evaluation",
+    "tool",
+    "evaluation",
+    "workflow-design",
+    "design",
+    "agent-versus-automation-selection",
+    "agent",
+    "versus",
+    "selection"
+  ],
+  "domains": [
+    "process analysis",
+    "bottleneck identification",
+    "automation ROI",
+    "tool evaluation",
+    "workflow design",
+    "agent-versus-automation selection"
+  ],
+  "skills": [
+    "optimizer",
+    "workflow",
+    "process analysis",
+    "bottleneck identification",
+    "automation ROI",
+    "tool evaluation",
+    "workflow design",
+    "agent-versus-automation selection"
   ],
   "verification": false,
   "risk_posture": "medium",
-  "skills": [
-    "optimizer",
-    "workflow"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

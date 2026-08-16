@@ -11,14 +11,50 @@
   "tags": [
     "engineer",
     "performance",
-    "platform"
+    "platform",
+    "performance-engineering",
+    "engineering",
+    "workload-modeling",
+    "workload",
+    "modeling",
+    "latency-analysis",
+    "latency",
+    "analysis",
+    "capacity-planning",
+    "capacity",
+    "planning",
+    "profiling",
+    "benchmarking",
+    "queuing-and-saturation",
+    "queuing",
+    "saturation",
+    "performance-regression",
+    "regression"
+  ],
+  "domains": [
+    "performance-engineering",
+    "workload-modeling",
+    "latency-analysis",
+    "capacity-planning",
+    "profiling",
+    "benchmarking",
+    "queuing-and-saturation",
+    "performance-regression"
+  ],
+  "skills": [
+    "engineer",
+    "performance",
+    "performance-engineering",
+    "workload-modeling",
+    "latency-analysis",
+    "capacity-planning",
+    "profiling",
+    "benchmarking",
+    "queuing-and-saturation",
+    "performance-regression"
   ],
   "verification": false,
   "risk_posture": "high",
-  "skills": [
-    "engineer",
-    "performance"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

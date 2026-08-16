@@ -11,15 +11,30 @@
     "paid",
     "search",
     "strategist",
-    "strategy"
+    "strategy",
+    "google-ads",
+    "google",
+    "ads",
+    "microsoft-ads",
+    "microsoft",
+    "amazon-ads",
+    "amazon"
   ],
-  "verification": false,
-  "risk_posture": "medium",
+  "domains": [
+    "google-ads",
+    "microsoft-ads",
+    "amazon-ads"
+  ],
   "skills": [
     "paid",
     "search",
-    "strategist"
+    "strategist",
+    "google-ads",
+    "microsoft-ads",
+    "amazon-ads"
   ],
+  "verification": false,
+  "risk_posture": "medium",
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

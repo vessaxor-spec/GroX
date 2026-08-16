@@ -10,14 +10,31 @@
   "tags": [
     "feedback",
     "intelligence",
-    "synthesizer"
+    "synthesizer",
+    "product",
+    "customer-success",
+    "customer",
+    "success",
+    "ux-research",
+    "ux",
+    "research"
+  ],
+  "domains": [
+    "product",
+    "customer-success",
+    "UX-research",
+    "any"
+  ],
+  "skills": [
+    "feedback",
+    "synthesizer",
+    "product",
+    "customer-success",
+    "UX-research",
+    "any"
   ],
   "verification": false,
   "risk_posture": "medium",
-  "skills": [
-    "feedback",
-    "synthesizer"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

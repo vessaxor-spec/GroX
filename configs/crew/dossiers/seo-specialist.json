@@ -10,14 +10,32 @@
   "tags": [
     "seo",
     "specialist",
-    "strategy"
+    "strategy",
+    "technical-seo",
+    "technical",
+    "content-seo",
+    "content",
+    "baidu",
+    "app-store",
+    "app",
+    "store"
+  ],
+  "domains": [
+    "technical-seo",
+    "content-seo",
+    "baidu",
+    "app-store"
+  ],
+  "skills": [
+    "seo",
+    "specialist",
+    "technical-seo",
+    "content-seo",
+    "baidu",
+    "app-store"
   ],
   "verification": false,
   "risk_posture": "medium",
-  "skills": [
-    "seo",
-    "specialist"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

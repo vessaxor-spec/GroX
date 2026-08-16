@@ -11,14 +11,41 @@
   "tags": [
     "designer",
     "strategy",
-    "ux"
+    "ux",
+    "ux-research",
+    "research",
+    "information-architecture",
+    "information",
+    "architecture",
+    "css-design-systems",
+    "css",
+    "design",
+    "systems",
+    "component-libraries",
+    "component",
+    "libraries",
+    "developer-handoff",
+    "developer",
+    "handoff"
+  ],
+  "domains": [
+    "UX research",
+    "information architecture",
+    "CSS design systems",
+    "component libraries",
+    "developer handoff"
+  ],
+  "skills": [
+    "designer",
+    "ux",
+    "UX research",
+    "information architecture",
+    "CSS design systems",
+    "component libraries",
+    "developer handoff"
   ],
   "verification": false,
   "risk_posture": "medium",
-  "skills": [
-    "designer",
-    "ux"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

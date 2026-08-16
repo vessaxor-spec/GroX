@@ -12,7 +12,38 @@
     "verification",
     "evidence",
     "audit",
-    "test"
+    "test",
+    "evidence-review",
+    "review",
+    "regression-validation",
+    "regression",
+    "validation",
+    "verifier-independence",
+    "verifier",
+    "independence",
+    "auditability",
+    "acceptance-criteria",
+    "acceptance",
+    "criteria",
+    "contradiction-detection",
+    "contradiction",
+    "detection"
+  ],
+  "domains": [
+    "evidence-review",
+    "regression-validation",
+    "verifier-independence",
+    "auditability",
+    "acceptance-criteria",
+    "contradiction-detection"
+  ],
+  "skills": [
+    "evidence-review",
+    "regression-validation",
+    "verifier-independence",
+    "auditability",
+    "acceptance-criteria",
+    "contradiction-detection"
   ],
   "verification": true
 }

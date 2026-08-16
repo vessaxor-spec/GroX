@@ -11,14 +11,52 @@
   "tags": [
     "engineer",
     "mlops",
-    "platform"
+    "platform",
+    "model-lifecycle",
+    "model",
+    "lifecycle",
+    "training-and-evaluation-pipelines",
+    "training",
+    "evaluation",
+    "pipelines",
+    "feature-and-dataset-lineage",
+    "feature",
+    "dataset",
+    "lineage",
+    "model-registry",
+    "registry",
+    "model-deployment",
+    "deployment",
+    "drift-and-retraining",
+    "drift",
+    "retraining",
+    "ml-platform-governance",
+    "ml",
+    "governance"
+  ],
+  "domains": [
+    "mlops",
+    "model-lifecycle",
+    "training-and-evaluation-pipelines",
+    "feature-and-dataset-lineage",
+    "model-registry",
+    "model-deployment",
+    "drift-and-retraining",
+    "ml-platform-governance"
+  ],
+  "skills": [
+    "engineer",
+    "mlops",
+    "model-lifecycle",
+    "training-and-evaluation-pipelines",
+    "feature-and-dataset-lineage",
+    "model-registry",
+    "model-deployment",
+    "drift-and-retraining",
+    "ml-platform-governance"
   ],
   "verification": false,
   "risk_posture": "high",
-  "skills": [
-    "engineer",
-    "mlops"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

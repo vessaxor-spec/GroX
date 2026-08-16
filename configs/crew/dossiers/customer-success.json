@@ -10,14 +10,36 @@
   "tags": [
     "customer",
     "strategy",
-    "success"
+    "success",
+    "general",
+    "healthcare",
+    "hospitality",
+    "retail",
+    "legal",
+    "real-estate",
+    "real",
+    "estate"
+  ],
+  "domains": [
+    "general",
+    "healthcare",
+    "hospitality",
+    "retail",
+    "legal",
+    "real-estate"
+  ],
+  "skills": [
+    "customer",
+    "success",
+    "general",
+    "healthcare",
+    "hospitality",
+    "retail",
+    "legal",
+    "real-estate"
   ],
   "verification": false,
   "risk_posture": "medium",
-  "skills": [
-    "customer",
-    "success"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

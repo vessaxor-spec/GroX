@@ -10,14 +10,39 @@
   "tags": [
     "buyer",
     "programmatic",
-    "strategy"
+    "strategy",
+    "dv360",
+    "trade-desk",
+    "trade",
+    "desk",
+    "amazon-dsp",
+    "amazon",
+    "dsp",
+    "abm-display",
+    "abm",
+    "display",
+    "tracking-architecture",
+    "tracking",
+    "architecture"
+  ],
+  "domains": [
+    "dv360",
+    "trade-desk",
+    "amazon-dsp",
+    "abm-display",
+    "tracking-architecture"
+  ],
+  "skills": [
+    "buyer",
+    "programmatic",
+    "dv360",
+    "trade-desk",
+    "amazon-dsp",
+    "abm-display",
+    "tracking-architecture"
   ],
   "verification": false,
   "risk_posture": "medium",
-  "skills": [
-    "buyer",
-    "programmatic"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

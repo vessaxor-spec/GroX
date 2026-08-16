@@ -11,14 +11,52 @@
   "tags": [
     "architect",
     "cloud",
-    "platform"
+    "platform",
+    "cloud-architecture",
+    "architecture",
+    "landing-zones",
+    "landing",
+    "zones",
+    "multi-account-and-subscription",
+    "multi",
+    "account",
+    "subscription",
+    "regional-design",
+    "regional",
+    "design",
+    "hybrid-and-multi-cloud",
+    "hybrid",
+    "cloud-migration",
+    "migration",
+    "cloud-governance",
+    "governance",
+    "cloud-resilience",
+    "resilience"
+  ],
+  "domains": [
+    "cloud-architecture",
+    "landing-zones",
+    "multi-account-and-subscription",
+    "regional-design",
+    "hybrid-and-multi-cloud",
+    "cloud-migration",
+    "cloud-governance",
+    "cloud-resilience"
+  ],
+  "skills": [
+    "architect",
+    "cloud",
+    "cloud-architecture",
+    "landing-zones",
+    "multi-account-and-subscription",
+    "regional-design",
+    "hybrid-and-multi-cloud",
+    "cloud-migration",
+    "cloud-governance",
+    "cloud-resilience"
   ],
   "verification": false,
   "risk_posture": "high",
-  "skills": [
-    "architect",
-    "cloud"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",
