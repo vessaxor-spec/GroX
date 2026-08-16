@@ -1,0 +1,112 @@
+name: Release GroX v0.7.1
+
+on:
+  push:
+    branches:
+      - stewardship/release-v0.7.1
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact operational-hardening baseline
+        uses: actions/checkout@v5
+        with:
+          ref: f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2
+          fetch-depth: 0
+
+      - name: Verify release target
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2"
+          grep -q 'version = "0.7.1"' pyproject.toml
+          grep -q "__version__='0.7.1'" src/grox/__init__.py
+          grep -q 'Operating standard:\*\* \*\*APEX QUALIFIED\*\*' README.md
+          grep -q 'Standing Crew:\*\* \*\*82\*\*' README.md
+          test -f .github/workflows/ci.yml
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v0.7.1 >/dev/null 2>&1; then
+            echo 'v0.7.1 already exists'
+            exit 1
+          fi
+          cat > /tmp/release-notes.md <<'EOF'
+          # GroX v0.7.1 - Post-Apex Operational Hardening
+
+          This release freezes the first operational-hardening baseline after Apex qualification.
+
+          ## Baseline
+
+          - canonical source commit: `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`
+          - package: `grox-vessel 0.7.1`
+          - GorXu operating standard: **APEX QUALIFIED**
+          - Standing Crew: **82**
+          - retired operational Crew: **0**
+          - GorXu remains the sole operational orchestrator
+
+          ## Operational hardening since v0.7.0
+
+          - persistent least-privilege GitHub Actions CI on pull requests and `main`;
+          - Python 3.11 and 3.12 regression gates;
+          - non-editable wheel/bootstrap portability checks;
+          - explicit, fail-closed Vessel-root discovery using `GROX_VESSEL_ROOT`, checkout ancestry, and editable-source ancestry;
+          - rejection of orchestrator-like Crew identities, including retired/legacy/backup variants and hidden orchestrator titles;
+          - rejection of retired or archived dossiers from the Standing Crew roster;
+          - reconstitution purges stale Crew operational state, Crew-scoped memory, and Crew performance state that are not part of the current source-defined roster;
+          - package/source version consistency is enforced by both pytest and unittest.
+
+          Historical Mission, Order, and Evidence records may retain old Crew references solely as inert audit history. They do not restore Crew authority.
+
+          ## Verification
+
+          PR #14 established the post-Apex operational-hardening baseline and permanent CI. PR #16 then reconciled package/source version metadata.
+
+          Final exact-head PR #16 verification run `31935094490` proved:
+
+          - Regression / Python 3.11: **PASS**
+          - Regression / Python 3.12: **PASS**
+          - Wheel bootstrap portability: **PASS**
+          - pytest: **129 passed, 2 existing environment-dependent browser skips**
+          - unittest: **131 tests OK, 2 skips**
+          - version consistency invariant: **PASS in both suites**
+
+          Canonical `main` push run `31935204046` independently re-ran all three permanent CI jobs successfully after merge.
+
+          ## Authority boundary
+
+          v0.7.1 does not widen GroX authority.
+
+          - Commander sovereignty remains absolute.
+          - GorXu remains the sole operational orchestrator.
+          - Commander -> GorXu -> Divisions -> Crew remains the command relationship.
+          - deny-wins authority, Inspect/Repair separation, verifier independence, evidence integrity, recovery controls, source/state compatibility, and hard Mission cost controls remain mandatory.
+          - Crew competence does not imply permission.
+          - improvement proposals cannot self-activate.
+
+          ## Privacy and persistence
+
+          Private SQLite and `.groxstate` operational state remain excluded from the public release. The source-defined current roster is authoritative during reconstitution, and stale retired Crew state is purged rather than reactivated.
+          EOF
+          gh release create v0.7.1 \
+            --target f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2 \
+            --title 'GroX v0.7.1 - Post-Apex Operational Hardening' \
+            --notes-file /tmp/release-notes.md
+
+      - name: Verify tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --tags origin
+          test "$(git rev-list -n 1 v0.7.1)" = "f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2"
+          gh release view v0.7.1 --json tagName,targetCommitish,name,isDraft,isPrerelease,url
