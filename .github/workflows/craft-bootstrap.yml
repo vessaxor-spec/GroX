@@ -31,7 +31,7 @@ jobs:
       - name: Commit generated cards when needed
         shell: bash
         run: |
-          if git diff --quiet -- configs/crew/specialists && [ -d configs/crew/specialists ]; then
+          if [ -z "$(git status --porcelain -- configs/crew/specialists)" ]; then
             echo 'Craft library already materialized; no commit required.'
             exit 0
           fi
