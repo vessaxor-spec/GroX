@@ -1,0 +1,167 @@
+name: Dossier Metadata Bootstrap
+
+on:
+  push:
+    branches: [agent/densify-standing-crew-dossiers]
+
+permissions:
+  contents: write
+
+jobs:
+  enrich:
+    if: github.event.head_commit.message == 'Bootstrap dossier metadata enrichment'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Derive dossier metadata from canonical craft cards
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+          import json
+          import re
+          from pathlib import Path
+
+          root = Path('.')
+          dossiers = root / 'configs' / 'crew' / 'dossiers'
+          cards = root / 'configs' / 'crew' / 'specialists'
+
+          stop = {
+              'a', 'an', 'and', 'or', 'the', 'of', 'for', 'to', 'in', 'on', 'by',
+              'with', 'from', 'into', 'across', 'via', 'using', 'use'
+          }
+          keep_short = {'ai', 'ml', 'ux', 'ui', 'ip', 'qa', 'xr', 'zk'}
+          protected_keys = (
+              'crew_id', 'division', 'title', 'capabilities', 'verification',
+              'risk_posture', 'standing_orders', 'status'
+          )
+
+          def unique(items):
+              seen = set()
+              out = []
+              for item in items:
+                  item = str(item).strip()
+                  if not item or item in seen:
+                      continue
+                  seen.add(item)
+                  out.append(item)
+              return out
+
+          def domains_from_card(path: Path) -> list[str]:
+              lines = path.read_text(encoding='utf-8').splitlines()
+              if not lines or lines[0].strip() != '---':
+                  raise AssertionError(f'missing frontmatter: {path}')
+              try:
+                  end = lines.index('---', 1)
+              except ValueError as exc:
+                  raise AssertionError(f'unclosed frontmatter: {path}') from exc
+              fm = lines[1:end]
+              domains = []
+              active = False
+              for line in fm:
+                  if re.match(r'^domains:\s*$', line):
+                      active = True
+                      continue
+                  if active:
+                      match = re.match(r'^\s+-\s+(.+?)\s*$', line)
+                      if match:
+                          value = match.group(1).strip().strip('"').strip("'")
+                          domains.append(value)
+                          continue
+                      if line and not line.startswith((' ', '\t')):
+                          break
+              if not domains:
+                  raise AssertionError(f'no domains in canonical card: {path}')
+              return unique(domains)
+
+          def routing_terms(domains: list[str]) -> list[str]:
+              terms = []
+              for domain in domains:
+                  slug = re.sub(r'[^a-z0-9]+', '-', domain.lower()).strip('-')
+                  if slug:
+                      terms.append(slug)
+                  for token in re.findall(r'[a-z0-9]+', domain.lower()):
+                      if token in stop:
+                          continue
+                      if len(token) >= 3 or token in keep_short:
+                          terms.append(token)
+              return unique(terms)
+
+          before_thin = 0
+          after_thin = 0
+          changed = 0
+          stats = []
+
+          dossier_paths = sorted(dossiers.glob('*.json'))
+          card_paths = sorted(cards.glob('*.md'))
+          assert len(dossier_paths) == 82, len(dossier_paths)
+          assert {p.stem for p in dossier_paths} == {p.stem for p in card_paths}
+
+          for path in dossier_paths:
+              original = json.loads(path.read_text(encoding='utf-8'))
+              protected = {key: original.get(key) for key in protected_keys}
+              existing_tags = list(original.get('tags', []))
+              existing_skills = list(original.get('skills', []))
+              if len(existing_skills) <= 3 and len(existing_tags) <= 4:
+                  before_thin += 1
+
+              domains = domains_from_card(cards / f'{path.stem}.md')
+              tags = unique(existing_tags + routing_terms(domains))
+              skills = unique(existing_skills + domains)
+
+              reordered = {}
+              preferred = (
+                  'crew_id', 'division', 'title', 'capabilities', 'tags', 'domains',
+                  'skills', 'verification', 'risk_posture', 'standing_orders', 'status'
+              )
+              values = dict(original)
+              values['tags'] = tags
+              values['domains'] = domains
+              values['skills'] = skills
+              for key in preferred:
+                  if key in values:
+                      reordered[key] = values[key]
+              for key, value in values.items():
+                  if key not in reordered:
+                      reordered[key] = value
+
+              for key, value in protected.items():
+                  assert reordered.get(key) == value, (path.name, key)
+              assert 'repo_read' in reordered['capabilities'], path.name
+              assert reordered['crew_id'] == path.stem, path.name
+
+              if len(skills) <= 3 and len(tags) <= 4:
+                  after_thin += 1
+              stats.append((path.stem, len(existing_tags), len(tags), len(existing_skills), len(skills), len(domains)))
+
+              rendered = json.dumps(reordered, indent=2, ensure_ascii=False) + '\n'
+              if rendered != path.read_text(encoding='utf-8'):
+                  path.write_text(rendered, encoding='utf-8')
+                  changed += 1
+
+          print(f'dossiers={len(dossier_paths)} changed={changed}')
+          print(f'thin_before={before_thin} thin_after={after_thin}')
+          print('minimums:', {
+              'tags': min(x[2] for x in stats),
+              'skills': min(x[4] for x in stats),
+              'domains': min(x[5] for x in stats),
+          })
+          print('medians:', {
+              'tags': sorted(x[2] for x in stats)[len(stats)//2],
+              'skills': sorted(x[4] for x in stats)[len(stats)//2],
+              'domains': sorted(x[5] for x in stats)[len(stats)//2],
+          })
+          assert changed == 82, changed
+          assert after_thin == 0, after_thin
+          PY
+      - name: Commit generated dossier metadata
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add configs/crew/dossiers/*.json
+          git diff --cached --check
+          git commit -m 'Enrich Standing Crew dossier metadata'
+          git push origin HEAD:agent/densify-standing-crew-dossiers
