@@ -11,7 +11,7 @@ import unittest
 from unittest.mock import patch
 
 from grox import cli
-from grox.health import FAIL, PASS, UNKNOWN, HealthCheck, VesselHealth
+from grox.health import FAIL, PASS, UNKNOWN, WARN, HealthCheck, VesselHealth
 from grox.state import StateStore, now
 
 
@@ -88,6 +88,32 @@ class VesselHealthTests(unittest.TestCase):
             self.collect(root)
             after = hashlib.sha256(db_path.read_bytes()).hexdigest()
             self.assertEqual(before, after)
+        finally:
+            td.cleanup()
+
+    def test_operational_state_warns_on_interrupted_mission(self) -> None:
+        td, root = health_vessel()
+        try:
+            store = StateStore(root / "configs/state/grox.sqlite3")
+            store.create_mission("MSN-interrupted-health", "recover me", "inspect", "medium")
+            store.update_mission("MSN-interrupted-health", "interrupted", "process ended")
+            store.close()
+            result = VesselHealth(root)._check_operational_state()
+            self.assertEqual(result.status, WARN)
+            self.assertIn("interrupted", result.detail)
+        finally:
+            td.cleanup()
+
+    def test_persistence_warns_when_runtime_history_has_no_snapshot(self) -> None:
+        td, root = health_vessel()
+        try:
+            store = StateStore(root / "configs/state/grox.sqlite3")
+            store.create_mission("MSN-unsnapshotted-health", "persist me", "inspect", "low")
+            store.update_mission("MSN-unsnapshotted-health", "completed", "done")
+            store.close()
+            result = VesselHealth(root)._check_persistence_readiness()
+            self.assertEqual(result.status, WARN)
+            self.assertIn("no recovery snapshot", result.detail)
         finally:
             td.cleanup()
 
