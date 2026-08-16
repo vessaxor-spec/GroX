@@ -1,6 +1,6 @@
 # Post-Apex Operational Evolution Program 001
 
-**Status:** IN EXECUTION — STAGES 0-3 COMPLETE; STAGE 4 NEXT
+**Status:** IN EXECUTION — STAGES 0-4 COMPLETE; STAGE 5 NEXT
 
 **Planning baseline:** `main@c93015278daf022b1c3d85fc8fb90a6fa52d8160`
 
@@ -17,7 +17,7 @@ The objective is to improve how the qualified Vessel determines its own conditio
 - Commander authority and GorXu's role as sole operational orchestrator remain unchanged.
 - Mission Control remains a GroX-native subsystem under GorXu, not a parallel command path.
 - Standing Crew remain source-defined operational identities; retired or archived Crew are not retained as sleeping operational identities.
-- Inspection, evaluation, health checking, telemetry, planning, and research do not grant mutation authority.
+- Inspection, evaluation, health checking, telemetry, planning, experimentation, and research do not grant mutation authority.
 - A6 findings and drift signals remain advisory and may not self-activate changes.
 - Private SQLite, `.groxstate`, raw Commander directives, private Mission content, credentials, and sensitive evidence remain outside public Git.
 - Existing A1-A7 qualification invariants are regression boundaries, not inherited assumptions.
@@ -95,33 +95,11 @@ Evidence: `docs/verification/VESSEL_HEALTH_MUTATION_MATRIX.md`
 - **TARGETED** — bounded noncritical WARN/UNKNOWN surfaces only, after all FULL triggers are ruled out.
 - **FULL** — fresh host, source change, critical failure, non-PASS recovery readiness, active/interrupted/unresolved Mission state, dirty source, persistence WARN/FAIL, or missing/non-PASS mandatory evidence; loads all 10 surfaces.
 
-CLI:
-
-```text
-grox reconstitution-plan
-grox reconstitution-plan --json
-grox reconstitution-plan --fresh-host
-grox reconstitution-plan --source-changed
-```
-
 The planner performs no restore, Pilot construction, Crew routing, state mutation, memory mutation, or authority change. Existing persistence/Mission recovery remains authoritative.
 
 FAST structurally avoids 6/10 defined reconstitution surfaces; this is a **structural loading metric, not a token-savings claim**.
 
-Preserved red mutation run `31951963722` produced 7 killed / 1 survived because disabling a final UNKNOWN-source safeguard remained protected by an earlier independent TARGETED WARN/UNKNOWN path. The survivor revealed redundant protection, not an unsafe FAST path. GroX did not remove the independent protection to improve mutation score. The matrix was refined to target unique missing-source and non-PASS recovery seams.
-
-Green Stage 3 run `31952132782` recorded:
-
-- clean Vessel health source smoke PASS;
-- tiered reconstitution source smoke PASS;
-- pytest **158 passed, 2 skipped, 19 subtests passed**;
-- unittest **160 OK, 2 skipped**;
-- Stage 1 mutations **12/12 KILLED**;
-- Stage 2 mutations **7/7 KILLED**;
-- Stage 3 mutations **9/9 KILLED**;
-- zero survivors;
-- all mutation restoration clean;
-- all five canonical CI jobs PASS.
+Preserved red mutation run `31951963722` revealed redundant independent protection rather than an unsafe FAST path. Green Stage 3 run `31952132782` passed the health/reconstitution smokes, pytest **158 passed, 2 skipped, 19 subtests passed**, unittest **160 OK, 2 skipped**, Stage 1 **12/12**, Stage 2 **7/7**, and Stage 3 **9/9** mutations killed, zero survivors, clean restoration, and all five CI jobs. PR #36 then closed Stage 3 through the protected merge path.
 
 Architecture: `docs/architecture/TIERED_RECONSTITUTION.md`  
 Evidence: `docs/verification/RECONSTITUTION_MUTATION_MATRIX.md`  
@@ -129,25 +107,49 @@ History: `docs/history/ships-log/0043-tiered-reconstitution-operational.md`
 
 **Exit condition:** PASSED.
 
-### Stage 4 — Context heat and bounded compression experiment — NEXT
+### Stage 4 — Context heat and bounded compression experiment — COMPLETE
 
 **Issue:** #30
 
-Test a GroX-native hot/warm/cold context model on representative long-horizon Mission and reconstitution traces.
+Stage 4 deliberately remains an experiment rather than a Pilot runtime mutation.
 
-- **Hot:** active intent, Commander constraints, authority, current graph/Mission state, unresolved exceptions/contradictions, latest critical evidence, next action.
-- **Warm:** recent relevant decisions, Crew findings, retrieved memory, completed-node summaries, currently relevant history.
-- **Cold:** old raw tool output, superseded discussion, dormant history, and re-derivable source material that is not currently authoritative.
+`src/grox/context_heat.py` defines a deterministic HOT/WARM/COLD policy:
 
-The experiment must measure context size/cost/latency where available and separately measure preservation of intent, hard constraints, authority, unresolved conflict, provenance, and final task quality. Adversarial cases must include old information that remains safety- or authority-critical.
+- active Commander intent, constraints, authority, Mission/graph state, unresolved exceptions/contradictions, critical evidence, safety boundaries, and next action are HOT and retained verbatim;
+- critical material remains HOT regardless of age;
+- relevant WARM decisions/findings/memory/history may use only caller-supplied attributable summaries; without a safe summary, raw text remains;
+- COLD re-derivable or superseded material may be omitted;
+- every retained item preserves provenance.
 
-**Exit condition:** GroX evidence supports adoption, partial adoption, or rejection. No external synthetic savings percentage is used as the target.
+`tests/experiments/context_heat_experiment.py` evaluates four controlled GroX scenarios: long Mission, reconstitution, adversarial old safety fact, and WARM material without a safe summary.
 
-### Stage 5 — A6 longitudinal operational drift analysis
+The deterministic corpus contains **20,464 source characters** and packs to **1,336 characters**, a controlled character reduction of **93.47%**, while preserving **100% of declared required critical facts** and **100% retained-item provenance**. Scenario reduction ranges from **70.82% to 97.90%**.
+
+This is **not a production token-savings or latency claim**. Processing-time telemetry is recorded only diagnostically because the corpus is too small to support a meaningful latency conclusion. ClaudX's synthetic 57.4% result was not used as a target or baseline.
+
+Decision: **HARVEST** the bounded HOT/WARM/COLD policy as an evidence-supported GroX design technique, but **defer Pilot runtime activation** until the integrated post-evolution Mission tests the technique against real program evidence.
+
+Research: `docs/research/CONTEXT_HEAT_EXPERIMENT.md`  
+History: `docs/history/ships-log/0044-context-heat-experiment-passed.md`
+
+**Exit condition:** PASSED for controlled experiment; runtime activation remains deliberately unclaimed.
+
+### Stage 5 — A6 longitudinal operational drift analysis — NEXT
 
 **Issue:** #28
 
-Extend A6 trajectory evaluation to compare real operational evidence across time without a self-normalizing baseline or self-activation path. Invariant failures remain first-class; controlled qualification corpora and real operational history remain separately attributable; missing/stale data is unknown rather than pass; drift creates investigation/proposal evidence only.
+Extend A6 trajectory evaluation to compare attributable operational evidence across time without a self-normalizing baseline or self-activation path.
+
+Required design constraints:
+
+- baseline identity/content must be frozen or cryptographically bound rather than overwritten by the act of checking;
+- real operational history remains distinguishable from controlled/synthetic qualification cases;
+- missing/stale evidence is UNKNOWN, not PASS;
+- invariant failures remain first-class and cannot be hidden inside a composite score;
+- drift creates an investigation/advisory finding or proposal only;
+- A6 proposal activation remains denied.
+
+Candidate signals include Mission disposition, evidence quality/trace completeness, verifier failures, authority/capability violations, exception/replan and recovery rates, cost, latency, tool failures, Crew utilization/routing concentration, and Commander escalation rate.
 
 **Exit condition:** replayable evidence detects real/injected degradation against a protected baseline without self-normalization or self-activation and all affected A6/A7 invariants remain green.
 

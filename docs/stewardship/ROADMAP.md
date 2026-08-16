@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.7.1` remains the current released post-Apex operational-hardening baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, and tiered reconstitution planning.
+GroX `v0.7.1` remains the current released post-Apex operational-hardening baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, and a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime.
 
 Native command architecture:
 
@@ -27,6 +27,7 @@ Native command architecture:
 - 12 high-consequence production invariants continuously mutation-proven.
 - Native `grox health` surface operational and read-only; 7 critical health behaviors mutation-proven.
 - Tiered `grox reconstitution-plan` operational; 9 reconstitution safety decisions mutation-proven.
+- Controlled HOT/WARM/COLD context experiment passed with 100% declared critical-fact/provenance retention and 93.47% character reduction on the bounded corpus; runtime activation remains deferred.
 
 ## Apex critical path
 
@@ -51,6 +52,17 @@ Tiered reconstitution now makes that rule explicit:
 
 FAST structurally loads 4/10 defined reconstitution surfaces versus FULL 10/10. This is an evidence-loading count, not a token-savings claim.
 
+## Context efficiency rule
+
+The controlled Stage 4 experiment supports the HOT/WARM/COLD principle but does not authorize automatic runtime compression.
+
+- HOT active/critical material remains verbatim, including Commander intent, constraints, authority, active Mission/graph state, unresolved exceptions/contradictions, critical evidence, safety boundaries, and next action.
+- WARM material may use only an attributable supplied summary; without one, raw text remains.
+- COLD material may be omitted only when genuinely re-derivable, superseded, or currently irrelevant.
+- Age alone never cools a binding safety or authority fact.
+
+The deterministic four-scenario corpus reduced 20,464 source characters to 1,336 while preserving all declared critical facts and retained provenance. This 93.47% controlled character reduction is **not** a production token/latency claim. Pilot runtime activation remains deferred to integrated operational evidence.
+
 ## Post-Apex operating posture
 
 There is no predeclared A8. Current work is **Post-Apex Operational Evolution Program 001**, driven by Commander-approved evidence from the ClaudX comparative review and by GroX-native tests/operational evidence. External ideas do not become authority or qualification evidence merely by being useful elsewhere.
@@ -64,9 +76,9 @@ Canonical plan: `docs/stewardship/POST_APEX_EVOLUTION_PROGRAM_001.md`
 1. **#29 — External capability intake convention: COMPLETE.** Four-posture `ADOPT | ADAPT | HARVEST | REJECT` review convention is canonical and exercised against pinned ClaudX evidence.
 2. **#25 — Critical detector mutation proving: COMPLETE.** Red run `31950179712` preserved ambiguous-target fail-closed behavior; green run `31950265325` killed 12/12 critical mutations; final Stage 1 exact-head CI also passed all five gates.
 3. **#26 — Native Vessel health surface: COMPLETE.** `grox health` is read-only and isolated. Preserved red runs `31950827151`, `31951286406`, and `31951491116` exposed test-fixture, smoke-order, and ignore-policy weaknesses without weakening health. Final exact-head run `31951586094` passed; PR #35 merged as `7209fa9cf3f5d2cf2cd9d1df840c91ea946c544c`; post-merge run `31951678763` passed.
-4. **#27 — Tiered reconstitution: COMPLETE.** FAST/TARGETED/FULL planning consumes Vessel Health rather than duplicating truth. Red run `31951963722` revealed redundant protection rather than unsafe behavior. Green run `31952132782` passed health/reconstitution smokes, pytest **158 passed, 2 skipped, 19 subtests**, unittest **160 OK, 2 skipped**, Stage 1 **12/12**, Stage 2 **7/7**, Stage 3 **9/9** mutations killed, zero survivors, clean restoration, and all five CI jobs.
-5. **#30 — Context heat and bounded compression experiment: NEXT.** Test a GroX-native HOT/WARM/COLD model using representative Mission/reconstitution traces. Measure size/cost/latency where meaningful and independently test preservation of Commander intent, hard constraints, authority, unresolved contradictions, provenance, and outcome quality. Old safety/authority-critical information must remain retained regardless of age. ClaudX's synthetic 57.4% figure is not GroX evidence.
-6. **#28 — A6 longitudinal operational drift analysis.** Extend A6 with protected/frozen baseline comparisons from attributable operational trajectories; missing/stale data remains unknown; invariant failures remain first-class; no self-normalization or self-activation.
+4. **#27 — Tiered reconstitution: COMPLETE.** FAST/TARGETED/FULL planning consumes Vessel Health rather than duplicating truth. Red run `31951963722` revealed redundant protection rather than unsafe behavior. Green run `31952132782` passed health/reconstitution smokes, pytest **158 passed, 2 skipped, 19 subtests**, unittest **160 OK, 2 skipped**, Stage 1 **12/12**, Stage 2 **7/7**, Stage 3 **9/9** mutations killed, zero survivors, clean restoration, and all five CI jobs. PR #36 completed through the protected merge path.
+5. **#30 — Context heat and bounded compression experiment: COMPLETE (CONTROLLED).** HOT/WARM/COLD policy preserved 100% of declared critical facts and retained provenance across four representative scenarios while reducing 20,464 characters to 1,336 (93.47%). Decision: HARVEST the bounded policy as a GroX technique; do not activate automatic Pilot compression until integrated operational evidence supports it. ClaudX's synthetic 57.4% figure was not used as proof or target.
+6. **#28 — A6 longitudinal operational drift analysis: NEXT.** Extend A6 with protected/frozen baseline comparisons from attributable operational trajectories; missing/stale data remains UNKNOWN; invariant failures remain first-class; controlled and operational evidence remain distinguishable; no self-normalization or self-activation.
 7. **#31 — Mission-to-source provenance research.** Threat-model a privacy-safe verifiable link from authorized private Missions to public PR/CI/merge history before implementation.
 8. **Integrated operational qualification.** Exercise all changed surfaces together and independently verify that no authority boundary widened before any release decision.
 
@@ -80,7 +92,7 @@ Do not:
 - retain retired Crew as sleeping operational identities;
 - remove `orchestration-evaluation-analyst` based only on ClaudX naming decisions;
 - treat ClaudX synthetic token-savings as GroX proof;
-- let health, reconstitution, evaluation, telemetry, or provenance metadata grant mutation authority.
+- let health, reconstitution, context heat, evaluation, telemetry, or provenance metadata grant mutation authority.
 
 ## Release posture
 
