@@ -7,7 +7,7 @@
 **Current released source:** `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
-**Current operating verdict:** **APEX QUALIFIED**
+**Current operating verdict:** **APEX QUALIFIED — OPERATIONAL AUDIT 001 CLOSED**
 **Standing Crew:** **82**
 **Current verified regression:** pytest **131 passed, 2 skipped**; unittest **133 OK, 2 skipped**
 
@@ -40,6 +40,7 @@ Verified by source, qualification evidence, and automated testing:
 - live medium-risk Repair Mission completed with independent verification
 - first post-Apex operational Inspect Mission `MSN-8a86f094509b` completed on the canonical source with `code-reviewer`, full regression evidence, and independent verification PASS by `independent-verifier`
 - permanent least-privilege CI now exercises Python 3.11 through 3.14 regressions plus non-editable wheel bootstrap portability on pull requests and `main`; third-party actions are pinned to immutable full commit SHAs
+- canonical `main` is protected by an active repository ruleset requiring pull requests and all five canonical CI gates with strict up-to-date enforcement, blocking deletion and non-fast-forward updates, with no bypass actors
 - Vessel-root discovery now supports explicit `GROX_VESSEL_ROOT` binding, current-checkout discovery, editable-source fallback, and fail-closed refusal to construct an unbound 0-Crew Vessel
 - package/source version metadata is synchronized at `0.7.1` and guarded by both pytest and unittest
 - release `v0.7.1` is pinned to the fully verified post-Apex operational-hardening source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`
@@ -97,7 +98,7 @@ This operational hardening preserves Apex status because it changes bootstrap/ve
 
 ## Post-release Operational Audit 001
 
-**Status: COMPLETE WITH EXTERNAL GOVERNANCE ITEM OPEN**
+**Status: COMPLETE — GOVERNANCE CLOSED**
 
 - native GorXu Inspect Mission `MSN-ac85d2c7192c` completed with `code-reviewer` and independent verification PASS by `independent-verifier` after the qualified digest-pinned workspace fallback was commissioned;
 - two earlier audit harness runs failed closed when the commissioned fallback was absent and are preserved as red environment evidence;
@@ -106,10 +107,13 @@ This operational hardening preserves Apex status because it changes bootstrap/ve
 - third-party GitHub Actions are pinned to full commit SHAs and an executable contract prevents mutable action references from returning;
 - weekly Dependabot monitoring covers GitHub Actions and Python dependencies without auto-merge;
 - pytest test/dev constraints now require `>=9.0.3,<10`, removing the audited `PYSEC-2026-1845` exposure from the previous 8.x constraint;
-- repository-level `main` protection remains externally gated and is tracked in issue #18; it is not represented as repaired until GitHub reports protection active.
-- exact final PR #19 CI run `31938508389` passed all five permanent gates; PR #19 merged as `53ecce335af79bfe9676f4467349fd78ebcdfb71` with zero tree drift at tree `087742f06877000fb5be9de80af64e11ddb21592`; canonical `main` CI run `31938672912` then passed all five gates.
+- exact final PR #19 CI run `31938508389` passed all five permanent gates; PR #19 merged as `53ecce335af79bfe9676f4467349fd78ebcdfb71` with zero tree drift at tree `087742f06877000fb5be9de80af64e11ddb21592`; canonical `main` CI run `31938672912` then passed all five gates;
+- follow-on maintenance PR #23 consolidated the researched GitHub Actions upgrades while retaining immutable full-SHA pinning; the canonical squash merge `fe16b334dc5a5174fc7a37fe2bc29e0a693d27c5` has the same tested tree `426ad165d1f3134760c6a81b422d237232ab805a` as the PR merge candidate;
+- canonical `main` post-merge CI run `31939076253` passed Python 3.11, 3.12, 3.13, 3.14 and Wheel bootstrap portability;
+- GitHub ruleset `Protect canonical main` is active against the default branch, requires pull requests, requires all five canonical CI checks with strict up-to-date enforcement, blocks deletion and non-fast-forward updates, and defines no bypass actors;
+- issue #18 was independently verified against live GitHub ruleset state and closed as completed.
 
-The audit preserved the existing command relationship, 82-Crew company, zero-retired-Crew operational state, Inspect/Repair boundary, routing and persistence semantics, and Apex qualification invariants.
+The audit preserved the existing command relationship, 82-Crew company, zero-retired-Crew operational state, Inspect/Repair boundary, routing and persistence semantics, and Apex qualification invariants. There are no remaining Audit 001 blockers.
 
 ## Known deliberate limits
 
@@ -433,7 +437,7 @@ A7 adds crash-persistent hard cost ceilings and source-normalized, independently
 
 - PR #12 reconciled post-Apex stewardship wording without runtime changes;
 - stabilization run `31909761968` passed documentation scope/diff checks plus **121 pytest passed, 2 skipped** and **123 unittest OK, 2 skipped**;
-- current release `v0.7.1` is pinned to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` and canonical source continues on `main`;
+- current release `v0.7.1` is pinned to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` and canonical source continues on protected `main`;
 - the released company remains **82 Standing Crew**;
 - A1 through A7 remain qualified;
 - future evolution must re-prove affected Apex invariants rather than silently inheriting qualification;

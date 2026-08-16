@@ -49,7 +49,8 @@ Apex is an evidence-backed operating standard, not additional authority. Future 
 The released Vessel includes:
 
 - Commander Seat CLI and interactive bridge;
-- persistent least-privilege GitHub Actions CI on pull requests and `main`, including Python 3.11/3.12 regressions and wheel-bootstrap portability checks;
+- persistent least-privilege GitHub Actions CI on pull requests and `main`, including Python 3.11-3.14 regressions plus wheel-bootstrap portability, with immutable full-SHA action pinning;
+- active default-branch repository protection requiring pull requests and all five canonical CI gates, strict up-to-date checks, blocked deletion/non-fast-forward updates, and no configured bypass actors;
 - Pilot GorXu orchestration with provider-neutral cognition and deterministic safe fallback;
 - native Mission Control;
 - **82 Standing Crew** across nine Divisions;
