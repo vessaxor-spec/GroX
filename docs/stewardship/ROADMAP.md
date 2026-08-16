@@ -78,3 +78,21 @@ Operational Audit 001 is complete. Native Mission `MSN-ac85d2c7192c`, PR #19, an
 There is no predeclared A8. The current phase is operation and evidence-driven evolution of the qualified Vessel. Real Commander Missions should produce telemetry, failures, recovery evidence, cost evidence, and operational friction that justify any next capability change. The first post-Apex operational cycle proved that rule in practice: a non-editable CLI launch exposed a Vessel-root portability weakness, the documented source bootstrap completed Mission `MSN-8a86f094509b` with independent verification, and the resulting bounded hardening added persistent CI plus fail-closed portable Vessel binding without widening authority. That hardening is frozen in release `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`; canonical source now continues through the protected PR-and-CI path on `main`.
 
 Known deliberate limits remain candidates for future work, not automatic roadmap commitments: autonomous memory consolidation, more general external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP support, and optional external-agent interoperability. Any promoted change must remain subordinate to the existing command architecture and re-prove affected Apex invariants before release.
+
+## Approved Post-Apex Operational Evolution Program 001
+
+The Commander approved the full set of actionable findings from the ClaudX comparative review. The execution plan is canonicalized in `docs/stewardship/POST_APEX_EVOLUTION_PROGRAM_001.md`. This is an evidence-driven post-Apex program, **not A8**.
+
+Execution tracks:
+
+1. **#29 - External capability intake convention.** Formalize lightweight `adopt | adapt | harvest | reject` classification without adding a command layer or duplicate decision store.
+2. **#25 - Critical detector mutation proving.** Deliberately challenge high-consequence GroX health/governance tests and prove they fail for the intended reason before relying on them.
+3. **#26 - Native Vessel health surface.** Build a unified diagnostic health view from authoritative existing GroX services; inspection remains non-mutating by default.
+4. **#27 - Tiered reconstitution.** Add fast/targeted/full reconstitution selection without weakening source/state, recovery, authority, or Mission-resume gates.
+5. **#30 - Context heat experiment.** Test a GroX-native hot/warm/cold context model and bounded compression against long-horizon Mission/reconstitution evidence; external synthetic token-savings claims are not accepted as proof.
+6. **#28 - A6 longitudinal operational drift analysis.** Extend A6 with protected-baseline trend analysis from real Mission trajectories while preserving non-self-activation and first-class invariant failures.
+7. **#31 - Mission-to-source provenance research.** Threat-model a privacy-safe verifiable link between authorized private Missions and public PR/CI/merge history before any implementation decision.
+
+Standing exclusions from the comparative review are also explicit: do not re-import GroX-derived ClaudX architecture as novelty; do not add a duplicate decisions ledger; do not import host-specific `launchd` architecture; do not retain sleeping retired Crew; do not remove `orchestration-evaluation-analyst` without GroX-native evidence; and do not treat ClaudX's synthetic 57.4% token-savings result as GroX evidence.
+
+The program proceeds in the above dependency order. Each implementation track must recalibrate against then-current repository/runtime truth, re-prove affected Apex invariants, pass the protected five-gate CI path, and use independent verification where required. Completion of the program requires an integrated operational Mission across the changed surfaces. No version bump, release, or new qualification stage is implied until that integrated evidence exists.
