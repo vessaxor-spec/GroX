@@ -135,7 +135,8 @@ class SpecialistCraftLibraryTest(unittest.TestCase):
         self.assertIn("### Evaluation non-activation boundary", text)
         self.assertIn("evaluation cannot self-activate", text.lower())
         self.assertIn("Proposals return to GorXu", text)
-        self.assertNotIn("retains routing and orchestration authority", text)
+        self.assertIn("Live routing authority remains with Pilot GorXu and maintainers", text)
+        self.assertNotIn("Mission Control", text)
 
     def test_roster_still_loads_dossiers_and_resolves_craft_additively(self):
         roster = CrewRoster(DOSSIERS)
