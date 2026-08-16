@@ -3,8 +3,6 @@ from __future__ import annotations
 from contextlib import redirect_stdout
 import io
 import json
-from pathlib import Path
-import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -51,6 +49,14 @@ class ReconstitutionPlannerTests(unittest.TestCase):
         self.assertLess(plan.planned_surface_count, plan.full_surface_count)
         self.assertTrue(any("source_repository is UNKNOWN" in reason for reason in plan.reasons))
 
+    def test_missing_source_repository_selects_targeted_not_fast(self) -> None:
+        report = healthy_report()
+        checks = tuple(item for item in report.checks if item.check_id != "source_repository")
+        plan = self.planner.plan(HealthReport("DEGRADED", checks, report.generated_at, report.vessel_root))
+        self.assertEqual(plan.mode, TARGETED)
+        self.assertIn("source_integrity", plan.load_surfaces)
+        self.assertTrue(any("source repository evidence missing" in reason for reason in plan.reasons))
+
     def test_noncritical_environment_warning_selects_targeted(self) -> None:
         report = healthy_report()
         checks = tuple(
@@ -81,6 +87,16 @@ class ReconstitutionPlannerTests(unittest.TestCase):
         plan = self.planner.plan(HealthReport("UNHEALTHY", checks, report.generated_at, report.vessel_root))
         self.assertEqual(plan.mode, FULL)
         self.assertTrue(any("critical health failure" in reason for reason in plan.reasons))
+
+    def test_recovery_warning_forces_full(self) -> None:
+        report = healthy_report()
+        checks = tuple(
+            item if item.check_id != "recovery_readiness" else check("recovery_readiness", "recovery", WARN, critical=True, detail="bounded resume required")
+            for item in report.checks
+        )
+        plan = self.planner.plan(HealthReport("DEGRADED", checks, report.generated_at, report.vessel_root))
+        self.assertEqual(plan.mode, FULL)
+        self.assertTrue(any("recovery readiness is WARN" in reason for reason in plan.reasons))
 
     def test_interrupted_or_running_state_forces_full(self) -> None:
         report = healthy_report(
