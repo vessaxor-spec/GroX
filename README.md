@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner/grox-banner.svg" alt="GroX persistent AI command environment banner" width="100%">
+  <img src="assets/banner/grox-banner-hd-optimized.png" alt="GroX persistent AI command environment banner" width="100%">
 </p>
 
 # GroX
