@@ -1,6 +1,7 @@
 # GroX
 
-**Release:** `v0.7.0`
+**Latest release:** `v0.7.0`
+**Current source package:** `0.7.1`
 **Operating standard:** **APEX QUALIFIED**
 **Standing Crew:** **82** — 81 specialist-inspired Crew plus 1 native independent verifier
 **Canonical release source:** `71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -44,6 +45,7 @@ Apex is an evidence-backed operating standard, not additional authority. Future 
 The released Vessel includes:
 
 - Commander Seat CLI and interactive bridge;
+- persistent least-privilege GitHub Actions CI on pull requests and `main`, including Python 3.11/3.12 regressions and wheel-bootstrap portability checks;
 - Pilot GorXu orchestration with provider-neutral cognition and deterministic safe fallback;
 - native Mission Control;
 - **82 Standing Crew** across nine Divisions;
@@ -83,6 +85,8 @@ grox roster
 grox mission "Inspect the Vessel and report readiness" --mode inspect
 grox bridge
 ```
+
+Vessel-root binding is explicit and fail-closed. GroX resolves `GROX_VESSEL_ROOT` first, then the current checkout ancestry, then the source-module ancestry used by an editable checkout. A non-editable installed CLI may operate from a valid GroX checkout or with `GROX_VESSEL_ROOT` set; outside a bound Vessel it refuses to start rather than constructing an empty company.
 
 ## Persistence model
 

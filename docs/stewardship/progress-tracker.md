@@ -1,13 +1,14 @@
 # GroX Progress Tracker
 
-**Status date:** 2026-08-15
+**Status date:** 2026-08-16
 **Canonical release:** `v0.7.0`
 **Canonical source branch:** `main`
+**Current source package:** `0.7.1`
 **Released qualified source:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **121 passed, 2 skipped**; unittest **123 OK, 2 skipped**
+**Current verified regression:** pytest **126 passed, 2 skipped**; unittest **128 OK, 2 skipped**
 
 ## Verified Vessel baseline
 
@@ -35,6 +36,9 @@ Verified by source, qualification evidence, and automated testing:
 - A6 external audit independently collected 102 tests (`pytest`: 100 passed, 2 environment-dependent browser skips; `unittest`: 102 ran OK, 2 skips)
 - live Inspect Mission completed successfully
 - live medium-risk Repair Mission completed with independent verification
+- first post-Apex operational Inspect Mission `MSN-8a86f094509b` completed on the canonical source with `code-reviewer`, full regression evidence, and independent verification PASS by `independent-verifier`
+- permanent least-privilege CI now exercises Python 3.11/3.12 regressions plus non-editable wheel bootstrap portability on pull requests and `main`
+- Vessel-root discovery now supports explicit `GROX_VESSEL_ROOT` binding, current-checkout discovery, editable-source fallback, and fail-closed refusal to construct an unbound 0-Crew Vessel
 
 ## Company state
 
@@ -60,6 +64,21 @@ Verified by source, qualification evidence, and automated testing:
 ## Evidence boundary
 
 The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/GroX` on `main`. Private SQLite and `.groxstate` operational state remain outside public Git by design. Historical private state may contain retired Crew identities that are not part of the active source-defined company.
+
+## First post-Apex operational cycle
+
+**Status: HARDENED AND CI-VERIFIED IN CURRENT SOURCE**
+
+- initial operational run `31919127956` used a normal non-editable install and correctly returned a bounded routing failure after the old CLI root assumption resolved into site-packages with 0 Standing Crew;
+- documented editable bootstrap run `31919157280` reconstituted all 82 Standing Crew and completed Inspect Mission `MSN-8a86f094509b`;
+- `code-reviewer` inspected 198 files and executed the full regression path with return code 0;
+- `independent-verifier` independently verified the Mission PASS;
+- no source mutation occurred in either operational observation run;
+- the bounded repair candidate introduced portable, explicit, fail-closed Vessel-root binding and the first persistent canonical CI workflow;
+- CI run `31919583794` passed wheel-bootstrap portability plus Python 3.11 and 3.12 regression jobs; Python 3.12 recorded **126 pytest passed, 2 skipped** and **128 unittest OK, 2 skipped**;
+- the wheel path proved three states: current-checkout binding succeeds with 82 Crew, explicit `GROX_VESSEL_ROOT` succeeds outside the checkout, and an unbound installed runtime fails closed rather than starting an empty Vessel.
+
+This operational hardening preserves Apex status because it changes bootstrap/verification infrastructure rather than Commander authority, GorXu orchestration authority, Crew organization, routing policy, persistence schema, or capability grants.
 
 ## Known deliberate limits
 
