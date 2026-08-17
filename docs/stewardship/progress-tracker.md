@@ -506,7 +506,7 @@ Next Apex stage after A6 was **A7 - Apex Qualification Gauntlet**.
 
 **Status: PRE-GAUNTLET HARDENING (historical checkpoint)**
 
-An external independent audit of `main@481d83e422119d94759685560b61bfccd9e532da` returned **PASS WITH CONDITIONS** for A7 entry. It independently reproduced the A6 private-state hashes, SQLite integrity, 82-Crew state, preserved Mission `MSN-f09179526ad7`, evaluation case `EVC-10573b2453b`, exact replay trace, zero invariants, verifier separation, authority/risk controls, and proposal activation denial.
+An external independent audit of `main@481d83e422119d94759685560b61bfccd9e532da` returned **PASS WITH CONDITIONS** for A7 entry. It independently reproduced the A6 private-state hashes, SQLite integrity, 82-Crew state, preserved Mission `MSN-f09179526ad7`, evaluation case `EVC-10573b245e54`, exact replay trace, zero invariants, verifier separation, authority/risk controls, and proposal activation denial.
 
 The bounded pre-A7 hardening response is limited to proved findings:
 
