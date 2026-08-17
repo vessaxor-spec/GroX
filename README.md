@@ -15,6 +15,7 @@ A persistent AI Vessel for translating **Commander intent into bounded Missions,
 [![GroX CI](https://github.com/vessaxor-spec/GroX/actions/workflows/ci.yml/badge.svg)](https://github.com/vessaxor-spec/GroX/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/vessaxor-spec/GroX?label=release)](https://github.com/vessaxor-spec/GroX/releases/latest)
 
+[**Public overview**](https://vessaxor-spec.github.io/grox/) ·
 [**Explore the architecture**](docs/architecture/ARCHITECTURE.md) ·
 [**See current progress**](docs/stewardship/progress-tracker.md) ·
 [**View the roadmap**](docs/stewardship/ROADMAP.md) ·
