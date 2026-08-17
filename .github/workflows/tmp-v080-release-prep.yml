@@ -1,0 +1,104 @@
+name: Temporary v0.8.0 release preparation
+
+on:
+  push:
+    branches: [release/v0.8.0-candidate]
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: release/v0.8.0-candidate
+      - name: Prepare bounded release candidate
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace(path, old, new, count=1):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              actual = text.count(old)
+              if actual != count:
+                  raise SystemExit(f'{path}: expected {count} occurrence(s), found {actual}: {old!r}')
+              p.write_text(text.replace(old, new), encoding='utf-8')
+
+          replace('pyproject.toml', 'version = "0.7.1"', 'version = "0.8.0"')
+          replace('src/grox/__init__.py', "__version__='0.7.1'", "__version__='0.8.0'")
+
+          replace(
+              'README.md',
+              '[![Release](https://img.shields.io/github/v/release/vessaxor-spec/GroX?label=release)](https://github.com/vessaxor-spec/GroX/releases/tag/v0.7.1)',
+              '[![Release](https://img.shields.io/github/v/release/vessaxor-spec/GroX?label=release)](https://github.com/vessaxor-spec/GroX/releases/latest)'
+          )
+          replace(
+              'README.md',
+              '**Release:** `v0.7.1` · **Package:** `0.7.1` · **Operating standard:** `APEX QUALIFIED` · **Standing Crew:** `82`',
+              '**Release candidate:** `v0.8.0` · **Current release:** `v0.7.1` · **Package:** `0.8.0` · **Operating standard:** `APEX QUALIFIED` · **Standing Crew:** `82`'
+          )
+          replace(
+              'README.md',
+              'GroX has completed the A1-A7 Apex qualification path and is operating in protected post-Apex evolution.',
+              'GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational Evolution Program 001. Canonical source is now being prepared as the `v0.8.0` release candidate.'
+          )
+          replace(
+              'README.md',
+              '| Completed program work | capability intake, critical mutation proving, Vessel health, tiered reconstitution, controlled context heat/compression experiment |\n| Next program stage | **#28 A6 longitudinal operational drift analysis** |',
+              '| Completed program work | Program 001 complete: capability intake, mutation proving, Vessel health, tiered reconstitution, controlled context heat, A6 longitudinal drift, Mission-to-source provenance, and integrated qualification |\n| Next program stage | **None predeclared. No A8 is implied.** |'
+          )
+          replace(
+              'README.md',
+              '- automatic Pilot context compression remains deferred until integrated operational evidence supports activation.',
+              '- automatic Pilot context compression remains deliberately unactivated; integrated qualification proved context preservation without silently enabling runtime compression;\n- **4/4** A6 operational-drift detector mutations killed;\n- **6/6** source-provenance detector mutations killed;\n- integrated Post-Apex qualification passed across health, reconstitution, context preservation, A6 drift, external-intake rejection, and privacy-safe source provenance without widening authority.'
+          )
+          replace(
+              'README.md',
+              'The Apex critical path is complete. GroX is now evolving through **Post-Apex Operational Evolution Program 001** without introducing a predeclared A8.\n\nCompleted program stages include:\n\n- external capability intake convention;\n- continuous critical-detector mutation proving;\n- native read-only Vessel health;\n- tiered FAST/TARGETED/FULL reconstitution planning;\n- controlled HOT/WARM/COLD context policy experiment.\n\nThe next approved stage is **#28 A6 longitudinal operational drift analysis**, followed by mission-to-source provenance research and integrated operational qualification of the changed surfaces. Completion of an individual stage does not imply a version bump, release tag, new Apex stage, or authority expansion.\n\nThe Commander retains the release decision.',
+              'The Apex critical path and **Post-Apex Operational Evolution Program 001** are complete and independently verified. Program 001 added evidence-backed Vessel health, tiered reconstitution, bounded context-heat policy, longitudinal A6 drift analysis, external-capability intake discipline, and privacy-safe Mission-to-source provenance, then qualified those surfaces together.\n\nThere is no predeclared A8. Future evolution requires new Commander intent and must preserve the existing Apex and Post-Apex regression boundaries.\n\nThe `v0.8.0` source candidate packages this completed baseline; creating the release tag and publishing the GitHub release remain separate Commander-controlled actions.'
+          )
+
+          replace(
+              'docs/stewardship/ROADMAP.md',
+              'Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. The Commander alone decides whether to create any subsequent release. No version bump, release tag, new Apex stage, or A8 is implied.',
+              'Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. Commander authorization has opened `v0.8.0` release preparation under issue #55. The candidate may align version metadata and release-facing stewardship, but the tag and GitHub release remain unpublished until a separately verified final candidate is explicitly released. No new Apex stage or A8 is implied.'
+          )
+          replace(
+              'docs/stewardship/ROADMAP.md',
+              'There is no predeclared A8. Current work is **Post-Apex Operational Evolution Program 001**, driven by Commander-approved evidence from the ClaudX comparative review and by GroX-native tests/operational evidence. External ideas do not become authority or qualification evidence merely by being useful elsewhere.',
+              'There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** Current bounded work is release preparation for `v0.8.0`; future evolution beyond this baseline requires new Commander intent. External ideas do not become authority or qualification evidence merely by being useful elsewhere.'
+          )
+
+          replace(
+              'docs/stewardship/progress-tracker.md',
+              '**Canonical release:** `v0.7.1`\n**Canonical source branch:** `main`\n**Current source package:** `0.7.1`',
+              '**Canonical release:** `v0.7.1`\n**Release candidate:** `v0.8.0` — PREPARATION AUTHORIZED; TAG/PUBLICATION PENDING\n**Canonical source branch:** `main`\n**Current source package:** `0.8.0`'
+          )
+          replace(
+              'docs/stewardship/progress-tracker.md',
+              '- package/source version metadata is synchronized at `0.7.1` and guarded by both pytest and unittest\n- release `v0.7.1` is pinned to the fully verified post-Apex operational-hardening source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`',
+              '- package/source version metadata is aligned to the `0.8.0` release candidate and remains guarded by both pytest and unittest\n- current published release `v0.7.1` remains pinned to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` until the verified `v0.8.0` candidate is explicitly published'
+          )
+          marker = 'Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.\n\n## Known deliberate limits'
+          insertion = '''Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.\n\n## v0.8.0 release candidate\n\n**Status: PREPARATION AUTHORIZED — TAG/PUBLICATION PENDING**\n\n- Commander authorization opened issue #55 for a bounded `v0.8.0` candidate;\n- candidate source begins from canonical post-merge verified `main@14262546967d7aed54cf07f94759cf6e77414f24`;\n- package/source metadata is aligned to `0.8.0`;\n- public README and current stewardship are being reconciled to the completed Program 001 state;\n- the complete protected CI matrix plus independent exact-head verification are required before publication can be considered;\n- no tag or GitHub release is created by preparation; publication remains a separate Commander-controlled action;\n- no Commander, GorXu, Crew, Tool Gateway, verifier, persistence, A6 activation, or other authority boundary is widened; no A8 is created or implied.\n\n## Known deliberate limits'''
+          replace('docs/stewardship/progress-tracker.md', marker, insertion)
+
+          workflow = Path('.github/workflows/tmp-v080-release-prep.yml')
+          if not workflow.exists():
+              raise SystemExit('temporary workflow missing before self-removal')
+          workflow.unlink()
+          PY
+
+          git diff --check
+          git status --short
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add pyproject.toml src/grox/__init__.py README.md docs/stewardship/ROADMAP.md docs/stewardship/progress-tracker.md .github/workflows/tmp-v080-release-prep.yml
+          git commit -m 'Prepare GroX v0.8.0 release candidate'
+          git push origin HEAD:release/v0.8.0-candidate
