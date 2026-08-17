@@ -1,6 +1,6 @@
 # GroX Progress Tracker
 
-**Status date:** 2026-08-16
+**Status date:** 2026-08-17
 **Canonical release:** `v0.7.1`
 **Canonical source branch:** `main`
 **Current source package:** `0.7.1`
@@ -9,7 +9,7 @@
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED — OPERATIONAL AUDIT 001 CLOSED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **131 passed, 2 skipped**; unittest **133 OK, 2 skipped**
+**Current verified regression:** pytest **185 passed, 2 skipped, 351 subtests**; unittest **187 OK, 2 skipped**
 
 ## Verified Vessel baseline
 
@@ -24,7 +24,7 @@ Verified by source, qualification evidence, and automated testing:
 - 81 specialist-inspired Standing Crew recruited as native GroX identities
 - 1 native independent verifier retained, for 82 total standing dossiers
 - active Standing Crew membership is canonical, source-defined, and free of stale roster overlap
-- retired, archived, removed, or otherwise stale Crew operational state is purged during roster reconstitution
+- non-standing or otherwise stale Crew operational state is purged during roster reconstitution
 - orchestration-role recruitment blocked; orchestration remains Pilot authority
 - fresh Crew tours with persistent tour/episodic state
 - SQLite Mission, Order, Evidence, and Crew state persistence
@@ -57,7 +57,7 @@ Verified by source, qualification evidence, and automated testing:
 ### Crew-state hygiene
 
 - operational Crew membership is defined only by the current source roster;
-- retired and archived dossiers fail closed rather than becoming sleeping Crew;
+- non-standing dossiers fail closed rather than becoming sleeping Crew;
 - stale Crew state, Crew-scoped memory, and adaptive performance data are purged at roster reconstitution;
 - historical Mission, Order, and Evidence rows remain inert audit history;
 - semantic `orchestrator` identities are rejected by Crew ID and title;
@@ -77,7 +77,7 @@ Verified by source, qualification evidence, and automated testing:
 
 ## Evidence boundary
 
-The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/GroX` on `main`. Private SQLite and `.groxstate` operational state remain outside public Git by design. Operational reconstitution purges stale Crew identities that are not part of the active source-defined company; retired or archived Crew are not retained as operational state.
+The complete Git-tracked live Vessel source is synchronized to `vessaxor-spec/GroX` on `main`. Private SQLite and `.groxstate` operational state remain outside public Git by design. Operational reconstitution purges stale Crew identities that are not part of the active source-defined company; only current source-defined Standing Crew are operational.
 
 ## First post-Apex operational cycle
 
@@ -113,7 +113,21 @@ This operational hardening preserves Apex status because it changes bootstrap/ve
 - GitHub ruleset `Protect canonical main` is active against the default branch, requires pull requests, requires all five canonical CI checks with strict up-to-date enforcement, blocks deletion and non-fast-forward updates, and defines no bypass actors;
 - issue #18 was independently verified against live GitHub ruleset state and closed as completed.
 
-The audit preserved the existing command relationship, 82-Crew company, zero-retired-Crew operational state, Inspect/Repair boundary, routing and persistence semantics, and Apex qualification invariants. There are no remaining Audit 001 blockers.
+The audit preserved the existing command relationship, 82-Crew company, source-defined operational roster, Inspect/Repair boundary, routing and persistence semantics, and Apex qualification invariants. There are no remaining Audit 001 blockers.
+
+## Post-Apex Evolution Program 001 — Stage 5
+
+**Status: COMPLETE — A6 LONGITUDINAL OPERATIONAL DRIFT VERIFIED**
+
+- operational windows are digest-bound to attributable A6 trajectory cases and do not create a second telemetry truth store;
+- missing, stale, tampered, incompatible, or non-operational evidence is `UNKNOWN`, never PASS;
+- critical authority/capability/verifier/escalation/evidence-trace failures remain first-class and cannot be averaged away;
+- baseline runs are selected explicitly and are not rewritten by observation;
+- the isolated operational experiment proved real GorXu Mission degradation detection with success **1.0 → 0.0** and tool failure rate **0.0 → 0.5** while the baseline digest and metrics remained unchanged;
+- A6 drift proposals remain advisory and `activate()` remains denied;
+- red run `32004304942` exposed and preserved an experiment bootstrap defect; green implementation run `32004673068` passed all five jobs, pytest **185 passed, 2 skipped, 351 subtests**, unittest **187 OK, 2 skipped**, and all mutation suites including Stage 5 **4/4 KILLED**.
+
+Stage 6 / issue #31 Mission-to-source provenance research is next.
 
 ## Known deliberate limits
 
