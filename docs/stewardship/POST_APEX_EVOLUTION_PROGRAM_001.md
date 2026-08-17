@@ -1,6 +1,6 @@
 # Post-Apex Operational Evolution Program 001
 
-**Status:** IN EXECUTION — STAGES 0-6 + PROVENANCE IMPLEMENTATION COMPLETE; INTEGRATION GATE NEXT
+**Status:** COMPLETE — INTEGRATED QUALIFICATION INDEPENDENTLY VERIFIED; PROTECTED MERGE PENDING
 
 **Planning baseline:** `main@c93015278daf022b1c3d85fc8fb90a6fa52d8160`
 
@@ -193,7 +193,7 @@ Architecture: `docs/architecture/SOURCE_PROVENANCE.md`
 Evidence: `docs/verification/SOURCE_PROVENANCE_MUTATION_MATRIX.md`
 History: `docs/history/ships-log/0049-source-provenance-receipts-operational.md`
 
-**Exit condition:** PASSED. Integrated Post-Apex Evolution Program 001 qualification is next.
+**Exit condition:** PASSED. Integrated Post-Apex Evolution Program 001 qualification has been independently verified; protected merge is the remaining repository-finalization gate.
 
 ## Cross-workstream verification rules
 
@@ -221,5 +221,22 @@ After implementation/research stages complete, run an integrated post-evolution 
 - external-intake classification prevents duplicate/circular architecture;
 - provenance, if implemented, is verifiable without exposing private state;
 - no change widens Commander, GorXu, Crew, Tool Gateway, verifier, or persistence authority.
+
+### Integrated qualification — INDEPENDENT PASS
+
+Protected CI run `32009009881` composed the completed Post-Apex surfaces on one exact branch head and passed all five canonical jobs. Python 3.12 recorded pytest **202 passed, 2 skipped, 354 subtests**, unittest **204 OK, 2 skipped**, Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, and all five mutation families fully killed: critical invariants **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6**.
+
+The integrated experiment additionally proved:
+
+- clean health selects FAST reconstitution while a fresh host selects FULL;
+- an injected non-Repair `fs_write` authority violation makes health `UNHEALTHY`, forces FULL reconstitution, and health leaves the private SQLite bytes unchanged;
+- Commander intent, authority, critical evidence, unresolved critical state, next action, and retained provenance survive the HOT/WARM/COLD packing policy while runtime activation remains disabled;
+- the production-path A6 degradation experiment reports `REGRESSION`, preserves the frozen baseline, leaves the proposal `proposed`, and blocks activation;
+- the external-intake convention still rejects circular GroX re-import and a duplicate decisions ledger without becoming a command layer;
+- private source authorization verifies against an exact source binding while the public commitment exposes no private authority values; missing private witness is `UNKNOWN`, class downgrade and replay are `FAIL`, and Inspect authority cannot mint source authorization.
+
+Preserved red run `32008781935` failed only at the new integration harness import boundary after all pre-existing gates had remained green. The direct-script loader was corrected without changing Vessel runtime semantics; the red evidence was not bypassed.
+
+Independent review on PR #53 recorded PASS against exact candidate head `5c58392a0b9f8fb80f085128588167712003f283` after full protected CI run `32009679294`. These status-only closeout edits create a new head and therefore must themselves pass exact-head CI and a second bounded review before protected merge. Program qualification is complete; release authority remains exclusively with the Commander.
 
 Only that integrated evidence should determine whether the program warrants a subsequent release. No version bump, release tag, new Apex stage, or A8 is implied by this plan.

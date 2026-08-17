@@ -107,6 +107,9 @@ jobs:
       - name: Source provenance mutation proof
         if: matrix.python-version == '3.12'
         run: python tests/mutation/run_source_provenance_invariants.py
+      - name: Post-Apex integrated operational qualification
+        if: matrix.python-version == '3.12'
+        run: python tests/experiments/post_apex_integration_experiment.py
 
   bootstrap-portability:
     name: Wheel bootstrap portability
