@@ -1,0 +1,24 @@
+name: Stage 6 temporary sync
+
+on:
+  push:
+    branches: [research/stage6-mission-source-provenance]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: python scripts/tmp_stage6_sync.py
+      - run: |
+          rm scripts/tmp_stage6_sync.py
+          rm .github/workflows/tmp-stage6-research-sync.yml
+          git config user.name VESSAXOR
+          git config user.email vessaxor@gmail.com
+          git add -A
+          git diff --cached --check
+          git commit -m "Synchronize Stage 6 provenance research"
+          git push origin HEAD:research/stage6-mission-source-provenance
