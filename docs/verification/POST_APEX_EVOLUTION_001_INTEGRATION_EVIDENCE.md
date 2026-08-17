@@ -1,8 +1,8 @@
 # Post-Apex Operational Evolution Program 001 — Integration Evidence
 
-**Evidence status:** PASS — independently verified candidate
+**Evidence status:** PASS — CANONICAL POST-MERGE VERIFIED
 
-**Independent exact-head verification:** PASS on PR #53 candidate head `5c58392a0b9f8fb80f085128588167712003f283`; final status-only head requires bounded re-verification before merge
+**Independent exact-head verification:** PASS on PR #53 candidate head `5c58392a0b9f8fb80f085128588167712003f283` and final closeout head `3a58a8e9df85087cbbe382085e1b1d9ea1ae6fcd`; canonical post-merge run `32010172588` PASS
 
 ## Scope
 
@@ -62,4 +62,4 @@ The experiment output sets:
 
 These are required boundaries. The experiment supplies evidence; independent exact-head verification decides whether that evidence is sufficient for protected merge. A release remains a separate Commander decision after program closure.
 
-Independent review recorded PASS on candidate head `5c58392a0b9f8fb80f085128588167712003f283` with exact-head CI run `32009679294`. The resulting status-only closeout changes intentionally restart exact-head CI and bounded independent review before protected merge. This record does not authorize a release.
+Independent review recorded PASS on candidate head `5c58392a0b9f8fb80f085128588167712003f283` with run `32009679294`; a second bounded review recorded PASS on final closeout head `3a58a8e9df85087cbbe382085e1b1d9ea1ae6fcd` with run `32009983924`. PR #53 merged as `4122845858fae6abdf52af7a3a1ce56256e0c5cf`, and canonical post-merge run `32010172588` passed. This record does not authorize a release.

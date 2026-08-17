@@ -1,6 +1,6 @@
 # Post-Apex Operational Evolution Program 001
 
-**Status:** COMPLETE — INTEGRATED QUALIFICATION INDEPENDENTLY VERIFIED; PROTECTED MERGE PENDING
+**Status:** COMPLETE — CANONICAL POST-MERGE VERIFIED; RELEASE DECISION RESERVED TO COMMANDER
 
 **Planning baseline:** `main@c93015278daf022b1c3d85fc8fb90a6fa52d8160`
 
@@ -193,7 +193,7 @@ Architecture: `docs/architecture/SOURCE_PROVENANCE.md`
 Evidence: `docs/verification/SOURCE_PROVENANCE_MUTATION_MATRIX.md`
 History: `docs/history/ships-log/0049-source-provenance-receipts-operational.md`
 
-**Exit condition:** PASSED. Integrated Post-Apex Evolution Program 001 qualification has been independently verified; protected merge is the remaining repository-finalization gate.
+**Exit condition:** PASSED. Integrated Post-Apex Evolution Program 001 qualification is canonical on protected `main` and post-merge verified.
 
 ## Cross-workstream verification rules
 
@@ -237,6 +237,6 @@ The integrated experiment additionally proved:
 
 Preserved red run `32008781935` failed only at the new integration harness import boundary after all pre-existing gates had remained green. The direct-script loader was corrected without changing Vessel runtime semantics; the red evidence was not bypassed.
 
-Independent review on PR #53 recorded PASS against exact candidate head `5c58392a0b9f8fb80f085128588167712003f283` after full protected CI run `32009679294`. These status-only closeout edits create a new head and therefore must themselves pass exact-head CI and a second bounded review before protected merge. Program qualification is complete; release authority remains exclusively with the Commander.
+Independent review on PR #53 recorded PASS against candidate head `5c58392a0b9f8fb80f085128588167712003f283` after run `32009679294`, and a second exact-head review recorded PASS on final closeout head `3a58a8e9df85087cbbe382085e1b1d9ea1ae6fcd` after run `32009983924`. PR #53 merged as `4122845858fae6abdf52af7a3a1ce56256e0c5cf`; canonical post-merge run `32010172588` then passed all five jobs. Program qualification and canonicalization are complete; release authority remains exclusively with the Commander.
 
 Only that integrated evidence should determine whether the program warrants a subsequent release. No version bump, release tag, new Apex stage, or A8 is implied by this plan.

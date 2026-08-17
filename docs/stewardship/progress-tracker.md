@@ -165,11 +165,11 @@ The bounded provenance implementation is now complete and verified. Integrated o
 Architecture: `docs/architecture/SOURCE_PROVENANCE.md`.
 Evidence: `docs/verification/SOURCE_PROVENANCE_MUTATION_MATRIX.md`.
 
-Integrated Post-Apex Evolution Program 001 qualification has passed independent review; protected merge finalization remains before canonical closure.
+Integrated Post-Apex Evolution Program 001 qualification is canonical on protected `main` and post-merge verified; any release remains a Commander decision.
 
 ## Post-Apex Evolution Program 001 — Integrated qualification
 
-**Status: COMPLETE — INDEPENDENT PASS; PROTECTED MERGE PENDING**
+**Status: COMPLETE — CANONICAL POST-MERGE PASS**
 
 - preserved red run `32008781935` isolated a direct-script import-path defect in the new integration harness after every pre-existing protected gate remained green; the harness loader was corrected rather than bypassed;
 - corrected exact-head run `32009009881` passed Python 3.11, 3.12, 3.13, 3.14 and Wheel bootstrap portability;
@@ -182,7 +182,7 @@ Integrated Post-Apex Evolution Program 001 qualification has passed independent 
 - private source provenance verified an exact source binding while public metadata remained privacy-minimized; missing private witness returned `UNKNOWN`, downgrade/replay returned `FAIL`, and Inspect authority could not issue source authorization;
 - mutation proof remained fully green: critical **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6** killed.
 
-The experiment deliberately emits `qualification_claim=false`, `release_decision=false`, and `new_apex_stage=false`; the experiment did not self-certify. Independent review on PR #53 recorded PASS against exact candidate head `5c58392a0b9f8fb80f085128588167712003f283` after run `32009679294`. These closeout edits require a new exact-head CI/review cycle before protected merge. Any later release remains a Commander decision.
+The experiment deliberately emits `qualification_claim=false`, `release_decision=false`, and `new_apex_stage=false`; the experiment did not self-certify. PR #53 received bounded PASS reviews on candidate head `5c58392a0b9f8fb80f085128588167712003f283` and final closeout head `3a58a8e9df85087cbbe382085e1b1d9ea1ae6fcd`; final PR CI run `32009983924` passed, the PR merged as `4122845858fae6abdf52af7a3a1ce56256e0c5cf`, and canonical post-merge run `32010172588` passed all five jobs. Any later release remains a Commander decision.
 
 Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.
 
