@@ -101,6 +101,9 @@ jobs:
       - name: Tiered reconstitution mutation proof
         if: matrix.python-version == '3.12'
         run: python tests/mutation/run_reconstitution_invariants.py
+      - name: Operational drift mutation proof
+        if: matrix.python-version == '3.12'
+        run: python tests/mutation/run_operational_drift_invariants.py
 
   bootstrap-portability:
     name: Wheel bootstrap portability
