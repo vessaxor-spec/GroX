@@ -65,19 +65,19 @@ class SpineTest(unittest.TestCase):
 
             store = StateStore(root / 'state.sqlite3')
             try:
-                store.ensure_crew('fixture-architect')
-                store.db.execute("UPDATE crew_state SET status='retired' WHERE crew_id='fixture-architect'")
+                store.ensure_crew('test-architecture-specialist')
+                store.db.execute("UPDATE crew_state SET status='retired' WHERE crew_id='test-architecture-specialist'")
                 store.remember(
                     kind='semantic',
                     scope='crew',
-                    crew_id='fixture-architect',
+                    crew_id='test-architecture-specialist',
                     task_class=None,
                     memory_key='legacy',
                     content='legacy operational memory',
                     provenance={'test': True},
                 )
                 store.record_performance(
-                    crew_id='fixture-architect',
+                    crew_id='test-architecture-specialist',
                     mission_id='MSN-history',
                     order_id='ORD-history',
                     task_class='legacy',
@@ -90,22 +90,22 @@ class SpineTest(unittest.TestCase):
                 )
                 store.db.execute(
                     "INSERT INTO orders VALUES(?,?,?,?,?,?,?,?)",
-                    ('ORD-audit', 'MSN-audit', 'fixture-architect', 'inspect', 'completed', '{}', 't', 't'),
+                    ('ORD-audit', 'MSN-audit', 'test-architecture-specialist', 'inspect', 'completed', '{}', 't', 't'),
                 )
                 store.db.commit()
 
                 roster = CrewRoster(dossier_dir, store)
                 self.assertEqual([d.crew_id for d in roster.all()], ['architect'])
                 self.assertEqual(
-                    store.db.execute("SELECT COUNT(*) FROM crew_state WHERE crew_id='fixture-architect'").fetchone()[0],
+                    store.db.execute("SELECT COUNT(*) FROM crew_state WHERE crew_id='test-architecture-specialist'").fetchone()[0],
                     0,
                 )
                 self.assertEqual(
-                    store.db.execute("SELECT COUNT(*) FROM memories WHERE crew_id='fixture-architect'").fetchone()[0],
+                    store.db.execute("SELECT COUNT(*) FROM memories WHERE crew_id='test-architecture-specialist'").fetchone()[0],
                     0,
                 )
                 self.assertEqual(
-                    store.db.execute("SELECT COUNT(*) FROM crew_performance WHERE crew_id='fixture-architect'").fetchone()[0],
+                    store.db.execute("SELECT COUNT(*) FROM crew_performance WHERE crew_id='test-architecture-specialist'").fetchone()[0],
                     0,
                 )
                 self.assertEqual(

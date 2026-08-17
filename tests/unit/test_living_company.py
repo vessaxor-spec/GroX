@@ -78,11 +78,11 @@ class LivingCompanyUnitTests(unittest.TestCase):
             loaded=p.intelligence.route('Inspect backend api service',['repo_read'])
             self.assertEqual(loaded.crew.crew_id,'backend-engineer-b')
             p.store.record_performance(
-                crew_id='fixture-architect',mission_id='M-best',order_id='O-best',task_class='backend',
+                crew_id='test-architecture-specialist',mission_id='M-best',order_id='O-best',task_class='backend',
                 status='completed',evidence_quality=1.0,verified=True,latency_ms=1,cost_units=0,risk='high',
             )
             repair=p.intelligence.route('Repair backend api service',['repo_read','repo_write'],risk=RiskClass.high)
-            self.assertNotEqual(repair.crew.crew_id,'fixture-architect')
+            self.assertNotEqual(repair.crew.crew_id,'test-architecture-specialist')
             self.assertTrue({'competence','reliability','evidence_quality','load','cost','latency','risk','experience','preference'} <= set(repair.components))
         finally: td.cleanup()
 

@@ -13,7 +13,7 @@ def durable_plan(directive):
         'budget': {'max_nodes': 12, 'max_parallel': 1, 'max_replans': 4},
         'nodes': [
             {'node_id':'architecture','objective':'Inspect architecture boundaries','mode':'inspect','dependencies':[],
-             'candidate_crew_ids':['fixture-architect'],'required_capabilities':['repo_read'],'scope':['.']},
+             'candidate_crew_ids':['test-architecture-specialist'],'required_capabilities':['repo_read'],'scope':['.']},
             {'node_id':'research','objective':'Inspect research evidence','mode':'inspect','dependencies':['architecture'],
              'candidate_crew_ids':['researcher'],'required_capabilities':['repo_read'],'scope':['docs']},
             {'node_id':'analysis','objective':'Inspect configuration evidence','mode':'inspect','dependencies':['research'],
@@ -66,7 +66,7 @@ class DurableOperationsIntegrationTests(unittest.TestCase):
                 p.command_graph(directive,plan=durable_plan(directive),plan_source='a4-crash-test')
             mission_id=p.store.recent_missions(1)[0]['mission_id']
             before=p.store.mission(mission_id)
-            architecture_orders=[o for o in before['orders'] if o['crew_id']=='fixture-architect']
+            architecture_orders=[o for o in before['orders'] if o['crew_id']=='test-architecture-specialist']
             self.assertEqual(len(architecture_orders),1)
             self.assertEqual(next(n for n in before['graph_nodes'] if n['node_id']=='architecture')['status'],'completed')
             self.assertEqual(next(n for n in before['graph_nodes'] if n['node_id']=='research')['status'],'running')
@@ -84,7 +84,7 @@ class DurableOperationsIntegrationTests(unittest.TestCase):
             self.assertEqual(resumed['synthesis']['replans'],2)
 
             mission=p2.store.mission(mission_id)
-            self.assertEqual(len([o for o in mission['orders'] if o['crew_id']=='fixture-architect']),1)
+            self.assertEqual(len([o for o in mission['orders'] if o['crew_id']=='test-architecture-specialist']),1)
             self.assertEqual(len([e for e in mission['graph_events'] if e['event_type']=='pilot_replan']),2)
             self.assertTrue(any(e['event_type']=='mission_resumed' for e in mission['graph_events']))
             decisions=p2.durable.exception_decisions(mission_id)
@@ -106,7 +106,7 @@ class DurableOperationsIntegrationTests(unittest.TestCase):
             plan={
                 'commander_intent':directive,'objective':'Prove critical exception escalation boundary.',
                 'nodes':[{'node_id':'inspect','objective':'Inspect critical boundary','mode':'inspect','dependencies':[],
-                          'candidate_crew_ids':['fixture-architect'],'required_capabilities':['repo_read'],'scope':['.']}],
+                          'candidate_crew_ids':['test-architecture-specialist'],'required_capabilities':['repo_read'],'scope':['.']}],
             }
             p.executor=AlwaysBlocker(p.executor)
             result=p.command_graph(directive,plan=plan,risk=RiskClass.critical,plan_source='a4-critical-test')
