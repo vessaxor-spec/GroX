@@ -1,6 +1,6 @@
 # Post-Apex Operational Evolution Program 001
 
-**Status:** IN EXECUTION — STAGES 0-4 COMPLETE; STAGE 5 NEXT
+**Status:** IN EXECUTION — STAGES 0-5 COMPLETE; STAGE 6 NEXT
 
 **Planning baseline:** `main@c93015278daf022b1c3d85fc8fb90a6fa52d8160`
 
@@ -16,7 +16,7 @@ The objective is to improve how the qualified Vessel determines its own conditio
 
 - Commander authority and GorXu's role as sole operational orchestrator remain unchanged.
 - Mission Control remains a GroX-native subsystem under GorXu, not a parallel command path.
-- Standing Crew remain source-defined operational identities; retired or archived Crew are not retained as sleeping operational identities.
+- Standing Crew remain source-defined operational identities; non-standing identities are not retained as sleeping operational identities.
 - Inspection, evaluation, health checking, telemetry, planning, experimentation, and research do not grant mutation authority.
 - A6 findings and drift signals remain advisory and may not self-activate changes.
 - Private SQLite, `.groxstate`, raw Commander directives, private Mission content, credentials, and sensitive evidence remain outside public Git.
@@ -40,7 +40,7 @@ The approved ClaudX review produced the following GroX decisions. Research and t
 | GroX-derived ClaudX command spine, Crew, memory, durable ops, Mission Graph, A6 concepts | REJECT | Already native GroX capability; do not re-import or duplicate. |
 | Separate decisions ledger | REJECT | Avoid duplicate source of truth. |
 | Host-specific launchd heartbeat architecture | REJECT | Preserve host portability; only the abstract unattended-health idea may inform design. |
-| Sleeping retired Crew identities | REJECT | Preserve GroX purge rule. |
+| Sleeping non-standing Crew identities | REJECT | Preserve GroX purge rule. |
 | ClaudX synthetic 57.4% token-savings claim as GroX proof | REJECT | Establish GroX evidence independently. |
 | Removing `orchestration-evaluation-analyst` because ClaudX removed a similar role | REJECT | GroX role decisions require GroX authority/capability evidence. |
 
@@ -134,24 +134,25 @@ History: `docs/history/ships-log/0044-context-heat-experiment-passed.md`
 
 **Exit condition:** PASSED for controlled experiment; runtime activation remains deliberately unclaimed.
 
-### Stage 5 — A6 longitudinal operational drift analysis — NEXT
+### Stage 5 — A6 longitudinal operational drift analysis — COMPLETE
 
 **Issue:** #28
 
-Extend A6 trajectory evaluation to compare attributable operational evidence across time without a self-normalizing baseline or self-activation path.
+`src/grox/operational_drift.py` extends the existing A6 evaluation plane with digest-bound operational windows and explicit `STABLE | WATCH | REGRESSION | UNKNOWN` findings. No second telemetry store or autonomous optimization loop was introduced.
 
-Required design constraints:
+Operational windows accept only attributable `canonical_private_mission_state` trajectory cases. Each window binds case IDs, case digests, trajectory digests, a window digest, metric schema, and the ordinary A6 run digest. Comparisons reopen and verify those bindings; missing, tampered, stale, incompatible, or non-operational evidence becomes `UNKNOWN` rather than PASS. A proposed baseline containing a critical invariant failure or incomplete trace is also `UNKNOWN`, preventing degradation from self-normalizing into the accepted baseline.
 
-- baseline identity/content must be frozen or cryptographically bound rather than overwritten by the act of checking;
-- real operational history remains distinguishable from controlled/synthetic qualification cases;
-- missing/stale evidence is UNKNOWN, not PASS;
-- invariant failures remain first-class and cannot be hidden inside a composite score;
-- drift creates an investigation/advisory finding or proposal only;
-- A6 proposal activation remains denied.
+Critical authority, capability, verifier-independence, escalation, and evidence-trace failures remain first-class and cannot be hidden by averages. Longitudinal signals include success, evidence quality, verification failures, cost, budget pressure when available, latency, retries, exceptions, replans, resumes, tool failures, Commander escalation, and Crew routing concentration/utilization. Findings remain advisory; A6 proposal activation is still denied.
 
-Candidate signals include Mission disposition, evidence quality/trace completeness, verifier failures, authority/capability violations, exception/replan and recovery rates, cost, latency, tool failures, Crew utilization/routing concentration, and Commander escalation rate.
+Preserved red run `32004304942` exposed a direct-script import-path defect in the operational experiment after all unit/regression tests had passed. The experiment bootstrap was corrected rather than bypassed. Green exact-head implementation run `32004673068` then passed all five canonical jobs with pytest **185 passed, 2 skipped, 351 subtests**, unittest **187 OK, 2 skipped**, Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, prior mutation suites **12/12**, **7/7**, and **9/9** killed, plus Stage 5 operational-drift mutations **4/4 KILLED**.
 
-**Exit condition:** replayable evidence detects real/injected degradation against a protected baseline without self-normalization or self-activation and all affected A6/A7 invariants remain green.
+The production-path experiment ran four real GorXu Inspect Missions in an isolated temporary Vessel: two healthy baseline Missions followed by two injected test-failure Missions. A6 detected `REGRESSION` with success rate **1.0 → 0.0**, tool failure rate **0.0 → 0.5**, evidence quality **0.916667 → 0.666667**, and no baseline digest/metric mutation. The generated proposal remained `proposed` and activation remained blocked.
+
+Architecture: `docs/architecture/OPERATIONAL_DRIFT.md`
+Evidence: `docs/verification/OPERATIONAL_DRIFT_MUTATION_MATRIX.md`
+History: `docs/history/ships-log/0047-a6-operational-drift-complete.md`
+
+**Exit condition:** PASSED.
 
 ### Stage 6 — Mission-to-source provenance research
 
