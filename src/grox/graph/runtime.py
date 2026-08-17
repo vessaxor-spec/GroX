@@ -144,7 +144,7 @@ class MissionGraphRunner:
         result = self.executor.execute(order)
         # `graph_verification` is reserved runtime evidence. Crew output cannot
         # manufacture verifier authority, including on a real verification node.
-        result.evidence = list(result.evidence)
+        result.evidence = [evidence for evidence in result.evidence if evidence.kind != "graph_verification"]
         if spec.mode is not MissionMode.verify or result.status != "completed":
             return result
 
@@ -581,7 +581,7 @@ class MissionGraphRunner:
                 if len(batch) >= plan.budget.max_parallel:
                     break
                 node_cost = max(0.0, float(specs[node_id].budget.cost_units))
-                if spent_cost + reserved_cost + node_cost < plan.budget.max_cost_units - 1e-12:
+                if spent_cost + reserved_cost + node_cost <= plan.budget.max_cost_units + 1e-12:
                     batch.append(node_id)
                     reserved_cost += node_cost
             if not batch:
