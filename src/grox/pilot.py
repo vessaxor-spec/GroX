@@ -52,17 +52,33 @@ class PilotGorXu:
         return {'inspect':['repo_read'],'repair':['repo_read','repo_write'],'verify':['repo_read','verify'],'execute':['repo_read']}[mode.value]
 
     def _roster_summary(self)->list[dict[str,Any]]:
-        return [
-            {'crew_id':d.crew_id,'division':d.division,'title':d.title,'capabilities':sorted(d.capabilities),'tags':sorted(d.tags),'verification':d.verification}
-            for d in self.roster.all()
-        ]
+        # Cognitive discovery receives descriptive Crew metadata only. Capability
+        # and tag gates remain local deterministic routing inputs.
+        return self.roster.cognitive_directory()
+
+    def _reasoner_usage(self)->dict[str,Any]|None:
+        getter=getattr(self.reasoner,'usage_snapshot',None) if self.reasoner else None
+        if not callable(getter): return None
+        try:
+            usage=getter()
+            if usage is None: return None
+            if hasattr(usage,'to_dict') and callable(usage.to_dict):
+                return usage.to_dict()
+            if isinstance(usage,dict):
+                return dict(usage)
+        except (AttributeError,TypeError,ValueError):
+            # Usage telemetry is observational only and must not become a new
+            # execution dependency or authority gate.
+            return None
+        return None
 
     def _interpret(self,directive:str):
-        if not self.reasoner: return None,None
+        if not self.reasoner: return None,None,None
         try:
-            return self.reasoner.interpret(directive,roster=self._roster_summary()),None
+            brief=self.reasoner.interpret(directive,roster=self._roster_summary())
+            return brief,None,self._reasoner_usage()
         except (ReasoningError,ValueError,TypeError) as e:
-            return None,str(e)
+            return None,str(e),self._reasoner_usage()
 
     def _reconcile_mode(self,directive:str,explicit:MissionMode|None,brief)->MissionMode:
         policy=self.mission_control.infer_mode(directive,explicit)
@@ -97,10 +113,12 @@ class PilotGorXu:
         return payload
 
     def command(self, directive:str, *, mode:MissionMode|None=None, risk:RiskClass|None=None, crew_id:str|None=None, scope:str='.', parameters:dict|None=None)->dict:
-        brief,cognition_error=self._interpret(directive)
+        brief,cognition_error,cognition_usage=self._interpret(directive)
         mode=self._reconcile_mode(directive,mode,brief)
         risk=self._reconcile_risk(directive,risk,brief)
         mission_id=f"MSN-{uuid.uuid4().hex[:12]}"; self.store.create_mission(mission_id,directive,mode.value,risk.value)
+        if cognition_usage:
+            self.store.add_evidence(mission_id,'GORXU-COGNITION',Evidence('cognitive_usage',cognition_usage))
         req=self._required_caps(mode)
         try:
             crew,routing=self._select_crew(directive,req,crew_id,brief,risk)
@@ -196,6 +214,9 @@ class PilotGorXu:
                 if not callable(planner):
                     raise ReasoningError('active cognitive provider does not supply Mission Graph planning')
                 plan = planner(directive, roster=self._roster_summary())
+                graph_usage=self._reasoner_usage()
+                if graph_usage:
+                    self.store.add_evidence(mission_id,'GORXU-GRAPH-PLAN',Evidence('cognitive_usage',graph_usage))
             if isinstance(plan, dict):
                 plan = MissionGraphPlan.from_mapping(plan, expected_intent=directive)
             if not isinstance(plan, MissionGraphPlan):
