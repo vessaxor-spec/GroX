@@ -20,7 +20,7 @@ A persistent AI Vessel for translating **Commander intent into bounded Missions,
 [**View the roadmap**](docs/stewardship/ROADMAP.md) ·
 [**Meet the Crew**](docs/stewardship/CREW_ROSTER.md)
 
-**Release candidate:** `v0.8.0` · **Current release:** `v0.7.1` · **Package:** `0.8.0` · **Operating standard:** `APEX QUALIFIED` · **Standing Crew:** `82`
+**Release:** `v0.8.0` · **Package:** `0.8.0` · **Operating standard:** `APEX QUALIFIED` · **Standing Crew:** `82`
 
 </div>
 
@@ -114,11 +114,11 @@ Canonical builder constraints are defined in [`AI_INSTRUCTIONS.md`](AI_INSTRUCTI
 
 ## Current state
 
-GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational Evolution Program 001. Canonical source is now being prepared as the `v0.8.0` release candidate.
+GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational Evolution Program 001. `v0.8.0` is the current published release baseline.
 
 | Surface | Current state |
 |---|---|
-| Current released baseline | [`v0.7.1`](https://github.com/vessaxor-spec/GroX/releases/tag/v0.7.1), post-Apex operational hardening |
+| Current released baseline | [`v0.8.0`](https://github.com/vessaxor-spec/GroX/releases/tag/v0.8.0), Post-Apex Operational Evolution |
 | First Apex-qualified release | `v0.7.0` |
 | Operating standard | **APEX QUALIFIED** |
 | Command spine | Commander → Pilot GorXu → Divisions → Standing Crew |
@@ -321,7 +321,7 @@ The Apex critical path and **Post-Apex Operational Evolution Program 001** are c
 
 There is no predeclared A8. Future evolution requires new Commander intent and must preserve the existing Apex and Post-Apex regression boundaries.
 
-The `v0.8.0` source candidate packages this completed baseline; creating the release tag and publishing the GitHub release remain separate Commander-controlled actions.
+`v0.8.0` packages this completed baseline and is the current published release. Future release decisions remain Commander-controlled.
 
 See the canonical [`Roadmap`](docs/stewardship/ROADMAP.md) for current sequencing and evidence boundaries.
 
