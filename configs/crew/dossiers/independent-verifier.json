@@ -45,5 +45,6 @@
     "acceptance-criteria",
     "contradiction-detection"
   ],
+  "ordinary_routing": false,
   "verification": true
 }
