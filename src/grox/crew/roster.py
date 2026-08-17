@@ -50,7 +50,7 @@ class CrewDossier:
 class CrewRoster:
     def __init__(self, dossier_dir: Path, store: StateStore | None = None):
         dossier_dir=Path(dossier_dir)
-        self.store=store; self._crew={}
+        self.store=store; self._crew={}; self._domains={}
         self._dossier_dir=dossier_dir
         self._specialist_dir=dossier_dir.parent/'specialists'
         for p in sorted(dossier_dir.glob('*.json')):
@@ -64,6 +64,10 @@ class CrewRoster:
                 raise ValueError(f"forbidden Crew command identity: {cid} / {title}")
             d=CrewDossier(cid,raw['division'],title,frozenset(raw['capabilities']),frozenset(raw.get('tags',[])),bool(raw.get('verification')))
             self._crew[cid]=d
+            # Domains are descriptive cognitive-discovery metadata only. They are
+            # never eligibility, capability, Mission authority, or Repair grants.
+            domains=raw.get('domains') or raw.get('skills') or raw.get('tags',[])
+            self._domains[cid]=tuple(str(value).strip() for value in domains if str(value).strip())
         if store is not None:
             for cid in sorted(self._crew):
                 store.ensure_crew(cid)
@@ -71,6 +75,24 @@ class CrewRoster:
 
     def get(self, crew_id:str)->CrewDossier:
         return self._crew[crew_id]
+
+    def cognitive_directory(self)->list[dict[str, object]]:
+        """Return a compact 82-Crew discovery surface for GorXu cognition.
+
+        The directory intentionally omits capabilities and expanded routing tags.
+        Those remain local deterministic eligibility/routing inputs. Descriptive
+        domains can help cognition recommend a Crew ID but can never grant authority.
+        """
+        return [
+            {
+                'crew_id':d.crew_id,
+                'division':d.division,
+                'title':d.title,
+                'domains':list(self._domains.get(d.crew_id,())),
+                'verification':d.verification,
+            }
+            for d in sorted(self._crew.values(),key=lambda crew:crew.crew_id)
+        ]
 
     def craft_card(self, crew_id:str)->str:
         """Return canonical craft depth for an active Standing Crew identity.

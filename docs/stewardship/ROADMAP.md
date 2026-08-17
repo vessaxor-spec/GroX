@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.7.1` remains the current released post-Apex operational-hardening baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, a source-backed privacy-safe Mission-to-source provenance design, an implemented private receipt/public commitment capability with continuous detector proof, and a canonical independently verified integrated Post-Apex qualification with post-merge CI complete.
+GroX `v0.8.0` is the current published Post-Apex Operational Evolution baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, a source-backed privacy-safe Mission-to-source provenance design, an implemented private receipt/public commitment capability with continuous detector proof, and a canonical independently verified integrated Post-Apex qualification with post-merge CI complete.
 
 Native command architecture:
 
@@ -38,9 +38,10 @@ Native command architecture:
 Released baselines:
 
 - first Apex release: `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`;
-- current released operational-hardening baseline: `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`.
+- post-Apex operational-hardening release: `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`;
+- current published Post-Apex Evolution release: `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`.
 
-Canonical source may advance beyond the release through the protected PR/CI path without moving either tag.
+Canonical source may advance beyond the release through the protected PR/CI path without moving any immutable release tag.
 
 ## Recovery rule
 
@@ -64,6 +65,34 @@ The controlled Stage 4 experiment supports the HOT/WARM/COLD principle but does 
 - Age alone never cools a binding safety or authority fact.
 
 The deterministic four-scenario corpus reduced 20,464 source characters to 1,336 while preserving all declared critical facts and retained provenance. This 93.47% controlled character reduction is **not** a production token/latency claim. Pilot runtime activation remains deferred to integrated operational evidence.
+
+## Cognitive Context Efficiency — issue #60
+
+**Status: IN PROGRESS — COMMANDER AUTHORIZED.** This is a bounded Post-Apex optimization effort, not A8 and not a new command layer.
+
+The current A1 cognitive path exposes all 82 Standing Crew to GorXu through a verbose per-call roster summary. Deep Crew craft cards are not injected on summon, but repeated roster metadata and provider framing create avoidable cognitive-context cost and are not currently evidenced with provider token telemetry.
+
+Approved execution order:
+
+1. **Usage telemetry.** Capture provider-neutral cognitive usage when available: input tokens, cached input tokens, cache-write tokens where exposed, output tokens, reasoning tokens, provider, and model. Persist usage as evidence; never treat cost telemetry as authority.
+2. **Compact Standing Crew Directory.** Derive an 82/82 cognitive directory from canonical dossiers using identity, title, Division, domains, and verification eligibility. Keep capability enforcement and expanded routing tags local to deterministic GroX routing rather than serializing them into every model call.
+3. **Cache-friendly provider framing.** Place stable cognitive contract and Standing Crew directory before Mission-specific Commander input. Provider caching remains an adapter optimization only; cache miss or loss may affect cost/latency but never behavior, authority, or recovery.
+4. **Qualification and measurement.** Re-run affected A1/A3 and integrated qualification, preserve novel-task Crew discovery, prove exact 82-Crew coverage, and compare measured cognitive usage against the current baseline.
+5. **Decision gate.** Only consider hierarchical shortlist routing if measured evidence shows the compact cached 82-Crew directory remains materially inefficient. Do not add embeddings, vector databases, extra model stages, or routing layers without demonstrated need.
+
+Adjacent but separate: future model-backed Standing Crew cognition should activate only Mission-relevant craft sections plus bounded relevant Crew memory rather than inject complete deep craft cards per summon. That work is not part of issue #60 unless separately authorized after this optimization is measured.
+
+Qualification invariants:
+
+- Commander intent remains verbatim and authoritative;
+- GorXu remains sole operational orchestrator;
+- all 82 Standing Crew remain cognitively discoverable;
+- cognition cannot create eligibility, capability, Repair authority, risk reduction, or verifier independence;
+- deterministic Living Company routing remains the authority-bearing selection path;
+- directory generation is deterministic from canonical dossiers;
+- cache failure changes efficiency only;
+- provider usage evidence is advisory/observational and cannot widen authority;
+- existing red canaries and full protected CI remain mandatory.
 
 ## Post-Apex operating posture
 

@@ -12,6 +12,22 @@
 **Standing Crew:** **82**
 **Current verified regression:** pytest **202 passed, 2 skipped, 354 subtests**; unittest **204 OK, 2 skipped**
 
+## Cognitive Context Efficiency — issue #60
+
+**Status: IN PROGRESS — COMMANDER AUTHORIZED**
+
+- Commander approved a bounded optimization of GorXu's repeated cognitive context; this is not A8 and does not create a new command layer or change release authority.
+- recalibration source before work: `main@40e8234aecb23d5775e3c407b6ed19a054b35f84`; canonical push CI run `32042022453` completed successfully on that exact source.
+- work is isolated on `agent/cognitive-context-efficiency` and tracked by issue #60.
+- investigation confirmed that deep Standing Crew craft cards are not automatically injected when Crew are summoned; `CrewRoster.craft_card()` is an explicit read-only lookup.
+- the current A1 cognitive path instead serializes all 82 Crew as a compact roster containing Crew ID, Division, title, capabilities, expanded tags, and verifier eligibility for each reasoning call.
+- the OpenAI reasoning adapter does not currently preserve provider usage telemetry, so GroX cannot evidence actual input, cached input, output, or reasoning tokens per cognitive Mission.
+- current provider framing places the changing Commander directive before the stable Crew roster, reducing reuse of a stable prompt prefix.
+- approved implementation order: provider-neutral cognitive usage telemetry; deterministic compact 82/82 Standing Crew Directory derived from canonical dossiers; cache-friendly stable-prefix framing; affected A1/A3/integrated qualification and measured before/after comparison.
+- hierarchical shortlist routing, embeddings, vector databases, and extra model routing stages remain deferred unless measured evidence shows the compact directory is still materially inefficient.
+- future selective deep-craft activation for model-backed Crew cognition remains adjacent but separate: relevant craft sections plus bounded Crew memory should be activated instead of injecting complete craft cards per summon.
+- hard invariants: all 82 Standing Crew remain cognitively discoverable; Commander intent remains verbatim; GorXu remains sole operational orchestrator; deterministic capability, risk, Repair, Tool Gateway, and verifier-independence controls remain authoritative; caching and usage telemetry cannot grant authority.
+
 ## Verified Vessel baseline
 
 **Operational bootstrap and full-company recruitment: COMPLETE**

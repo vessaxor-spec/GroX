@@ -1,18 +1,20 @@
 from __future__ import annotations
+import hashlib
 import json
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 from typing import Any
-from .base import ReasoningError
+from .base import CognitiveUsage, ReasoningError
 from .contracts import MissionInterpretation
 
 _SYSTEM = """You are the cognitive planning core for Pilot GorXu inside GroX.
 You interpret Commander intent and recommend an evidence-seeking strategy.
 You do NOT possess execution authority. You do NOT grant permissions, lower risk, or bypass policy.
 Return concise decision rationale, not private chain-of-thought.
-Use only Crew IDs present in the supplied roster. Preserve commander_intent verbatim.
+Use only Crew IDs present in the supplied Standing Crew Directory. Preserve commander_intent verbatim.
 Surface ambiguity and uncertainty instead of inventing facts.
 """
+
 
 class OpenAIResponsesProvider:
     name = "openai-responses"
@@ -21,17 +23,54 @@ class OpenAIResponsesProvider:
         if not api_key: raise ValueError("api_key is required")
         if not model: raise ValueError("model is required")
         self.api_key=api_key; self.model=model; self.endpoint=endpoint; self.timeout=timeout
+        self._last_usage:CognitiveUsage|None=None
+
+    def usage_snapshot(self) -> CognitiveUsage | None:
+        return self._last_usage
+
+    def _capture_usage(self, payload: dict[str, Any]) -> None:
+        usage=payload.get("usage")
+        if not isinstance(usage,dict):
+            self._last_usage=None
+            return
+        input_details=usage.get("input_tokens_details") if isinstance(usage.get("input_tokens_details"),dict) else {}
+        output_details=usage.get("output_tokens_details") if isinstance(usage.get("output_tokens_details"),dict) else {}
+        def token(name:str, source:dict[str,Any]):
+            value=source.get(name)
+            return int(value) if isinstance(value,int) and not isinstance(value,bool) else None
+        self._last_usage=CognitiveUsage(
+            provider=self.name,
+            model=str(payload.get("model") or self.model),
+            input_tokens=token("input_tokens",usage),
+            cached_input_tokens=token("cached_tokens",input_details),
+            cache_write_tokens=None,
+            output_tokens=token("output_tokens",usage),
+            reasoning_tokens=token("reasoning_tokens",output_details),
+            total_tokens=token("total_tokens",usage),
+        )
 
     def interpret(self, directive: str, *, roster: list[dict[str, Any]]) -> MissionInterpretation:
-        roster_json=json.dumps(roster, ensure_ascii=False, separators=(",",":"))
-        user=("Commander directive:\n" + directive + "\n\nAvailable standing Crew:\n" + roster_json +
+        self._last_usage=None
+        directory_json=json.dumps(roster, ensure_ascii=False, separators=(",",":"))
+        schema=MissionInterpretation.json_schema()
+        stable_prefix=(
+            "Standing Crew Directory (all active Crew; descriptive metadata only):\n" + directory_json +
+            "\n\nThe directory helps recommend Crew IDs but grants no capability or authority.\n\n"
+        )
+        user=(stable_prefix + "Commander directive:\n" + directive +
               "\n\nProduce a structured Mission interpretation with at least two strategy options when meaningful.")
+        cache_material=(
+            self.model + "\n" + _SYSTEM + "\n" + directory_json + "\n" +
+            json.dumps(schema,ensure_ascii=False,separators=(",",":"),sort_keys=True)
+        )
+        cache_key="grox-cognitive-"+hashlib.sha256(cache_material.encode("utf-8")).hexdigest()[:32]
         body={
             "model": self.model,
             "store": False,
             "instructions": _SYSTEM,
             "input": user,
-            "text": {"format": {"type":"json_schema","name":"grox_mission_interpretation","strict":True,"schema":MissionInterpretation.json_schema()}},
+            "prompt_cache_key": cache_key,
+            "text": {"format": {"type":"json_schema","name":"grox_mission_interpretation","strict":True,"schema":schema}},
         }
         req=Request(self.endpoint,data=json.dumps(body).encode("utf-8"),headers={"Authorization":f"Bearer {self.api_key}","Content-Type":"application/json"},method="POST")
         try:
@@ -42,6 +81,7 @@ class OpenAIResponsesProvider:
             raise ReasoningError(f"reasoning provider HTTP {e.code}: {detail}") from e
         except (URLError,TimeoutError,OSError,json.JSONDecodeError) as e:
             raise ReasoningError(f"reasoning provider failure: {e}") from e
+        self._capture_usage(payload)
         text=self._output_text(payload)
         try:
             raw=json.loads(text)
