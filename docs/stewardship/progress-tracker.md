@@ -9,7 +9,7 @@
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED — OPERATIONAL AUDIT 001 CLOSED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **185 passed, 2 skipped, 351 subtests**; unittest **187 OK, 2 skipped**
+**Current verified regression:** pytest **200 passed, 2 skipped, 354 subtests**; unittest **202 OK, 2 skipped**
 
 ## Verified Vessel baseline
 
@@ -145,7 +145,27 @@ Stage 6 / issue #31 Mission-to-source provenance research is complete with decis
 
 Research: `docs/research/MISSION_SOURCE_PROVENANCE.md`.
 
-A separate bounded implementation is warranted before integrated operational qualification.
+The bounded provenance implementation is now complete and verified. Integrated operational qualification is next.
+
+## Post-Apex Evolution Program 001 — Provenance implementation
+
+**Status: COMPLETE — PRIVATE SOURCE AUTHORIZATION RECEIPTS VERIFIED**
+
+- receipt state is additive to the existing private `StateStore` SQLite plane; no second Mission ledger/database was created;
+- issuance requires a real existing Repair Order with an explicit mutating action and source scope covering the requested receipt paths;
+- public receipt metadata is restricted to schema version, opaque random receipt ID, nonce-bound SHA-256 commitment, and coarse change class;
+- private verification rechecks the originating Mission/Orders, current Repair/mutation authority, commitment, change-class floor, normalized source scope, replay state, and exact PR head/tree binding;
+- missing private authority evidence is `UNKNOWN`, not PASS;
+- successful consumption requires the exact verified PR/head/tree and records the canonical source revision;
+- public CI receives no Commander directive, private Mission/Order IDs, nonce, private SQLite, `.groxstate`, Crew evidence, or secret authority-verification key;
+- repository-wide mandatory provenance enforcement remains deferred until integrated qualification and operational private receipt issuance are proven together;
+- red source-provenance mutation run `32007023966` killed 4/6 and exposed two non-isolating targets protected by redundant defenses; repaired exact-head run `32007232455` passed all five jobs and killed **6/6** source-provenance mutations with zero survivors and exact restoration;
+- exact-head regression at that gate: pytest **200 passed, 2 skipped, 354 subtests**, unittest **202 OK, 2 skipped**.
+
+Architecture: `docs/architecture/SOURCE_PROVENANCE.md`.
+Evidence: `docs/verification/SOURCE_PROVENANCE_MUTATION_MATRIX.md`.
+
+Integrated Post-Apex Evolution Program 001 qualification is next.
 
 ## Known deliberate limits
 

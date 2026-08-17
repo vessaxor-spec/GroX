@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.7.1` remains the current released post-Apex operational-hardening baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, and a source-backed privacy-safe Mission-to-source provenance design.
+GroX `v0.7.1` remains the current released post-Apex operational-hardening baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, a source-backed privacy-safe Mission-to-source provenance design, and an implemented private receipt/public commitment capability with continuous detector proof.
 
 Native command architecture:
 
@@ -29,6 +29,7 @@ Native command architecture:
 - Tiered `grox reconstitution-plan` operational; 9 reconstitution safety decisions mutation-proven.
 - Controlled HOT/WARM/COLD context experiment passed with 100% declared critical-fact/provenance retention and 93.47% character reduction on the bounded corpus; runtime activation remains deferred.
 - A6 longitudinal operational drift analysis is operational with frozen evidence bindings, fail-closed UNKNOWN semantics, first-class invariant regressions, routing concentration signals, and continuous 4/4 mutation proof.
+- Privacy-safe source authorization receipts are implemented in the existing private StateStore plane with exact Repair/scope gating, nonce-bound public commitments, exact-head verification, replay/class-downgrade protection, and continuous 6/6 mutation proof.
 
 ## Apex critical path
 
@@ -81,8 +82,8 @@ Canonical plan: `docs/stewardship/POST_APEX_EVOLUTION_PROGRAM_001.md`
 5. **#30 — Context heat and bounded compression experiment: COMPLETE (CONTROLLED).** HOT/WARM/COLD policy preserved 100% of declared critical facts and retained provenance across four representative scenarios while reducing 20,464 characters to 1,336 (93.47%). Decision: HARVEST the bounded policy as a GroX technique; do not activate automatic Pilot compression until integrated operational evidence supports it. ClaudX's synthetic 57.4% figure was not used as proof or target.
 6. **#28 — A6 longitudinal operational drift analysis: COMPLETE.** Digest-bound operational windows, `STABLE | WATCH | REGRESSION | UNKNOWN`, first-class critical invariants, operational Mission degradation proof, and 4/4 continuous detector mutations passed without self-normalization or self-activation.
 7. **#31 — Mission-to-source provenance research: COMPLETE.** Decision **ADAPT**: use a private nonce-bound authorization receipt, public opaque commitment, structural-only public CI, and independent private witness verification; optional GitHub/Sigstore attestation remains deferred hardening rather than the authority record.
-8. **Bounded provenance implementation: NEXT.** Implement the minimal receipt/commitment mechanism in the existing private state plane, then prove forgery, replay, scope expansion, class downgrade, missing-witness and squash-linkage behavior before integration.
-9. **Integrated operational qualification.** Exercise all changed surfaces together and independently verify that no authority boundary widened before any release decision.
+8. **#45 — Bounded provenance implementation: COMPLETE.** Private receipts require existing Repair/mutation authority and bounded source scope; public commitments remain privacy-minimized; exact-head verification, replay/class-downgrade defenses, missing-witness UNKNOWN semantics, and 6/6 continuous detector mutations passed.
+9. **Integrated operational qualification: NEXT.** Exercise all changed surfaces together and independently verify that no authority boundary widened before any release decision.
 
 ## Standing exclusions
 
