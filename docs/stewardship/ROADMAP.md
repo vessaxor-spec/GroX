@@ -116,17 +116,29 @@ Preserved invariants:
 
 ## Runtime Integrity Repairs — issues #63 and #64
 
-**Issue #63 status: IN PROGRESS — SANDBOX RED BASELINE REPRODUCED.** This bounded reliability repair follows the isolated sandbox qualification of canonical `main@8470a715a0bc37877013608c9daa178acfa4cbab`. It is not A8 and does not move a release/tag.
+**Issue #63 status: COMPLETE — CANONICAL POST-MERGE VERIFIED.** This bounded reliability repair is canonical on protected `main`; it is not A8 and did not move a release/tag.
 
-Confirmed repair scope:
+Implemented:
 
-1. post-Repair verification timeout must take the same safe rollback path as a nonzero verification result, preserving mutation-journal evidence;
-2. explicitly authorized Mission Graph Repair must execute without crossing the Pilot-owned SQLite connection into a worker thread;
-3. Vessel Health persistence readiness must consume the actual `SnapshotReport.manifest` / `errors` contract for valid and invalid snapshot-present paths.
+1. post-Repair verification timeout now enters the same evidence-bearing rollback path as a nonzero verification result;
+2. explicitly authorized Mission Graph Repair remains on the Pilot scheduler thread so Pilot-owned SQLite mutation journaling does not cross thread affinity;
+3. Vessel Health persistence readiness consumes the actual `SnapshotReport.manifest` / `errors` contract for valid and invalid snapshot-present paths;
+4. permanent regressions cover timeout rollback, authorized Graph Repair, valid snapshot readiness, and invalid snapshot readiness.
 
-Qualification gate: focused red-before/green-after regressions, full pytest/unittest, all existing mutation harnesses, integrated Post-Apex qualification, and an independent sandbox reproduction of each repaired path. Commander/GorXu authority, risk floors, Tool Gateway enforcement, verifier independence, source binding, and 82-Crew structure remain unchanged.
+Qualification evidence:
 
-**Issue #64 status: OPEN — POLICY ONLY.** The sandbox also exposed an ambiguity around ordinary execution eligibility for `independent-verifier`. No behavior change is authorized in issue #63; resolve #64 separately against canonical Crew doctrine and verifier-independence semantics.
+- sandbox red baseline: canonical `main@8470a715a0bc37877013608c9daa178acfa4cbab` reproduced all three defects before repair;
+- corrected implementation head: `9c4c014292d890cfa22e97fd2a6b4607ce74d6dd`;
+- exact-head PR CI `32075807852`: PASS all five required jobs after one transient A5 Docker-probe rerun on unchanged source;
+- PR #65 merged as `ccd26f2b7eed0804338667fc9e13190c5e9d389e`;
+- canonical post-merge CI `32076103017`: PASS all five required jobs on that exact `main` SHA;
+- Python 3.12 canonical post-merge evidence: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **209 passed, 2 skipped, 354 subtests**, unittest **211 OK, 2 skipped**, critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6**, and integrated Post-Apex qualification PASS.
+
+Preserved canary evidence: an interrupted local mutation harness temporarily carried two deliberate graph mutants into the first branch candidate. Static PR inspection caught both before merge; canonical `forged-graph-verification-filter` and `hard-cost-budget-boundary` behavior was restored, and the exact-head plus post-merge mutation suites killed both invariants again with clean source restoration.
+
+Commander/GorXu authority, risk floors, Tool Gateway enforcement, verifier independence, source binding, 82-Crew structure, release state, and Apex-stage state are unchanged.
+
+**Issue #64 status: OPEN — POLICY ONLY.** The sandbox also exposed an ambiguity around ordinary execution eligibility for `independent-verifier`. No behavior change was included in issue #63; resolve #64 separately against canonical Crew doctrine and verifier-independence semantics.
 
 ## Post-Apex operating posture
 
