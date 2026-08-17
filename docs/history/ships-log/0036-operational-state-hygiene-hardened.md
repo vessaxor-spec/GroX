@@ -13,6 +13,8 @@ The reconstitution path enforces that rule by allowing only source-defined stand
 
 Historical audit evidence remains non-routable and cannot grant Crew authority. GorXu remains the sole operational orchestrator.
 
+The current source tree was also scrubbed of obsolete identity-specific references so future tests and stewardship records exercise the rule without carrying the removed identity forward.
+
 ## Verification boundary
 
 This stewardship rule changes no Commander authority, GorXu authority, Division structure, capability grant, routing policy, or Apex qualification invariant.
