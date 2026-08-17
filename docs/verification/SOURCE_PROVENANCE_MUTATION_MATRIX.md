@@ -20,7 +20,7 @@ The matrix was corrected by:
 - adding a dedicated regression that injects a persisted mutation grant into a non-Repair Order so the Repair-mode gate is isolated;
 - targeting the exact PR head/tree binding detector rather than a replay seam that was intentionally defended twice.
 
-## Green exact-head evidence
+## Green implementation evidence
 
 GroX CI run `32007232455` passed all five protected jobs on PR #46 head `27134cdb1c595afb8d6460e8983674c73f0c9a4e`.
 
@@ -36,6 +36,8 @@ The Python 3.12 lane recorded:
 - tiered reconstitution mutations: **9/9 KILLED**;
 - operational drift mutations: **4/4 KILLED**;
 - source provenance mutations: **6/6 KILLED**, zero survivors, exact source restoration.
+
+The one-shot stewardship workflow then materialized the final architecture/stewardship records and removed itself. GitHub returned `action_required` for CI run `32007531751` on that workflow-authored commit rather than treating a workflow-generated source update as automatically trusted. A normal repository-authored evidence commit was therefore used to trigger the protected CI path for the final PR head. This trust transition is preserved as evidence; it is not counted as a green verification result.
 
 ## Source-provenance mutations
 
