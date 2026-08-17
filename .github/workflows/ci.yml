@@ -89,6 +89,9 @@ jobs:
       - name: Controlled context heat experiment
         if: matrix.python-version == '3.12'
         run: python tests/experiments/context_heat_experiment.py
+      - name: Operational drift Mission experiment
+        if: matrix.python-version == '3.12'
+        run: python tests/experiments/operational_drift_experiment.py
       - name: Critical invariant mutation proof
         if: matrix.python-version == '3.12'
         run: python tests/mutation/run_critical_invariants.py
