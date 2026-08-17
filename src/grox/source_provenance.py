@@ -318,12 +318,41 @@ class SourceProvenanceService:
         if receipt["consumed_pr"] is not None and int(receipt["consumed_pr"]) != int(pr_number):
             return ProvenanceVerification(FAIL, "authorization receipt was already consumed by another change", (public.receipt_id,))
 
+        order_ids = tuple(json.loads(receipt["order_ids"]))
+        receipt_scope = tuple(json.loads(receipt["scope_paths"]))
+        mission = self.store.mission(receipt["mission_id"])
+        if not mission:
+            return ProvenanceVerification(UNKNOWN, "authorizing Mission is unavailable", (public.receipt_id,))
+        current_orders = {row["order_id"]: row for row in mission["orders"]}
+        if any(order_id not in current_orders for order_id in order_ids):
+            return ProvenanceVerification(UNKNOWN, "authorizing Mission Order is unavailable", (public.receipt_id,))
+        current_scopes: list[str] = []
+        for order_id in order_ids:
+            order = current_orders[order_id]
+            if order["mode"] != "repair":
+                return ProvenanceVerification(FAIL, "authorizing Mission Order no longer carries Repair authority", (public.receipt_id,))
+            if order["status"] in {"failed", "cancelled", "blocked", "rejected"}:
+                return ProvenanceVerification(FAIL, "authorizing Mission Order is no longer usable", (public.receipt_id,))
+            try:
+                order_payload = json.loads(order["payload"])
+            except (TypeError, json.JSONDecodeError):
+                return ProvenanceVerification(UNKNOWN, "authorizing Mission Order payload is unreadable", (public.receipt_id,))
+            if not (set(order_payload.get("allowed_actions") or ()) & _MUTATING_ACTIONS):
+                return ProvenanceVerification(FAIL, "authorizing Mission Order no longer carries a mutating action", (public.receipt_id,))
+            current_scopes.extend(order_payload.get("scope") or ())
+        try:
+            scope_valid = self._scope_covers(receipt_scope, current_scopes)
+        except ValueError:
+            return ProvenanceVerification(UNKNOWN, "authorizing Mission Order scope is unreadable", (public.receipt_id,))
+        if not scope_valid:
+            return ProvenanceVerification(FAIL, "private receipt scope is no longer covered by its authorizing Mission Orders", (public.receipt_id,))
+
         payload = self._private_payload(
             receipt_id=receipt["receipt_id"],
             mission_id=receipt["mission_id"],
-            order_ids=tuple(json.loads(receipt["order_ids"])),
+            order_ids=order_ids,
             change_class=receipt["change_class"],
-            scope_paths=tuple(json.loads(receipt["scope_paths"])),
+            scope_paths=receipt_scope,
             operation=receipt["operation"],
             authority_state=receipt["authority_state"],
             issued_at=receipt["issued_at"],

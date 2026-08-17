@@ -130,6 +130,33 @@ class SourceProvenanceTest(unittest.TestCase):
             other_store.close()
         self.assertEqual(result.status, UNKNOWN)
 
+    def test_private_verification_rechecks_current_authorizing_order(self):
+        receipt = self.issue()
+        block = self.service.render_public_block(receipt)
+        self.store.update_order(self.order.order_id, "failed")
+        result = self.service.verify_change(
+            [block],
+            changed_paths=["src/grox/source_provenance.py"],
+            pr_number=45,
+            head_sha="a" * 40,
+            tree_sha="b" * 40,
+        )
+        self.assertEqual(result.status, FAIL)
+
+    def test_missing_authorizing_order_is_unknown(self):
+        receipt = self.issue()
+        block = self.service.render_public_block(receipt)
+        self.store.db.execute("DELETE FROM orders WHERE order_id=?", (self.order.order_id,))
+        self.store.db.commit()
+        result = self.service.verify_change(
+            [block],
+            changed_paths=["src/grox/source_provenance.py"],
+            pr_number=45,
+            head_sha="a" * 40,
+            tree_sha="b" * 40,
+        )
+        self.assertEqual(result.status, UNKNOWN)
+
     def test_forged_commitment_fails(self):
         receipt = self.issue()
         block = self.service.render_public_block(receipt).replace(receipt["commitment"], "sha256:" + "0" * 64)
