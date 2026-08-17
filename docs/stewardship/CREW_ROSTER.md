@@ -15,7 +15,7 @@ Standing Crew identity has two deliberately separate canonical layers:
 
 The split is intentional. A craft card makes a Crew member a meaningful specialist; it does **not** grant capabilities, Mission authority, Repair permission, routing priority, or command authority. Those remain governed by the existing GroX runtime and active Mission Order.
 
-Only source-defined standing dossiers are operational Crew. Retired, archived, removed, or otherwise stale Crew identities are not retained as sleeping operational state. Roster reconstitution purges stale Crew state, Crew-scoped memory, and adaptive performance data that do not belong to the current source-defined company.
+Only source-defined standing dossiers are operational Crew. Non-standing, archived, removed, or otherwise stale Crew identities are not retained as sleeping operational state. Roster reconstitution purges stale Crew state, Crew-scoped memory, and adaptive performance data that do not belong to the current source-defined company.
 
 Historical Mission, Order, and Evidence records may retain factual references to prior Crew for auditability, but those records are not Crew identities and cannot be routed or reactivated.
 
@@ -39,7 +39,7 @@ The native `independent-verifier` card is authored directly for GroX at equivale
 
 ## Command boundary
 
-No Crew member is an orchestrator. Pilot GorXu remains the sole operational orchestrator. Crew IDs and titles that claim an `orchestrator` identity are rejected, including retired, archived, backup, legacy, or other semantic variants.
+No Crew member is an orchestrator. Pilot GorXu remains the sole operational orchestrator. Crew IDs and titles that claim an `orchestrator` identity are rejected, including stale, archived, backup, legacy, or other semantic variants.
 
 Crew may analyze, execute, verify, report blockers, and propose materially better or safer paths. They may not widen their own authority, self-deploy collaborators, create Repair authority from natural-language instruction, self-activate from evaluation findings, or establish a parallel command path. A blocker, safer path, missing capability, elevated risk, scope change, or irreversible consequence is reported to GorXu before the affected mutation.
 
@@ -108,7 +108,7 @@ The company manifest is stored at `configs/crew/company-manifest.json`. Contract
 - all 82 active dossier stems have exactly one matching canonical craft card;
 - the orchestration role is not recruited and `agents-orchestrator` does not leak into craft handoffs;
 - semantic `orchestrator` identity variants are rejected by Crew ID and title;
-- retired and archived dossiers cannot enter the active roster;
+- non-standing and archived dossiers cannot enter the active roster;
 - stale operational Crew state is purged at reconstitution;
 - no duplicate Crew IDs exist;
 - every craft card contains the required specialist structure and a non-placeholder depth floor;

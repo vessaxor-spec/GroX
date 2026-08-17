@@ -35,7 +35,7 @@ The convention was exercised against the pinned ClaudX review source:
 
 `vessaxor-spec/ClaudX@c82162b525ee183757e76300cc4a53f5643884f1`
 
-The exercise demonstrates per-seam classification rather than repository-wide adoption. Useful independent ideas were adapted or harvested, while GroX-derived concepts, duplicate truth stores, host-specific architecture, sleeping retired identities, unsupported synthetic proof, and authority-incompatible conclusions were rejected.
+The exercise demonstrates per-seam classification rather than repository-wide adoption. Useful independent ideas were adapted or harvested, while GroX-derived concepts, duplicate truth stores, host-specific architecture, sleeping non-standing identities, unsupported synthetic proof, and authority-incompatible conclusions were rejected.
 
 ## Authority result
 

@@ -9,7 +9,7 @@ Pilot GorXu now has eighty-one domain-specialist Crew available across Strategy,
 
 The orchestration role was not recruited. Command remains where it belongs: Commander at the bridge, Pilot GorXu as second-in-command and sole operational orchestrator, Mission Control in service to the Pilot, and Crew executing bounded Mission Orders.
 
-The original bootstrap Systems Architect overlap was retired in favor of the canonical Architect Crew. Company integrity checks report no duplicate IDs and no command-role intrusion.
+The original bootstrap Systems Architect overlap was removed in favor of the canonical Architect Crew. Company integrity checks report no duplicate IDs and no command-role intrusion.
 
 A routing defect discovered during commissioning was corrected before closeout: verification-capable specialists are no longer disadvantaged during ordinary domain routing. Domain-routing contracts now prove that specialized work reaches the intended Crew.
 

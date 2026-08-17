@@ -29,8 +29,8 @@ The Commander approval does not authorize circular or incompatible imports. GroX
 - re-import ClaudX features that were themselves derived from GroX and label them new architecture;
 - add a duplicate decisions ledger as a competing source of truth;
 - make a host-specific `launchd` heartbeat part of the portable Vessel architecture;
-- retain retired Crew as sleeping operational identities;
-- remove `orchestration-evaluation-analyst` merely because ClaudX retired a similarly named role;
+- retain non-standing Crew as sleeping operational identities;
+- remove `orchestration-evaluation-analyst` merely because ClaudX removed a similarly named role;
 - accept ClaudX's synthetic 57.4% token-savings result as evidence for GroX;
 - weaken recovery gates in order to make tiered reconstitution faster;
 - allow health, evaluation, drift, provenance, or external-intake mechanisms to grant or widen authority.

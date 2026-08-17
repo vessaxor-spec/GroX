@@ -23,11 +23,11 @@ class SpineTest(unittest.TestCase):
         cases = [
             ('orchestrator', 'Analyst'),
             ('agents-orchestrator', 'Analyst'),
-            ('retired-orchestrator', 'Analyst'),
+            ('stale-orchestrator', 'Analyst'),
             ('legacy-orchestrator', 'Analyst'),
             ('backup-orchestrator', 'Analyst'),
             ('ordinary-analyst', 'Orchestrator'),
-            ('ordinary-analyst', 'Retired Orchestrator'),
+            ('ordinary-analyst', 'Stale Orchestrator'),
         ]
         for crew_id, title in cases:
             with self.subTest(crew_id=crew_id, title=title), tempfile.TemporaryDirectory() as td:
@@ -43,7 +43,7 @@ class SpineTest(unittest.TestCase):
                     store.close()
 
     def test_non_standing_dossier_cannot_enter_active_roster(self):
-        for status in ('retired', 'archived'):
+        for status in ('stale', 'archived'):
             with self.subTest(status=status), tempfile.TemporaryDirectory() as td:
                 root = Path(td)
                 dossier_dir = root / 'dossiers'
@@ -66,7 +66,7 @@ class SpineTest(unittest.TestCase):
             store = StateStore(root / 'state.sqlite3')
             try:
                 store.ensure_crew('test-architecture-specialist')
-                store.db.execute("UPDATE crew_state SET status='retired' WHERE crew_id='test-architecture-specialist'")
+                store.db.execute("UPDATE crew_state SET status='stale' WHERE crew_id='test-architecture-specialist'")
                 store.remember(
                     kind='semantic',
                     scope='crew',

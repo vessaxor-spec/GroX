@@ -58,7 +58,7 @@ Advisory Ruff inspection reported 142 legacy style/import/modernization findings
 
 - Commander authority is unchanged.
 - GorXu remains the sole operational orchestrator.
-- Standing Crew remains 82 with zero retired operational Crew.
+- Standing Crew remains 82 with source-defined operational Crew only.
 - Inspect/Repair separation remains mandatory.
 - No Crew, routing, persistence, Mission Order, Gateway, or authority semantics are widened.
 - Historical qualification branches remain preserved because they contain red-to-green evidence.
