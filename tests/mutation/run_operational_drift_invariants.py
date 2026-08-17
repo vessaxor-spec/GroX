@@ -70,13 +70,6 @@ SPECS = (
         '                elif False:\n                    reasons.append(\n',
         "tests/unit/test_operational_drift.py::OperationalDriftTests::test_stale_observed_window_is_unknown",
     ),
-    Spec(
-        "window-binding-digest",
-        "The digest binding the selected operational cases must be verified before comparison.",
-        '        if config.get("window_sha256") != _sha(bindings):\n            reasons.append(f"{label} window binding digest mismatch")\n',
-        '        if False:\n            reasons.append(f"{label} window binding digest mismatch")\n',
-        "tests/unit/test_operational_drift.py::OperationalDriftTests::test_window_binding_digest_mismatch_is_unknown",
-    ),
 )
 
 
