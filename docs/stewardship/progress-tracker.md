@@ -25,7 +25,7 @@
 - interrupted local mutation qualification temporarily carried two deliberate graph mutants into an early candidate; static PR review caught them before merge, both canonical invariants were restored, and remote mutation proof killed them again with clean restoration;
 - no authority widening, release/tag change, Crew roster change, new Apex stage, or A8 was introduced.
 
-**Issue #64 status: IMPLEMENTED — FINAL EXACT-HEAD QUALIFICATION PENDING MERGE**
+**Issue #64 status: COMPLETE — CANONICAL POST-MERGE VERIFIED**
 
 - canonical doctrine says `independent-verifier` is not an alternate automatic execution route, while a separately authorized Mission Order may deliberately assign another role/mode;
 - repository inspection confirmed **16 verification-capable Crew**, so `verification=true` remains verification eligibility and cannot serve as a verification-only marker;
@@ -35,7 +35,9 @@
 - exact red-baseline CI `32078007106` failed the three intended ordinary-routing assertions before implementation and kept Health/Wheel green;
 - implementation qualification on Python 3.12 reached Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **215 passed, 2 skipped, 354 subtests**, unittest **217 OK, 2 skipped**, mutations **12/12**, **7/7**, **9/9**, **4/4**, **6/6**, and integrated Post-Apex PASS;
 - an older durable-recovery assertion was strengthened from incidental Crew assignment count to the committed architecture node's actual objective/order identity after the new routing boundary legitimately changed recovery consultation Crew reuse;
-- final merge remains gated on fresh exact-head all-five-job CI after stewardship/hygiene consolidation; no release/tag, authority, Crew membership, Apex-stage, or A8 change is included.
+- final exact-head CI `32078828303` passed all five required jobs on `1531f4d4f3e2a222cdef5c32b7c6b70debba35de`; PR #67 merged as `main@d04d21e38ffe1645d9c9e0df61e7ca96ac465066`; exact-SHA post-merge push CI `32079205250` completed successfully;
+- canonical Python 3.12 evidence is Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **215 passed, 2 skipped, 354 subtests**, unittest **217 OK, 2 skipped**, mutations **12/12**, **7/7**, **9/9**, **4/4**, **6/6** killed with clean restoration, and integrated Post-Apex PASS;
+- no release/tag, authority, Crew membership, Apex-stage, or A8 change was introduced.
 
 ## Cognitive Context Efficiency — issue #60
 
