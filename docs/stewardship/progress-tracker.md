@@ -10,22 +10,24 @@
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED — OPERATIONAL AUDIT 001 CLOSED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **205 passed, 2 skipped, 354 subtests**; unittest **207 OK, 2 skipped**
+**Current verified regression:** pytest **209 passed, 2 skipped, 354 subtests**; unittest **211 OK, 2 skipped**
 
 ## Runtime Integrity Repairs — issues #63 and #64
 
-**Issue #63 status: IN PROGRESS — RED BASELINE REPRODUCED / LOCAL REPAIR CANDIDATE GREEN**
+**Issue #63 status: COMPLETE — CANONICAL POST-MERGE VERIFIED**
 
-- isolated sandbox qualification of exact canonical `main@8470a715a0bc37877013608c9daa178acfa4cbab` found three runtime-integrity gaps not covered by the existing green CI suite;
-- red regressions now prove: Repair timeout leaves the target applied, authorized Graph Repair fails with SQLite thread affinity, and snapshot-present Health dereferences nonexistent `SnapshotReport` fields on the canonical baseline;
-- local repair candidate makes all four focused regressions green: timeout rollback, authorized Graph Repair, valid snapshot Health, and invalid snapshot Health;
-- local split pytest regression is green across **211 tests / 354 subtests** on the available Python 3.13 sandbox host; this is not yet canonical CI evidence;
-- cognitive-context, context-heat, and operational-drift experiments remain green; full mutation and exact-head protected CI remain required before merge;
-- no authority widening, release/tag change, Crew roster change, new Apex stage, or A8 is included.
+- isolated sandbox qualification of exact canonical `main@8470a715a0bc37877013608c9daa178acfa4cbab` reproduced three runtime-integrity gaps before repair: Repair timeout rollback bypass, authorized Graph Repair SQLite thread affinity, and snapshot-present Health/SnapshotReport contract mismatch;
+- four permanent regressions now cover timeout rollback, authorized Graph Repair, valid snapshot readiness, and invalid snapshot readiness;
+- corrected implementation head `9c4c014292d890cfa22e97fd2a6b4607ce74d6dd` passed exact-head PR CI `32075807852` across all five required jobs after one transient A5 Docker-probe rerun on unchanged source;
+- PR #65 merged as canonical `main@ccd26f2b7eed0804338667fc9e13190c5e9d389e`;
+- independent exact-SHA Actions audit resolved canonical push run `32076103017`, which completed successfully across Python 3.11, 3.12, 3.13, 3.14 and Wheel bootstrap;
+- Python 3.12 canonical post-merge evidence: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **209 passed, 2 skipped, 354 subtests**, unittest **211 OK, 2 skipped**, critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6**, integrated Post-Apex qualification PASS;
+- interrupted local mutation qualification temporarily carried two deliberate graph mutants into an early candidate; static PR review caught them before merge, both canonical invariants were restored, and remote mutation proof killed them again with clean restoration;
+- no authority widening, release/tag change, Crew roster change, new Apex stage, or A8 was introduced.
 
 **Issue #64 status: OPEN — POLICY QUESTION ONLY**
 
-- ordinary execution eligibility for `independent-verifier` is recorded separately; issue #63 does not change verifier routing semantics.
+- ordinary execution eligibility for `independent-verifier` remains recorded separately; issue #63 made no verifier-routing policy change.
 
 ## Cognitive Context Efficiency — issue #60
 
