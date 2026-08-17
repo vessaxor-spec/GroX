@@ -44,10 +44,10 @@ class Result:
 SPECS = (
     Spec(
         "repair-order-required",
-        "Only an explicit Repair Order may support a source authorization receipt.",
+        "Only an explicit Repair Order may support a source authorization receipt, even if persisted mutation grants are injected.",
         '            if row["mode"] != "repair":\n                raise PermissionError(f"source provenance requires explicit Repair authority: {order_id}")\n',
         '            if False:\n                raise PermissionError(f"source provenance requires explicit Repair authority: {order_id}")\n',
-        "tests/unit/test_source_provenance.py::SourceProvenanceTest::test_receipt_requires_real_repair_order_with_mutation_authority",
+        "tests/unit/test_source_provenance.py::SourceProvenanceTest::test_injected_mutation_grant_cannot_turn_non_repair_order_into_receipt_authority",
     ),
     Spec(
         "commitment-must-match",
@@ -78,11 +78,11 @@ SPECS = (
         "tests/unit/test_source_provenance.py::SourceProvenanceTest::test_missing_private_witness_is_unknown_not_pass",
     ),
     Spec(
-        "consumed-receipt-cannot-replay",
-        "A receipt consumed by one logical change cannot authorize another PR.",
-        '        if receipt["consumed_pr"] is not None and int(receipt["consumed_pr"]) != int(pr_number):\n            return ProvenanceVerification(FAIL, "authorization receipt was already consumed by another change", (public.receipt_id,))\n',
-        '        if False:\n            return ProvenanceVerification(FAIL, "authorization receipt was already consumed by another change", (public.receipt_id,))\n',
-        "tests/unit/test_source_provenance.py::SourceProvenanceTest::test_consumed_receipt_cannot_be_replayed_on_another_pr",
+        "exact-head-binding-required",
+        "Receipt verification must remain bound to the exact PR head and tree before consumption.",
+        '        return (\n            receipt["status"] in {"verified", "consumed"}\n            and receipt["verified_pr"] == int(pr_number)\n            and receipt["verified_head"] == str(head_sha)\n            and receipt["verified_tree"] == str(tree_sha)\n        )\n',
+        '        return (\n            receipt["status"] in {"verified", "consumed"}\n            and receipt["verified_pr"] == int(pr_number)\n        )\n',
+        "tests/unit/test_source_provenance.py::SourceProvenanceTest::test_exact_scope_and_head_binding_then_consumption",
     ),
 )
 
