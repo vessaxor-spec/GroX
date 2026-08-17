@@ -11,14 +11,46 @@
   "tags": [
     "engineer",
     "engineering",
-    "game"
+    "game",
+    "game-design",
+    "design",
+    "level-design",
+    "level",
+    "narrative-design",
+    "narrative",
+    "audio-engineering",
+    "audio",
+    "technical-art",
+    "technical",
+    "art",
+    "shader-development",
+    "shader",
+    "development",
+    "multiplayer-engineering",
+    "multiplayer"
+  ],
+  "domains": [
+    "game-design",
+    "level-design",
+    "narrative-design",
+    "audio-engineering",
+    "technical-art",
+    "shader-development",
+    "multiplayer-engineering"
+  ],
+  "skills": [
+    "engineer",
+    "game",
+    "game-design",
+    "level-design",
+    "narrative-design",
+    "audio-engineering",
+    "technical-art",
+    "shader-development",
+    "multiplayer-engineering"
   ],
   "verification": false,
   "risk_posture": "medium",
-  "skills": [
-    "engineer",
-    "game"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

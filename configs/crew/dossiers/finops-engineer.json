@@ -11,14 +11,49 @@
   "tags": [
     "engineer",
     "finops",
-    "platform"
+    "platform",
+    "technology-economics",
+    "technology",
+    "economics",
+    "cloud-cost-engineering",
+    "cloud",
+    "cost",
+    "engineering",
+    "unit-economics",
+    "unit",
+    "cost-allocation",
+    "allocation",
+    "forecasting",
+    "commitment-management",
+    "commitment",
+    "management",
+    "cost-anomaly-response",
+    "anomaly",
+    "response"
+  ],
+  "domains": [
+    "finops",
+    "technology-economics",
+    "cloud-cost-engineering",
+    "unit-economics",
+    "cost-allocation",
+    "forecasting",
+    "commitment-management",
+    "cost-anomaly-response"
+  ],
+  "skills": [
+    "engineer",
+    "finops",
+    "technology-economics",
+    "cloud-cost-engineering",
+    "unit-economics",
+    "cost-allocation",
+    "forecasting",
+    "commitment-management",
+    "cost-anomaly-response"
   ],
   "verification": false,
   "risk_posture": "high",
-  "skills": [
-    "engineer",
-    "finops"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

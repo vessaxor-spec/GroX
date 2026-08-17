@@ -10,14 +10,32 @@
   "tags": [
     "manager",
     "product",
-    "strategy"
+    "strategy",
+    "b2b-saas",
+    "b2b",
+    "saas",
+    "consumer",
+    "platform",
+    "enterprise"
+  ],
+  "domains": [
+    "B2B-SaaS",
+    "consumer",
+    "platform",
+    "enterprise",
+    "any"
+  ],
+  "skills": [
+    "manager",
+    "product",
+    "B2B-SaaS",
+    "consumer",
+    "platform",
+    "enterprise",
+    "any"
   ],
   "verification": false,
   "risk_posture": "high",
-  "skills": [
-    "manager",
-    "product"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

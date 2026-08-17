@@ -11,15 +11,38 @@
     "media",
     "social",
     "strategist",
-    "strategy"
+    "strategy",
+    "tiktok",
+    "instagram",
+    "facebook",
+    "twitter",
+    "linkedin",
+    "reddit",
+    "youtube"
   ],
-  "verification": false,
-  "risk_posture": "medium",
+  "domains": [
+    "tiktok",
+    "instagram",
+    "facebook",
+    "twitter",
+    "linkedin",
+    "reddit",
+    "youtube"
+  ],
   "skills": [
     "media",
     "social",
-    "strategist"
+    "strategist",
+    "tiktok",
+    "instagram",
+    "facebook",
+    "twitter",
+    "linkedin",
+    "reddit",
+    "youtube"
   ],
+  "verification": false,
+  "risk_posture": "medium",
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

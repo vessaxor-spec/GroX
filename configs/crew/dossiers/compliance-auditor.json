@@ -10,14 +10,47 @@
   "tags": [
     "assurance",
     "auditor",
-    "compliance"
+    "compliance",
+    "compliance-auditing",
+    "auditing",
+    "privacy-regulation",
+    "privacy",
+    "regulation",
+    "automation-governance",
+    "automation",
+    "governance",
+    "agentic-identity-and-trust",
+    "agentic",
+    "identity",
+    "trust",
+    "risk-assessment",
+    "risk",
+    "assessment",
+    "ai-regulatory-classification-and-governance",
+    "ai",
+    "regulatory",
+    "classification"
+  ],
+  "domains": [
+    "compliance auditing",
+    "privacy regulation",
+    "automation governance",
+    "agentic identity and trust",
+    "risk assessment",
+    "AI regulatory classification and governance"
+  ],
+  "skills": [
+    "auditor",
+    "compliance",
+    "compliance auditing",
+    "privacy regulation",
+    "automation governance",
+    "agentic identity and trust",
+    "risk assessment",
+    "AI regulatory classification and governance"
   ],
   "verification": true,
   "risk_posture": "critical",
-  "skills": [
-    "auditor",
-    "compliance"
-  ],
   "standing_orders": {
     "command": "Serve Commander intent through Pilot GorXu. Never establish a parallel command path or self-authorize scope.",
     "adaptability": "Use relevant memory and evidence, adapt when facts change, and report materially better or safer paths to GorXu before affected mutation.",

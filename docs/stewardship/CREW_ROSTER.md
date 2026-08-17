@@ -8,9 +8,9 @@ GroX operates a standing-company model. Crew are durable organizational identiti
 
 The current company contains **81 specialist-inspired domain Crew** plus **1 native independent verifier**, for **82 Standing Crew**.
 
-Standing Crew identity now has two deliberately separate canonical layers:
+Standing Crew identity has two deliberately separate canonical layers:
 
-- `configs/crew/dossiers/<crew_id>.json` is the machine-readable operational dossier. It defines active roster membership, Division, title, capability eligibility, routing tags, verification eligibility, risk posture where present, and standing status. `CrewRoster` continues to load these dossiers and capability gating continues to use them.
+- `configs/crew/dossiers/<crew_id>.json` is the machine-readable operational dossier. It defines active roster membership, Division, title, capability eligibility, routing tags, verification eligibility, risk posture where present, standing status, and bounded domain/skill metadata used to make deterministic routing more descriptive.
 - `configs/crew/specialists/<crew_id>.md` is the canonical craft specification. It defines the Crew member's deep professional identity, purpose, domain context, responsibilities, non-responsibilities and handoffs, inputs, outputs, safety boundaries, operating protocols, collaboration patterns, examples, freshness posture, and GroX operational binding.
 
 The split is intentional. A craft card makes a Crew member a meaningful specialist; it does **not** grant capabilities, Mission authority, Repair permission, routing priority, or command authority. Those remain governed by the existing GroX runtime and active Mission Order.
@@ -21,7 +21,7 @@ Historical Mission, Order, and Evidence records may retain factual references to
 
 ## Craft source and adaptation
 
-The 81 specialist-inspired craft cards are full-depth adaptations of the matching specialist cards from `vessaxor-spec/The-ever-evolving-orchestration-`, pinned to source revision `fab4cb1d16e6ed210bdf5555d8fbbe45a609e415` for this Repair.
+The 81 specialist-inspired craft cards are full-depth adaptations of the matching specialist cards from `vessaxor-spec/The-ever-evolving-orchestration-`, pinned to source revision `fab4cb1d16e6ed210bdf5555d8fbbe45a609e415` for the craft Repair.
 
 The adaptation rule is preservation-first:
 
@@ -47,11 +47,30 @@ Crew may analyze, execute, verify, report blockers, and propose materially bette
 
 ## Runtime use
 
-`CrewRoster` remains dossier-first. Its existing selection path still uses dossier capabilities, tags, verification eligibility, and forbidden-command checks.
+`CrewRoster` remains dossier-first. Its existing selection path uses dossier capabilities, tags, verification eligibility, and forbidden-command checks.
 
 For an already active Standing Crew identity, `CrewRoster.craft_card(crew_id)` provides read-only access to the matching canonical craft specification. The lookup first requires the Crew ID to exist in the active roster. Reading a craft card therefore cannot create a new Crew member, bypass dossier eligibility, add capabilities, or authorize mutation.
 
 The runtime should retrieve craft depth when the specialist's actual methods, boundaries, protocols, or handoffs are relevant. It should not indiscriminately inject the entire 82-card library into every Mission context.
+
+## Dossier metadata contract
+
+Machine-readable dossiers carry three distinct kinds of descriptive metadata:
+
+- `domains` mirrors the matching canonical craft card's declared domain list exactly;
+- `skills` retains any existing skill labels and includes the declared craft domains for inspectable specialist coverage;
+- `tags` retains existing routing tags and adds normalized terms derived from declared craft domains for deterministic objective matching.
+
+These fields are descriptive and routing-supporting, not authority-bearing. In particular:
+
+- **capabilities remain the eligibility gate** for actions and required capability selection;
+- `domains`, `skills`, and `tags` cannot add a capability, create Repair permission, widen a Mission Order, grant verification eligibility, or create command authority;
+- deterministic selection may use `tags` only after required capability eligibility is satisfied;
+- metadata enrichment must preserve existing tags rather than silently replacing prior routing vocabulary;
+- each dossier's `domains` must remain attributable to its matching canonical craft card rather than being invented independently;
+- routing regression tests must remain green when dossier tags change.
+
+This keeps the machine dossier useful when inspected on its own without duplicating the full craft card or turning descriptive competence into authority.
 
 ## Division attendance
 
@@ -95,5 +114,7 @@ The company manifest is stored at `configs/crew/company-manifest.json`. Contract
 - every craft card contains the required specialist structure and a non-placeholder depth floor;
 - all specialist-inspired cards retain pinned source provenance;
 - every card carries GroX operational binding that leaves capability and authority with the existing runtime;
+- every dossier carries craft-attributable domain metadata with non-thin skills and routing tags;
+- metadata enrichment preserves capability gating and the established domain-routing contract;
 - the independent verifier card preserves verifier independence and cannot self-activate;
 - `CrewRoster` still loads dossiers while craft retrieval remains additive and read-only.
