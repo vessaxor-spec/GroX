@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.7.1` remains the current released post-Apex operational-hardening baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, and digest-bound A6 longitudinal operational drift analysis with advisory-only findings.
+GroX `v0.7.1` remains the current released post-Apex operational-hardening baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, and a source-backed privacy-safe Mission-to-source provenance design.
 
 Native command architecture:
 
@@ -80,8 +80,9 @@ Canonical plan: `docs/stewardship/POST_APEX_EVOLUTION_PROGRAM_001.md`
 4. **#27 — Tiered reconstitution: COMPLETE.** FAST/TARGETED/FULL planning consumes Vessel Health rather than duplicating truth. Red run `31951963722` revealed redundant protection rather than unsafe behavior. Green run `31952132782` passed health/reconstitution smokes, pytest **158 passed, 2 skipped, 19 subtests**, unittest **160 OK, 2 skipped**, Stage 1 **12/12**, Stage 2 **7/7**, Stage 3 **9/9** mutations killed, zero survivors, clean restoration, and all five CI jobs. PR #36 completed through the protected merge path.
 5. **#30 — Context heat and bounded compression experiment: COMPLETE (CONTROLLED).** HOT/WARM/COLD policy preserved 100% of declared critical facts and retained provenance across four representative scenarios while reducing 20,464 characters to 1,336 (93.47%). Decision: HARVEST the bounded policy as a GroX technique; do not activate automatic Pilot compression until integrated operational evidence supports it. ClaudX's synthetic 57.4% figure was not used as proof or target.
 6. **#28 — A6 longitudinal operational drift analysis: COMPLETE.** Digest-bound operational windows, `STABLE | WATCH | REGRESSION | UNKNOWN`, first-class critical invariants, operational Mission degradation proof, and 4/4 continuous detector mutations passed without self-normalization or self-activation.
-7. **#31 — Mission-to-source provenance research: NEXT.** Threat-model a privacy-safe verifiable link from authorized private Missions to public PR/CI/merge history before implementation.
-8. **Integrated operational qualification.** Exercise all changed surfaces together and independently verify that no authority boundary widened before any release decision.
+7. **#31 — Mission-to-source provenance research: COMPLETE.** Decision **ADAPT**: use a private nonce-bound authorization receipt, public opaque commitment, structural-only public CI, and independent private witness verification; optional GitHub/Sigstore attestation remains deferred hardening rather than the authority record.
+8. **Bounded provenance implementation: NEXT.** Implement the minimal receipt/commitment mechanism in the existing private state plane, then prove forgery, replay, scope expansion, class downgrade, missing-witness and squash-linkage behavior before integration.
+9. **Integrated operational qualification.** Exercise all changed surfaces together and independently verify that no authority boundary widened before any release decision.
 
 ## Standing exclusions
 

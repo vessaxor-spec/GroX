@@ -1,6 +1,6 @@
 # Post-Apex Operational Evolution Program 001
 
-**Status:** IN EXECUTION — STAGES 0-5 COMPLETE; STAGE 6 NEXT
+**Status:** IN EXECUTION — STAGES 0-6 COMPLETE; PROVENANCE IMPLEMENTATION NEXT
 
 **Planning baseline:** `main@c93015278daf022b1c3d85fc8fb90a6fa52d8160`
 
@@ -154,17 +154,24 @@ History: `docs/history/ships-log/0047-a6-operational-drift-complete.md`
 
 **Exit condition:** PASSED.
 
-### Stage 6 — Mission-to-source provenance research
+### Stage 6 — Mission-to-source provenance research — COMPLETE
 
 **Issue:** #31
 
-Research a privacy-safe link:
+Research decision: **ADAPT**.
 
-**Commander directive → GorXu decision → Mission / Mission Order → bounded implementation evidence → PR → CI / verification → merge → resulting source**
+`docs/research/MISSION_SOURCE_PROVENANCE.md` defines a privacy-safe bridge between private Commander-authorized Mission/Order evidence and public PR/CI/merge history without creating a second Mission ledger or exposing private operational state.
 
-Research covers opaque identifiers/digests/attestations, squash-merge survival, multi-Mission changes, documentation-only work, verification rather than assertion, and leakage threats. CI must not need raw private operational state merely to prove provenance.
+The recommended minimal design is a private nonce-bound authorization receipt stored in the existing operational evidence plane, a public opaque receipt ID + SHA-256 commitment + coarse change class, structural-only public CI, and independent private verification of commitment/scope/replay state. Final source revisions map back to the merged PR through the source-control platform's commit-to-PR association rather than depending on feature-branch commit survival.
 
-**Exit condition:** a source-backed `ADOPT | ADAPT | HARVEST | REJECT` decision with threat model, privacy boundary, verification mechanism, failure modes, and minimal implementation proposal only if warranted.
+Raw Mission/Order identifiers, Commander directives, private nonce, Crew notes, SQLite, `.groxstate`, credentials, and sensitive evidence remain private. Provenance proves a prior authorization relationship; it never grants authority.
+
+GitHub/Sigstore custom attestations are retained only as optional future public cryptographic hardening if an external consumer appears. They are not the private authority witness and are not required for the minimal design.
+
+Research: `docs/research/MISSION_SOURCE_PROVENANCE.md`
+History: `docs/history/ships-log/0048-mission-source-provenance-researched.md`
+
+**Exit condition:** PASSED. Separate bounded implementation is warranted and must prove forged/replayed/out-of-scope/downgraded receipts fail, missing private evidence is UNKNOWN, squash linkage survives, and public CI never receives private raw operational state.
 
 ## Cross-workstream verification rules
 

@@ -127,7 +127,25 @@ The audit preserved the existing command relationship, 82-Crew company, source-d
 - A6 drift proposals remain advisory and `activate()` remains denied;
 - red run `32004304942` exposed and preserved an experiment bootstrap defect; green implementation run `32004673068` passed all five jobs, pytest **185 passed, 2 skipped, 351 subtests**, unittest **187 OK, 2 skipped**, and all mutation suites including Stage 5 **4/4 KILLED**.
 
-Stage 6 / issue #31 Mission-to-source provenance research is next.
+Stage 6 / issue #31 Mission-to-source provenance research is complete with decision **ADAPT**. A bounded implementation of the private receipt/public commitment design is next before integrated program qualification.
+
+## Post-Apex Evolution Program 001 — Stage 6
+
+**Status: COMPLETE — MISSION-TO-SOURCE PROVENANCE RESEARCH PASSED**
+
+- source-backed decision: **ADAPT**;
+- private authorization truth remains in the existing Mission/Order/Evidence state plane rather than GitHub;
+- recommended public surface is limited to a random opaque receipt ID, nonce-bound SHA-256 commitment, and coarse change class;
+- the private nonce is never published, preventing the public digest from becoming a practical dictionary oracle for low-entropy Mission facts;
+- public CI performs structural checks only and receives no private SQLite, `.groxstate`, Commander directive, Mission payload, nonce, or secret authority-verification key;
+- independent private verification recomputes the commitment, validates Mission/Order attribution and exact source scope, prevents replay/class downgrade, and binds successful consumption to the merged source revision;
+- squash-merge survival uses the source-control platform's canonical commit-to-associated-PR relation rather than relying solely on feature-branch commits or commit-message formatting;
+- GitHub/Sigstore custom attestations remain optional future hardening for an external consumer and are not the authority witness;
+- zero-knowledge proof infrastructure and HMAC/public-CI secret distribution were rejected as unnecessary or trust-widening for the current need.
+
+Research: `docs/research/MISSION_SOURCE_PROVENANCE.md`.
+
+A separate bounded implementation is warranted before integrated operational qualification.
 
 ## Known deliberate limits
 
