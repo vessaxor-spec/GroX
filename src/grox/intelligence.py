@@ -227,7 +227,7 @@ class LivingCompanyIntelligence:
         eligible = [
             crew for crew in self.roster.all()
             if crew.crew_id not in excluded
-            and (not verifier or crew.verification)
+            and (crew.verification if verifier else crew.ordinary_routing)
             and (not required_set or required_set.issubset(crew.capabilities))
         ]
         if preferred:
