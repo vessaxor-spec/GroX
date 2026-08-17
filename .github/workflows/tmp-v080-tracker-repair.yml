@@ -1,0 +1,44 @@
+name: Temporary v0.8.0 tracker repair
+
+on:
+  push:
+    branches: [release/v0.8.0-candidate]
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: release/v0.8.0-candidate
+          fetch-depth: 0
+      - name: Restore tracker and apply bounded canary evidence
+        shell: bash
+        run: |
+          git show 2809bb7685fc670fdf7da35e828e1bf2680a1c7a:docs/stewardship/progress-tracker.md > docs/stewardship/progress-tracker.md
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('docs/stewardship/progress-tracker.md')
+          text = p.read_text(encoding='utf-8')
+          old = '''- public README and current stewardship are being reconciled to the completed Program 001 state;\n- the complete protected CI matrix plus independent exact-head verification are required before publication can be considered;'''
+          new = '''- public README and current stewardship are being reconciled to the completed Program 001 state;\n- preserved release-canary run `32014163449` failed because `test_source_version_detector_rejects_metadata_drift` hard-coded the prior `0.7.1` package string, so the test challenge no longer mutated metadata after the intentional `0.8.0` bump; Vessel Health itself remained healthy and reported source/package version aligned at `0.8.0`;\n- the canary was repaired by deriving the current package version from `pyproject.toml` before injecting `9.9.9`, preserving the detector requirement while removing release-number coupling;\n- the complete protected CI matrix plus independent exact-head verification are required before publication can be considered;'''
+          if text.count(old) != 1:
+              raise SystemExit(f'expected exact candidate marker once, found {text.count(old)}')
+          p.write_text(text.replace(old, new), encoding='utf-8')
+          workflow = Path('.github/workflows/tmp-v080-tracker-repair.yml')
+          if not workflow.exists():
+              raise SystemExit('temporary workflow missing before self-removal')
+          workflow.unlink()
+          PY
+          git diff --check
+          git status --short
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/stewardship/progress-tracker.md .github/workflows/tmp-v080-tracker-repair.yml
+          git commit -m 'Restore bounded v0.8.0 tracker evidence'
+          git push origin HEAD:release/v0.8.0-candidate
