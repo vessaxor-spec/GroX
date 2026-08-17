@@ -13,6 +13,7 @@ from unittest.mock import patch
 
 from grox import cli
 from grox.health import FAIL, PASS, UNKNOWN, WARN, HealthCheck, VesselHealth
+from grox.persistence import PersistenceManager
 from grox.state import StateStore, now
 
 
@@ -115,6 +116,35 @@ class VesselHealthTests(unittest.TestCase):
             result = VesselHealth(root)._check_persistence_readiness()
             self.assertEqual(result.status, WARN)
             self.assertIn("no recovery snapshot", result.detail)
+        finally:
+            td.cleanup()
+
+    def test_persistence_passes_when_latest_snapshot_verifies(self) -> None:
+        td, root = health_vessel()
+        try:
+            store = StateStore(root / "configs/state/grox.sqlite3")
+            store.create_mission("MSN-snapshotted-health", "persist me", "inspect", "low")
+            store.update_mission("MSN-snapshotted-health", "completed", "done")
+            store.close()
+            snapshot = root / "configs/state/snapshots/health-valid.groxstate"
+            report = PersistenceManager(root).create_snapshot(output=snapshot)
+            self.assertTrue(report.valid)
+            result = VesselHealth(root)._check_persistence_readiness()
+            self.assertEqual(result.status, PASS)
+            self.assertEqual(result.evidence["state_sha256"], report.manifest["state_sha256"])
+        finally:
+            td.cleanup()
+
+    def test_persistence_fails_cleanly_when_latest_snapshot_is_invalid(self) -> None:
+        td, root = health_vessel()
+        try:
+            snapshot_dir = root / "configs/state/snapshots"
+            snapshot_dir.mkdir(parents=True)
+            (snapshot_dir / "broken.groxstate").write_bytes(b"not-a-valid-groxstate")
+            result = VesselHealth(root)._check_persistence_readiness()
+            self.assertEqual(result.status, FAIL)
+            self.assertIn("not directly restorable", result.detail)
+            self.assertNotEqual(result.status, UNKNOWN)
         finally:
             td.cleanup()
 

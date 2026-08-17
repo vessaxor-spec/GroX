@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 import json
 import math
 from dataclasses import replace
@@ -649,7 +649,19 @@ class MissionGraphRunner:
             with ThreadPoolExecutor(max_workers=max(1, len(prepared))) as pool:
                 for node_id, (spec, order, dep_results) in prepared.items():
                     started_at[node_id] = perf_counter()
-                    futures[pool.submit(self._execute_prepared, spec, order, dep_results)] = node_id
+                    if spec.mode is MissionMode.repair:
+                        # Durable mutation journaling shares the Pilot-owned SQLite connection.
+                        # Keep Repair execution on the scheduler thread; ordinary read/execute
+                        # nodes may still use worker threads. This preserves SQLite thread
+                        # affinity and serializes authority-bearing mutation work.
+                        future: Future = Future()
+                        try:
+                            future.set_result(self._execute_prepared(spec, order, dep_results))
+                        except BaseException as exc:
+                            future.set_exception(exc)
+                        futures[future] = node_id
+                    else:
+                        futures[pool.submit(self._execute_prepared, spec, order, dep_results)] = node_id
                 for future in as_completed(futures):
                     node_id = futures[future]
                     spec, order, _ = prepared[node_id]

@@ -238,9 +238,9 @@ class VesselHealth:
                 PASS,
                 f"latest private snapshot verifies against current Vessel source: {latest.name}",
                 False,
-                {"snapshot": latest.name, "state_sha256": result.state_sha256},
+                {"snapshot": latest.name, "state_sha256": result.manifest.get("state_sha256")},
             )
-        detail = result.error or "snapshot verification failed"
+        detail = "; ".join(result.errors) if result.errors else "snapshot verification failed"
         status = WARN if "source" in detail.lower() or "ancestor" in detail.lower() else FAIL
         return HealthCheck(
             "persistence_readiness",

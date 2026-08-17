@@ -97,6 +97,32 @@ class MissionGraphIntegrationTests(unittest.TestCase):
             self.assertFalse((root/'docs/x.txt').exists())
         finally: td.cleanup()
 
+    def test_authorized_graph_repair_executes_and_journals(self):
+        td,root,p=graph_vessel()
+        try:
+            directive='Repair a bounded Vessel file through an explicitly authorized Mission Graph.'
+            plan={
+                'commander_intent':directive,
+                'objective':'Execute one explicitly authorized durable graph Repair.',
+                'budget':{'max_nodes':4,'max_parallel':2,'max_replans':1},
+                'nodes':[
+                    {'node_id':'repair','objective':'Repair a bounded file','mode':'repair','dependencies':[],
+                     'candidate_crew_ids':['backend-engineer'],'required_capabilities':['repo_read','repo_write','test_run'],
+                     'scope':['docs/graph-repair.txt'],
+                     'parameters':{'operation':'write_text','path':'docs/graph-repair.txt','content':'graph repair\n'}},
+                ],
+            }
+            r=p.command_graph(directive,plan=plan,plan_source='test-cognition',allow_repair=True)
+            self.assertEqual(r['status'],'completed')
+            self.assertEqual((root/'docs/graph-repair.txt').read_text(),'graph repair\n')
+            history=p.durable.mutation_history(r['mission_id'])
+            self.assertEqual(len(history),1)
+            self.assertEqual(history[0]['status'],'verified')
+            mission=p.store.mission(r['mission_id'])
+            node=next(n for n in mission['graph_nodes'] if n['node_id']=='repair')
+            self.assertEqual(node['status'],'completed')
+        finally: td.cleanup()
+
     def test_injected_crew_failure_is_replanned_without_commander(self):
         td,root,p=graph_vessel()
         try:
