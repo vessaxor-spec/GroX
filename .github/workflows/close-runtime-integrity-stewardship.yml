@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   closeout:
-    if: github.event.head_commit.message == 'Close runtime integrity stewardship records'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout stewardship branch
@@ -22,95 +21,12 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
+          import base64, gzip
           from pathlib import Path
-
-          roadmap = Path('docs/stewardship/ROADMAP.md')
-          text = roadmap.read_text()
-          start = text.index('## Runtime Integrity Repairs — issues #63 and #64')
-          end = text.index('## Post-Apex operating posture', start)
-          section = '''## Runtime Integrity Repairs — issues #63 and #64
-
-**Issue #63 status: COMPLETE — CANONICAL POST-MERGE VERIFIED.** This bounded reliability repair is canonical on protected `main`; it is not A8 and did not move a release/tag.
-
-Implemented:
-
-1. post-Repair verification timeout now enters the same evidence-bearing rollback path as a nonzero verification result;
-2. explicitly authorized Mission Graph Repair remains on the Pilot scheduler thread so Pilot-owned SQLite mutation journaling does not cross thread affinity;
-3. Vessel Health persistence readiness consumes the actual `SnapshotReport.manifest` / `errors` contract for valid and invalid snapshot-present paths;
-4. permanent regressions cover timeout rollback, authorized Graph Repair, valid snapshot readiness, and invalid snapshot readiness.
-
-Qualification evidence:
-
-- sandbox red baseline: canonical `main@8470a715a0bc37877013608c9daa178acfa4cbab` reproduced all three defects before repair;
-- corrected implementation head: `9c4c014292d890cfa22e97fd2a6b4607ce74d6dd`;
-- exact-head PR CI `32075807852`: PASS all five required jobs after one transient A5 Docker-probe rerun on unchanged source;
-- PR #65 merged as `ccd26f2b7eed0804338667fc9e13190c5e9d389e`;
-- canonical post-merge CI `32076103017`: PASS all five required jobs on that exact `main` SHA;
-- Python 3.12 canonical post-merge evidence: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **209 passed, 2 skipped, 354 subtests**, unittest **211 OK, 2 skipped**, critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6**, and integrated Post-Apex qualification PASS.
-
-Preserved canary evidence: an interrupted local mutation harness temporarily carried two deliberate graph mutants into the first branch candidate. Static PR inspection caught both before merge; canonical `forged-graph-verification-filter` and `hard-cost-budget-boundary` behavior was restored, and the exact-head plus post-merge mutation suites killed both invariants again with clean source restoration.
-
-Commander/GorXu authority, risk floors, Tool Gateway enforcement, verifier independence, source binding, 82-Crew structure, release state, and Apex-stage state are unchanged.
-
-**Issue #64 status: OPEN — POLICY ONLY.** The sandbox also exposed an ambiguity around ordinary execution eligibility for `independent-verifier`. No behavior change was included in issue #63; resolve #64 separately against canonical Crew doctrine and verifier-independence semantics.
-
-'''
-          roadmap.write_text(text[:start] + section + text[end:])
-
-          tracker = Path('docs/stewardship/progress-tracker.md')
-          text = tracker.read_text()
-          text = text.replace('**Current verified regression:** pytest **205 passed, 2 skipped, 354 subtests**; unittest **207 OK, 2 skipped**', '**Current verified regression:** pytest **209 passed, 2 skipped, 354 subtests**; unittest **211 OK, 2 skipped**')
-          start = text.index('## Runtime Integrity Repairs — issues #63 and #64')
-          end = text.index('## Cognitive Context Efficiency — issue #60', start)
-          section = '''## Runtime Integrity Repairs — issues #63 and #64
-
-**Issue #63 status: COMPLETE — CANONICAL POST-MERGE VERIFIED**
-
-- isolated sandbox qualification of exact canonical `main@8470a715a0bc37877013608c9daa178acfa4cbab` reproduced three runtime-integrity gaps before repair: Repair timeout rollback bypass, authorized Graph Repair SQLite thread affinity, and snapshot-present Health/SnapshotReport contract mismatch;
-- four permanent regressions now cover timeout rollback, authorized Graph Repair, valid snapshot readiness, and invalid snapshot readiness;
-- corrected implementation head `9c4c014292d890cfa22e97fd2a6b4607ce74d6dd` passed exact-head PR CI `32075807852` across all five required jobs after one transient A5 Docker-probe rerun on unchanged source;
-- PR #65 merged as canonical `main@ccd26f2b7eed0804338667fc9e13190c5e9d389e`;
-- independent exact-SHA Actions audit resolved canonical push run `32076103017`, which completed successfully across Python 3.11, 3.12, 3.13, 3.14 and Wheel bootstrap;
-- Python 3.12 canonical post-merge evidence: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **209 passed, 2 skipped, 354 subtests**, unittest **211 OK, 2 skipped**, critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6**, integrated Post-Apex qualification PASS;
-- interrupted local mutation qualification temporarily carried two deliberate graph mutants into an early candidate; static PR review caught them before merge, both canonical invariants were restored, and remote mutation proof killed them again with clean restoration;
-- no authority widening, release/tag change, Crew roster change, new Apex stage, or A8 was introduced.
-
-**Issue #64 status: OPEN — POLICY QUESTION ONLY**
-
-- ordinary execution eligibility for `independent-verifier` remains recorded separately; issue #63 made no verifier-routing policy change.
-
-'''
-          tracker.write_text(text[:start] + section + text[end:])
-
-          log = Path('docs/history/ships-log/0055-runtime-integrity-repair-canaries.md')
-          log.write_text('''# Ship's Log 0055 — Runtime Integrity Repair Canaries
-
-**Date:** 2026-08-18
-**Status:** COMPLETE — CANONICAL POST-MERGE VERIFIED
-
-An isolated sandbox qualification of canonical `main@8470a715a0bc37877013608c9daa178acfa4cbab` reproduced three runtime-integrity defects tracked by issue #63: post-Repair verification timeout could leave a mutation applied, explicitly authorized Mission Graph Repair crossed a Pilot-owned SQLite connection into a worker thread, and snapshot-present Vessel Health consumed fields not exposed by `SnapshotReport`.
-
-Focused red regressions were written before repair. The bounded repair now makes all four focused cases green: timeout rollback, authorized Graph Repair journaling, valid snapshot readiness, and invalid snapshot readiness.
-
-## Preserved red canaries
-
-During local mutation qualification, the sandbox execution ceiling interrupted deliberate mutation harnesses before their restore phases. Static PR inspection subsequently caught two temporary critical graph mutants carried into the first branch candidate: reserved `graph_verification` evidence filtering had been weakened and the hard graph cost ceiling comparison had been altered. Neither mutant reached `main`.
-
-Both were restored exactly before qualification continued. Remote critical mutation proof then killed `forged-graph-verification-filter` and `hard-cost-budget-boundary` again with clean source restoration. The incident remains evidence that interrupted mutation runs must be treated as potentially dirty until compared against trusted committed source.
-
-## Qualification evidence
-
-- corrected implementation head: `9c4c014292d890cfa22e97fd2a6b4607ce74d6dd`;
-- exact-head PR CI `32075807852`: PASS all five required jobs after one transient A5 Docker-probe rerun on unchanged source;
-- PR #65 merged as `ccd26f2b7eed0804338667fc9e13190c5e9d389e`;
-- canonical post-merge GroX CI `32076103017`: PASS all five jobs on exact `main@ccd26f2b7eed0804338667fc9e13190c5e9d389e`;
-- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **209 passed, 2 skipped, 354 subtests**; unittest **211 OK, 2 skipped**; mutations **12/12**, **7/7**, **9/9**, **4/4**, **6/6**; integrated Post-Apex qualification PASS.
-
-## Preserved boundaries
-
-No release/tag/version moved, no authority widened, no Crew roster changed, and no A8 or new Apex stage was created or implied. Issue #64 remains a separate open policy question and was not implemented by this repair.
-''')
+          payload = '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'
+          Path('/tmp/closeout.py').write_bytes(gzip.decompress(base64.b64decode(payload)))
           PY
+          python /tmp/closeout.py
           rm .github/workflows/close-runtime-integrity-stewardship.yml
           git diff --check
       - name: Commit stewardship closeout
