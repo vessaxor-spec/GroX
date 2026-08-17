@@ -1,0 +1,24 @@
+name: Temporary source provenance stewardship closure
+
+on:
+  push:
+    branches: [feature/source-provenance-receipts]
+
+permissions:
+  contents: write
+
+jobs:
+  close:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: python scripts/tmp_close_source_provenance.py
+      - run: |
+          rm scripts/tmp_close_source_provenance.py
+          rm .github/workflows/tmp-close-source-provenance.yml
+          git config user.name VESSAXOR
+          git config user.email vessaxor@gmail.com
+          git add -A
+          git diff --cached --check
+          git commit -m "Record source provenance implementation completion"
+          git push origin HEAD:feature/source-provenance-receipts
