@@ -94,8 +94,8 @@
   ],
   "rules": [
     "Pilot GorXu is the sole operational orchestrator.",
-    "No Crew ID or title may claim an orchestrator identity, including retired, archived, backup, legacy, or other semantic variants.",
-    "Only source-defined standing dossiers are operational Crew; stale, retired, archived, or removed Crew operational state is purged during roster reconstitution.",
+    "No Crew ID or title may claim an orchestrator identity, including stale, archived, backup, legacy, or other semantic variants.",
+    "Only source-defined standing dossiers are operational Crew; stale, archived, removed, or otherwise non-standing Crew operational state is purged during roster reconstitution.",
     "Crew competence never grants Mission authority.",
     "Crew wake into fresh tour context and retain durable identity and memory.",
     "Crew may propose better paths but cannot mutate beyond their Mission Order.",

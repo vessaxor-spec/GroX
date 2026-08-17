@@ -22,6 +22,6 @@ GitHub now independently reports repository ruleset `Protect canonical main` as 
 
 Issue #18 was closed as completed only after the live GitHub ruleset state showed all five required CI gates.
 
-The governance closure does not widen GroX authority. Commander sovereignty, GorXu's sole-orchestrator role, the 82 Standing Crew company, zero-retired-Crew operational state, Inspect/Repair separation, independent verification, and all qualified Apex boundaries remain unchanged.
+The governance closure does not widen GroX authority. Commander sovereignty, GorXu's sole-orchestrator role, the 82 Standing Crew company, source-defined-only Crew operational state, Inspect/Repair separation, independent verification, and all qualified Apex boundaries remain unchanged.
 
 With Audit 001 closed, GroX returns to its intended post-Apex posture: real Commander Missions drive future evolution. No A8 is predeclared.

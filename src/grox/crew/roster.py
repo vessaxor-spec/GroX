@@ -14,7 +14,7 @@ def _forbidden_command_identity(crew_id: str, title: str) -> bool:
     if cid in FORBIDDEN_IDS or normalized_title in FORBIDDEN_IDS:
         return True
     # GorXu is the sole operational orchestrator. Reject semantic variants such
-    # as retired-orchestrator, backup-orchestrator, or a hidden Orchestrator title.
+    # as stale-orchestrator, backup-orchestrator, or a hidden Orchestrator title.
     return "orchestrator" in cid or "orchestrator" in normalized_title
 
 

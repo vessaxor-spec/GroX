@@ -27,6 +27,6 @@ Canonical `main` was observed as unprotected and repository rulesets were empty.
 
 ## Authority boundary
 
-This audit does not alter the GroX command relationship, Crew authority, Mission Orders, routing policy, persistence semantics, Tool Gateway authority, or Apex qualification boundary. GorXu remains the sole operational orchestrator and the operational company remains 82 Standing Crew with no retired Crew.
+This audit does not alter the GroX command relationship, Crew authority, Mission Orders, routing policy, persistence semantics, Tool Gateway authority, or Apex qualification boundary. GorXu remains the sole operational orchestrator and the operational company remains 82 Standing Crew with no non-standing Crew retained.
 
 PR #19 candidate CI run `31938365523` passed Python 3.11 through 3.14 and Wheel bootstrap portability; exact final run `31938508389` re-proved all five gates. PR #19 then squash-merged as `53ecce335af79bfe9676f4467349fd78ebcdfb71`; its tree `087742f06877000fb5be9de80af64e11ddb21592` exactly matches the tested PR merge-candidate tree. Canonical `main` CI run `31938672912` passed all five gates. Issue #18 remains open solely for repository-level `main` protection.
