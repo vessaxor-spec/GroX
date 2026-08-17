@@ -9,7 +9,7 @@
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED — OPERATIONAL AUDIT 001 CLOSED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **200 passed, 2 skipped, 354 subtests**; unittest **202 OK, 2 skipped**
+**Current verified regression:** pytest **202 passed, 2 skipped, 354 subtests**; unittest **204 OK, 2 skipped**
 
 ## Verified Vessel baseline
 
@@ -165,7 +165,26 @@ The bounded provenance implementation is now complete and verified. Integrated o
 Architecture: `docs/architecture/SOURCE_PROVENANCE.md`.
 Evidence: `docs/verification/SOURCE_PROVENANCE_MUTATION_MATRIX.md`.
 
-Integrated Post-Apex Evolution Program 001 qualification is next.
+Integrated Post-Apex Evolution Program 001 qualification evidence has passed; independent exact-head verification remains before protected merge and closure.
+
+## Post-Apex Evolution Program 001 — Integrated qualification candidate
+
+**Status: EVIDENCE PASS — INDEPENDENT EXACT-HEAD VERIFICATION PENDING**
+
+- preserved red run `32008781935` isolated a direct-script import-path defect in the new integration harness after every pre-existing protected gate remained green; the harness loader was corrected rather than bypassed;
+- corrected exact-head run `32009009881` passed Python 3.11, 3.12, 3.13, 3.14 and Wheel bootstrap portability;
+- Python 3.12 recorded pytest **202 passed, 2 skipped, 354 subtests** and unittest **204 OK, 2 skipped**;
+- Vessel Health remained **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN** on the clean source and detected the injected non-Repair `fs_write` authority violation as `UNHEALTHY` without changing the private SQLite bytes;
+- clean state selected FAST reconstitution; fresh-host and degraded authority state selected FULL;
+- HOT/WARM/COLD packing preserved Commander intent, authority, critical evidence, unresolved critical state, next action, and retained provenance; automatic Pilot runtime activation remained disabled;
+- A6 operational degradation remained `REGRESSION`, baseline content remained unchanged, the proposal remained `proposed`, and activation remained blocked;
+- external intake continued to reject circular GroX re-import and duplicate decision truth;
+- private source provenance verified an exact source binding while public metadata remained privacy-minimized; missing private witness returned `UNKNOWN`, downgrade/replay returned `FAIL`, and Inspect authority could not issue source authorization;
+- mutation proof remained fully green: critical **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6** killed.
+
+The experiment deliberately emits `qualification_claim=false`, `release_decision=false`, and `new_apex_stage=false`. Qualification is not allowed to self-certify. Independent exact-head review and protected merge remain required before Program 001 is closed; any later release remains a Commander decision.
+
+Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.
 
 ## Known deliberate limits
 
