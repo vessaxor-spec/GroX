@@ -29,6 +29,8 @@ Canonical PR run `32004673068` passed all five GroX CI jobs. Python 3.12 recorde
 
 Run `32004304942` failed after the full regression suite had passed because direct execution of the new operational experiment could not import the repository test-support package. This was a harness/bootstrap defect, not a reason to weaken Stage 5. The script now explicitly binds its repository root before importing test support, after which the operational experiment and all detector mutations passed.
 
+Temporary stewardship run `32004669875` later failed closed on `git diff --check` because two generated Markdown lines carried trailing whitespace. The content generator was corrected, run `32005038453` completed successfully, materialized the canonical Stage 5 stewardship records, and removed the temporary workflow from the branch.
+
 ## Authority boundary
 
 These detectors are evidence mechanisms only. Mutation proof does not grant routing, policy, Crew, source, memory, or Repair authority. A6 improvement proposals remain non-self-activating.
