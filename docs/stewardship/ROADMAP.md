@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.7.1` remains the current released post-Apex operational-hardening baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, a source-backed privacy-safe Mission-to-source provenance design, an implemented private receipt/public commitment capability with continuous detector proof, and a green integrated Post-Apex qualification candidate awaiting independent exact-head verification.
+GroX `v0.7.1` remains the current released post-Apex operational-hardening baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, a source-backed privacy-safe Mission-to-source provenance design, an implemented private receipt/public commitment capability with continuous detector proof, and an independently verified integrated Post-Apex qualification awaiting protected merge finalization.
 
 Native command architecture:
 
@@ -83,7 +83,7 @@ Canonical plan: `docs/stewardship/POST_APEX_EVOLUTION_PROGRAM_001.md`
 6. **#28 — A6 longitudinal operational drift analysis: COMPLETE.** Digest-bound operational windows, `STABLE | WATCH | REGRESSION | UNKNOWN`, first-class critical invariants, operational Mission degradation proof, and 4/4 continuous detector mutations passed without self-normalization or self-activation.
 7. **#31 — Mission-to-source provenance research: COMPLETE.** Decision **ADAPT**: use a private nonce-bound authorization receipt, public opaque commitment, structural-only public CI, and independent private witness verification; optional GitHub/Sigstore attestation remains deferred hardening rather than the authority record.
 8. **#45 — Bounded provenance implementation: COMPLETE.** Private receipts require existing Repair/mutation authority and bounded source scope; public commitments remain privacy-minimized; exact-head verification, replay/class-downgrade defenses, missing-witness UNKNOWN semantics, and 6/6 continuous detector mutations passed.
-9. **Integrated operational qualification: EVIDENCE PASSED.** Protected run `32009009881` passed the composed health/reconstitution/context/A6/intake/provenance gate with no authority widening; independent exact-head verification remains required before protected merge and program closure.
+9. **Integrated operational qualification: COMPLETE — INDEPENDENT PASS.** The composed health/reconstitution/context/A6/intake/provenance gate passed with no authority widening; independent review on PR #53 passed against exact candidate head `5c58392a0b9f8fb80f085128588167712003f283`. Protected merge finalization remains before this state becomes canonical `main`.
 
 ## Standing exclusions
 
@@ -99,4 +99,4 @@ Do not:
 
 ## Release posture
 
-No version bump, release tag, new Apex stage, or A8 is implied by completion of an individual program stage. Integrated operational evidence has passed, but independent exact-head verification remains the protected merge gate. After that gate closes, the Commander retains the release decision.
+No version bump, release tag, new Apex stage, or A8 is implied by completion of an individual program stage. Post-Apex Evolution Program 001 qualification is complete and independently verified. Protected merge finalization remains; after canonical post-merge verification, the Commander alone decides whether to create any release. No version bump, release tag, new Apex stage, or A8 is implied.

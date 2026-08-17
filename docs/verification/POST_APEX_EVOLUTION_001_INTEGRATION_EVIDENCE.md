@@ -1,8 +1,8 @@
 # Post-Apex Operational Evolution Program 001 — Integration Evidence
 
-**Evidence status:** PASS candidate
+**Evidence status:** PASS — independently verified candidate
 
-**Independent exact-head verification:** required before protected merge
+**Independent exact-head verification:** PASS on PR #53 candidate head `5c58392a0b9f8fb80f085128588167712003f283`; final status-only head requires bounded re-verification before merge
 
 ## Scope
 
@@ -62,4 +62,4 @@ The experiment output sets:
 
 These are required boundaries. The experiment supplies evidence; independent exact-head verification decides whether that evidence is sufficient for protected merge. A release remains a separate Commander decision after program closure.
 
-This candidate record is now frozen for final exact-head CI and independent review; any later content change requires those gates to run again.
+Independent review recorded PASS on candidate head `5c58392a0b9f8fb80f085128588167712003f283` with exact-head CI run `32009679294`. The resulting status-only closeout changes intentionally restart exact-head CI and bounded independent review before protected merge. This record does not authorize a release.
