@@ -1,0 +1,27 @@
+name: Temporary Crew terminology purge
+
+on:
+  push:
+    branches: [stewardship/obsolete-crew-terminology-purge]
+
+permissions:
+  contents: write
+
+jobs:
+  purge:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: python -m pip install -e '.[test]'
+      - run: python scripts/tmp_purge_crew_terminology.py
+      - run: |
+          rm scripts/tmp_purge_crew_terminology.py
+          rm .github/workflows/tmp-apply-crew-terminology-purge.yml
+      - run: python -m pytest -q tests/contracts/test_current_crew_terminology.py tests/contracts/test_command_spine.py
+      - run: |
+          git config user.name VESSAXOR
+          git config user.email vessaxor@gmail.com
+          git add -A
+          git diff --cached --check
+          git commit -m "Remove obsolete Crew terminology from current tree"
+          git push origin HEAD:stewardship/obsolete-crew-terminology-purge
