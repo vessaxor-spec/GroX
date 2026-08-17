@@ -1,6 +1,6 @@
 # Post-Apex Operational Evolution Program 001
 
-**Status:** IN EXECUTION — STAGES 0-6 COMPLETE; PROVENANCE IMPLEMENTATION NEXT
+**Status:** IN EXECUTION — STAGES 0-6 + PROVENANCE IMPLEMENTATION COMPLETE; INTEGRATION GATE NEXT
 
 **Planning baseline:** `main@c93015278daf022b1c3d85fc8fb90a6fa52d8160`
 
@@ -172,6 +172,28 @@ Research: `docs/research/MISSION_SOURCE_PROVENANCE.md`
 History: `docs/history/ships-log/0048-mission-source-provenance-researched.md`
 
 **Exit condition:** PASSED. Separate bounded implementation is warranted and must prove forged/replayed/out-of-scope/downgraded receipts fail, missing private evidence is UNKNOWN, squash linkage survives, and public CI never receives private raw operational state.
+
+### Provenance implementation — COMPLETE
+
+**Issue:** #45
+
+`src/grox/source_provenance.py` implements the Stage 6 ADAPT decision as a private authorization-evidence capability over the existing `StateStore` SQLite plane. It introduces no second state database or public Mission ledger.
+
+Receipt issuance requires an existing explicit Repair Order carrying a mutating action and source scope that covers the requested receipt paths. Each receipt uses a random opaque public ID and 256-bit private nonce. Public metadata exposes only the v1 schema, opaque ID, domain-separated SHA-256 commitment, and coarse change class.
+
+Private verification reopens the originating Mission and Orders, verifies current Repair/mutation authority, recomputes the commitment, rejects class downgrade, enforces normalized path coverage, prevents incompatible replay, and binds PASS to the exact PR head/tree. Missing private authority evidence is `UNKNOWN`, never PASS. Consumption requires that exact verified binding and records the canonical source revision.
+
+Repository-wide mandatory provenance enforcement remains deliberately inactive until integrated qualification and a durable private Vessel can issue/verify the corresponding private receipts operationally. Public CI remains structural-only and receives no raw private authority state.
+
+Preserved red evidence includes temporary harness run `32006665435`, which exposed a missing test-runtime installation, and source-provenance CI run `32007023966`, which killed 4/6 mutations while exposing two non-isolating mutation targets protected by redundant defenses. Neither result was bypassed. The harness and detector targets were corrected without weakening production behavior.
+
+Exact-head green run `32007232455` then passed all five protected jobs with pytest **200 passed, 2 skipped, 354 subtests**, unittest **202 tests, 2 skipped**, all prior Post-Apex experiments/mutation suites green, and source-provenance mutation proof **6/6 KILLED**, zero survivors, exact source restoration.
+
+Architecture: `docs/architecture/SOURCE_PROVENANCE.md`
+Evidence: `docs/verification/SOURCE_PROVENANCE_MUTATION_MATRIX.md`
+History: `docs/history/ships-log/0049-source-provenance-receipts-operational.md`
+
+**Exit condition:** PASSED. Integrated Post-Apex Evolution Program 001 qualification is next.
 
 ## Cross-workstream verification rules
 
