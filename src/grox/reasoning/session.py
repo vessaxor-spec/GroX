@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from .base import ReasoningError
+from .base import CognitiveUsage, ReasoningError
 from .contracts import MissionInterpretation
 from ..graph import MissionGraphPlan
 
@@ -38,6 +38,11 @@ class SessionReasoningProvider:
         self._responder = responder
         self._graph_responder = graph_responder
         self.name = name
+
+    def usage_snapshot(self) -> CognitiveUsage | None:
+        # The current project/session callback contract does not expose host token
+        # accounting. Returning None is explicit and never invents usage evidence.
+        return None
 
     def interpret(self, directive: str, *, roster: list[dict[str, Any]]) -> MissionInterpretation:
         raw = self._responder(directive, roster)
