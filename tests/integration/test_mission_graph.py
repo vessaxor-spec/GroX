@@ -29,7 +29,7 @@ def qualification_plan(directive):
         'budget': {'max_nodes': 12, 'max_parallel': 3, 'max_replans': 2},
         'nodes': [
             {'node_id':'architecture','objective':'Inspect architecture and command boundaries','mode':'inspect','dependencies':[],
-             'candidate_crew_ids':['systems-architect'],'required_capabilities':['repo_read'],'scope':['.']},
+             'candidate_crew_ids':['test-architecture-specialist'],'required_capabilities':['repo_read'],'scope':['.']},
             {'node_id':'research','objective':'Research internal evidence and readiness records','mode':'inspect','dependencies':[],
              'candidate_crew_ids':['researcher'],'required_capabilities':['repo_read'],'scope':['docs']},
             {'node_id':'analysis','objective':'Analyze configuration and evidence structure','mode':'inspect','dependencies':[],
@@ -131,7 +131,7 @@ class MissionGraphIntegrationTests(unittest.TestCase):
                 'objective':'Exercise graph defect containment.',
                 'nodes':[
                     {'node_id':'inspect','objective':'Inspect architecture','mode':'inspect','dependencies':[],
-                     'candidate_crew_ids':['systems-architect'],'required_capabilities':['repo_read'],'scope':['.']},
+                     'candidate_crew_ids':['test-architecture-specialist'],'required_capabilities':['repo_read'],'scope':['.']},
                 ],
             }
             r=p.command_graph(directive,plan=plan,plan_source='test-defect')

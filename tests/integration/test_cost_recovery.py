@@ -32,7 +32,7 @@ class CostRecoveryTests(unittest.TestCase):
                 "nodes": [
                     {
                         "node_id": "one", "objective": "Cost recovery step one", "mode": "inspect",
-                        "dependencies": [], "candidate_crew_ids": ["systems-architect"],
+                        "dependencies": [], "candidate_crew_ids": ["test-architecture-specialist"],
                         "required_capabilities": ["repo_read"], "scope": ["."],
                         "budget": {"cost_units": 1.0},
                     },

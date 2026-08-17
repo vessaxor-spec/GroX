@@ -16,7 +16,7 @@ class PilotTest(unittest.TestCase):
         try:
             result = p.command("Inspect architecture and report", mode=MissionMode.inspect)
             self.assertEqual(result["status"], "completed")
-            self.assertEqual(result["crew"], "systems-architect")
+            self.assertEqual(result["crew"], "test-architecture-specialist")
         finally:
             td.cleanup()
 
@@ -83,7 +83,7 @@ class PilotTest(unittest.TestCase):
             result = p.command(
                 "Repair file",
                 mode=MissionMode.repair,
-                crew_id="systems-architect",
+                crew_id="test-architecture-specialist",
                 parameters={"operation": "write_text", "path": "x", "content": "x"},
                 scope="x",
             )

@@ -68,7 +68,7 @@ class CognitivePilotTest(unittest.TestCase):
         try:
             p=PilotGorXu(root,reasoner=FakeReasoner(candidate='nonexistent-crew'))
             r=p.command('Inspect architecture',mode=MissionMode.inspect)
-            self.assertEqual(r['crew'],'systems-architect')
+            self.assertEqual(r['crew'],'test-architecture-specialist')
         finally: td.cleanup()
 
     def test_cognition_failure_degrades_without_widening_authority(self):

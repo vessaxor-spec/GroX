@@ -23,7 +23,7 @@ Verified by source, qualification evidence, and automated testing:
 - Mission Control operates as a native advisory/policy subsystem under GorXu
 - 81 specialist-inspired Standing Crew recruited as native GroX identities
 - 1 native independent verifier retained, for 82 total standing dossiers
-- former bootstrap `systems-architect` overlap replaced by the canonical `architect` Crew
+- active Standing Crew membership is canonical, source-defined, and free of stale roster overlap
 - retired, archived, removed, or otherwise stale Crew operational state is purged during roster reconstitution
 - orchestration-role recruitment blocked; orchestration remains Pilot authority
 - fresh Crew tours with persistent tour/episodic state
@@ -234,7 +234,7 @@ Recovery evidence:
 
 - live `main` matched the A2 handoff commit before recovery work;
 - the private `GROX-A2-qualified.groxstate` checkpoint passed archive-path, schema, SHA-256, and SQLite integrity verification and was restored through GroX's controlled persistence path;
-- active source-defined company remains 82 Standing Crew; the formerly retired `systems-architect` operational row has been purged and current reconstitution removes any stale Crew state not present in the source roster;
+- active source-defined company remains 82 Standing Crew, and current reconstitution removes stale Crew state not present in the source roster;
 - two source-integrity defects were found before A3: corrupted bytes in the A2 Mission Graph regression test and one mis-indented runtime statement in bounded replanning;
 - both defects were repaired on an isolated recovery branch without changing Mission Graph authority semantics;
 - the lost `test_graph_repair_requires_explicit_mutation_authority` invariant was recovered from A2 qualification evidence;

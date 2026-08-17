@@ -25,7 +25,7 @@ class ContradictoryFindingExecutor:
         self.base = base
 
     def execute(self, order):
-        if order.assigned_crew == "systems-architect":
+        if order.assigned_crew == "test-architecture-specialist":
             return TourResult(
                 order.order_id,
                 order.assigned_crew,
@@ -143,7 +143,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
                 "budget": {"max_nodes": 6, "max_parallel": 2, "max_replans": 0},
                 "nodes": [
                     {"node_id": "architecture", "objective": "Assess serializer strategy from architecture evidence", "mode": "inspect", "dependencies": [],
-                     "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."]},
+                     "candidate_crew_ids": ["test-architecture-specialist"], "required_capabilities": ["repo_read"], "scope": ["."]},
                     {"node_id": "research", "objective": "Assess serializer strategy from research evidence", "mode": "inspect", "dependencies": [],
                      "candidate_crew_ids": ["researcher"], "required_capabilities": ["repo_read"], "scope": ["docs"]},
                     {"node_id": "verify", "objective": "Independently verify both serializer findings", "mode": "verify", "dependencies": ["architecture", "research"],
@@ -174,7 +174,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
                 "budget": {"max_nodes": 8, "max_parallel": 3, "max_replans": 0},
                 "nodes": [
                     {"node_id": "architecture", "objective": "Assess serializer strategy from architecture evidence", "mode": "inspect", "dependencies": [],
-                     "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."]},
+                     "candidate_crew_ids": ["test-architecture-specialist"], "required_capabilities": ["repo_read"], "scope": ["."]},
                     {"node_id": "research", "objective": "Assess serializer strategy from research evidence", "mode": "inspect", "dependencies": [],
                      "candidate_crew_ids": ["researcher"], "required_capabilities": ["repo_read"], "scope": ["docs"]},
                     {"node_id": "context", "objective": "Inspect unrelated context", "mode": "inspect", "dependencies": [],
@@ -200,8 +200,8 @@ class ApexQualificationGauntlet(unittest.TestCase):
                 self.base = base
 
             def execute(self, order):
-                if order.assigned_crew in {"systems-architect", "researcher"}:
-                    position = "replace" if order.assigned_crew == "systems-architect" else "retain"
+                if order.assigned_crew in {"test-architecture-specialist", "researcher"}:
+                    position = "replace" if order.assigned_crew == "test-architecture-specialist" else "retain"
                     confidence = 0.90 if position == "replace" else 0.55
                     quality = 0.90 if position == "replace" else 0.60
                     return TourResult(order.order_id, order.assigned_crew, "completed", position, [
@@ -225,7 +225,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
                 "budget": {"max_nodes": 8, "max_parallel": 3, "max_replans": 0},
                 "nodes": [
                     {"node_id": "architecture", "objective": "Architecture serializer finding", "mode": "inspect", "dependencies": [],
-                     "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."]},
+                     "candidate_crew_ids": ["test-architecture-specialist"], "required_capabilities": ["repo_read"], "scope": ["."]},
                     {"node_id": "research", "objective": "Research serializer finding", "mode": "inspect", "dependencies": [],
                      "candidate_crew_ids": ["researcher"], "required_capabilities": ["repo_read"], "scope": ["docs"]},
                     {"node_id": "context", "objective": "Unrelated context", "mode": "inspect", "dependencies": [],
@@ -241,7 +241,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
             mission = pilot.store.mission(result["mission_id"])
             source_orders = {
                 row["order_id"] for row in mission["orders"]
-                if row["payload"] and json.loads(row["payload"])["assigned_crew"] in {"systems-architect", "researcher"}
+                if row["payload"] and json.loads(row["payload"])["assigned_crew"] in {"test-architecture-specialist", "researcher"}
             }
             forged_persisted = [
                 ev for ev in mission["evidence"]
@@ -257,7 +257,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
                 self.base = base
 
             def execute(self, order):
-                if order.assigned_crew == "systems-architect":
+                if order.assigned_crew == "test-architecture-specialist":
                     return TourResult(order.order_id, order.assigned_crew, "completed", "replace", [
                         Evidence("finding", {
                             "topic": "serializer_strategy", "position": "replace", "claim": "replace once",
@@ -281,7 +281,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
                 "budget": {"max_nodes": 6, "max_parallel": 2, "max_replans": 0},
                 "nodes": [
                     {"node_id": "architecture", "objective": "Architecture serializer finding", "mode": "inspect", "dependencies": [],
-                     "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."]},
+                     "candidate_crew_ids": ["test-architecture-specialist"], "required_capabilities": ["repo_read"], "scope": ["."]},
                     {"node_id": "research", "objective": "Research serializer finding", "mode": "inspect", "dependencies": [],
                      "candidate_crew_ids": ["researcher"], "required_capabilities": ["repo_read"], "scope": ["docs"]},
                     {"node_id": "verify", "objective": "Verify both source Orders", "mode": "verify", "dependencies": ["architecture", "research"],
@@ -303,7 +303,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
             nodes = []
             previous = None
             objectives = []
-            crew_cycle = ["systems-architect", "researcher", "data-analyst", "application-security-engineer"]
+            crew_cycle = ["test-architecture-specialist", "researcher", "data-analyst", "application-security-engineer"]
             for index in range(1, 10):
                 objective = f"Long-horizon inspection checkpoint {index}"
                 objectives.append(objective)
@@ -345,7 +345,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
             directive = "Inspect an irreversible production credential boundary."
             plan = {"commander_intent": directive, "objective": "Prove Commander escalation boundary", "nodes": [
                 {"node_id": "inspect", "objective": "Inspect irreversible boundary", "mode": "inspect", "dependencies": [],
-                 "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."]}
+                 "candidate_crew_ids": ["test-architecture-specialist"], "required_capabilities": ["repo_read"], "scope": ["."]}
             ]}
             pilot.executor = AlwaysBlocker(pilot.executor)
             result = pilot.command_graph(directive, plan=plan, risk=RiskClass.critical, plan_source="a7-critical")
@@ -428,7 +428,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
         scope = ["docs"]
         params = {"allowed_origins": ["https://example.com"], "mcp_grants": {"adapter": ["read"]}}
         order = MissionOrder.new(
-            "MSN-A7-ORDER", "intent", "objective", MissionMode.inspect, "systems-architect",
+            "MSN-A7-ORDER", "intent", "objective", MissionMode.inspect, "test-architecture-specialist",
             required_capabilities=["repo_read"], allowed_actions=["fs_list", "fs_read"], forbidden_actions=["fs_write"],
             scope=scope, parameters=params,
         )
@@ -453,7 +453,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
                 directive = "Inspect architecture and independently verify it."
                 plan = {"commander_intent": directive, "objective": "Routing consistency qualification", "nodes": [
                     {"node_id": "inspect", "objective": "Inspect architecture", "mode": "inspect", "dependencies": [],
-                     "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."]},
+                     "candidate_crew_ids": ["test-architecture-specialist"], "required_capabilities": ["repo_read"], "scope": ["."]},
                     {"node_id": "verify", "objective": "Verify architecture evidence", "mode": "verify", "dependencies": ["inspect"],
                      "candidate_crew_ids": ["code-reviewer"], "required_capabilities": ["repo_read", "verify"], "scope": ["."]},
                 ]}
@@ -501,7 +501,7 @@ class ApexQualificationGauntlet(unittest.TestCase):
                 "budget": {"max_nodes": 5, "max_parallel": 1, "max_replans": 0, "max_cost_units": 2.0},
                 "nodes": [
                     {"node_id": "one", "objective": "Cost step one", "mode": "inspect", "dependencies": [],
-                     "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."], "budget": {"cost_units": 1.0}},
+                     "candidate_crew_ids": ["test-architecture-specialist"], "required_capabilities": ["repo_read"], "scope": ["."], "budget": {"cost_units": 1.0}},
                     {"node_id": "two", "objective": "Cost step two", "mode": "inspect", "dependencies": ["one"],
                      "candidate_crew_ids": ["researcher"], "required_capabilities": ["repo_read"], "scope": ["."], "budget": {"cost_units": 1.0}},
                     {"node_id": "three", "objective": "Cost step three", "mode": "inspect", "dependencies": ["two"],
