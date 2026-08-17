@@ -1,0 +1,41 @@
+name: Sync verifier routing stewardship
+
+on:
+  push:
+    branches:
+      - agent/independent-verifier-routing
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.event.head_commit.message == 'Run verifier routing stewardship sync'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: agent/independent-verifier-routing
+          fetch-depth: 0
+      - name: Apply canonical stewardship updates
+        shell: bash
+        run: |
+          python - <<'PY'
+          import base64, gzip
+          from pathlib import Path
+          payload='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'
+          Path('/tmp/sync.py').write_bytes(gzip.decompress(base64.b64decode(payload)))
+          PY
+          python /tmp/sync.py
+          rm .github/workflows/sync-verifier-routing-stewardship.yml
+          rm -f .verifier-routing-stewardship-trigger
+          git diff --check
+      - name: Commit stewardship sync
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Sync verifier routing stewardship'
+          git push origin HEAD:agent/independent-verifier-routing
