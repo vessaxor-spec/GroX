@@ -8,6 +8,7 @@ private qualification state outside temporary test storage.
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import shutil
@@ -20,10 +21,20 @@ from grox.operational_drift import REGRESSION
 from grox.reconstitution import FAST, FULL, ReconstitutionPlanner
 from grox.source_provenance import FAIL as PROVENANCE_FAIL, PASS as PROVENANCE_PASS, UNKNOWN as PROVENANCE_UNKNOWN, SourceProvenanceService
 from grox.state import StateStore, now
-from tests.experiments.operational_drift_experiment import run as run_operational_drift
 
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def _run_operational_drift() -> dict:
+    """Load the existing drift experiment by path without packaging tests."""
+    path = ROOT / "tests/experiments/operational_drift_experiment.py"
+    spec = importlib.util.spec_from_file_location("grox_operational_drift_experiment", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load operational drift experiment: {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.run()
 
 
 def _check_map(report) -> dict:
@@ -328,7 +339,7 @@ def source_provenance_evidence() -> dict:
 
 def run() -> dict:
     health_context = health_reconstitution_context_evidence()
-    drift = run_operational_drift()
+    drift = _run_operational_drift()
     if drift["finding"]["status"] != REGRESSION:
         raise AssertionError(drift)
     if not drift["baseline_unchanged"] or not drift["activation_blocked"]:
