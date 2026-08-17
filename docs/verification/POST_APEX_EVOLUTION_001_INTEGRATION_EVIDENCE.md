@@ -61,3 +61,5 @@ The experiment output sets:
 - `new_apex_stage=false`.
 
 These are required boundaries. The experiment supplies evidence; independent exact-head verification decides whether that evidence is sufficient for protected merge. A release remains a separate Commander decision after program closure.
+
+This candidate record is now frozen for final exact-head CI and independent review; any later content change requires those gates to run again.
