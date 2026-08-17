@@ -2,8 +2,9 @@
 
 **Status date:** 2026-08-17
 **Canonical release:** `v0.7.1`
+**Release candidate:** `v0.8.0` — PREPARATION AUTHORIZED; TAG/PUBLICATION PENDING
 **Canonical source branch:** `main`
-**Current source package:** `0.7.1`
+**Current source package:** `0.8.0`
 **Current released source:** `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
@@ -42,8 +43,8 @@ Verified by source, qualification evidence, and automated testing:
 - permanent least-privilege CI now exercises Python 3.11 through 3.14 regressions plus non-editable wheel bootstrap portability on pull requests and `main`; third-party actions are pinned to immutable full commit SHAs
 - canonical `main` is protected by an active repository ruleset requiring pull requests and all five canonical CI gates with strict up-to-date enforcement, blocking deletion and non-fast-forward updates, with no bypass actors
 - Vessel-root discovery now supports explicit `GROX_VESSEL_ROOT` binding, current-checkout discovery, editable-source fallback, and fail-closed refusal to construct an unbound 0-Crew Vessel
-- package/source version metadata is synchronized at `0.7.1` and guarded by both pytest and unittest
-- release `v0.7.1` is pinned to the fully verified post-Apex operational-hardening source commit `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`
+- package/source version metadata is aligned to the `0.8.0` release candidate and remains guarded by both pytest and unittest
+- current published release `v0.7.1` remains pinned to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` until the verified `v0.8.0` candidate is explicitly published
 
 ## Company state
 
@@ -185,6 +186,18 @@ Integrated Post-Apex Evolution Program 001 qualification is canonical on protect
 The experiment deliberately emits `qualification_claim=false`, `release_decision=false`, and `new_apex_stage=false`; the experiment did not self-certify. PR #53 received bounded PASS reviews on candidate head `5c58392a0b9f8fb80f085128588167712003f283` and final closeout head `3a58a8e9df85087cbbe382085e1b1d9ea1ae6fcd`; final PR CI run `32009983924` passed, the PR merged as `4122845858fae6abdf52af7a3a1ce56256e0c5cf`, and canonical post-merge run `32010172588` passed all five jobs. Any later release remains a Commander decision.
 
 Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.
+
+## v0.8.0 release candidate
+
+**Status: PREPARATION AUTHORIZED — TAG/PUBLICATION PENDING**
+
+- Commander authorization opened issue #55 for a bounded `v0.8.0` candidate;
+- candidate source begins from canonical post-merge verified `main@14262546967d7aed54cf07f94759cf6e77414f24`;
+- package/source metadata is aligned to `0.8.0`;
+- public README and current stewardship are being reconciled to the completed Program 001 state;
+- the complete protected CI matrix plus independent exact-head verification are required before publication can be considered;
+- no tag or GitHub release is created by preparation; publication remains a separate Commander-controlled action;
+- no Commander, GorXu, Crew, Tool Gateway, verifier, persistence, A6 activation, or other authority boundary is widened; no A8 is created or implied.
 
 ## Known deliberate limits
 

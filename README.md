@@ -13,14 +13,14 @@
 A persistent AI Vessel for translating **Commander intent into bounded Missions, durable execution, attributable evidence, independent verification, and recoverable continuity**.
 
 [![GroX CI](https://github.com/vessaxor-spec/GroX/actions/workflows/ci.yml/badge.svg)](https://github.com/vessaxor-spec/GroX/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/vessaxor-spec/GroX?label=release)](https://github.com/vessaxor-spec/GroX/releases/tag/v0.7.1)
+[![Release](https://img.shields.io/github/v/release/vessaxor-spec/GroX?label=release)](https://github.com/vessaxor-spec/GroX/releases/latest)
 
 [**Explore the architecture**](docs/architecture/ARCHITECTURE.md) ·
 [**See current progress**](docs/stewardship/progress-tracker.md) ·
 [**View the roadmap**](docs/stewardship/ROADMAP.md) ·
 [**Meet the Crew**](docs/stewardship/CREW_ROSTER.md)
 
-**Release:** `v0.7.1` · **Package:** `0.7.1` · **Operating standard:** `APEX QUALIFIED` · **Standing Crew:** `82`
+**Release candidate:** `v0.8.0` · **Current release:** `v0.7.1` · **Package:** `0.8.0` · **Operating standard:** `APEX QUALIFIED` · **Standing Crew:** `82`
 
 </div>
 
@@ -114,7 +114,7 @@ Canonical builder constraints are defined in [`AI_INSTRUCTIONS.md`](AI_INSTRUCTI
 
 ## Current state
 
-GroX has completed the A1-A7 Apex qualification path and is operating in protected post-Apex evolution.
+GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational Evolution Program 001. Canonical source is now being prepared as the `v0.8.0` release candidate.
 
 | Surface | Current state |
 |---|---|
@@ -126,8 +126,8 @@ GroX has completed the A1-A7 Apex qualification path and is operating in protect
 | Canonical source | protected `main`; source may advance beyond the release through the governed PR/CI path |
 | CI boundary | Python 3.11-3.14 regressions plus wheel-bootstrap portability; five required gates |
 | Current evolution program | [`Post-Apex Operational Evolution Program 001`](docs/stewardship/POST_APEX_EVOLUTION_PROGRAM_001.md) |
-| Completed program work | capability intake, critical mutation proving, Vessel health, tiered reconstitution, controlled context heat/compression experiment |
-| Next program stage | **#28 A6 longitudinal operational drift analysis** |
+| Completed program work | Program 001 complete: capability intake, mutation proving, Vessel health, tiered reconstitution, controlled context heat, A6 longitudinal drift, Mission-to-source provenance, and integrated qualification |
+| Next program stage | **None predeclared. No A8 is implied.** |
 | Canonical current status | [`docs/stewardship/progress-tracker.md`](docs/stewardship/progress-tracker.md) |
 
 The live Vessel includes Commander Seat interfaces, durable Missions and Mission Graphs, 82 Standing Crew, attributable organizational memory, capability-gated execution, independent verification, crash-safe same-Mission recovery, bounded replanning, Tool Gateway v2, isolated workspace execution, exact-origin network access, offline browser evidence capture, pre-registered stdio MCP adapters, evaluation that cannot self-activate, read-only Vessel health, tiered reconstitution planning, and integrity-checked private state snapshots.
@@ -161,7 +161,10 @@ Current protected evolution has added continuous proof around high-consequence c
 - `grox reconstitution-plan` selects FAST, TARGETED, or FULL recovery scope without duplicating health truth or widening authority;
 - the controlled Stage 4 HOT/WARM/COLD experiment retained **100% of declared critical facts and retained provenance** while reducing the bounded corpus from 20,464 to 1,336 characters, a **93.47% controlled character reduction**;
 - that Stage 4 result is an experimental character-count result, not a production token, latency, or runtime-activation claim;
-- automatic Pilot context compression remains deferred until integrated operational evidence supports activation.
+- automatic Pilot context compression remains deliberately unactivated; integrated qualification proved context preservation without silently enabling runtime compression;
+- **4/4** A6 operational-drift detector mutations killed;
+- **6/6** source-provenance detector mutations killed;
+- integrated Post-Apex qualification passed across health, reconstitution, context preservation, A6 drift, external-intake rejection, and privacy-safe source provenance without widening authority.
 
 Historical red runs remain evidence rather than being erased to create a clean narrative. Exact current milestones, run IDs, and qualification evidence are maintained in the [`Progress Tracker`](docs/stewardship/progress-tracker.md), [`Roadmap`](docs/stewardship/ROADMAP.md), and Ship's Log.
 
@@ -314,19 +317,11 @@ The README is an entry point. It does not outrank current repository authority, 
 
 ## Roadmap
 
-The Apex critical path is complete. GroX is now evolving through **Post-Apex Operational Evolution Program 001** without introducing a predeclared A8.
+The Apex critical path and **Post-Apex Operational Evolution Program 001** are complete and independently verified. Program 001 added evidence-backed Vessel health, tiered reconstitution, bounded context-heat policy, longitudinal A6 drift analysis, external-capability intake discipline, and privacy-safe Mission-to-source provenance, then qualified those surfaces together.
 
-Completed program stages include:
+There is no predeclared A8. Future evolution requires new Commander intent and must preserve the existing Apex and Post-Apex regression boundaries.
 
-- external capability intake convention;
-- continuous critical-detector mutation proving;
-- native read-only Vessel health;
-- tiered FAST/TARGETED/FULL reconstitution planning;
-- controlled HOT/WARM/COLD context policy experiment.
-
-The next approved stage is **#28 A6 longitudinal operational drift analysis**, followed by mission-to-source provenance research and integrated operational qualification of the changed surfaces. Completion of an individual stage does not imply a version bump, release tag, new Apex stage, or authority expansion.
-
-The Commander retains the release decision.
+The `v0.8.0` source candidate packages this completed baseline; creating the release tag and publishing the GitHub release remain separate Commander-controlled actions.
 
 See the canonical [`Roadmap`](docs/stewardship/ROADMAP.md) for current sequencing and evidence boundaries.
 
