@@ -42,7 +42,7 @@ Raw Mission/Order identifiers, Commander directives, private nonce, Crew notes, 
 
 GitHub/Sigstore custom attestations are retained only as optional future public cryptographic hardening if an external consumer appears. They are not the private authority witness and are not required for the minimal design.
 
-Research: `docs/research/MISSION_SOURCE_PROVENANCE.md`  
+Research: `docs/research/MISSION_SOURCE_PROVENANCE.md`
 History: `docs/history/ships-log/0048-mission-source-provenance-researched.md`
 
 **Exit condition:** PASSED. Separate bounded implementation is warranted and must prove forged/replayed/out-of-scope/downgraded receipts fail, missing private evidence is UNKNOWN, squash linkage survives, and public CI never receives private raw operational state.
