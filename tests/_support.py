@@ -6,7 +6,7 @@ CREW=[
 {"crew_id":"test-architecture-specialist","division":"engineering","title":"Systems Architect","capabilities":["repo_read","architecture_review","analysis","test_run"],"tags":["architecture","inspect","review"]},
 {"crew_id":"backend-engineer","division":"engineering","title":"Backend Engineer","capabilities":["repo_read","repo_write","python","test_run"],"tags":["repair","write","code"]},
 {"crew_id":"code-reviewer","division":"verification","title":"Code Reviewer","capabilities":["repo_read","code_review","verify","test_run"],"tags":["verify","review"],"verification":True},
-{"crew_id":"independent-verifier","division":"verification","title":"Independent Verifier","capabilities":["repo_read","verify","test_run"],"tags":["verify","evidence"],"verification":True},
+{"crew_id":"independent-verifier","division":"verification","title":"Independent Verifier","capabilities":["repo_read","verify","test_run"],"tags":["verify","evidence"],"ordinary_routing":False,"verification":True},
 ]
 
 def temp_vessel():

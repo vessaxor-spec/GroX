@@ -45,6 +45,7 @@ class CrewDossier:
     capabilities:frozenset[str]
     tags:frozenset[str]
     verification:bool=False
+    ordinary_routing:bool=True
 
 
 class CrewRoster:
@@ -62,7 +63,11 @@ class CrewRoster:
                 raise ValueError(f"non-standing Crew dossier is not allowed in the active roster: {cid} ({status})")
             if _forbidden_command_identity(cid, title):
                 raise ValueError(f"forbidden Crew command identity: {cid} / {title}")
-            d=CrewDossier(cid,raw['division'],title,frozenset(raw['capabilities']),frozenset(raw.get('tags',[])),bool(raw.get('verification')))
+            d=CrewDossier(
+                cid,raw['division'],title,
+                frozenset(raw['capabilities']),frozenset(raw.get('tags',[])),
+                bool(raw.get('verification')),bool(raw.get('ordinary_routing',True)),
+            )
             self._crew[cid]=d
             # Domains are descriptive cognitive-discovery metadata only. They are
             # never eligibility, capability, Mission authority, or Repair grants.
@@ -113,7 +118,10 @@ class CrewRoster:
         candidates=[]
         for d in self._crew.values():
             if d.crew_id in excluded: continue
-            if verifier and not d.verification: continue
+            if verifier:
+                if not d.verification: continue
+            elif not d.ordinary_routing:
+                continue
             if required and not required.issubset(d.capabilities): continue
             score=len(words & d.tags)*4 + len(required & d.capabilities)*3
             candidates.append((score,len(d.capabilities),d.crew_id,d))
