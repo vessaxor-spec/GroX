@@ -1,7 +1,7 @@
 # Ship's Log 0056 — Independent Verifier Routing Boundary
 
 **Date:** 2026-08-18
-**Status:** IMPLEMENTED — FINAL EXACT-HEAD QUALIFICATION PENDING MERGE
+**Status:** COMPLETE — CANONICAL POST-MERGE VERIFIED
 
 Sandbox qualification found that `independent-verifier` could enter ordinary automatic routing even though its canonical craft card says it is not an alternate route for execution. The same card also preserves a deliberate exception: a separately authorized Mission Order may assign a different role or mode.
 
@@ -31,10 +31,14 @@ After the routing boundary was implemented, an existing durable-recovery test fa
 
 The regression was strengthened to bind its non-replay assertion to the architecture node's actual objective and persisted `order_id`. This preserves the real durability invariant while allowing legitimate Crew reuse during recovery.
 
-## Qualification posture
+## Qualification evidence
 
-Implementation head `e8a919ec54945a9a5cc400f9160389318702eb8a` passed the complete Python 3.12 qualification: Vessel Health 10/10 PASS; pytest 215 passed, 2 skipped, 354 subtests; unittest 217 OK, 2 skipped; cognitive context efficiency 82/82 at 45.15% structural reduction; context heat PASS; expected operational-drift REGRESSION with activation blocked; mutations 12/12, 7/7, 9/9, 4/4, 6/6 killed with clean restoration; integrated Post-Apex qualification PASS. Python 3.11, Python 3.14, and Wheel bootstrap were also green; Python 3.13 was still completing when final hygiene/stewardship changes created a new branch head.
+- final implementation head: `1531f4d4f3e2a222cdef5c32b7c6b70debba35de`;
+- exact-head PR CI `32078828303`: PASS all five required jobs;
+- PR #67 merged as `d04d21e38ffe1645d9c9e0df61e7ca96ac465066`;
+- canonical push CI `32079205250`: PASS all five required jobs on exact `main@d04d21e38ffe1645d9c9e0df61e7ca96ac465066`;
+- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **215 passed, 2 skipped, 354 subtests**; unittest **217 OK, 2 skipped**; cognitive context efficiency **82/82 Crew** at **45.15%** structural reduction; context heat PASS; expected operational-drift REGRESSION with activation blocked; mutations **12/12**, **7/7**, **9/9**, **4/4**, **6/6** killed with clean restoration; integrated Post-Apex qualification PASS.
 
-Roadmap and Progress Tracker now describe the implemented policy as merge-pending. The final consolidated branch head contains the exact runtime, regression, durability-assertion, hygiene, and stewardship state intended for merge; PR #67 will record its exact SHA and five-job CI result without changing that source after qualification.
+## Preserved boundaries
 
-Final canonical merge remains gated on a fresh exact-head five-job CI run. No release/tag/version moved, no authority widened, no Crew roster changed, and no A8 or new Apex stage was created or implied.
+No release/tag/version moved, no authority widened, no Crew roster membership changed, and no A8 or new Apex stage was created or implied. The `ordinary_routing` policy constrains only automatic ordinary routing for `independent-verifier`; Verify eligibility and explicit separately authorized assignment remain intact.
