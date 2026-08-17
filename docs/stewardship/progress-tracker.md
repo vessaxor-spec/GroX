@@ -10,7 +10,7 @@
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED — OPERATIONAL AUDIT 001 CLOSED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **209 passed, 2 skipped, 354 subtests**; unittest **211 OK, 2 skipped**
+**Current verified regression:** pytest **215 passed, 2 skipped, 354 subtests**; unittest **217 OK, 2 skipped**
 
 ## Runtime Integrity Repairs — issues #63 and #64
 
@@ -25,9 +25,17 @@
 - interrupted local mutation qualification temporarily carried two deliberate graph mutants into an early candidate; static PR review caught them before merge, both canonical invariants were restored, and remote mutation proof killed them again with clean restoration;
 - no authority widening, release/tag change, Crew roster change, new Apex stage, or A8 was introduced.
 
-**Issue #64 status: OPEN — POLICY QUESTION ONLY**
+**Issue #64 status: IMPLEMENTED — FINAL EXACT-HEAD QUALIFICATION PENDING MERGE**
 
-- ordinary execution eligibility for `independent-verifier` remains recorded separately; issue #63 made no verifier-routing policy change.
+- canonical doctrine says `independent-verifier` is not an alternate automatic execution route, while a separately authorized Mission Order may deliberately assign another role/mode;
+- repository inspection confirmed **16 verification-capable Crew**, so `verification=true` remains verification eligibility and cannot serve as a verification-only marker;
+- a distinct dossier property `ordinary_routing` defaults to `true` and is `false` only for `independent-verifier`;
+- Living Company and legacy roster ordinary routing honor that property; Verify routing remains governed by `verification=true`;
+- cognitive/preferred recommendations cannot force a role-only verifier into ordinary routing, while explicit bounded GorXu `crew_id` assignment remains the separately authorized exception path;
+- exact red-baseline CI `32078007106` failed the three intended ordinary-routing assertions before implementation and kept Health/Wheel green;
+- implementation qualification on Python 3.12 reached Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **215 passed, 2 skipped, 354 subtests**, unittest **217 OK, 2 skipped**, mutations **12/12**, **7/7**, **9/9**, **4/4**, **6/6**, and integrated Post-Apex PASS;
+- an older durable-recovery assertion was strengthened from incidental Crew assignment count to the committed architecture node's actual objective/order identity after the new routing boundary legitimately changed recovery consultation Crew reuse;
+- final merge remains gated on fresh exact-head all-five-job CI after stewardship/hygiene consolidation; no release/tag, authority, Crew membership, Apex-stage, or A8 change is included.
 
 ## Cognitive Context Efficiency — issue #60
 

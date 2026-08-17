@@ -138,7 +138,11 @@ Preserved canary evidence: an interrupted local mutation harness temporarily car
 
 Commander/GorXu authority, risk floors, Tool Gateway enforcement, verifier independence, source binding, 82-Crew structure, release state, and Apex-stage state are unchanged.
 
-**Issue #64 status: OPEN — POLICY ONLY.** The sandbox also exposed an ambiguity around ordinary execution eligibility for `independent-verifier`. No behavior change was included in issue #63; resolve #64 separately against canonical Crew doctrine and verifier-independence semantics.
+**Issue #64 status: IMPLEMENTED — FINAL EXACT-HEAD QUALIFICATION PENDING MERGE.** Canonical doctrine now distinguishes verification capability from ordinary automatic-routing eligibility. Because 16 Standing Crew are verification-capable, `verification=true` remains a verification-eligibility marker and is not reused as a verification-only role flag. A distinct `ordinary_routing` property defaults to `true` and is `false` only for `independent-verifier`. Ordinary automatic routing and cognitive preference respect that boundary; Verify routing remains unchanged; explicit GorXu `crew_id` assignment remains the separately authorized exception path described by the craft card and still passes normal Mission Order, capability, action, risk, scope, host-policy, and verification gates.
+
+Red-before-green evidence: exact red-baseline run `32078007106` failed the three intended ordinary-routing assertions before routing code changed while Health and Wheel remained green. The implemented routing boundary then made those regressions green. A compatibility canary exposed an older durability test that counted every Order assigned to one Crew as a proxy for graph-node replay; that assertion was strengthened to bind to the committed architecture node's actual objective and persisted `order_id`, preserving the real no-replay invariant while allowing legitimate recovery consultation reuse.
+
+No command layer, authority, Crew membership, release/tag, or Apex-stage change is introduced.
 
 ## Post-Apex operating posture
 
