@@ -63,8 +63,18 @@ class CrewExecutor:
             evidence.append(Evidence('mutation',{'operation':'write_text','before_sha256':before,**result}))
 
         if 'test_run' in order.allowed_actions:
-            test=self.gateway.run_tests(order); evidence.append(Evidence('test_run',test))
-            if test['returncode']!=0:
+            try:
+                test=self.gateway.run_tests(order)
+                evidence.append(Evidence('test_run',test))
+                verification_failed=test['returncode']!=0
+                failure_summary='Repair applied but tests failed'
+                failure_type='post_repair_test_failure'
+            except TimeoutError as exc:
+                evidence.append(Evidence('test_run',{'status':'timeout','error':str(exc)}))
+                verification_failed=True
+                failure_summary='Repair applied but tests timed out'
+                failure_type='post_repair_test_timeout'
+            if verification_failed:
                 if self.store is not None:
                     journal=self.store.mutation(key)
                     try:
@@ -81,8 +91,8 @@ class CrewExecutor:
                                           {'type':'mutation_state_diverged','irreversible':True,'rollback':'failed','recommendation':'Return to GorXu; do not overwrite divergent state'})
                 else:
                     rollback='unavailable'
-                return TourResult(order.order_id,order.assigned_crew,'exception','Repair applied but tests failed',evidence,
-                                  {'type':'post_repair_test_failure','rollback':rollback,'recommendation':'Stop further mutation and return to GorXu'})
+                return TourResult(order.order_id,order.assigned_crew,'exception',failure_summary,evidence,
+                                  {'type':failure_type,'rollback':rollback,'recommendation':'Stop further mutation and return to GorXu'})
         if self.store is not None:
             self.store.update_mutation(key,'verified',after_sha256=self.gateway.current_hash(target))
         return TourResult(order.order_id,order.assigned_crew,'completed',f"Repaired {target}",evidence)

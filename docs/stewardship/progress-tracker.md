@@ -1,6 +1,6 @@
 # GroX Progress Tracker
 
-**Status date:** 2026-08-17
+**Status date:** 2026-08-18
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
@@ -11,6 +11,21 @@
 **Current operating verdict:** **APEX QUALIFIED — OPERATIONAL AUDIT 001 CLOSED**
 **Standing Crew:** **82**
 **Current verified regression:** pytest **205 passed, 2 skipped, 354 subtests**; unittest **207 OK, 2 skipped**
+
+## Runtime Integrity Repairs — issues #63 and #64
+
+**Issue #63 status: IN PROGRESS — RED BASELINE REPRODUCED / LOCAL REPAIR CANDIDATE GREEN**
+
+- isolated sandbox qualification of exact canonical `main@8470a715a0bc37877013608c9daa178acfa4cbab` found three runtime-integrity gaps not covered by the existing green CI suite;
+- red regressions now prove: Repair timeout leaves the target applied, authorized Graph Repair fails with SQLite thread affinity, and snapshot-present Health dereferences nonexistent `SnapshotReport` fields on the canonical baseline;
+- local repair candidate makes all four focused regressions green: timeout rollback, authorized Graph Repair, valid snapshot Health, and invalid snapshot Health;
+- local split pytest regression is green across **211 tests / 354 subtests** on the available Python 3.13 sandbox host; this is not yet canonical CI evidence;
+- cognitive-context, context-heat, and operational-drift experiments remain green; full mutation and exact-head protected CI remain required before merge;
+- no authority widening, release/tag change, Crew roster change, new Apex stage, or A8 is included.
+
+**Issue #64 status: OPEN — POLICY QUESTION ONLY**
+
+- ordinary execution eligibility for `independent-verifier` is recorded separately; issue #63 does not change verifier routing semantics.
 
 ## Cognitive Context Efficiency — issue #60
 

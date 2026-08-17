@@ -137,6 +137,25 @@ class DurableOperationsIntegrationTests(unittest.TestCase):
             self.assertTrue(any(e['event_type']=='mission_cancelled' for e in mission['graph_events']))
         finally: td.cleanup()
 
+    def test_repair_test_timeout_is_automatically_rolled_back(self):
+        td,root,p=graph_vessel()
+        try:
+            target=root/'docs/a4-timeout-rollback.txt'
+            def timeout(_order):
+                raise TimeoutError('injected post-Repair verification timeout')
+            p.gateway.run_tests=timeout
+            result=p.repair_write('docs/a4-timeout-rollback.txt','new content',crew_id='backend-engineer')
+            self.assertEqual(result['status'],'exception')
+            self.assertFalse(target.exists())
+            history=p.durable.mutation_history(result['mission_id'])
+            self.assertEqual(len(history),1)
+            self.assertEqual(history[0]['status'],'rolled_back')
+            evidence=p.store.mission(result['mission_id'])['evidence']
+            rollback=[e for e in evidence if e['kind']=='mutation_rollback']
+            self.assertEqual(len(rollback),1)
+            self.assertEqual(json.loads(rollback[0]['content'])['status'],'rolled_back')
+        finally: td.cleanup()
+
     def test_failed_repair_is_automatically_rolled_back(self):
         td,root,p=graph_vessel()
         try:

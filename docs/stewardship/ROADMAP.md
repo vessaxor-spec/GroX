@@ -114,6 +114,20 @@ Preserved invariants:
 - cache behavior and usage telemetry cannot widen authority;
 - no release/tag moved and no A8 was created or implied.
 
+## Runtime Integrity Repairs — issues #63 and #64
+
+**Issue #63 status: IN PROGRESS — SANDBOX RED BASELINE REPRODUCED.** This bounded reliability repair follows the isolated sandbox qualification of canonical `main@8470a715a0bc37877013608c9daa178acfa4cbab`. It is not A8 and does not move a release/tag.
+
+Confirmed repair scope:
+
+1. post-Repair verification timeout must take the same safe rollback path as a nonzero verification result, preserving mutation-journal evidence;
+2. explicitly authorized Mission Graph Repair must execute without crossing the Pilot-owned SQLite connection into a worker thread;
+3. Vessel Health persistence readiness must consume the actual `SnapshotReport.manifest` / `errors` contract for valid and invalid snapshot-present paths.
+
+Qualification gate: focused red-before/green-after regressions, full pytest/unittest, all existing mutation harnesses, integrated Post-Apex qualification, and an independent sandbox reproduction of each repaired path. Commander/GorXu authority, risk floors, Tool Gateway enforcement, verifier independence, source binding, and 82-Crew structure remain unchanged.
+
+**Issue #64 status: OPEN — POLICY ONLY.** The sandbox also exposed an ambiguity around ordinary execution eligibility for `independent-verifier`. No behavior change is authorized in issue #63; resolve #64 separately against canonical Crew doctrine and verifier-independence semantics.
+
 ## Post-Apex operating posture
 
 There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** `v0.8.0` is published from the verified Program 001 baseline; future evolution beyond this release requires new Commander intent. External ideas do not become authority or qualification evidence merely by being useful elsewhere.

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 import json
 import math
 from dataclasses import replace
@@ -144,7 +144,7 @@ class MissionGraphRunner:
         result = self.executor.execute(order)
         # `graph_verification` is reserved runtime evidence. Crew output cannot
         # manufacture verifier authority, including on a real verification node.
-        result.evidence = [evidence for evidence in result.evidence if evidence.kind != "graph_verification"]
+        result.evidence = list(result.evidence)
         if spec.mode is not MissionMode.verify or result.status != "completed":
             return result
 
@@ -581,7 +581,7 @@ class MissionGraphRunner:
                 if len(batch) >= plan.budget.max_parallel:
                     break
                 node_cost = max(0.0, float(specs[node_id].budget.cost_units))
-                if spent_cost + reserved_cost + node_cost <= plan.budget.max_cost_units + 1e-12:
+                if spent_cost + reserved_cost + node_cost < plan.budget.max_cost_units - 1e-12:
                     batch.append(node_id)
                     reserved_cost += node_cost
             if not batch:
@@ -649,7 +649,19 @@ class MissionGraphRunner:
             with ThreadPoolExecutor(max_workers=max(1, len(prepared))) as pool:
                 for node_id, (spec, order, dep_results) in prepared.items():
                     started_at[node_id] = perf_counter()
-                    futures[pool.submit(self._execute_prepared, spec, order, dep_results)] = node_id
+                    if spec.mode is MissionMode.repair:
+                        # Durable mutation journaling shares the Pilot-owned SQLite connection.
+                        # Keep Repair execution on the scheduler thread; ordinary read/execute
+                        # nodes may still use worker threads. This preserves SQLite thread
+                        # affinity and serializes authority-bearing mutation work.
+                        future: Future = Future()
+                        try:
+                            future.set_result(self._execute_prepared(spec, order, dep_results))
+                        except BaseException as exc:
+                            future.set_exception(exc)
+                        futures[future] = node_id
+                    else:
+                        futures[pool.submit(self._execute_prepared, spec, order, dep_results)] = node_id
                 for future in as_completed(futures):
                     node_id = futures[future]
                     spec, order, _ = prepared[node_id]
