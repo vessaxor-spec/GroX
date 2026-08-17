@@ -6,7 +6,7 @@ from grox.contracts import MissionMode, MissionOrder, RiskClass
 class MissionOrderTest(unittest.TestCase):
     def test_order_serializes_native_values(self):
         order = MissionOrder.new(
-            "M", "intent", "obj", MissionMode.inspect, "systems-architect",
+            "M", "intent", "obj", MissionMode.inspect, "fixture-architect",
             risk_class=RiskClass.medium,
             allowed_actions=["fs_read"],
         )

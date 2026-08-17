@@ -40,7 +40,7 @@ class FullCompanyTest(unittest.TestCase):
     def test_architect_replaces_bootstrap_overlap(self):
         files={p.stem for p in DOS.glob('*.json')}
         self.assertIn('architect',files)
-        self.assertNotIn('systems-architect',files)
+        self.assertNotIn('fixture-architect',files)
 
     def test_roster_catalogue_load_does_not_require_state_store(self):
         from grox.crew.roster import CrewRoster

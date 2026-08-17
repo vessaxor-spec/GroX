@@ -12,7 +12,7 @@ class MissionGraphContractTests(unittest.TestCase):
             "nodes": [
                 {
                     "node_id": "a", "objective": "Inspect architecture", "mode": "inspect", "dependencies": [],
-                    "candidate_crew_ids": ["systems-architect"], "required_capabilities": ["repo_read"], "scope": ["."],
+                    "candidate_crew_ids": ["fixture-architect"], "required_capabilities": ["repo_read"], "scope": ["."],
                 },
                 {
                     "node_id": "b", "objective": "Verify architecture", "mode": "verify", "dependencies": ["a"],
