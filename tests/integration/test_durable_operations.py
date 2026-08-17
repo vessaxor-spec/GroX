@@ -66,9 +66,12 @@ class DurableOperationsIntegrationTests(unittest.TestCase):
                 p.command_graph(directive,plan=durable_plan(directive),plan_source='a4-crash-test')
             mission_id=p.store.recent_missions(1)[0]['mission_id']
             before=p.store.mission(mission_id)
-            architecture_orders=[o for o in before['orders'] if o['crew_id']=='test-architecture-specialist']
+            architecture_orders=[o for o in before['orders'] if json.loads(o['payload'])['objective']=='Inspect architecture boundaries']
             self.assertEqual(len(architecture_orders),1)
-            self.assertEqual(next(n for n in before['graph_nodes'] if n['node_id']=='architecture')['status'],'completed')
+            architecture_order_id=architecture_orders[0]['order_id']
+            architecture_node=next(n for n in before['graph_nodes'] if n['node_id']=='architecture')
+            self.assertEqual(architecture_node['status'],'completed')
+            self.assertEqual(architecture_node['order_id'],architecture_order_id)
             self.assertEqual(next(n for n in before['graph_nodes'] if n['node_id']=='research')['status'],'running')
             p.store.close()
 
@@ -84,7 +87,9 @@ class DurableOperationsIntegrationTests(unittest.TestCase):
             self.assertEqual(resumed['synthesis']['replans'],2)
 
             mission=p2.store.mission(mission_id)
-            self.assertEqual(len([o for o in mission['orders'] if o['crew_id']=='test-architecture-specialist']),1)
+            architecture_orders=[o for o in mission['orders'] if json.loads(o['payload'])['objective']=='Inspect architecture boundaries']
+            self.assertEqual([o['order_id'] for o in architecture_orders],[architecture_order_id])
+            self.assertEqual(next(n for n in mission['graph_nodes'] if n['node_id']=='architecture')['order_id'],architecture_order_id)
             self.assertEqual(len([e for e in mission['graph_events'] if e['event_type']=='pilot_replan']),2)
             self.assertTrue(any(e['event_type']=='mission_resumed' for e in mission['graph_events']))
             decisions=p2.durable.exception_decisions(mission_id)
