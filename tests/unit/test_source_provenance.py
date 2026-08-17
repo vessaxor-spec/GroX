@@ -83,6 +83,27 @@ class SourceProvenanceTest(unittest.TestCase):
                 scope_paths=["src/grox/source_provenance.py"],
             )
 
+    def test_injected_mutation_grant_cannot_turn_non_repair_order_into_receipt_authority(self):
+        injected = MissionOrder.new(
+            self.mission_id,
+            "Repair authority seed",
+            "Create a row that will be downgraded after persistence",
+            MissionMode.repair,
+            "backend-engineer",
+            allowed_actions=("fs_read", "fs_write"),
+            scope=("src/grox",),
+        )
+        self.store.save_order(injected)
+        self.store.db.execute("UPDATE orders SET mode='inspect' WHERE order_id=?", (injected.order_id,))
+        self.store.db.commit()
+        with self.assertRaises(PermissionError):
+            self.service.issue_receipt(
+                mission_id=self.mission_id,
+                order_ids=[injected.order_id],
+                change_class="runtime",
+                scope_paths=["src/grox/source_provenance.py"],
+            )
+
     def test_scope_cannot_exceed_repair_order(self):
         with self.assertRaises(PermissionError):
             self.issue(scope_paths=["configs/tool-policy.json"])
