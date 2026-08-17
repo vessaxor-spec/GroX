@@ -74,35 +74,39 @@ jobs:
               "- package/source version metadata is aligned to released `v0.8.0` and remains guarded by both pytest and unittest\n- current published release `v0.8.0` is pinned to `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`; canonical source may advance beyond that immutable release through the protected PR/CI path",
           )
 
-          old_section = """## v0.8.0 release candidate
-
-**Status: PREPARATION AUTHORIZED — TAG/PUBLICATION PENDING**
-
-- Commander authorization opened issue #55 for a bounded `v0.8.0` candidate;
-- candidate source begins from canonical post-merge verified `main@14262546967d7aed54cf07f94759cf6e77414f24`;
-- package/source metadata is aligned to `0.8.0`;
-- public README and current stewardship are being reconciled to the completed Program 001 state;
-- preserved release-canary run `32014163449` failed because `test_source_version_detector_rejects_metadata_drift` hard-coded the prior `0.7.1` package string, so the test challenge no longer mutated metadata after the intentional `0.8.0` bump; Vessel Health itself remained healthy and reported source/package version aligned at `0.8.0`;
-- the canary was repaired by deriving the current package version from `pyproject.toml` before injecting `9.9.9`, preserving the detector requirement while removing release-number coupling;
-- the complete protected CI matrix plus independent exact-head verification are required before publication can be considered;
-- no tag or GitHub release is created by preparation; publication remains a separate Commander-controlled action;
-- no Commander, GorXu, Crew, Tool Gateway, verifier, persistence, A6 activation, or other authority boundary is widened; no A8 is created or implied.
-"""
-          new_section = """## v0.8.0 release
-
-**Status: PUBLISHED — LATEST**
-
-- Commander authorization completed issue #55 and published `v0.8.0` as GitHub release ID `371649229`;
-- release/tag source is exactly `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`;
-- candidate exact-head CI `32014558365` passed before merge;
-- canonical post-merge `main` CI `32015076306` passed all five canonical jobs on the exact release source;
-- bounded publisher run `32015853726` succeeded after verifying both the exact `main` SHA and the successful canonical CI run before minting the tag/release;
-- definition-only publisher run `32015714728` failed before job creation and performed no tag or release mutation; it remains preserved red evidence;
-- `refs/tags/v0.8.0` resolves exactly to the release source and `v0.8.0` is non-draft, non-prerelease, and GitHub's current latest release;
-- package/source metadata remains aligned at `0.8.0`;
-- the earlier release-canary `32014163449` exposed a hard-coded prior package string; the repaired version-drift challenge remains version-agnostic and passed in the final candidate matrix;
-- no Commander, GorXu, Crew, Tool Gateway, verifier, persistence, A6 activation, or other authority boundary was widened; no A8 was created or implied.
-"""
+          old_section = "\n".join([
+              "## v0.8.0 release candidate",
+              "",
+              "**Status: PREPARATION AUTHORIZED — TAG/PUBLICATION PENDING**",
+              "",
+              "- Commander authorization opened issue #55 for a bounded `v0.8.0` candidate;",
+              "- candidate source begins from canonical post-merge verified `main@14262546967d7aed54cf07f94759cf6e77414f24`;",
+              "- package/source metadata is aligned to `0.8.0`;",
+              "- public README and current stewardship are being reconciled to the completed Program 001 state;",
+              "- preserved release-canary run `32014163449` failed because `test_source_version_detector_rejects_metadata_drift` hard-coded the prior `0.7.1` package string, so the test challenge no longer mutated metadata after the intentional `0.8.0` bump; Vessel Health itself remained healthy and reported source/package version aligned at `0.8.0`;",
+              "- the canary was repaired by deriving the current package version from `pyproject.toml` before injecting `9.9.9`, preserving the detector requirement while removing release-number coupling;",
+              "- the complete protected CI matrix plus independent exact-head verification are required before publication can be considered;",
+              "- no tag or GitHub release is created by preparation; publication remains a separate Commander-controlled action;",
+              "- no Commander, GorXu, Crew, Tool Gateway, verifier, persistence, A6 activation, or other authority boundary is widened; no A8 is created or implied.",
+              "",
+          ])
+          new_section = "\n".join([
+              "## v0.8.0 release",
+              "",
+              "**Status: PUBLISHED — LATEST**",
+              "",
+              "- Commander authorization completed issue #55 and published `v0.8.0` as GitHub release ID `371649229`;",
+              "- release/tag source is exactly `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`;",
+              "- candidate exact-head CI `32014558365` passed before merge;",
+              "- canonical post-merge `main` CI `32015076306` passed all five canonical jobs on the exact release source;",
+              "- bounded publisher run `32015853726` succeeded after verifying both the exact `main` SHA and the successful canonical CI run before minting the tag/release;",
+              "- definition-only publisher run `32015714728` failed before job creation and performed no tag or release mutation; it remains preserved red evidence;",
+              "- `refs/tags/v0.8.0` resolves exactly to the release source and `v0.8.0` is non-draft, non-prerelease, and GitHub's current latest release;",
+              "- package/source metadata remains aligned at `0.8.0`;",
+              "- the earlier release-canary `32014163449` exposed a hard-coded prior package string; the repaired version-drift challenge remains version-agnostic and passed in the final candidate matrix;",
+              "- no Commander, GorXu, Crew, Tool Gateway, verifier, persistence, A6 activation, or other authority boundary was widened; no A8 was created or implied.",
+              "",
+          ])
           replace_once("docs/stewardship/progress-tracker.md", old_section, new_section)
 
           for path, forbidden in [
