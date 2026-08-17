@@ -24,6 +24,28 @@ For each Commander directive, the cognitive provider returns a validated Mission
 
 Private chain-of-thought is neither requested nor stored. GroX records concise decision rationale and evidence-seeking strategy only.
 
+## Standing Crew cognitive directory
+
+GorXu's cognitive provider receives a compact discovery directory derived from the canonical active Crew dossiers. The directory keeps every Standing Crew identity cognitively visible while limiting repeated model context to descriptive fields:
+
+- Crew ID;
+- Division;
+- title;
+- descriptive domains;
+- verification eligibility.
+
+The directory deliberately omits capability grants and expanded routing tags. Capabilities, eligibility, experienced routing, Mission authority, risk floors, Repair permission, and verifier independence remain local deterministic GroX controls. A cognitive Crew recommendation is advisory; an invalid or ineligible recommendation cannot make a Crew member eligible and falls back through the qualified deterministic routing path.
+
+Deep specialist craft cards are not part of this directory and are not injected merely because a Crew member is selected. `craft_card()` remains an explicit read-only craft lookup. Future model-backed Crew cognition, if separately authorized, should activate bounded Mission-relevant craft rather than require complete-card reinjection per tour.
+
+## Cognitive usage evidence
+
+Provider adapters may expose normalized observational usage for a cognitive invocation, including input, cached input, output, reasoning, total tokens, provider, and model when the provider supplies those fields. GorXu may persist that observation as `cognitive_usage` Mission evidence.
+
+Usage telemetry is not an authority surface. Missing, malformed, or unavailable usage data must not block or widen execution, alter eligibility, lower risk, grant Repair permission, or affect verifier independence.
+
+Provider-specific prompt caching is likewise an efficiency optimization only. Stable Standing Crew context may be framed before Mission-specific input and associated with a deterministic provider cache identity, but cache hit, miss, expiry, or provider removal cannot change GroX behavior or authority.
+
 ## Authority boundary
 
 Cognition may:
