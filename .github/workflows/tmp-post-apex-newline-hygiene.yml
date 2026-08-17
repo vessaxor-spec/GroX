@@ -1,0 +1,60 @@
+name: Temporary Post-Apex qualification newline hygiene
+
+on:
+  push:
+    branches:
+      - qualification/post-apex-evolution-001
+    paths:
+      - .github/workflows/tmp-post-apex-newline-hygiene.yml
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: qualification/post-apex-evolution-001
+      - name: Normalize changed text files
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          paths = [
+              '.github/workflows/ci.yml',
+              'tests/experiments/post_apex_integration_experiment.py',
+              'docs/history/ships-log/0050-post-apex-integration-evidence-passed.md',
+              'docs/stewardship/POST_APEX_EVOLUTION_PROGRAM_001.md',
+              'docs/stewardship/ROADMAP.md',
+              'docs/stewardship/progress-tracker.md',
+              'docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md',
+          ]
+          for raw in paths:
+              p = Path(raw)
+              data = p.read_bytes()
+              if data and not data.endswith(b'\n'):
+                  p.write_bytes(data + b'\n')
+                  print(f'normalized: {raw}')
+          PY
+          git diff --check
+          git config user.name 'VESSAXOR'
+          git config user.email 'vessaxor@gmail.com'
+          git rm .github/workflows/tmp-post-apex-newline-hygiene.yml
+          git add .github/workflows/ci.yml \
+                  tests/experiments/post_apex_integration_experiment.py \
+                  docs/history/ships-log/0050-post-apex-integration-evidence-passed.md \
+                  docs/stewardship/POST_APEX_EVOLUTION_PROGRAM_001.md \
+                  docs/stewardship/ROADMAP.md \
+                  docs/stewardship/progress-tracker.md \
+                  docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            git commit --allow-empty -m 'Confirm qualification text-file newline hygiene'
+          else
+            git commit -m 'Normalize qualification text-file newline hygiene'
+          fi
+          git push origin HEAD:qualification/post-apex-evolution-001
