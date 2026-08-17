@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import shutil
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -162,10 +163,14 @@ class VesselHealthTests(unittest.TestCase):
     def test_source_version_detector_rejects_metadata_drift(self) -> None:
         td, root = health_vessel()
         try:
-            text = (root / "pyproject.toml").read_text(encoding="utf-8")
-            mutated = text.replace('version = "0.7.1"', 'version = "9.9.9"')
+            project_path = root / "pyproject.toml"
+            text = project_path.read_text(encoding="utf-8")
+            current_version = tomllib.loads(text)["project"]["version"]
+            source_line = f'version = "{current_version}"'
+            self.assertIn(source_line, text, "fixture must expose current package metadata")
+            mutated = text.replace(source_line, 'version = "9.9.9"', 1)
             self.assertNotEqual(mutated, text, "fixture mutation must actually change package metadata")
-            (root / "pyproject.toml").write_text(mutated, encoding="utf-8")
+            project_path.write_text(mutated, encoding="utf-8")
             result = VesselHealth(root)._check_source_version()
             self.assertEqual(result.status, FAIL)
             self.assertIn("version disagreement", result.detail)

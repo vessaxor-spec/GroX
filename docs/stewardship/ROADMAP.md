@@ -67,7 +67,7 @@ The deterministic four-scenario corpus reduced 20,464 source characters to 1,336
 
 ## Post-Apex operating posture
 
-There is no predeclared A8. Current work is **Post-Apex Operational Evolution Program 001**, driven by Commander-approved evidence from the ClaudX comparative review and by GroX-native tests/operational evidence. External ideas do not become authority or qualification evidence merely by being useful elsewhere.
+There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** Current bounded work is release preparation for `v0.8.0`; future evolution beyond this baseline requires new Commander intent. External ideas do not become authority or qualification evidence merely by being useful elsewhere.
 
 Known deliberate limits remain candidates, not automatic commitments: autonomous memory consolidation, generic external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP, and optional external-agent interoperability.
 
@@ -99,4 +99,4 @@ Do not:
 
 ## Release posture
 
-Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. The Commander alone decides whether to create any subsequent release. No version bump, release tag, new Apex stage, or A8 is implied.
+Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. Commander authorization has opened `v0.8.0` release preparation under issue #55. The candidate may align version metadata and release-facing stewardship, but the tag and GitHub release remain unpublished until a separately verified final candidate is explicitly released. No new Apex stage or A8 is implied.
