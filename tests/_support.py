@@ -9,6 +9,13 @@ CREW=[
 {"crew_id":"independent-verifier","division":"verification","title":"Independent Verifier","capabilities":["repo_read","verify","test_run"],"tags":["verify","evidence"],"ordinary_routing":False,"verification":True},
 ]
 
+# Some integration fixtures add these dossiers after temp_vessel() returns. Their
+# craft stubs are pre-provisioned so the synthetic Vessel preserves the same
+# dossier-to-craft invariant as production when those dossiers are activated.
+DYNAMIC_CRAFT_FIXTURES=[
+{"crew_id":"devops-engineer","division":"platform","title":"DevOps Engineer","capabilities":["repo_read","workspace_exec"],"tags":["workspace","platform","runtime"]},
+]
+
 
 def _synthetic_craft(dossier):
     crew_id=dossier['crew_id']
@@ -78,4 +85,6 @@ def temp_vessel():
     (root/'tests/test_smoke.py').write_text('import unittest\nclass T(unittest.TestCase):\n def test_ok(self): self.assertTrue(True)\n')
     for d in CREW:
         add_synthetic_crew(root,d)
+    for d in DYNAMIC_CRAFT_FIXTURES:
+        (root/'configs/crew/specialists'/f"{d['crew_id']}.md").write_text(_synthetic_craft(d))
     return td,root,PilotGorXu(root)
