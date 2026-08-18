@@ -1,12 +1,39 @@
 from __future__ import annotations
+
+from collections.abc import Mapping
+from pathlib import Path
 import hashlib
+import json
+from typing import Any
+
 from ..contracts import MissionOrder, MissionMode, TourResult, Evidence
+from ..crew_cognition import CrewCognitionDenied, CrewCognitionError, CrewCognitionStep
 from ..tools.gateway import ToolGateway, ToolDenied
 from ..durable_state import DurableState
 
+
+def _plain(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {key: _plain(item) for key, item in value.items()}
+    if isinstance(value, (tuple, list)):
+        return [_plain(item) for item in value]
+    return value
+
+
 class CrewExecutor:
-    def __init__(self, gateway:ToolGateway, durable:DurableState|None=None):
+    def __init__(
+        self,
+        gateway:ToolGateway,
+        durable:DurableState|None=None,
+        *,
+        cognition_provider:Any=None,
+        cognition_max_steps:int=4,
+        cognition_observation_chars:int=8000,
+    ):
         self.gateway=gateway; self.store=durable
+        self.cognition_provider=cognition_provider
+        self.cognition_max_steps=max(1,min(8,int(cognition_max_steps)))
+        self.cognition_observation_chars=max(256,min(32000,int(cognition_observation_chars)))
 
     def _repair_write_text(self, order:MissionOrder)->TourResult:
         evidence=[]
@@ -97,7 +124,103 @@ class CrewExecutor:
             self.store.update_mutation(key,'verified',after_sha256=self.gateway.current_hash(target))
         return TourResult(order.order_id,order.assigned_crew,'completed',f"Repaired {target}",evidence)
 
-    def execute(self, order:MissionOrder)->TourResult:
+    def _cognition_order_envelope(self, order:MissionOrder)->dict[str,Any]:
+        return {
+            'mission_id':order.mission_id,
+            'order_id':order.order_id,
+            'commander_intent':order.commander_intent,
+            'objective':order.objective,
+            'mode':order.mode.value,
+            'assigned_crew':order.assigned_crew,
+            'required_capabilities':list(order.required_capabilities),
+            'allowed_actions':list(order.allowed_actions),
+            'forbidden_actions':list(order.forbidden_actions),
+            'scope':list(order.scope),
+            'risk_class':order.risk_class.value,
+            'stop_conditions':list(order.stop_conditions),
+        }
+
+    def _assert_cognition_scope(self, order:MissionOrder, rel:str)->None:
+        if not rel or Path(rel).is_absolute():
+            raise CrewCognitionDenied(f"Crew cognition path is outside Mission scope: {rel}")
+        root=self.gateway.root.resolve()
+        target=(root/rel).resolve()
+        try:
+            target.relative_to(root)
+        except ValueError as exc:
+            raise CrewCognitionDenied(f"Crew cognition path escapes Vessel root: {rel}") from exc
+        for scope_rel in order.scope or ('.',):
+            scope=(root/scope_rel).resolve()
+            try:
+                scope.relative_to(root)
+            except ValueError:
+                continue
+            if target==scope or target.is_relative_to(scope):
+                return
+        raise CrewCognitionDenied(f"Crew cognition path is outside Mission scope: {rel}")
+
+    def _cognition_observation(self, order:MissionOrder, step:CrewCognitionStep)->tuple[dict[str,Any],dict[str,Any]]:
+        if step.action in order.forbidden_actions or step.action not in order.allowed_actions:
+            raise CrewCognitionDenied(f"Crew cognition action not granted by Mission Order: {step.action}")
+        if step.action in {'fs_list','fs_read'}:
+            assert step.path is not None
+            self._assert_cognition_scope(order,step.path)
+        if step.action=='fs_list':
+            files=self.gateway.list_path(order,step.path or '.')
+            visible=files[:100]
+            provider={'action':'fs_list','path':step.path,'files':visible,'count':len(files),'truncated':len(files)>len(visible)}
+            persistent={'action':'fs_list','path':step.path,'count':len(files),'visible_count':len(visible),
+                        'sha256':hashlib.sha256(json.dumps(visible,sort_keys=True).encode()).hexdigest()}
+            return provider,persistent
+        if step.action=='fs_read':
+            text=self.gateway.read_text(order,step.path or '.',limit=self.cognition_observation_chars)
+            provider={'action':'fs_read','path':step.path,'content':text,'chars':len(text)}
+            persistent={'action':'fs_read','path':step.path,'chars':len(text),'sha256':hashlib.sha256(text.encode()).hexdigest()}
+            return provider,persistent
+        if step.action=='test_run':
+            result=self.gateway.run_tests(order)
+            stdout=str(result.get('stdout') or '')[-self.cognition_observation_chars//2:]
+            stderr=str(result.get('stderr') or '')[-self.cognition_observation_chars//2:]
+            provider={'action':'test_run','returncode':result.get('returncode'),'stdout':stdout,'stderr':stderr}
+            persistent={'action':'test_run','returncode':result.get('returncode'),
+                        'stdout_sha256':hashlib.sha256(stdout.encode()).hexdigest(),
+                        'stderr_sha256':hashlib.sha256(stderr.encode()).hexdigest()}
+            return provider,persistent
+        raise CrewCognitionDenied(f"Crew cognition action is outside the read-only seam: {step.action}")
+
+    def _run_cognition(self, order:MissionOrder)->tuple[str,list[Evidence]]:
+        provider=self.cognition_provider
+        craft=_plain(order.parameters.get('_craft_context') or [])
+        memory=_plain(order.parameters.get('_memory_context') or [])
+        craft_meta=_plain(order.parameters.get('_craft_context_meta') or {})
+        observations:list[dict[str,Any]]=[]
+        evidence:list[Evidence]=[]
+        for _ in range(self.cognition_max_steps):
+            raw=provider.next_step(
+                order=self._cognition_order_envelope(order),
+                craft_context=craft,
+                memory_context=memory,
+                observations=observations,
+            )
+            step=CrewCognitionStep.from_mapping(raw)
+            if step.action=='finish':
+                evidence.append(Evidence('crew_cognition',{
+                    'provider':str(getattr(provider,'name','crew-cognition-provider')),
+                    'work_product':step.work_product,
+                    'craft_sha256':craft_meta.get('craft_sha256'),
+                    'selected_headings':craft_meta.get('selected_headings') or [],
+                    'selected_chars':craft_meta.get('selected_chars'),
+                    'memory_ids':[item.get('memory_id') for item in memory if isinstance(item,dict) and item.get('memory_id') is not None],
+                    'observation_count':len(observations),
+                    'mode':'read_only_inspect',
+                }))
+                return step.work_product or '',evidence
+            provider_observation,persistent=self._cognition_observation(order,step)
+            observations.append(provider_observation)
+            evidence.append(Evidence('crew_cognition_observation',persistent))
+        raise CrewCognitionError(f"Crew cognition exceeded bounded step limit: {self.cognition_max_steps}")
+
+    def _execute_deterministic(self, order:MissionOrder)->TourResult:
         evidence=[]
         try:
             if order.mode in {MissionMode.inspect,MissionMode.verify}:
@@ -156,3 +279,31 @@ class CrewExecutor:
             return TourResult(order.order_id,order.assigned_crew,'completed',f"Executed bounded mission context scan across {len(files)} files",evidence)
         except (ToolDenied,FileNotFoundError,IsADirectoryError,TimeoutError) as e:
             return TourResult(order.order_id,order.assigned_crew,'exception',str(e),evidence,{'type':type(e).__name__,'recommendation':'Return to GorXu; do not widen authority'})
+
+    def execute(self, order:MissionOrder)->TourResult:
+        # The first Crew-cognition slice is deliberately read-only Inspect only.
+        # Verify, Repair, and Execute retain their existing deterministic paths.
+        if self.cognition_provider is None or order.mode is not MissionMode.inspect:
+            return self._execute_deterministic(order)
+        try:
+            work_product,cognitive_evidence=self._run_cognition(order)
+        except CrewCognitionDenied as exc:
+            return TourResult(
+                order.order_id,order.assigned_crew,'exception',str(exc),
+                [Evidence('crew_cognition_denied',{'error':str(exc),'mode':'read_only_inspect'})],
+                {'type':'crew_cognition_denied','recommendation':'Return to GorXu; do not widen Mission Order authority'},
+            )
+        except (CrewCognitionError,ValueError,TypeError) as exc:
+            result=self._execute_deterministic(order)
+            result.evidence.append(Evidence('crew_cognition_degraded',{
+                'provider':str(getattr(self.cognition_provider,'name','crew-cognition-provider')),
+                'error':str(exc),
+                'fallback':'deterministic Crew executor',
+            }))
+            return result
+
+        result=self._execute_deterministic(order)
+        result.evidence.extend(cognitive_evidence)
+        if result.status=='completed':
+            result.summary += f"; Crew cognition: {work_product}"
+        return result
