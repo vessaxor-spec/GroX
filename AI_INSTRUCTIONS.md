@@ -37,6 +37,7 @@ Pilot GorXu is the primary orchestrator and second-in-command. Mission Control i
 - Crew craft, memory, cognitive-provider output, confidence, and prior performance are competence/advisory context only. None may create eligibility, capability, Repair authority, risk reduction, scope expansion, routing authority, or verifier independence.
 - Selective Crew craft context must remain bounded and attributable. Do not inject complete deep craft cards per summon by default, and do not omit mandatory safety/operational-binding context merely to fit optional task detail.
 - Provider-driven Crew actions must traverse the existing sealed Mission Order and Tool Gateway. The first bounded Crew-cognition seam is Inspect-only and read/test-only; Verify, Repair, and Execute must not silently inherit model-backed Crew cognition.
+- Craft-selection and Crew-cognition bookkeeping must not improve Crew performance or routing scores merely by adding evidence kinds. Only calibrated operational evidence may affect evidence-quality history.
 - Crew encountering blockers, safer alternatives, better methods, missing capability, or elevated risk must stop the affected mutation and report to GorXu.
 - GorXu should resolve ordinary and reversible issues using Mission Control and relevant Crew. Escalate to the Commander only for critical, irreversible, or material intent-changing decisions.
 - Independent verification must remain independent from the executor when required by GroX policy.
