@@ -29,11 +29,15 @@ class CrewExecutor:
         cognition_provider:Any=None,
         cognition_max_steps:int=4,
         cognition_observation_chars:int=8000,
+        cognition_max_test_runs:int=1,
+        cognition_work_product_chars:int=4000,
     ):
         self.gateway=gateway; self.store=durable
         self.cognition_provider=cognition_provider
         self.cognition_max_steps=max(1,min(8,int(cognition_max_steps)))
         self.cognition_observation_chars=max(256,min(32000,int(cognition_observation_chars)))
+        self.cognition_max_test_runs=max(0,min(1,int(cognition_max_test_runs)))
+        self.cognition_work_product_chars=max(256,min(8192,int(cognition_work_product_chars)))
 
     def _repair_write_text(self, order:MissionOrder)->TourResult:
         evidence=[]
@@ -195,6 +199,7 @@ class CrewExecutor:
         craft_meta=_plain(order.parameters.get('_craft_context_meta') or {})
         observations:list[dict[str,Any]]=[]
         evidence:list[Evidence]=[]
+        test_runs=0
         for _ in range(self.cognition_max_steps):
             try:
                 raw=provider.next_step(
@@ -212,17 +217,33 @@ class CrewExecutor:
             except (CrewCognitionError,ValueError,TypeError) as exc:
                 return {'status':'degraded','error':str(exc),'evidence':evidence}
             if step.action=='finish':
+                work_product=step.work_product or ''
+                if len(work_product)>self.cognition_work_product_chars:
+                    return {
+                        'status':'degraded',
+                        'error':f"Crew cognition work product exceeds bounded size: {len(work_product)} > {self.cognition_work_product_chars}",
+                        'evidence':evidence,
+                    }
                 evidence.append(Evidence('crew_cognition',{
                     'provider':str(getattr(provider,'name','crew-cognition-provider')),
-                    'work_product':step.work_product,
+                    'work_product':work_product,
                     'craft_sha256':craft_meta.get('craft_sha256'),
                     'selected_headings':craft_meta.get('selected_headings') or [],
                     'selected_chars':craft_meta.get('selected_chars'),
                     'memory_ids':[item.get('memory_id') for item in memory if isinstance(item,dict) and item.get('memory_id') is not None],
                     'observation_count':len(observations),
+                    'test_run_count':test_runs,
                     'mode':'read_only_inspect',
                 }))
-                return {'status':'completed','work_product':step.work_product or '','evidence':evidence}
+                return {'status':'completed','work_product':work_product,'evidence':evidence}
+            if step.action=='test_run':
+                if test_runs>=self.cognition_max_test_runs:
+                    return {
+                        'status':'denied',
+                        'error':f"Crew cognition test_run budget exceeded: {self.cognition_max_test_runs}",
+                        'evidence':evidence,
+                    }
+                test_runs+=1
             try:
                 provider_observation,persistent=self._cognition_observation(order,step)
             except (CrewCognitionDenied,ToolDenied) as exc:
