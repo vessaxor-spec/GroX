@@ -1,7 +1,7 @@
 # GorXu Apex Orchestrator Evolution Plan
 
 **Status:** QUALIFIED
-**Assessment date:** 2026-08-16
+**Assessment date:** 2026-08-18
 **Current verdict:** APEX QUALIFIED
 **Priority:** Preserve Apex qualification through bounded evolution and regression evidence
 **A1 status:** SESSION-QUALIFIED with GPT-5.6 Sol; deterministic fallback retained
@@ -11,7 +11,7 @@
 **A5 status:** QUALIFIED; governed workspace, secret, network, browser-evidence, and MCP capability paths proven without widening Crew authority
 **A6 status:** QUALIFIED; replayable orchestration evaluation and non-self-activating improvement proposals proven
 **A7 status:** QUALIFIED; final adversarial Apex gauntlet and independent canaries proven
-**Release baseline:** `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`; canonical source continues on `main`
+**Release baseline:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`; canonical source continues on protected `main` and may advance beyond the immutable release through governed PR/CI
 
 ## Definition
 
@@ -38,6 +38,7 @@ Apex is a demonstrated operating standard, not a title.
 - Supported text Repair is atomic and privately journaled for idempotent replay, bounded compensation, and fail-closed divergence handling.
 - Tool Gateway v2 now mediates isolated workspace execution, memory-only secret aliases, exact-origin HTTP(S), offline browser evidence capture, and pre-registered stdio MCP adapters through deny-wins Mission Order and host-policy grants.
 - A5 host isolation is portable: user/PID/network namespaces are preferred; a pre-provisioned, digest-pinned Docker boundary is the fail-closed fallback where hosted kernels deny user-namespace mapping.
+- Single-Mission Pilot outcomes now separate bounded execution state from Commander-objective delivery and conservatively report mutation and rollback state.
 
 ## Qualified boundaries and remaining limits
 
@@ -162,6 +163,8 @@ GorXu earns Apex status only after passing a formal gauntlet covering:
 **APEX QUALIFIED.** A1 through A7 are qualified for the current project-hosted operating model.
 
 GorXu has demonstrated ambiguous-intent preservation, governed multi-domain orchestration, durable recovery, ordinary-exception resolution, irreversible-decision escalation, independently verified contradiction synthesis, hard Mission cost ceilings, prompt-injection resistance, replayable evidence, and measured improvement without widening his own authority.
+
+Post-release Mission Outcome Truthfulness strengthens how the single-Mission Pilot reports actual effects, objective delivery state, mutation state, and verification scope. It is protected-main hardening, not A8, a new qualification stage, a release change, or new authority.
 
 Qualification remains subordinate to the Commander and to stronger current evidence. Apex is not permission for self-authorization, unrestricted mutation, or silent capability expansion.
 
@@ -319,4 +322,4 @@ Evidence chain:
 
 **A7 exit gate: PASSED.**
 
-**Apex verdict: CANONICAL — APEX QUALIFIED.** Stewardship-final exact-head run `31882589081` passed the full 16/16 A7 gauntlet, complete regression suites, historically pinned independent recovery/budget/contradiction and synthesis-integrity canaries, version/status assertions, and diff hygiene. PR #11 merged as `419cc73950f573c3e201106f7949c6bf7829f2af` with zero tree drift from the qualified A7 head. Post-Apex documentation stabilization re-ran the complete regression suites in `31909761968`; `v0.7.0` remains the first Apex-qualified release at `71ffd60769d81b5b249dac4eca56333ff27e26d0`. Operational hardening is released as `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` while canonical source continues on `main`.
+**Apex verdict: CANONICAL — APEX QUALIFIED.** Stewardship-final exact-head run `31882589081` passed the full 16/16 A7 gauntlet, complete regression suites, historically pinned independent recovery/budget/contradiction and synthesis-integrity canaries, version/status assertions, and diff hygiene. PR #11 merged as `419cc73950f573c3e201106f7949c6bf7829f2af` with zero tree drift from the qualified A7 head. Post-Apex documentation stabilization re-ran the complete regression suites in `31909761968`; `v0.7.0` remains the first Apex-qualified release at `71ffd60769d81b5b249dac4eca56333ff27e26d0`. Operational hardening `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` remains an immutable historical release; the current published release is `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`, while canonical source continues on protected `main`.
