@@ -117,7 +117,7 @@ Canonical builder constraints are defined in [`AI_INSTRUCTIONS.md`](AI_INSTRUCTI
 
 ## Current state
 
-GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational Evolution Program 001. `v0.8.0` is the current published release baseline. Canonical source has continued beyond that immutable release through protected `main`, including the Mission Outcome Truthfulness repair merged in PR #71.
+GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational Evolution Program 001. `v0.8.0` is the current published release baseline. Canonical source has continued beyond that immutable release through protected `main`, including Mission Outcome Truthfulness and bounded Selective Deep-Craft Crew Cognition.
 
 | Surface | Current state |
 |---|---|
@@ -131,10 +131,11 @@ GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational E
 | Current evolution program | [`Post-Apex Operational Evolution Program 001`](docs/stewardship/POST_APEX_EVOLUTION_PROGRAM_001.md) |
 | Completed program work | Program 001 complete: capability intake, mutation proving, Vessel health, tiered reconstitution, controlled context heat, A6 longitudinal drift, Mission-to-source provenance, and integrated qualification |
 | Post-release source hardening | Mission Outcome Truthfulness: scan-only execution is no longer represented as Commander-objective delivery; mutation/rollback state is reported conservatively |
+| Post-release Crew evolution | Inspect-only selective deep craft + bounded Crew memory with a CI-qualified provider-neutral read-only cognition seam; **live model-backed Crew is not yet qualified** |
 | Next program stage | **None predeclared. No A8 is implied.** |
 | Canonical current status | [`docs/stewardship/progress-tracker.md`](docs/stewardship/progress-tracker.md) |
 
-The live Vessel includes Commander Seat interfaces, durable Missions and Mission Graphs, 82 Standing Crew, attributable organizational memory, capability-gated execution, independent verification, crash-safe same-Mission recovery, bounded replanning, Tool Gateway v2, isolated workspace execution, exact-origin network access, offline browser evidence capture, pre-registered stdio MCP adapters, evaluation that cannot self-activate, read-only Vessel health, tiered reconstitution planning, integrity-checked private state snapshots, and persisted single-Mission outcome classification that distinguishes bounded execution from objective delivery.
+The live Vessel includes Commander Seat interfaces, durable Missions and Mission Graphs, 82 Standing Crew, attributable organizational memory, capability-gated execution, independent verification, crash-safe same-Mission recovery, bounded replanning, Tool Gateway v2, isolated workspace execution, exact-origin network access, offline browser evidence capture, pre-registered stdio MCP adapters, evaluation that cannot self-activate, read-only Vessel health, tiered reconstitution planning, integrity-checked private state snapshots, truthful single-Mission outcome classification, Inspect-only selective deep craft with explicit attribution evidence, and a controlled provider-neutral Crew cognition seam that remains subordinate to sealed Mission Orders and the existing Tool Gateway.
 
 <details>
 <summary><strong>Current qualification and evidence snapshot</strong></summary>
@@ -169,7 +170,10 @@ Current protected evolution has added continuous proof around high-consequence c
 - **4/4** A6 operational-drift detector mutations killed;
 - **6/6** source-provenance detector mutations killed;
 - integrated Post-Apex qualification passed across health, reconstitution, context preservation, A6 drift, external-intake rejection, and privacy-safe source provenance without widening authority;
-- Mission Outcome Truthfulness is regression-covered for generic scan-only Execute, implicit repair-like wording under Execute, supported explicit Repair, unresolved mutation after rollback failure, and completed rollback with no remaining mutation.
+- Mission Outcome Truthfulness is regression-covered for generic scan-only Execute, implicit repair-like wording under Execute, supported explicit Repair, unresolved mutation after rollback failure, and completed rollback with no remaining mutation;
+- Selective Deep-Craft Crew Cognition exact-head qualification passed **235 pytest tests, 2 skips, 354 subtests** and **237 unittest tests, 2 skips**, with all existing mutation and integrated Post-Apex gates green;
+- all **82** canonical craft cards fit their complete mandatory Purpose / Safety Boundaries / GroX Operational Binding context within the default Inspect craft budget;
+- cognition/context bookkeeping is regression-proven not to inflate Living Company evidence-quality routing history.
 
 Historical red runs remain evidence rather than being erased to create a clean narrative. Exact current milestones, run IDs, and qualification evidence are maintained in the [`Progress Tracker`](docs/stewardship/progress-tracker.md), [`Roadmap`](docs/stewardship/ROADMAP.md), and Ship's Log.
 
@@ -180,6 +184,7 @@ Historical red runs remain evidence rather than being erased to create a clean n
 The Apex baseline does not claim unrestricted power. Current deliberate limits include:
 
 - cognition remains project/session-hosted with deterministic safe fallback;
+- the Standing Crew cognition seam is provider-neutral and CI-qualified with controlled fake providers, but **no live project/session or external model provider is yet operationally qualified for Standing Crew**;
 - unrestricted interactive desktop actuation is outside the qualified boundary;
 - arbitrary or networked third-party MCP processes are outside the qualified boundary;
 - runtime image pulls or builds are not implicit Crew authority;
@@ -228,6 +233,8 @@ grox mission "Inspect the Vessel and report readiness" --mode inspect
 ```
 
 For a generic Execute directive without a supported governed operation, GroX may legitimately return `status: scan_only` with `execution_status: completed`. That means the bounded context scan completed, **not** that the wider Commander objective was delivered. Use an explicit supported operation or the explicit Repair path when mutation is actually authorized; do not infer mutation authority from words such as “fix” or “write.”
+
+Selective deep craft is automatically bounded and attributable on Inspect Orders in current protected source. The provider-neutral Crew cognition seam is an internal runtime capability and does not imply that a live Crew model provider is configured or qualified.
 
 ### Enter the Commander bridge
 
@@ -286,6 +293,7 @@ See [`docs/architecture/PERSISTENCE_ARCHITECTURE.md`](docs/architecture/PERSISTE
 | persistence and reconstitution | [`docs/architecture/PERSISTENCE_ARCHITECTURE.md`](docs/architecture/PERSISTENCE_ARCHITECTURE.md) |
 | durable operating principles | [`docs/specification/PRINCIPLES.md`](docs/specification/PRINCIPLES.md) |
 | bounded Crew authority and Mission outcome semantics | [`docs/specification/MISSION_ORDER.md`](docs/specification/MISSION_ORDER.md) |
+| Living Company memory, routing, selective craft, and controlled Crew cognition | [`docs/specification/LIVING_COMPANY_INTELLIGENCE.md`](docs/specification/LIVING_COMPANY_INTELLIGENCE.md) |
 | Mission Graph execution | [`docs/specification/MISSION_GRAPH.md`](docs/specification/MISSION_GRAPH.md) |
 | current Vessel status | [`docs/stewardship/progress-tracker.md`](docs/stewardship/progress-tracker.md) |
 | current strategic direction | [`docs/stewardship/ROADMAP.md`](docs/stewardship/ROADMAP.md) |
@@ -317,6 +325,7 @@ Higher authority wins when instructions conflict. Historical records remain hist
 - successful bounded execution is not automatically Commander-objective delivery;
 - a green CI run proves the checks it actually executed, not a broader claim;
 - controlled experiments remain distinct from integrated operational evidence;
+- controlled fake-provider CI proves the Crew cognition seam and its boundaries, **not live model-backed Crew operation**;
 - red evidence is preserved when it reveals a real weakness or ambiguity;
 - consequential changes must preserve Commander sovereignty, GorXu's sole-orchestrator role, bounded Mission Orders, verifier independence, evidence integrity, recovery, and source/state compatibility;
 - private SQLite state, `.groxstate` archives, and secrets remain outside public Git by design.
@@ -327,9 +336,9 @@ The README is an entry point. It does not outrank current repository authority, 
 
 The Apex critical path and **Post-Apex Operational Evolution Program 001** are complete and independently verified. Program 001 added evidence-backed Vessel health, tiered reconstitution, bounded context-heat policy, longitudinal A6 drift analysis, external-capability intake discipline, and privacy-safe Mission-to-source provenance, then qualified those surfaces together.
 
-Post-release protected `main` also includes the Mission Outcome Truthfulness repair. It does not define a new Apex stage or release; it hardens how the single-Mission Pilot reports bounded execution versus objective delivery.
+Post-release protected `main` also includes Mission Outcome Truthfulness and Selective Deep-Craft Crew Cognition. Neither defines a new Apex stage or release. The latter provides bounded Inspect craft and a controlled provider-neutral read-only Crew cognition seam while explicitly stopping short of a live-model claim.
 
-There is no predeclared A8. Future evolution requires new Commander intent and must preserve the existing Apex and Post-Apex regression boundaries.
+There is no predeclared A8. Future evolution requires new Commander intent and must preserve the existing Apex and Post-Apex regression boundaries. The immediate adjacent evidence candidate is **live Crew cognition provider qualification**, but it is not automatically authorized or claimed.
 
 `v0.8.0` packages the completed Post-Apex Program 001 baseline and remains the current published release. Canonical source may advance beyond it through protected `main`; future release decisions remain Commander-controlled.
 
