@@ -122,6 +122,10 @@ Pilot GorXu remains sole operational orchestrator and Mission authority remains 
             self.assertEqual(meta['craft']['craft_sha256'], order.parameters['_craft_context_meta']['craft_sha256'])
             pilot.store.save_order(order)
             self.assertTrue(order.sealed)
+            result=pilot.executor.execute(order)
+            craft_evidence=[item for item in result.evidence if item.kind=='craft_selection']
+            self.assertEqual(len(craft_evidence),1)
+            self.assertEqual(craft_evidence[0].content['craft_sha256'],meta['craft']['craft_sha256'])
             with self.assertRaises(AttributeError):
                 order.parameters = {'_craft_context': []}
         finally:
@@ -146,6 +150,9 @@ Pilot GorXu remains sole operational orchestrator and Mission authority remains 
             self.assertNotIn('_craft_context',order.parameters)
             self.assertNotIn('_craft_context_meta',order.parameters)
             self.assertIsNone(meta['craft'])
+            pilot.store.save_order(order)
+            result=pilot.executor.execute(order)
+            self.assertFalse(any(item.kind=='craft_selection' for item in result.evidence))
         finally:
             td.cleanup()
 
