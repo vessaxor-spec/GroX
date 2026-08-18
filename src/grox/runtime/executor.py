@@ -188,7 +188,7 @@ class CrewExecutor:
             return provider,persistent
         raise CrewCognitionDenied(f"Crew cognition action is outside the read-only seam: {step.action}")
 
-    def _run_cognition(self, order:MissionOrder)->tuple[str,list[Evidence]]:
+    def _run_cognition(self, order:MissionOrder)->dict[str,Any]:
         provider=self.cognition_provider
         craft=_plain(order.parameters.get('_craft_context') or [])
         memory=_plain(order.parameters.get('_memory_context') or [])
@@ -196,13 +196,21 @@ class CrewExecutor:
         observations:list[dict[str,Any]]=[]
         evidence:list[Evidence]=[]
         for _ in range(self.cognition_max_steps):
-            raw=provider.next_step(
-                order=self._cognition_order_envelope(order),
-                craft_context=craft,
-                memory_context=memory,
-                observations=observations,
-            )
-            step=CrewCognitionStep.from_mapping(raw)
+            try:
+                raw=provider.next_step(
+                    order=_plain(self._cognition_order_envelope(order)),
+                    craft_context=_plain(craft),
+                    memory_context=_plain(memory),
+                    observations=_plain(observations),
+                )
+            except (CrewCognitionError,ValueError,TypeError) as exc:
+                return {'status':'degraded','error':str(exc),'evidence':evidence}
+            try:
+                step=CrewCognitionStep.from_mapping(raw)
+            except CrewCognitionDenied as exc:
+                return {'status':'denied','error':str(exc),'evidence':evidence}
+            except (CrewCognitionError,ValueError,TypeError) as exc:
+                return {'status':'degraded','error':str(exc),'evidence':evidence}
             if step.action=='finish':
                 evidence.append(Evidence('crew_cognition',{
                     'provider':str(getattr(provider,'name','crew-cognition-provider')),
@@ -214,11 +222,20 @@ class CrewExecutor:
                     'observation_count':len(observations),
                     'mode':'read_only_inspect',
                 }))
-                return step.work_product or '',evidence
-            provider_observation,persistent=self._cognition_observation(order,step)
+                return {'status':'completed','work_product':step.work_product or '','evidence':evidence}
+            try:
+                provider_observation,persistent=self._cognition_observation(order,step)
+            except (CrewCognitionDenied,ToolDenied) as exc:
+                return {'status':'denied','error':str(exc),'evidence':evidence}
+            except (FileNotFoundError,IsADirectoryError,TimeoutError) as exc:
+                return {'status':'degraded','error':str(exc),'evidence':evidence}
             observations.append(provider_observation)
             evidence.append(Evidence('crew_cognition_observation',persistent))
-        raise CrewCognitionError(f"Crew cognition exceeded bounded step limit: {self.cognition_max_steps}")
+        return {
+            'status':'degraded',
+            'error':f"Crew cognition exceeded bounded step limit: {self.cognition_max_steps}",
+            'evidence':evidence,
+        }
 
     def _execute_deterministic(self, order:MissionOrder)->TourResult:
         evidence=[]
@@ -285,25 +302,26 @@ class CrewExecutor:
         # Verify, Repair, and Execute retain their existing deterministic paths.
         if self.cognition_provider is None or order.mode is not MissionMode.inspect:
             return self._execute_deterministic(order)
-        try:
-            work_product,cognitive_evidence=self._run_cognition(order)
-        except CrewCognitionDenied as exc:
+        run=self._run_cognition(order)
+        prior=list(run.get('evidence') or [])
+        if run['status']=='denied':
+            prior.append(Evidence('crew_cognition_denied',{'error':run['error'],'mode':'read_only_inspect'}))
             return TourResult(
-                order.order_id,order.assigned_crew,'exception',str(exc),
-                [Evidence('crew_cognition_denied',{'error':str(exc),'mode':'read_only_inspect'})],
+                order.order_id,order.assigned_crew,'exception',run['error'],prior,
                 {'type':'crew_cognition_denied','recommendation':'Return to GorXu; do not widen Mission Order authority'},
             )
-        except (CrewCognitionError,ValueError,TypeError) as exc:
+        if run['status']=='degraded':
             result=self._execute_deterministic(order)
+            result.evidence=prior+result.evidence
             result.evidence.append(Evidence('crew_cognition_degraded',{
                 'provider':str(getattr(self.cognition_provider,'name','crew-cognition-provider')),
-                'error':str(exc),
+                'error':run['error'],
                 'fallback':'deterministic Crew executor',
             }))
             return result
 
         result=self._execute_deterministic(order)
-        result.evidence.extend(cognitive_evidence)
+        result.evidence.extend(prior)
         if result.status=='completed':
-            result.summary += f"; Crew cognition: {work_product}"
+            result.summary += f"; Crew cognition: {run['work_product']}"
         return result
