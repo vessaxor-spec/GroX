@@ -60,6 +60,15 @@ Pilot GorXu remains sole operational orchestrator. Mission authority and Repair 
 '''
 
 
+def add_synthetic_crew(root: Path, dossier: dict) -> None:
+    """Add one synthetic Crew identity with the same craft-card invariant as production."""
+    (root/'configs/crew/dossiers').mkdir(parents=True, exist_ok=True)
+    (root/'configs/crew/specialists').mkdir(parents=True, exist_ok=True)
+    crew_id=dossier['crew_id']
+    (root/'configs/crew/dossiers'/f"{crew_id}.json").write_text(json.dumps(dossier))
+    (root/'configs/crew/specialists'/f"{crew_id}.md").write_text(_synthetic_craft(dossier))
+
+
 def temp_vessel():
     td=tempfile.TemporaryDirectory(); root=Path(td.name)
     (root/'configs/crew/dossiers').mkdir(parents=True); (root/'configs/crew/specialists').mkdir(parents=True)
@@ -68,6 +77,5 @@ def temp_vessel():
     # A tiny always-passing nested test for ToolGateway.run_tests
     (root/'tests/test_smoke.py').write_text('import unittest\nclass T(unittest.TestCase):\n def test_ok(self): self.assertTrue(True)\n')
     for d in CREW:
-        (root/'configs/crew/dossiers'/f"{d['crew_id']}.json").write_text(json.dumps(d))
-        (root/'configs/crew/specialists'/f"{d['crew_id']}.md").write_text(_synthetic_craft(d))
+        add_synthetic_crew(root,d)
     return td,root,PilotGorXu(root)
