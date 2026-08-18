@@ -43,6 +43,19 @@ A Mission Order is an immutable issued authority contract. Authority-bearing sca
 
 Runtime code must not widen a sealed Order in place. A broader scope, different grant, changed verifier requirement, or altered parameter envelope requires a newly issued bounded Order through GorXu. Serialization preserves the external JSON list/object shapes even though the sealed in-memory authority envelope is immutable.
 
+### Pre-issuance Crew context
+
+Before persistence/sealing, GorXu's Living Company service may add bounded competence context to Order parameters, including:
+
+- task-class metadata;
+- selected relevant Crew memory;
+- selected Mission-relevant sections from the assigned Standing Crew member's canonical craft card;
+- attribution metadata such as craft digest, selected headings, selected size, source revision, and freshness policy.
+
+This context is not authority-bearing. It cannot add an allowed action, remove a forbidden action, expand scope, lower risk, change mode, grant a capability, replace the assigned Crew, or satisfy an independent-verifier requirement. Once the Order is sealed, the contextual parameter envelope is immutable with the rest of the issued Order.
+
+A separately supplied Crew cognition provider receives a sanitized copy of the Order authority envelope rather than arbitrary internal parameters. Provider-local mutation of that copy has no effect on the sealed Order.
+
 ## Inspect mode
 
 Inspect mode is read-and-report by default.
@@ -56,6 +69,8 @@ Typical authority:
 - propose resolutions.
 
 Mutation is forbidden unless a diagnostic mutation is explicitly listed and safely reversible.
+
+A bounded optional Crew cognition provider may assist an Inspect tour using selected craft, selected memory, and governed observations. The provider is not a new authority source. Its action requests must still be present in the sealed Order and pass the existing Tool Gateway. The first bounded seam permits only `fs_list`, `fs_read`, and `test_run`, with hard step/output/test-run limits and Mission-scope confinement. Policy denial fails closed; recoverable provider failure may degrade to the existing deterministic Inspect executor without authority widening.
 
 ## Repair mode
 
@@ -73,11 +88,15 @@ A repair order must make clear:
 
 There is no implicit "while I am here" authority.
 
+The first bounded Crew cognition seam does not operate in Repair mode. A cognitive-provider output cannot create or infer Repair permission.
+
 ## Execute mode
 
 Execute mode covers bounded work that is neither inspection-only nor a repair mutation. Any side-effecting action remains subject to explicit capability and action grants.
 
 A generic Execute directive that has no explicitly governed operation may complete only a bounded context inventory. In the single-Mission Pilot path, that execution is reported at Mission level as `scan_only`, not as proof that the Commander objective was delivered.
+
+The first bounded Crew cognition seam does not replace or reinterpret Execute behavior.
 
 ## Mission outcome versus Order execution
 
@@ -101,6 +120,8 @@ Outcome classification never grants authority. Explicit Repair remains the mutat
 ## Verify mode
 
 Verification receives its own Mission Order and authority envelope. A verifier should not receive mutation capability unless remediation of a verification harness is itself the explicit task.
+
+The first bounded Crew cognition seam does not run in Verify mode. Controlled Crew cognition therefore cannot become an alternate automatic verifier or satisfy an independence requirement by itself.
 
 ## Exception protocol
 
