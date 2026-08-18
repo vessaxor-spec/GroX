@@ -48,25 +48,29 @@ Authority may narrow as it travels downward. It may not widen without a new deci
 1. **Commander Seat:** CLI/bridge for directives, status, intervention, and review.
 2. **Pilot GorXu:** interprets intent, plans, consults Mission Control, selects Crew, issues Orders, and synthesizes outcomes.
 3. **Mission Control:** risk, authority, routing, verification, evidence, and advisory policy.
-4. **Standing Crew:** durable organizational identity with fresh mission-specific tours.
+4. **Standing Crew:** durable organizational identity with fresh mission-specific tours, bounded relevant memory, selective deep craft on Inspect tours, and optional governed read-only cognition when separately configured.
 5. **Tool Gateway:** deny-wins capability enforcement and host/Vessel confinement.
 6. **Mission Store:** durable Mission, Order, Evidence, Crew, memory, and performance state.
-7. **Living Company Intelligence:** advisory memory retrieval and experienced eligible-Crew ranking under GorXu.
+7. **Living Company Intelligence:** advisory memory retrieval, Inspect-only selective specialist craft context, and experienced eligible-Crew ranking under GorXu.
 8. **Durable Operations:** private graph-run/checkpoint/exception/mutation ledger for safe resume and compensation under GorXu.
 9. **Executive Exception Loop:** deterministic classification and bounded consultation/replan policy under GorXu.
 10. **Verification:** independent verification path where policy requires it.
 11. **Persistence Manager:** private operational-state snapshots, integrity checking, and confirmation-gated restore.
 
+Selective Crew cognition is not another runtime command layer. It is an optional bounded working mode inside an already-issued Standing Crew Inspect tour and remains subordinate to the same Mission Order and Tool Gateway.
+
 ## Standing Crew model
 
-Crew are logically persistent organizational identities with durable dossiers, competencies, procedures, history, and memory. They need not remain as live model processes while asleep.
+Crew are logically persistent organizational identities with durable dossiers, competencies, procedures, history, memory, and canonical specialist craft. They need not remain as live model processes while asleep.
 
-Each wake creates a fresh tour context containing only what is needed for the current Mission plus relevant retrieved memory. This preserves continuity without allowing old working context to accumulate indefinitely.
+Each wake creates a fresh tour context containing only what is needed for the current Mission plus relevant retrieved memory. A bounded Inspect tour may additionally receive Mission-relevant craft sections from that Crew member's canonical craft card. Verify, Repair, and Execute do not carry unused deep craft in the first cognition seam. The complete historical memory store and complete deep craft card are never injected by default.
 
 Crew competence and Mission authority are separate:
 
 - Competence describes what a Crew member knows how to do.
 - Mission authority describes what that Crew member may do now.
+
+Craft, memory, provider output, confidence, and prior performance belong to the competence/advisory side of that boundary. They cannot manufacture authority.
 
 ## Mission Control
 
@@ -93,17 +97,52 @@ Inspection and mutation are separate modes.
 - no mutation authority unless explicitly required for a safe diagnostic and granted in the Mission Order;
 - findings return to GorXu.
 
+An optional provider-neutral Crew cognition seam may assist Inspect tours. It receives a sanitized copy of the issued Order plus bounded selected craft, bounded relevant memory, and observations produced through the existing Tool Gateway. The first bounded seam permits only `fs_list`, `fs_read`, and `test_run`; all requests remain subject to the sealed Order, Crew capability, scope, host policy, and Tool Gateway denial. The provider does not own tools directly.
+
 ### Repair
 
 - issued only after GorXu has accepted a repair path within delegated authority or the Commander has approved where required;
 - mutation is restricted to explicit capabilities, paths, systems, and stop conditions;
 - blockers, better methods, elevated risk, or scope changes return to GorXu before affected mutation continues.
 
+The first bounded Crew cognition seam does not operate in Repair. Model or craft output cannot create Repair authority.
+
+## Selective craft and Crew cognition
+
+After Crew routing and before an **Inspect** Mission Order is sealed, Living Company Intelligence may attach bounded Mission-relevant craft for the assigned Standing Crew member. Other modes retain their existing task/memory context without selective deep craft.
+
+The selective-craft path:
+
+- reads only the assigned active Crew member's canonical craft card;
+- requires `Purpose`, `Safety Boundaries`, and `GroX Operational Binding` to fit **in full** when present;
+- fails closed rather than truncating mandatory safety/operational binding when the configured budget is insufficient;
+- selects additional Mission-relevant sections deterministically from the remaining budget;
+- defaults to at most **6 sections / 4,500 characters**;
+- records the full-card SHA-256, selected headings/size, source revision, and freshness policy;
+- emits explicit `craft_selection` evidence during Inspect execution;
+- never treats craft prose as authority;
+- never injects the complete deep card by default.
+
+When a Crew cognition provider is separately configured, the first governed cognitive seam is **Inspect-only**. It defaults to:
+
+- at most **4** cognitive steps;
+- at most **1** cognitive `test_run` per tour;
+- at most **8,000** characters in each bounded observation returned to cognition;
+- at most **4,000** characters in the final cognitive work product.
+
+Provider-facing Order, craft, memory, and observation values are copies. Provider-local mutation cannot alter the executor-owned context, sealed Order, or prior observation history. Governed observations remain attributable evidence even when the provider later fails. Persistent read-observation evidence retains path/count/hash metadata rather than copying raw file contents into the cognitive evidence record.
+
+A mutating action request or scope escape is denied and does not gain a broader fallback. Known recoverable provider/contract failures may degrade to the existing deterministic Inspect executor. Verify, Repair, and Execute remain on their existing deterministic paths in this first seam.
+
+Controlled fake-provider CI qualifies only the provider-neutral seam and its safety properties. It is **not** evidence that a live project/session or external model provider is operational for Crew cognition. Live provider activation requires separate operational evidence.
+
 ## Verification
 
 Verification is independent where policy requires it. The executor may provide self-checks, but self-checks are not independent verification.
 
 Verification should evaluate the evidence package, requested outcome, authority compliance, and actual resulting state.
+
+The first bounded Crew cognition seam does not run in Verify mode and therefore cannot become an alternate automatic verifier or satisfy verifier independence by itself.
 
 ## Mission outcome truthfulness
 
@@ -168,6 +207,8 @@ The A5-qualified Tool Gateway v2 exposes bounded filesystem/list/test operations
 
 A5 browser capture deliberately keeps network authority in the Gateway: approved HTML is fetched through `net_fetch`, then rendered offline while browser-originated HTTP(S) is blocked. MCP process definitions are host/Pilot registered rather than Crew supplied, and mutating MCP tools require a separate mutation action grant. Secret values remain memory-only and are not durable Mission data.
 
+The Crew cognition seam reuses this same Gateway. It does not add direct provider tool ownership, an alternate filesystem API, broader network access, or an MCP/desktop path.
+
 Unrestricted interactive desktop actuation, arbitrary third-party/networked MCP transports, runtime image pulls/builds, and optional external-agent delegation remain outside the A5-qualified boundary.
 
 ## Memory architecture
@@ -184,13 +225,15 @@ Memory must support provenance, relevance, consolidation, correction, and bounde
 
 The qualified Living Company implementation provides episodic retrieval plus durable semantic, procedural, and Vessel memory. Durable records require explicit provenance, confidence, scope, and keys; corrections supersede rather than silently rewrite prior active records; records can be deactivated for bounded forgetting. Retrieval is relevance-scored and capped by item/character budgets, with memory-plane diversity preserved where relevant.
 
-Living Company Intelligence also persists per-Crew/task-class performance observations and lets GorXu rank only otherwise-eligible Crew using competence, evidence quality, reliability, load, cost, latency, risk, and prior performance. Memory and performance remain advisory: they cannot grant capability, lower risk, authorize Repair, alter Commander intent, or bypass verifier independence. Autonomous memory consolidation is not yet implemented.
+Living Company Intelligence also persists per-Crew/task-class performance observations and lets GorXu rank only otherwise-eligible Crew using competence, evidence quality, reliability, load, cost, latency, risk, and prior performance. Memory, craft, cognition, and performance remain advisory: they cannot grant capability, lower risk, authorize Repair, alter Commander intent, self-route Crew, or bypass verifier independence. Autonomous memory consolidation is not yet implemented.
 
 ## Cognitive Pilot
 
 GorXu may use a provider-neutral reasoning layer for interpretation, uncertainty detection, strategy comparison, and Crew recommendation. Cognition is advisory to the Pilot and never becomes an authority source.
 
 Deterministic Mission Control and Tool Gateway policy remain capable of denying model proposals. A model may raise caution but cannot lower the risk floor or grant itself mutation authority.
+
+Pilot cognition and Crew cognition are distinct placements under the same authority doctrine. Pilot cognition advises GorXu before or during orchestration. Optional Crew cognition operates only inside an already-issued bounded Inspect tour. Neither placement can create authority, and external intelligence does not inherit command merely because a provider can reason.
 
 ## Recruitment and evolution
 

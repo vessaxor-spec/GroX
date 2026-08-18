@@ -24,7 +24,7 @@ Higher authority wins when instructions conflict.
 
 **Commander → Pilot GorXu → Divisions → Standing Crew**
 
-Pilot GorXu is the primary orchestrator and second-in-command. Mission Control is a native GroX policy/advisory service used by GorXu; it is not a command layer. No Crew member, Division, verifier, tool, scheduler, or external system may become a parallel orchestrator.
+Pilot GorXu is the primary orchestrator and second-in-command. Mission Control is a native GroX policy/advisory service used by GorXu; it is not a command layer. No Crew member, Division, verifier, tool, scheduler, cognitive provider, or external system may become a parallel orchestrator.
 
 ## Hard constraints
 
@@ -34,6 +34,10 @@ Pilot GorXu is the primary orchestrator and second-in-command. Mission Control i
 - Do not conflate competence with authority. Knowing how to perform an action does not grant permission to perform it.
 - Keep inspection and repair authority separate.
 - Do not conflate successful bounded execution with delivery of the Commander objective. Mission synthesis must state actual effect, objective state, mutation state, and verification scope truthfully.
+- Crew craft, memory, cognitive-provider output, confidence, and prior performance are competence/advisory context only. None may create eligibility, capability, Repair authority, risk reduction, scope expansion, routing authority, or verifier independence.
+- Selective Crew craft context must remain bounded and attributable. Do not inject complete deep craft cards per summon by default, and do not omit mandatory safety/operational-binding context merely to fit optional task detail.
+- Provider-driven Crew actions must traverse the existing sealed Mission Order and Tool Gateway. The first bounded Crew-cognition seam is Inspect-only and read/test-only; Verify, Repair, and Execute must not silently inherit model-backed Crew cognition.
+- Craft-selection and Crew-cognition bookkeeping must not improve Crew performance or routing scores merely by adding evidence kinds. Only calibrated operational evidence may affect evidence-quality history.
 - Crew encountering blockers, safer alternatives, better methods, missing capability, or elevated risk must stop the affected mutation and report to GorXu.
 - GorXu should resolve ordinary and reversible issues using Mission Control and relevant Crew. Escalate to the Commander only for critical, irreversible, or material intent-changing decisions.
 - Independent verification must remain independent from the executor when required by GroX policy.
@@ -62,6 +66,7 @@ Pilot GorXu is the primary orchestrator and second-in-command. Mission Control i
 - Record major architectural milestones in the Ship's Log.
 - Treat implementation claims as unverified until source and tests are inspected.
 - Preserve approved architecture when synchronizing or recovering runtime state; do not replace richer canonical doctrine with bootstrap summaries.
+- Distinguish controlled/fake-provider CI from live model-backed operation. A provider-neutral seam is not a live-provider qualification claim.
 
 ## Builder objective
 

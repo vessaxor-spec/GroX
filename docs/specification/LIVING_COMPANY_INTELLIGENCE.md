@@ -1,6 +1,6 @@
 # GroX Living Company Intelligence
 
-**Qualification status:** **A3 QUALIFIED** in GroX `v0.8.0`. Memory and experience remain advisory to GorXu and can never grant eligibility, authority, Repair permission, or verifier independence.
+**Qualification status:** **A3 QUALIFIED** in GroX `v0.8.0`. Memory, craft, experience, and Crew cognition remain advisory to GorXu and can never grant eligibility, authority, Repair permission, or verifier independence. Later protected-main evolution may strengthen these surfaces without creating a new Apex stage.
 
 A3 established the Standing Crew as an experienced organization without changing GroX command authority.
 
@@ -10,14 +10,14 @@ Living Company Intelligence is a native advisory service under Pilot GorXu.
 
 **Commander → Pilot GorXu → Divisions → Standing Crew**
 
-The intelligence service may rank eligible Crew and retrieve relevant memory. It may not:
+The intelligence service may rank eligible Crew and retrieve relevant memory and, for bounded Inspect tours, selective craft context. It may not:
 
 - create a new command layer;
 - grant capabilities or mutation authority;
 - lower Mission Control risk;
 - bypass verifier independence;
 - alter Commander intent;
-- make memory authoritative merely because it was previously stored.
+- make memory, craft prose, or provider output authoritative merely because it was supplied to a Crew tour.
 
 Crew competence and Mission authority remain hard eligibility gates. Experience affects ranking only after those gates pass.
 
@@ -69,13 +69,62 @@ Historical performance may change the winner among otherwise eligible Crew. It c
 
 ## Context-isolated tours
 
-Every Mission Order remains a fresh bounded tour. Living Company Intelligence adds only:
+Every Mission Order remains a fresh bounded tour. Living Company Intelligence continues to add:
 
 - a stable task-class label;
 - a capped relevant-memory context;
-- routing-decision evidence.
+- routing/context-selection metadata.
 
-The memory context is bounded by item count and character budget. This preserves continuity without accumulating prior working context indefinitely.
+For **Inspect** tours only, Living Company Intelligence may also add bounded selective specialist craft before the Order is sealed. Verify, Repair, and Execute retain their existing memory/routing context without carrying unused deep craft.
+
+### Selective specialist craft
+
+The post-Apex selective-craft path uses deterministic section selection after Crew routing and before an Inspect Mission Order is sealed.
+
+Default limits are:
+
+- at most **6** selected craft sections;
+- at most **4,500** selected craft characters.
+
+When present, `Purpose`, `Safety Boundaries`, and `GroX Operational Binding` must fit **in full** before optional task-relevant craft is selected. If the complete mandatory set cannot fit within the configured budget, selection fails closed rather than truncating safety/operational binding. Remaining sections are selected by bounded lexical relevance with stable fallback fundamentals.
+
+The selected context carries the full-card SHA-256 plus source revision and freshness-policy metadata. Inspect execution emits explicit `craft_selection` evidence so selection remains attributable even when no cognition provider is configured.
+
+The complete craft card is never injected by default. Craft context is competence context only: a craft card cannot add a capability, widen scope, lower risk, authorize Repair, override a forbidden action, self-route Crew, or satisfy verifier independence.
+
+## Bounded read-only Crew cognition
+
+GroX exposes a provider-neutral Crew cognition seam for **Inspect** tours when a Crew cognition provider is separately supplied. The seam consumes:
+
+- a sanitized copy of the sealed Mission Order envelope;
+- the bounded selected specialist craft;
+- the existing bounded relevant Crew memory;
+- observations returned only by governed read/test actions already allowed by that Order.
+
+The first bounded seam deliberately excludes Verify, Repair, and Execute. Those modes retain their existing deterministic execution paths and do not receive selective deep craft through this seam.
+
+Within an Inspect tour, a cognitive Crew provider may request only:
+
+- `fs_list`;
+- `fs_read`;
+- `test_run`.
+
+Every request is still checked against the issued Mission Order, forbidden actions, Mission scope, Vessel-root confinement, Crew capability, Tool Gateway policy, and host restrictions. The provider does not receive an alternate tool path. Requests for mutation or scope escape fail closed rather than falling back to broader execution.
+
+Default resource limits are:
+
+- at most **4** cognitive steps per tour;
+- at most **1** cognitive `test_run` per tour;
+- at most **8,000** characters of a bounded observation supplied back to cognition;
+- at most **4,000** characters in the final cognitive work product.
+
+Provider-facing Order, craft, memory, and observation structures are copied for each call. Provider-local mutation cannot alter executor-owned context, Mission authority, or prior observation history.
+
+Governed cognitive observations are persisted as attributable evidence even if the provider later fails or degrades. Raw file-read content is not copied into persistent cognitive-observation evidence; bounded metadata and hashes are retained. A successful cognitive work product records provider identity, selected craft attribution, selected headings, selected size, relevant memory IDs, observation count, and cognitive test-run count.
+
+Known recoverable provider/contract failures degrade to the existing deterministic Crew executor without widening authority. A policy or authority denial does not silently fall back. Unexpected programming defects remain defects rather than being normalized as ordinary provider failure.
+
+Controlled fake-provider CI can qualify this provider-neutral seam and its boundaries. **That evidence does not by itself establish live model-backed Crew operation.** Any project/session or external model provider requires a separate operational qualification before GroX may claim live model-backed Crew cognition.
 
 ## Qualified A3 gate
 
@@ -92,4 +141,4 @@ A3 qualification was established by demonstrating all of the following:
 
 **Exit gate:** repeated Missions measurably improve routing and execution without indiscriminate context growth.
 
-**Current status:** QUALIFIED. Autonomous memory consolidation remains outside the released Apex baseline until separately evidenced and governed.
+**Current A3 status:** QUALIFIED. Later selective-craft and controlled Crew-cognition hardening are post-Apex extensions and do not redefine the historical A3 gate. Autonomous memory consolidation remains outside the released Apex baseline until separately evidenced and governed.

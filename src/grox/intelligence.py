@@ -5,14 +5,22 @@ from types import MappingProxyType
 from dataclasses import dataclass
 from typing import Any, Iterable
 
-from .contracts import MissionOrder, RiskClass, TourResult
+from .contracts import MissionMode, MissionOrder, RiskClass, TourResult
 from .crew.roster import CrewDossier, CrewRoster
+from .craft_context import select_craft_context
 from .state import StateStore
 
 _GENERIC_TAGS = {
     "analysis", "code", "engineer", "engineering", "evidence", "inspect",
     "repair", "review", "service", "verify", "write",
 }
+_NON_QUALITY_EVIDENCE = frozenset({
+    "craft_selection",
+    "crew_cognition",
+    "crew_cognition_observation",
+    "crew_cognition_degraded",
+    "crew_cognition_denied",
+})
 _RISK_RANK = {RiskClass.low: 0, RiskClass.medium: 1, RiskClass.high: 2, RiskClass.critical: 3}
 
 _ROUTING_COMPONENT_KEYS = ("competence", "reliability", "evidence_quality", "load", "cost", "latency", "risk", "experience", "preference")
@@ -54,11 +62,22 @@ class RoutingDecision:
 class LivingCompanyIntelligence:
     """Evidence-backed memory retrieval and experienced Crew ranking under GorXu."""
 
-    def __init__(self, store: StateStore, roster: CrewRoster, *, memory_items: int = 6, memory_chars: int = 3000):
+    def __init__(
+        self,
+        store: StateStore,
+        roster: CrewRoster,
+        *,
+        memory_items: int = 6,
+        memory_chars: int = 3000,
+        craft_sections: int = 6,
+        craft_chars: int = 4500,
+    ):
         self.store = store
         self.roster = roster
         self.memory_items = max(1, int(memory_items))
         self.memory_chars = max(256, int(memory_chars))
+        self.craft_sections = max(1, int(craft_sections))
+        self.craft_chars = max(256, int(craft_chars))
         self._known_tags = {tag for crew in roster.all() for tag in crew.tags}
 
     def task_class(self, objective: str) -> str:
@@ -159,15 +178,36 @@ class LivingCompanyIntelligence:
                 break
         return selected
 
+    def craft_context(self, crew_id: str, objective: str) -> dict[str, Any]:
+        card = self.roster.craft_card(crew_id)
+        return select_craft_context(
+            card,
+            objective,
+            max_sections=self.craft_sections,
+            max_chars=self.craft_chars,
+        )
+
     def inject_order_context(self, order: MissionOrder, objective: str) -> dict[str, Any]:
         task_class = self.task_class(objective)
         memory = self.memory_context(order.assigned_crew, objective, task_class=task_class)
-        order.parameters = {
+        parameters = {
             **dict(order.parameters),
             "_task_class": task_class,
             "_memory_context": memory,
         }
-        return {"task_class": task_class, "memory_count": len(memory), "memory_ids": [m["memory_id"] for m in memory if m["memory_id"] is not None]}
+        craft_meta: dict[str, Any] | None = None
+        if order.mode is MissionMode.inspect:
+            craft = self.craft_context(order.assigned_crew, objective)
+            craft_meta = {key: value for key, value in craft.items() if key != "selected_sections"}
+            parameters["_craft_context"] = craft["selected_sections"]
+            parameters["_craft_context_meta"] = craft_meta
+        order.parameters = parameters
+        return {
+            "task_class": task_class,
+            "memory_count": len(memory),
+            "memory_ids": [m["memory_id"] for m in memory if m["memory_id"] is not None],
+            "craft": craft_meta,
+        }
 
     def record_performance(
         self,
@@ -182,7 +222,7 @@ class LivingCompanyIntelligence:
         verified: bool | None = None,
         cost_units: float = 0.0,
     ) -> None:
-        kinds = {e.kind for e in result.evidence}
+        kinds = {e.kind for e in result.evidence if e.kind not in _NON_QUALITY_EVIDENCE}
         evidence_quality = min(1.0, len(kinds) / 3.0)
         tests = [e for e in result.evidence if e.kind == "test_run"]
         if tests and all(e.content.get("returncode") == 0 for e in tests):
