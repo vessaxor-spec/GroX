@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from grox.contracts import MissionMode
@@ -65,6 +66,11 @@ class CountingProvider:
         return {'action':'finish','work_product':'should not be called'}
 
 
+def _evidence_content(row):
+    content=row['content']
+    return json.loads(content) if isinstance(content,str) else content
+
+
 class CrewCognitionIntegrationTests(unittest.TestCase):
     def test_inspect_consumes_selective_craft_memory_and_governed_observation(self):
         td,root,p=temp_vessel()
@@ -91,16 +97,16 @@ class CrewCognitionIntegrationTests(unittest.TestCase):
             mission=p.store.mission(result['mission_id'])
             evidence=[e for e in mission['evidence'] if e['kind'] in {'crew_cognition','crew_cognition_observation'}]
             self.assertEqual(len([e for e in evidence if e['kind']=='crew_cognition']),1)
-            observation=next(e for e in evidence if e['kind']=='crew_cognition_observation')
-            self.assertEqual(observation['content']['action'],'fs_read')
-            self.assertEqual(observation['content']['path'],'README.md')
-            self.assertIn('sha256',observation['content'])
-            self.assertNotIn('content',observation['content'])
-            cognition=next(e for e in evidence if e['kind']=='crew_cognition')
-            self.assertEqual(cognition['content']['provider'],provider.name)
-            self.assertGreater(cognition['content']['selected_chars'],0)
-            self.assertIn('GroX Operational Binding',cognition['content']['selected_headings'])
-            self.assertGreaterEqual(cognition['content']['observation_count'],1)
+            observation=_evidence_content(next(e for e in evidence if e['kind']=='crew_cognition_observation'))
+            self.assertEqual(observation['action'],'fs_read')
+            self.assertEqual(observation['path'],'README.md')
+            self.assertIn('sha256',observation)
+            self.assertNotIn('content',observation)
+            cognition=_evidence_content(next(e for e in evidence if e['kind']=='crew_cognition'))
+            self.assertEqual(cognition['provider'],provider.name)
+            self.assertGreater(cognition['selected_chars'],0)
+            self.assertIn('GroX Operational Binding',cognition['selected_headings'])
+            self.assertGreaterEqual(cognition['observation_count'],1)
         finally:
             td.cleanup()
 
@@ -126,7 +132,7 @@ class CrewCognitionIntegrationTests(unittest.TestCase):
             result=p.command('Inspect docs only',mode=MissionMode.inspect,crew_id='backend-engineer',scope='docs')
             self.assertEqual(result['status'],'exception')
             self.assertEqual(result['exception']['type'],'crew_cognition_denied')
-            self.assertIn('scope',result['summary'])
+            self.assertIn('escapes Vessel root',result['summary'])
         finally:
             td.cleanup()
 
@@ -168,9 +174,9 @@ class CrewCognitionIntegrationTests(unittest.TestCase):
             self.assertEqual(result['status'],'completed')
             self.assertTrue(result['synthesis']['verification_passed'])
             mission=p.store.mission(result['mission_id'])
-            cognitive=[e for e in mission['evidence'] if e['kind']=='crew_cognition']
+            cognitive=[_evidence_content(e) for e in mission['evidence'] if e['kind']=='crew_cognition']
             self.assertGreaterEqual(len(cognitive),5)
-            self.assertTrue(all(e['content']['mode']=='read_only_inspect' for e in cognitive))
+            self.assertTrue(all(content['mode']=='read_only_inspect' for content in cognitive))
             verifier_orders=[o for o in mission['orders'] if o['mode']=='verify']
             self.assertEqual(len(verifier_orders),1)
             verifier_evidence=[e for e in mission['evidence'] if e['order_id']==verifier_orders[0]['order_id']]
