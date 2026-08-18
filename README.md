@@ -64,6 +64,7 @@ GroX is designed to make capable AI execution durable without making authority a
 - letting retries, replanning, or fallback silently widen authority;
 - allowing an executor to satisfy an independence requirement by verifying itself;
 - representing experiments, simulations, or staged behavior as stronger operational proof than the evidence supports;
+- representing successful bounded execution as proof that the Commander objective was delivered when only a narrower effect occurred;
 - allowing improvement proposals to self-activate without governed approval.
 
 ## How GroX works
@@ -97,6 +98,7 @@ Capabilities, tools, schedulers, memory, evaluators, and external systems are re
 6. **Verification remains independent.** Where policy requires independence, the verifier must differ from the executor and evidence must be attributable.
 7. **Failure narrows authority.** Recovery, fallback, and replanning may restore reversible execution but may not widen scope or change Commander intent.
 8. **Continuity requires evidence.** Persistence, recovery, and reconstitution are operational infrastructure, not assumptions about a surviving process.
+9. **Execution completion is not objective completion.** GorXu must report the actual bounded effect, Commander-objective state, remaining mutation state, and verification scope rather than promoting a completed step into a stronger delivery claim.
 
 Canonical builder constraints are defined in [`AI_INSTRUCTIONS.md`](AI_INSTRUCTIONS.md). Detailed command and runtime architecture is defined in [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md).
 
@@ -115,7 +117,7 @@ Canonical builder constraints are defined in [`AI_INSTRUCTIONS.md`](AI_INSTRUCTI
 
 ## Current state
 
-GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational Evolution Program 001. `v0.8.0` is the current published release baseline.
+GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational Evolution Program 001. `v0.8.0` is the current published release baseline. Canonical source has continued beyond that immutable release through protected `main`, including the Mission Outcome Truthfulness repair merged in PR #71.
 
 | Surface | Current state |
 |---|---|
@@ -128,10 +130,11 @@ GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational E
 | CI boundary | Python 3.11-3.14 regressions plus wheel-bootstrap portability; five required gates |
 | Current evolution program | [`Post-Apex Operational Evolution Program 001`](docs/stewardship/POST_APEX_EVOLUTION_PROGRAM_001.md) |
 | Completed program work | Program 001 complete: capability intake, mutation proving, Vessel health, tiered reconstitution, controlled context heat, A6 longitudinal drift, Mission-to-source provenance, and integrated qualification |
+| Post-release source hardening | Mission Outcome Truthfulness: scan-only execution is no longer represented as Commander-objective delivery; mutation/rollback state is reported conservatively |
 | Next program stage | **None predeclared. No A8 is implied.** |
 | Canonical current status | [`docs/stewardship/progress-tracker.md`](docs/stewardship/progress-tracker.md) |
 
-The live Vessel includes Commander Seat interfaces, durable Missions and Mission Graphs, 82 Standing Crew, attributable organizational memory, capability-gated execution, independent verification, crash-safe same-Mission recovery, bounded replanning, Tool Gateway v2, isolated workspace execution, exact-origin network access, offline browser evidence capture, pre-registered stdio MCP adapters, evaluation that cannot self-activate, read-only Vessel health, tiered reconstitution planning, and integrity-checked private state snapshots.
+The live Vessel includes Commander Seat interfaces, durable Missions and Mission Graphs, 82 Standing Crew, attributable organizational memory, capability-gated execution, independent verification, crash-safe same-Mission recovery, bounded replanning, Tool Gateway v2, isolated workspace execution, exact-origin network access, offline browser evidence capture, pre-registered stdio MCP adapters, evaluation that cannot self-activate, read-only Vessel health, tiered reconstitution planning, integrity-checked private state snapshots, and persisted single-Mission outcome classification that distinguishes bounded execution from objective delivery.
 
 <details>
 <summary><strong>Current qualification and evidence snapshot</strong></summary>
@@ -165,7 +168,8 @@ Current protected evolution has added continuous proof around high-consequence c
 - automatic Pilot context compression remains deliberately unactivated; integrated qualification proved context preservation without silently enabling runtime compression;
 - **4/4** A6 operational-drift detector mutations killed;
 - **6/6** source-provenance detector mutations killed;
-- integrated Post-Apex qualification passed across health, reconstitution, context preservation, A6 drift, external-intake rejection, and privacy-safe source provenance without widening authority.
+- integrated Post-Apex qualification passed across health, reconstitution, context preservation, A6 drift, external-intake rejection, and privacy-safe source provenance without widening authority;
+- Mission Outcome Truthfulness is regression-covered for generic scan-only Execute, implicit repair-like wording under Execute, supported explicit Repair, unresolved mutation after rollback failure, and completed rollback with no remaining mutation.
 
 Historical red runs remain evidence rather than being erased to create a clean narrative. Exact current milestones, run IDs, and qualification evidence are maintained in the [`Progress Tracker`](docs/stewardship/progress-tracker.md), [`Roadmap`](docs/stewardship/ROADMAP.md), and Ship's Log.
 
@@ -223,6 +227,8 @@ grox reconstitution-plan
 grox mission "Inspect the Vessel and report readiness" --mode inspect
 ```
 
+For a generic Execute directive without a supported governed operation, GroX may legitimately return `status: scan_only` with `execution_status: completed`. That means the bounded context scan completed, **not** that the wider Commander objective was delivered. Use an explicit supported operation or the explicit Repair path when mutation is actually authorized; do not infer mutation authority from words such as “fix” or “write.”
+
 ### Enter the Commander bridge
 
 ```bash
@@ -279,7 +285,7 @@ See [`docs/architecture/PERSISTENCE_ARCHITECTURE.md`](docs/architecture/PERSISTE
 | command and runtime architecture | [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) |
 | persistence and reconstitution | [`docs/architecture/PERSISTENCE_ARCHITECTURE.md`](docs/architecture/PERSISTENCE_ARCHITECTURE.md) |
 | durable operating principles | [`docs/specification/PRINCIPLES.md`](docs/specification/PRINCIPLES.md) |
-| bounded Crew authority | [`docs/specification/MISSION_ORDER.md`](docs/specification/MISSION_ORDER.md) |
+| bounded Crew authority and Mission outcome semantics | [`docs/specification/MISSION_ORDER.md`](docs/specification/MISSION_ORDER.md) |
 | Mission Graph execution | [`docs/specification/MISSION_GRAPH.md`](docs/specification/MISSION_GRAPH.md) |
 | current Vessel status | [`docs/stewardship/progress-tracker.md`](docs/stewardship/progress-tracker.md) |
 | current strategic direction | [`docs/stewardship/ROADMAP.md`](docs/stewardship/ROADMAP.md) |
@@ -308,6 +314,7 @@ Higher authority wins when instructions conflict. Historical records remain hist
 ### Evidence discipline
 
 - implementation is not qualification;
+- successful bounded execution is not automatically Commander-objective delivery;
 - a green CI run proves the checks it actually executed, not a broader claim;
 - controlled experiments remain distinct from integrated operational evidence;
 - red evidence is preserved when it reveals a real weakness or ambiguity;
@@ -320,9 +327,11 @@ The README is an entry point. It does not outrank current repository authority, 
 
 The Apex critical path and **Post-Apex Operational Evolution Program 001** are complete and independently verified. Program 001 added evidence-backed Vessel health, tiered reconstitution, bounded context-heat policy, longitudinal A6 drift analysis, external-capability intake discipline, and privacy-safe Mission-to-source provenance, then qualified those surfaces together.
 
+Post-release protected `main` also includes the Mission Outcome Truthfulness repair. It does not define a new Apex stage or release; it hardens how the single-Mission Pilot reports bounded execution versus objective delivery.
+
 There is no predeclared A8. Future evolution requires new Commander intent and must preserve the existing Apex and Post-Apex regression boundaries.
 
-`v0.8.0` packages this completed baseline and is the current published release. Future release decisions remain Commander-controlled.
+`v0.8.0` packages the completed Post-Apex Program 001 baseline and remains the current published release. Canonical source may advance beyond it through protected `main`; future release decisions remain Commander-controlled.
 
 See the canonical [`Roadmap`](docs/stewardship/ROADMAP.md) for current sequencing and evidence boundaries.
 

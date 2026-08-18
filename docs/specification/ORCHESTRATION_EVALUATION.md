@@ -1,6 +1,6 @@
 # Orchestration Evaluation and Self-Improvement
 
-**Qualification status:** **A6 QUALIFIED** in GroX `v0.7.1`. Evaluation remains advisory after Apex qualification: proposals cannot self-activate and controlled evaluator improvement is not equivalent to production-policy activation.
+**Qualification status:** **A6 QUALIFIED** in GroX `v0.8.0`. Evaluation remains advisory after Apex qualification: proposals cannot self-activate and controlled evaluator improvement is not equivalent to production-policy activation.
 
 ## Purpose
 

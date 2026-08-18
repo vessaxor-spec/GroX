@@ -1,6 +1,6 @@
 # GroX Living Company Intelligence
 
-**Qualification status:** **A3 QUALIFIED** in GroX `v0.7.1`. Memory and experience remain advisory to GorXu and can never grant eligibility, authority, Repair permission, or verifier independence.
+**Qualification status:** **A3 QUALIFIED** in GroX `v0.8.0`. Memory and experience remain advisory to GorXu and can never grant eligibility, authority, Repair permission, or verifier independence.
 
 A3 established the Standing Crew as an experienced organization without changing GroX command authority.
 

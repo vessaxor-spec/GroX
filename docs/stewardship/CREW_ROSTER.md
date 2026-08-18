@@ -1,6 +1,6 @@
 # Standing Crew Roster
 
-**Current released baseline:** GroX `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` / **82 Standing Crew**. Canonical source continues on `main`.
+**Current released baseline:** GroX `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` / **82 Standing Crew**. Canonical source continues on protected `main` and may advance beyond the immutable release through governed PR/CI.
 
 ## Company model
 

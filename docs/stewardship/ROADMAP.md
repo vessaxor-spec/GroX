@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.8.0` is the current published Post-Apex Operational Evolution baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, a source-backed privacy-safe Mission-to-source provenance design, an implemented private receipt/public commitment capability with continuous detector proof, a canonical independently verified integrated Post-Apex qualification, and a compact 82/82 Standing Crew cognitive directory with provider-neutral usage telemetry and cache-friendly framing.
+GroX `v0.8.0` is the current published Post-Apex Operational Evolution baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, a source-backed privacy-safe Mission-to-source provenance design, an implemented private receipt/public commitment capability with continuous detector proof, a canonical independently verified integrated Post-Apex qualification, a compact 82/82 Standing Crew cognitive directory with provider-neutral usage telemetry and cache-friendly framing, and post-release Mission Outcome Truthfulness that distinguishes bounded execution from Commander-objective delivery without widening authority.
 
 Native command architecture:
 
@@ -13,6 +13,7 @@ Native command architecture:
 - GorXu sole operational orchestrator; Mission Control remains subordinate and non-parallel.
 - 81 specialist-inspired Standing Crew plus native independent verifier; non-standing or stale operational Crew state is purged.
 - Mission Orders, Inspect/Repair separation, deny-wins Tool Gateway, evidence, verifier independence, and Commander escalation boundaries implemented.
+- Single-Mission Pilot outcomes distinguish executor lifecycle, actual effect, objective state, remaining mutation state, next required authority, and verification scope; generic inventory fallback is `scan_only` rather than objective completion.
 - SQLite Mission/Order/Evidence/Crew/graph/evaluation state plus private `.groxstate` recovery implemented.
 - A1 Cognitive Pilot: SESSION-QUALIFIED.
 - A2 Mission Graph Orchestration: QUALIFIED.
@@ -146,9 +147,37 @@ Final qualification: exact-head PR CI `32078828303` passed all five required job
 
 No command layer, authority, Crew membership, release/tag, or Apex-stage change is introduced.
 
+## Mission Outcome Truthfulness — issue #70 / PR #71
+
+**Status: COMPLETE — CANONICAL MERGED AND EXACT-TREE QUALIFIED.** This post-release source hardening is canonical on protected `main`; it is not A8 and does not move the `v0.8.0` release tag.
+
+Implemented:
+
+1. single-Mission Pilot output separates `execution_status` from Commander-facing Mission status;
+2. a persisted `mission_outcome` contract records execution, actual effect, objective state, remaining mutation state, next required authority, and verification scope;
+3. generic Execute inventory fallback reports `status: scan_only`, `objective: not_delivered`, and no mutation instead of plain objective-like completion;
+4. verification PASS on an unsatisfied objective is explicitly scoped to bounded execution evidence only;
+5. supported explicit `repair-write` retains Repair mutation authority, objective-satisfied semantics, and independent verification;
+6. failed Repair reporting is conservative: completed rollback reports no remaining mutation, while rollback failure/divergence reports `mutation_state_unresolved`, `mutation: true`, and `next_authority: pilot_recovery`.
+
+Independent review caught the unresolved-mutation failure-state gap before merge; permanent regressions cover both failed and completed rollback outcomes.
+
+Qualification evidence:
+
+- final implementation head `37392878566bbe9ad84eba3b5d723a974cca5164`;
+- exact-head PR CI `32127267143`: PASS all five required jobs;
+- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **218 passed, 2 skipped, 354 subtests**, unittest **220 OK, 2 skipped**;
+- critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6** killed;
+- integrated Post-Apex qualification PASS with `new_apex_stage=false`, `qualification_claim=false`, and `release_decision=false`;
+- PR #71 merged as `main@1409605a98e0fd805a55839321f28364505773f5`;
+- the merged `main` tree SHA `fedb4d54bb2e907f6fc9ff1e0125476c6af4f587` exactly matches the final CI-qualified PR-head tree, proving source equivalence;
+- issue #70 closed as completed.
+
+No separate post-merge push run is claimed because none was observable through the available GitHub interface. Commander/GorXu authority, Repair boundaries, verifier independence, Mission Graph semantics, Crew membership, package version, published release, and Apex-stage state are unchanged.
+
 ## Post-Apex operating posture
 
-There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** `v0.8.0` is published from the verified Program 001 baseline; future evolution beyond this release requires new Commander intent. External ideas do not become authority or qualification evidence merely by being useful elsewhere.
+There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** `v0.8.0` is published from the verified Program 001 baseline. Later protected-main hardening such as Mission Outcome Truthfulness remains source evolution beyond the immutable release and does not itself create a new program stage or release. Future evolution requires new Commander intent. External ideas do not become authority or qualification evidence merely by being useful elsewhere.
 
 Known deliberate limits remain candidates, not automatic commitments: autonomous memory consolidation, generic external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP, and optional external-agent interoperability.
 
@@ -180,4 +209,4 @@ Do not:
 
 ## Release posture
 
-Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. `v0.8.0` is published from `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` after exact-head candidate CI `32014558365` and canonical post-merge CI `32015076306` passed. Issue #55 is complete. Future release or evolution decisions remain Commander-controlled. No new Apex stage or A8 is implied.
+Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. `v0.8.0` is published from `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` after exact-head candidate CI `32014558365` and canonical post-merge CI `32015076306` passed. Issue #55 is complete. Canonical source has since advanced through protected-main hardening without moving the immutable release tag. Future release or evolution decisions remain Commander-controlled. No new Apex stage or A8 is implied.

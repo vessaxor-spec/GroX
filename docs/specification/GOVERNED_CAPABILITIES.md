@@ -1,6 +1,6 @@
 # GroX Governed Capability Expansion
 
-**Qualification status:** **A5 QUALIFIED** in GroX `v0.7.1`. The qualified capability boundary remains deny-wins and does not grant unrestricted host, desktop, networked MCP, or runtime image-acquisition authority.
+**Qualification status:** **A5 QUALIFIED** in GroX `v0.8.0`. The qualified capability boundary remains deny-wins and does not grant unrestricted host, desktop, networked MCP, or runtime image-acquisition authority.
 
 A5 established broader operational reach without turning tools, adapters, services, or external systems into command authorities.
 

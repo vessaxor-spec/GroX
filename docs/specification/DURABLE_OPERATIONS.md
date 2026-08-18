@@ -1,6 +1,6 @@
 # GroX Durable Operations and Executive Exception Loop
 
-**Qualification status:** **A4 QUALIFIED** in GroX `v0.7.1`. Same-Mission crash recovery, bounded executive exception handling, cancellation, idempotency, and journaled text-Repair compensation remain Apex regression boundaries.
+**Qualification status:** **A4 QUALIFIED** in GroX `v0.8.0`. Same-Mission crash recovery, bounded executive exception handling, cancellation, idempotency, and journaled text-Repair compensation remain Apex regression boundaries.
 
 A4 established resumable long-running Mission Graphs and a bounded executive exception loop under GorXu without creating another command layer.
 
