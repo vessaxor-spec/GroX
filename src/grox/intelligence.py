@@ -5,7 +5,7 @@ from types import MappingProxyType
 from dataclasses import dataclass
 from typing import Any, Iterable
 
-from .contracts import MissionOrder, RiskClass, TourResult
+from .contracts import MissionMode, MissionOrder, RiskClass, TourResult
 from .crew.roster import CrewDossier, CrewRoster
 from .craft_context import select_craft_context
 from .state import StateStore
@@ -183,15 +183,18 @@ class LivingCompanyIntelligence:
     def inject_order_context(self, order: MissionOrder, objective: str) -> dict[str, Any]:
         task_class = self.task_class(objective)
         memory = self.memory_context(order.assigned_crew, objective, task_class=task_class)
-        craft = self.craft_context(order.assigned_crew, objective)
-        craft_meta = {key: value for key, value in craft.items() if key != "selected_sections"}
-        order.parameters = {
+        parameters = {
             **dict(order.parameters),
             "_task_class": task_class,
             "_memory_context": memory,
-            "_craft_context": craft["selected_sections"],
-            "_craft_context_meta": craft_meta,
         }
+        craft_meta: dict[str, Any] | None = None
+        if order.mode is MissionMode.inspect:
+            craft = self.craft_context(order.assigned_crew, objective)
+            craft_meta = {key: value for key, value in craft.items() if key != "selected_sections"}
+            parameters["_craft_context"] = craft["selected_sections"]
+            parameters["_craft_context_meta"] = craft_meta
+        order.parameters = parameters
         return {
             "task_class": task_class,
             "memory_count": len(memory),
