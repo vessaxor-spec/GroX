@@ -4,13 +4,35 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
+**Current canonical source:** `main@1409605a98e0fd805a55839321f28364505773f5`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED — OPERATIONAL AUDIT 001 CLOSED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **215 passed, 2 skipped, 354 subtests**; unittest **217 OK, 2 skipped**
+**Current verified regression:** pytest **218 passed, 2 skipped, 354 subtests**; unittest **220 OK, 2 skipped**
+
+## Mission Outcome Truthfulness — issue #70 / PR #71
+
+**Status: COMPLETE — CANONICAL MERGED AND EXACT-TREE QUALIFIED**
+
+- public-readiness testing against `main@16f541480b192ca1f2576e3ed9c3457885b58f5e` showed generic Execute Missions could complete only a bounded repository inventory while plain `completed` could be misread as Commander-objective delivery;
+- issue #70 bounded the repair without weakening authority, adding no generic natural-language writer, no implicit Repair, no command layer, no Crew, no Apex stage, and no release change;
+- the single-Mission Pilot now separates executor lifecycle from Commander-facing Mission outcome and persists `mission_outcome` evidence with `execution`, `effect`, `objective`, `mutation`, `next_authority`, and `verification_scope`;
+- generic Execute inventory fallback now reports `status: scan_only` with `execution_status: completed`, `objective: not_delivered`, `mutation: false`, and `next_authority: explicit_operation_or_repair`;
+- verification PASS on an unsatisfied objective is explicitly scoped to bounded execution evidence only and cannot become proof of objective delivery;
+- supported explicit `repair-write` remains a Repair-authorized mutation path with independent verification and bounded objective-satisfied semantics;
+- independent review found and blocked one unsafe exception-reporting edge before merge: a Repair mutation could remain unresolved after rollback failure while the initial classifier would have said `mutation: false`;
+- final behavior is conservative: completed rollback reports `mutation_rolled_back` and no remaining mutation; rollback failure or divergent state reports `mutation_state_unresolved`, `mutation: true`, and `next_authority: pilot_recovery`;
+- permanent regressions cover generic build intent, repair-like wording under Execute, supported `repair-write`, unresolved mutation after failed rollback, and completed rollback with no remaining mutation;
+- final implementation head `37392878566bbe9ad84eba3b5d723a974cca5164` passed exact-head PR CI `32127267143` across all five required jobs;
+- Python 3.12 qualification: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **218 passed, 2 skipped, 354 subtests**, unittest **220 OK, 2 skipped**, critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6**, and integrated Post-Apex qualification PASS;
+- integrated qualification explicitly retained `new_apex_stage=false`, `qualification_claim=false`, and `release_decision=false`;
+- PR #71 merged as canonical `main@1409605a98e0fd805a55839321f28364505773f5` and issue #70 closed as completed;
+- merged `main` tree `fedb4d54bb2e907f6fc9ff1e0125476c6af4f587` exactly matches the final CI-qualified PR-head tree, proving exact source equivalence;
+- no separate post-merge push run is claimed because none was observable through the available GitHub interface;
+- Commander authority, GorXu sole-orchestrator status, Repair boundaries, verifier independence, Mission Graph semantics, package `0.8.0`, published `v0.8.0`, 82-Crew company, and no-A8 posture remain unchanged.
 
 ## Runtime Integrity Repairs — issues #63 and #64
 
@@ -95,6 +117,7 @@ Verified by source, qualification evidence, and automated testing:
 - Vessel-root discovery now supports explicit `GROX_VESSEL_ROOT` binding, current-checkout discovery, editable-source fallback, and fail-closed refusal to construct an unbound 0-Crew Vessel
 - package/source version metadata is aligned to released `v0.8.0` and remains guarded by both pytest and unittest
 - current published release `v0.8.0` is pinned to `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`; canonical source may advance beyond that immutable release through the protected PR/CI path
+- current protected source includes Mission Outcome Truthfulness with explicit scan-only and mutation-state outcome evidence while package version remains `0.8.0`
 
 ## Company state
 
@@ -264,7 +287,7 @@ Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.
 
 **Current status: APEX QUALIFIED**
 
-The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot, A2 Mission Graph Orchestration, A3 Living Company Intelligence, A4 Executive Exception Loop and Durable Operations, A5 Governed Capability Expansion, and A6 Orchestration Intelligence and Self-Improvement have qualified. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, attributable organizational memory, experienced routing, bounded selective memory, same-Mission crash recovery, checkpointed execution, bounded executive consultation/replanning, cancellation, journaled text-Repair compensation, governed multi-tool execution through Tool Gateway v2, and replayable evidence-backed orchestration evaluation whose proposals cannot self-activate.
+The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot through A7 Apex Qualification have qualified, and Post-Apex Operational Evolution Program 001 has completed. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, attributable organizational memory, experienced routing, bounded selective memory, same-Mission crash recovery, checkpointed execution, bounded executive consultation/replanning, cancellation, journaled text-Repair compensation, governed multi-tool execution through Tool Gateway v2, replayable evidence-backed orchestration evaluation whose proposals cannot self-activate, continuous health/reconstitution/drift/provenance mutation proof, and truthful single-Mission outcome classification that does not overstate bounded execution.
 
 The canonical evolution path is recorded in `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md`.
 
@@ -574,8 +597,8 @@ A7 adds crash-persistent hard cost ceilings and source-normalized, independently
 
 - PR #12 reconciled post-Apex stewardship wording without runtime changes;
 - stabilization run `31909761968` passed documentation scope/diff checks plus **121 pytest passed, 2 skipped** and **123 unittest OK, 2 skipped**;
-- current release `v0.7.1` is pinned to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` and canonical source continues on protected `main`;
-- the released company remains **82 Standing Crew**;
+- historical operational-hardening release `v0.7.1` is pinned to `f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`; the current published release is `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`, and canonical source continues on protected `main`;
+- the company remains **82 Standing Crew**;
 - A1 through A7 remain qualified;
 - future evolution must re-prove affected Apex invariants rather than silently inheriting qualification;
-- no A8 is currently defined: operational Mission evidence should determine the next evolution.
+- no A8 is currently defined: operational Mission evidence and Commander intent should determine future evolution.
