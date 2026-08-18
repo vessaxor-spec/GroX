@@ -258,6 +258,14 @@ class CrewExecutor:
             'evidence':evidence,
         }
 
+    def _craft_selection_evidence(self, order:MissionOrder)->Evidence|None:
+        if order.mode is not MissionMode.inspect:
+            return None
+        meta=_plain(order.parameters.get('_craft_context_meta') or {})
+        if not meta:
+            return None
+        return Evidence('craft_selection',meta)
+
     def _execute_deterministic(self, order:MissionOrder)->TourResult:
         evidence=[]
         try:
@@ -321,10 +329,16 @@ class CrewExecutor:
     def execute(self, order:MissionOrder)->TourResult:
         # The first Crew-cognition slice is deliberately read-only Inspect only.
         # Verify, Repair, and Execute retain their existing deterministic paths.
+        craft_evidence=self._craft_selection_evidence(order)
         if self.cognition_provider is None or order.mode is not MissionMode.inspect:
-            return self._execute_deterministic(order)
+            result=self._execute_deterministic(order)
+            if craft_evidence is not None:
+                result.evidence.insert(0,craft_evidence)
+            return result
         run=self._run_cognition(order)
         prior=list(run.get('evidence') or [])
+        if craft_evidence is not None:
+            prior.insert(0,craft_evidence)
         if run['status']=='denied':
             prior.append(Evidence('crew_cognition_denied',{'error':run['error'],'mode':'read_only_inspect'}))
             return TourResult(
@@ -342,7 +356,7 @@ class CrewExecutor:
             return result
 
         result=self._execute_deterministic(order)
-        result.evidence.extend(prior)
+        result.evidence=prior+result.evidence
         if result.status=='completed':
             result.summary += f"; Crew cognition: {run['work_product']}"
         return result
