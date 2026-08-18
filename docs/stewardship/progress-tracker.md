@@ -4,7 +4,7 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current canonical source:** `main@1409605a98e0fd805a55839321f28364505773f5`
+**Runtime baseline before this documentation synchronization:** `main@1409605a98e0fd805a55839321f28364505773f5`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
