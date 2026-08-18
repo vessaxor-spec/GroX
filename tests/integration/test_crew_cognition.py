@@ -55,6 +55,36 @@ class RecoverableFailureProvider:
         raise CrewCognitionError('injected recoverable provider failure')
 
 
+class FailAfterReadProvider:
+    name='fake-fail-after-read'
+
+    def next_step(self, *, observations, **kwargs):
+        if not observations:
+            return {'action':'fs_read','path':'README.md'}
+        raise CrewCognitionError('injected failure after governed read')
+
+
+class MutatingInputProvider:
+    name='fake-mutating-input'
+
+    def __init__(self):
+        self.snapshots=[]
+
+    def next_step(self, *, order, craft_context, memory_context, observations):
+        self.snapshots.append({
+            'craft_headings':[item['heading'] for item in craft_context],
+            'memory_count':len(memory_context),
+            'observation_count':len(observations),
+        })
+        if not observations:
+            craft_context.clear()
+            memory_context.clear()
+            observations.append({'action':'fake','content':'provider-local mutation'})
+            order['scope'].clear()
+            return {'action':'fs_read','path':'README.md'}
+        return {'action':'finish','work_product':'Provider-local mutations did not alter executor-owned context.'}
+
+
 class CountingProvider:
     name='fake-counting-provider'
 
@@ -147,6 +177,47 @@ class CrewCognitionIntegrationTests(unittest.TestCase):
             self.assertIn('crew_cognition_degraded',kinds)
             self.assertIn('inventory',kinds)
             self.assertIn('test_run',kinds)
+        finally:
+            td.cleanup()
+
+    def test_governed_observation_remains_evidenced_when_provider_then_degrades(self):
+        td,root,p=temp_vessel()
+        try:
+            p.executor.cognition_provider=FailAfterReadProvider()
+            result=p.command('Inspect README evidence',mode=MissionMode.inspect,crew_id='backend-engineer')
+            self.assertEqual(result['status'],'completed')
+            mission=p.store.mission(result['mission_id'])
+            kinds=[e['kind'] for e in mission['evidence']]
+            self.assertIn('crew_cognition_observation',kinds)
+            self.assertIn('crew_cognition_degraded',kinds)
+            observation=_evidence_content(next(e for e in mission['evidence'] if e['kind']=='crew_cognition_observation'))
+            self.assertEqual(observation['action'],'fs_read')
+            self.assertEqual(observation['path'],'README.md')
+        finally:
+            td.cleanup()
+
+    def test_provider_cannot_mutate_executor_owned_context_or_observation_history(self):
+        td,root,p=temp_vessel()
+        try:
+            p.intelligence.remember(
+                kind='semantic',scope='crew',crew_id='backend-engineer',memory_key='immutable-provider-view',
+                content='README evidence remains attributable despite provider-local mutation attempts.',
+                provenance={'mission_id':'M-immutable-view'},
+            )
+            provider=MutatingInputProvider()
+            p.executor.cognition_provider=provider
+            result=p.command('Inspect README evidence',mode=MissionMode.inspect,crew_id='backend-engineer')
+            self.assertEqual(result['status'],'completed')
+            self.assertEqual(len(provider.snapshots),2)
+            self.assertIn('GroX Operational Binding',provider.snapshots[0]['craft_headings'])
+            self.assertIn('GroX Operational Binding',provider.snapshots[1]['craft_headings'])
+            self.assertGreaterEqual(provider.snapshots[0]['memory_count'],1)
+            self.assertEqual(provider.snapshots[1]['memory_count'],provider.snapshots[0]['memory_count'])
+            self.assertEqual(provider.snapshots[0]['observation_count'],0)
+            self.assertEqual(provider.snapshots[1]['observation_count'],1)
+            mission=p.store.mission(result['mission_id'])
+            cognition=_evidence_content(next(e for e in mission['evidence'] if e['kind']=='crew_cognition'))
+            self.assertEqual(cognition['observation_count'],1)
         finally:
             td.cleanup()
 
