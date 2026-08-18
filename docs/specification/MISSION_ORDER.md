@@ -45,12 +45,13 @@ Runtime code must not widen a sealed Order in place. A broader scope, different 
 
 ### Pre-issuance Crew context
 
-Before persistence/sealing, GorXu's Living Company service may add bounded competence context to Order parameters, including:
+Before persistence/sealing, GorXu's Living Company service may add bounded competence context to Order parameters:
 
 - task-class metadata;
 - selected relevant Crew memory;
-- selected Mission-relevant sections from the assigned Standing Crew member's canonical craft card;
-- attribution metadata such as craft digest, selected headings, selected size, source revision, and freshness policy.
+- for **Inspect** Orders only, selected Mission-relevant sections from the assigned Standing Crew member's canonical craft card plus attribution metadata such as craft digest, selected headings, selected size, source revision, and freshness policy.
+
+Verify, Repair, and Execute Orders retain their normal task/memory context without carrying unused selective deep craft from this first cognition seam.
 
 This context is not authority-bearing. It cannot add an allowed action, remove a forbidden action, expand scope, lower risk, change mode, grant a capability, replace the assigned Crew, or satisfy an independent-verifier requirement. Once the Order is sealed, the contextual parameter envelope is immutable with the rest of the issued Order.
 
@@ -71,6 +72,8 @@ Typical authority:
 Mutation is forbidden unless a diagnostic mutation is explicitly listed and safely reversible.
 
 A bounded optional Crew cognition provider may assist an Inspect tour using selected craft, selected memory, and governed observations. The provider is not a new authority source. Its action requests must still be present in the sealed Order and pass the existing Tool Gateway. The first bounded seam permits only `fs_list`, `fs_read`, and `test_run`, with hard step/output/test-run limits and Mission-scope confinement. Policy denial fails closed; recoverable provider failure may degrade to the existing deterministic Inspect executor without authority widening.
+
+Inspect execution records explicit `craft_selection` evidence when selective craft is attached, even when no Crew cognition provider is configured.
 
 ## Repair mode
 
