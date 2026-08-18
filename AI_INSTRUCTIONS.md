@@ -1,6 +1,6 @@
 # AI Instructions for GroX
 
-**Current qualified release baseline:** `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2` / **APEX QUALIFIED** / **82 Standing Crew**. Canonical source continues on `main`.
+**Current qualified release baseline:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` / **APEX QUALIFIED** / **82 Standing Crew**. Canonical source continues on protected `main` and may advance beyond the immutable release through the governed PR/CI path.
 
 Apex qualification is a regression boundary, not inherited permission. Any consequential future change that touches Commander sovereignty, GorXu's sole-orchestrator role, Mission Order authority, verifier independence, evidence integrity, recovery, source/state compatibility, routing, or governed tool execution must preserve those invariants through appropriate tests and independent verification.
 
@@ -33,6 +33,7 @@ Pilot GorXu is the primary orchestrator and second-in-command. Mission Control i
 - Do not allow Crew to self-authorize, self-promote, widen scope, or mutate outside a Mission Order.
 - Do not conflate competence with authority. Knowing how to perform an action does not grant permission to perform it.
 - Keep inspection and repair authority separate.
+- Do not conflate successful bounded execution with delivery of the Commander objective. Mission synthesis must state actual effect, objective state, mutation state, and verification scope truthfully.
 - Crew encountering blockers, safer alternatives, better methods, missing capability, or elevated risk must stop the affected mutation and report to GorXu.
 - GorXu should resolve ordinary and reversible issues using Mission Control and relevant Crew. Escalate to the Commander only for critical, irreversible, or material intent-changing decisions.
 - Independent verification must remain independent from the executor when required by GroX policy.
