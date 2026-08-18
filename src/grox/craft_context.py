@@ -50,8 +50,8 @@ def select_craft_context(
     """Select bounded Mission-relevant specialist craft without granting authority.
 
     Selection is deterministic and lexical. Mandatory safety/operational sections
-    receive budget first, then Mission-relevant sections are selected by token
-    overlap. If the objective has no useful overlap, stable craft fundamentals are
+    must fit in full before Mission-relevant sections may consume the remaining
+    budget. If the objective has no useful overlap, stable craft fundamentals are
     used as bounded fallbacks. Complete craft cards are never injected by default.
     """
     max_sections = max(1, int(max_sections))
@@ -62,6 +62,11 @@ def select_craft_context(
     mandatory = [heading for heading in _MANDATORY_HEADINGS if heading in section_map]
     if len(mandatory) > max_sections:
         raise ValueError("craft section budget is too small for mandatory safety context")
+    mandatory_chars = sum(len(section_map[heading]) for heading in mandatory)
+    if mandatory_chars > max_chars:
+        raise ValueError(
+            f"craft character budget is too small for complete mandatory safety context: {mandatory_chars} > {max_chars}"
+        )
 
     scored: list[tuple[int, int, str]] = []
     for position, (heading, text) in enumerate(sections):
@@ -91,21 +96,12 @@ def select_craft_context(
     used_chars = 0
     clipped = False
 
-    # Mandatory sections cannot be starved by an earlier long relevant section.
-    for index, heading in enumerate(mandatory):
+    # Safety/operational binding is never silently clipped to make room for
+    # optional craft. If it cannot fit in full, selection fails closed above.
+    for heading in mandatory:
         text = section_map[heading]
-        remaining = max_chars - used_chars
-        mandatory_left = len(mandatory) - index
-        if remaining <= 0:
-            raise ValueError("craft character budget cannot represent mandatory safety context")
-        fair_share = max(1, remaining // mandatory_left)
-        chosen = text[:fair_share].rstrip()
-        if len(chosen) < len(text):
-            clipped = True
-        if not chosen:
-            raise ValueError(f"craft character budget cannot represent mandatory section: {heading}")
-        context.append({"heading": heading, "content": chosen})
-        used_chars += len(chosen)
+        context.append({"heading": heading, "content": text})
+        used_chars += len(text)
 
     # Relevant/fallback craft receives only the remaining bounded budget.
     for heading in optional:
