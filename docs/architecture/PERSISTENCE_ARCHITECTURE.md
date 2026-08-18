@@ -1,6 +1,6 @@
 # GroX Persistence Architecture
 
-**Qualified release baseline:** `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`. Canonical source continues on `main`. Snapshot source binding, ancestor compatibility control, and fail-closed unrelated-source restore are part of the Apex regression boundary.
+**Qualified release baseline:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`. Canonical source continues on protected `main` and may advance beyond the immutable release through governed PR/CI. Snapshot source binding, ancestor compatibility control, and fail-closed unrelated-source restore are part of the Apex regression boundary.
 
 ## Decision
 
