@@ -14,6 +14,13 @@ _GENERIC_TAGS = {
     "analysis", "code", "engineer", "engineering", "evidence", "inspect",
     "repair", "review", "service", "verify", "write",
 }
+_NON_QUALITY_EVIDENCE = frozenset({
+    "craft_selection",
+    "crew_cognition",
+    "crew_cognition_observation",
+    "crew_cognition_degraded",
+    "crew_cognition_denied",
+})
 _RISK_RANK = {RiskClass.low: 0, RiskClass.medium: 1, RiskClass.high: 2, RiskClass.critical: 3}
 
 _ROUTING_COMPONENT_KEYS = ("competence", "reliability", "evidence_quality", "load", "cost", "latency", "risk", "experience", "preference")
@@ -215,7 +222,7 @@ class LivingCompanyIntelligence:
         verified: bool | None = None,
         cost_units: float = 0.0,
     ) -> None:
-        kinds = {e.kind for e in result.evidence}
+        kinds = {e.kind for e in result.evidence if e.kind not in _NON_QUALITY_EVIDENCE}
         evidence_quality = min(1.0, len(kinds) / 3.0)
         tests = [e for e in result.evidence if e.kind == "test_run"]
         if tests and all(e.content.get("returncode") == 0 for e in tests):
