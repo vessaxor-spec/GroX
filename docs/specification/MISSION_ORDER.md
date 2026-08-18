@@ -1,6 +1,6 @@
 # GroX Mission Order
 
-**Current contract status:** qualified and regression-protected in GroX `v0.7.1`. Issued authority is immutable; post-issuance scope, grant, verifier, stop-condition, or nested parameter widening requires a newly issued Order through GorXu.
+**Current contract status:** qualified and regression-protected in GroX `v0.8.0`. Issued authority is immutable; post-issuance scope, grant, verifier, stop-condition, or nested parameter widening requires a newly issued Order through GorXu. Canonical source may advance beyond the immutable release through protected `main`.
 
 A Mission Order is the bounded operational contract through which Pilot GorXu assigns work to Crew.
 
@@ -77,6 +77,27 @@ There is no implicit "while I am here" authority.
 
 Execute mode covers bounded work that is neither inspection-only nor a repair mutation. Any side-effecting action remains subject to explicit capability and action grants.
 
+A generic Execute directive that has no explicitly governed operation may complete only a bounded context inventory. In the single-Mission Pilot path, that execution is reported at Mission level as `scan_only`, not as proof that the Commander objective was delivered.
+
+## Mission outcome versus Order execution
+
+Order execution state and Commander-facing Mission outcome are separate facts.
+
+A bounded Order may finish its permitted work successfully while the wider Commander objective remains `not_delivered` or `not_proven`. Pilot GorXu therefore persists a `mission_outcome` evidence record for the single-Mission path with:
+
+- `execution` — executor lifecycle result;
+- `effect` — what the bounded execution actually did;
+- `objective` — whether Commander-objective delivery was satisfied, not delivered, or not proven;
+- `mutation` — whether a mutation remains in the resulting state;
+- `next_authority` — any narrower authority path required to continue;
+- `verification_scope` — what the verification result actually covers.
+
+A generic inventory fallback under Execute is `effect: scan_only`, `objective: not_delivered`, and `mutation: false`. If verification is required in that path, a PASS proves the bounded execution evidence only; it does not transform the scan into objective delivery.
+
+For supported Repair, successful verified mutation may satisfy the bounded objective. If Repair fails after mutation, outcome reporting is conservative: a completed rollback reports `mutation_rolled_back` with no remaining mutation, while failed rollback or divergent mutation state reports `mutation_state_unresolved`, `mutation: true`, and returns control to Pilot recovery.
+
+Outcome classification never grants authority. Explicit Repair remains the mutation authority path.
+
 ## Verify mode
 
 Verification receives its own Mission Order and authority envelope. A verifier should not receive mutation capability unless remediation of a verification harness is itself the explicit task.
@@ -107,4 +128,4 @@ GorXu may:
 
 ## Closure
 
-An order is complete only when its required outcome, evidence, verification state, exceptions, and final disposition have been recorded in Mission state.
+An Order is closed only when its bounded execution, evidence, verification state, exceptions, and final disposition have been recorded. Order closure does not by itself prove the wider Commander objective was delivered; Mission synthesis records that separately and must not overstate it.
