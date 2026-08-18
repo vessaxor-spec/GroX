@@ -1,6 +1,6 @@
 # GroX Architecture
 
-**Qualified release baseline:** GroX `v0.7.1@f7ed57dc9dac2eb9de7857fffb743ecdf27f05f2`. Canonical source continues on `main`. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. A1–A7 are qualified for the current project-hosted operating model.
+**Qualified release baseline:** GroX `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`. Canonical source continues on protected `main` and may advance beyond that immutable release through governed PR/CI. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. A1–A7 are qualified for the current project-hosted operating model.
 
 ## Purpose
 
@@ -104,6 +104,23 @@ Inspection and mutation are separate modes.
 Verification is independent where policy requires it. The executor may provide self-checks, but self-checks are not independent verification.
 
 Verification should evaluate the evidence package, requested outcome, authority compliance, and actual resulting state.
+
+## Mission outcome truthfulness
+
+Successful bounded execution is not automatically proof that the Commander objective was delivered. In the single-Mission Pilot path, GorXu separates executor lifecycle state from Commander-facing Mission outcome and persists `mission_outcome` evidence containing:
+
+- execution state;
+- actual effect;
+- objective delivery/proof state;
+- remaining mutation state;
+- next required authority path where applicable;
+- verification scope.
+
+A generic Execute fallback that only inventories bounded Mission context is reported as `scan_only` at Mission level while retaining `execution_status: completed`. Its objective is `not_delivered`, mutation is false, and any verification PASS is explicitly scoped to the bounded execution evidence rather than the requested objective.
+
+Supported explicit Repair remains the mutation authority path. A successful verified `write_text` Repair may report the bounded objective satisfied. A failed Repair that completes rollback reports `mutation_rolled_back` and no remaining mutation. If rollback fails or mutation state diverges, GroX reports `mutation_state_unresolved`, preserves `mutation: true`, and returns the condition to Pilot recovery rather than claiming safe completion.
+
+Outcome classification is evidence and synthesis. It does not grant capability, Repair authority, or broader scope, and it does not change Mission Graph authority semantics.
 
 ## Mission durability
 
