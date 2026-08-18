@@ -50,7 +50,7 @@ def select_craft_context(
     """Select bounded Mission-relevant specialist craft without granting authority.
 
     Selection is deterministic and lexical. Mandatory safety/operational sections
-    are retained when present, then Mission-relevant sections are chosen by token
+    receive budget first, then Mission-relevant sections are selected by token
     overlap. If the objective has no useful overlap, stable craft fundamentals are
     used as bounded fallbacks. Complete craft cards are never injected by default.
     """
@@ -59,14 +59,13 @@ def select_craft_context(
     sections = _sections(card)
     section_map = {heading: text for heading, text in sections}
     objective_words = _words(objective)
-
-    selected_headings: list[str] = [
-        heading for heading in _MANDATORY_HEADINGS if heading in section_map
-    ]
+    mandatory = [heading for heading in _MANDATORY_HEADINGS if heading in section_map]
+    if len(mandatory) > max_sections:
+        raise ValueError("craft section budget is too small for mandatory safety context")
 
     scored: list[tuple[int, int, str]] = []
     for position, (heading, text) in enumerate(sections):
-        if heading in selected_headings:
+        if heading in mandatory:
             continue
         heading_overlap = len(objective_words & _words(heading))
         body_overlap = len(objective_words & _words(text))
@@ -75,33 +74,48 @@ def select_craft_context(
             scored.append((-score, position, heading))
     scored.sort()
 
+    optional: list[str] = []
     for _, _, heading in scored:
-        if heading not in selected_headings:
-            selected_headings.append(heading)
-        if len(selected_headings) >= max_sections:
+        if heading not in optional:
+            optional.append(heading)
+        if len(mandatory) + len(optional) >= max_sections:
             break
-
-    if len(selected_headings) < max_sections:
+    if len(mandatory) + len(optional) < max_sections:
         for heading in _FALLBACK_HEADINGS:
-            if heading in section_map and heading not in selected_headings:
-                selected_headings.append(heading)
-            if len(selected_headings) >= max_sections:
+            if heading in section_map and heading not in mandatory and heading not in optional:
+                optional.append(heading)
+            if len(mandatory) + len(optional) >= max_sections:
                 break
-
-    selected_set = set(selected_headings[:max_sections])
-    ordered = [(heading, text) for heading, text in sections if heading in selected_set]
 
     context: list[dict[str, Any]] = []
     used_chars = 0
     clipped = False
-    for heading, text in ordered:
+
+    # Mandatory sections cannot be starved by an earlier long relevant section.
+    for index, heading in enumerate(mandatory):
+        text = section_map[heading]
+        remaining = max_chars - used_chars
+        mandatory_left = len(mandatory) - index
+        if remaining <= 0:
+            raise ValueError("craft character budget cannot represent mandatory safety context")
+        fair_share = max(1, remaining // mandatory_left)
+        chosen = text[:fair_share].rstrip()
+        if len(chosen) < len(text):
+            clipped = True
+        if not chosen:
+            raise ValueError(f"craft character budget cannot represent mandatory section: {heading}")
+        context.append({"heading": heading, "content": chosen})
+        used_chars += len(chosen)
+
+    # Relevant/fallback craft receives only the remaining bounded budget.
+    for heading in optional:
         remaining = max_chars - used_chars
         if remaining <= 0:
             clipped = True
             break
-        chosen = text
-        if len(chosen) > remaining:
-            chosen = chosen[:remaining].rstrip()
+        text = section_map[heading]
+        chosen = text[:remaining].rstrip()
+        if len(chosen) < len(text):
             clipped = True
         if not chosen:
             continue
