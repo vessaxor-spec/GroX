@@ -48,10 +48,10 @@ Authority may narrow as it travels downward. It may not widen without a new deci
 1. **Commander Seat:** CLI/bridge for directives, status, intervention, and review.
 2. **Pilot GorXu:** interprets intent, plans, consults Mission Control, selects Crew, issues Orders, and synthesizes outcomes.
 3. **Mission Control:** risk, authority, routing, verification, evidence, and advisory policy.
-4. **Standing Crew:** durable organizational identity with fresh mission-specific tours, bounded selected craft/memory context, and optional governed read-only cognition when separately configured.
+4. **Standing Crew:** durable organizational identity with fresh mission-specific tours, bounded relevant memory, selective deep craft on Inspect tours, and optional governed read-only cognition when separately configured.
 5. **Tool Gateway:** deny-wins capability enforcement and host/Vessel confinement.
 6. **Mission Store:** durable Mission, Order, Evidence, Crew, memory, and performance state.
-7. **Living Company Intelligence:** advisory memory retrieval, selective specialist craft context, and experienced eligible-Crew ranking under GorXu.
+7. **Living Company Intelligence:** advisory memory retrieval, Inspect-only selective specialist craft context, and experienced eligible-Crew ranking under GorXu.
 8. **Durable Operations:** private graph-run/checkpoint/exception/mutation ledger for safe resume and compensation under GorXu.
 9. **Executive Exception Loop:** deterministic classification and bounded consultation/replan policy under GorXu.
 10. **Verification:** independent verification path where policy requires it.
@@ -63,7 +63,7 @@ Selective Crew cognition is not another runtime command layer. It is an optional
 
 Crew are logically persistent organizational identities with durable dossiers, competencies, procedures, history, memory, and canonical specialist craft. They need not remain as live model processes while asleep.
 
-Each wake creates a fresh tour context containing only what is needed for the current Mission plus relevant retrieved memory and bounded Mission-relevant craft. The complete historical memory store and complete deep craft card are not injected by default. This preserves continuity and expertise without allowing old working context or million-character craft libraries to accumulate indiscriminately.
+Each wake creates a fresh tour context containing only what is needed for the current Mission plus relevant retrieved memory. A bounded Inspect tour may additionally receive Mission-relevant craft sections from that Crew member's canonical craft card. Verify, Repair, and Execute do not carry unused deep craft in the first cognition seam. The complete historical memory store and complete deep craft card are never injected by default.
 
 Crew competence and Mission authority are separate:
 
@@ -109,15 +109,17 @@ The first bounded Crew cognition seam does not operate in Repair. Model or craft
 
 ## Selective craft and Crew cognition
 
-After Crew routing and before Mission Order sealing, Living Company Intelligence may attach bounded competence context for the assigned Standing Crew member.
+After Crew routing and before an **Inspect** Mission Order is sealed, Living Company Intelligence may attach bounded Mission-relevant craft for the assigned Standing Crew member. Other modes retain their existing task/memory context without selective deep craft.
 
 The selective-craft path:
 
 - reads only the assigned active Crew member's canonical craft card;
-- reserves context for `Purpose`, `Safety Boundaries`, and `GroX Operational Binding` when present;
-- selects additional Mission-relevant sections deterministically;
+- requires `Purpose`, `Safety Boundaries`, and `GroX Operational Binding` to fit **in full** when present;
+- fails closed rather than truncating mandatory safety/operational binding when the configured budget is insufficient;
+- selects additional Mission-relevant sections deterministically from the remaining budget;
 - defaults to at most **6 sections / 4,500 characters**;
 - records the full-card SHA-256, selected headings/size, source revision, and freshness policy;
+- emits explicit `craft_selection` evidence during Inspect execution;
 - never treats craft prose as authority;
 - never injects the complete deep card by default.
 
