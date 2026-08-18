@@ -10,7 +10,7 @@ Living Company Intelligence is a native advisory service under Pilot GorXu.
 
 **Commander → Pilot GorXu → Divisions → Standing Crew**
 
-The intelligence service may rank eligible Crew and retrieve relevant memory and craft context. It may not:
+The intelligence service may rank eligible Crew and retrieve relevant memory and, for bounded Inspect tours, selective craft context. It may not:
 
 - create a new command layer;
 - grant capabilities or mutation authority;
@@ -69,27 +69,28 @@ Historical performance may change the winner among otherwise eligible Crew. It c
 
 ## Context-isolated tours
 
-Every Mission Order remains a fresh bounded tour. Living Company Intelligence adds only pre-issuance competence context and attribution metadata:
+Every Mission Order remains a fresh bounded tour. Living Company Intelligence continues to add:
 
 - a stable task-class label;
 - a capped relevant-memory context;
-- a bounded selective specialist-craft context;
-- routing/context-selection evidence.
+- routing/context-selection metadata.
 
-The memory context remains bounded by item count and character budget. Specialist craft is selected only from the routed Standing Crew member's canonical craft card. The complete craft card is not injected by default.
+For **Inspect** tours only, Living Company Intelligence may also add bounded selective specialist craft before the Order is sealed. Verify, Repair, and Execute retain their existing memory/routing context without carrying unused deep craft.
 
 ### Selective specialist craft
 
-The post-Apex selective-craft path uses deterministic section selection after Crew routing and before Mission Order sealing.
+The post-Apex selective-craft path uses deterministic section selection after Crew routing and before an Inspect Mission Order is sealed.
 
 Default limits are:
 
 - at most **6** selected craft sections;
 - at most **4,500** selected craft characters.
 
-When present, `Purpose`, `Safety Boundaries`, and `GroX Operational Binding` receive reserved context budget before task-relevant optional sections. Remaining sections are selected by bounded lexical relevance with stable fallback fundamentals. The selected context carries the full-card SHA-256 plus source revision and freshness-policy metadata so the tour remains attributable to its canonical craft source.
+When present, `Purpose`, `Safety Boundaries`, and `GroX Operational Binding` must fit **in full** before optional task-relevant craft is selected. If the complete mandatory set cannot fit within the configured budget, selection fails closed rather than truncating safety/operational binding. Remaining sections are selected by bounded lexical relevance with stable fallback fundamentals.
 
-Craft context is competence context only. A craft card cannot add a capability, widen scope, lower risk, authorize Repair, override a forbidden action, self-route Crew, or satisfy verifier independence.
+The selected context carries the full-card SHA-256 plus source revision and freshness-policy metadata. Inspect execution emits explicit `craft_selection` evidence so selection remains attributable even when no cognition provider is configured.
+
+The complete craft card is never injected by default. Craft context is competence context only: a craft card cannot add a capability, widen scope, lower risk, authorize Repair, override a forbidden action, self-route Crew, or satisfy verifier independence.
 
 ## Bounded read-only Crew cognition
 
@@ -100,7 +101,7 @@ GroX exposes a provider-neutral Crew cognition seam for **Inspect** tours when a
 - the existing bounded relevant Crew memory;
 - observations returned only by governed read/test actions already allowed by that Order.
 
-The first bounded seam deliberately excludes Verify, Repair, and Execute. Those modes retain their existing deterministic execution paths.
+The first bounded seam deliberately excludes Verify, Repair, and Execute. Those modes retain their existing deterministic execution paths and do not receive selective deep craft through this seam.
 
 Within an Inspect tour, a cognitive Crew provider may request only:
 
