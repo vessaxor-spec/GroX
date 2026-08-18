@@ -4,7 +4,7 @@ import unittest
 from grox.contracts import TourResult
 from grox.pilot import PilotGorXu
 from grox.runtime.executor import CrewExecutor
-from tests._support import temp_vessel
+from tests._support import add_synthetic_crew, temp_vessel
 
 EXTRA_CREW=[
     {'crew_id':'researcher','division':'intelligence','title':'Researcher','capabilities':['repo_read','analysis'], 'tags':['research','evidence']},
@@ -17,7 +17,7 @@ EXTRA_CREW=[
 def graph_vessel():
     td,root,_=temp_vessel()
     for d in EXTRA_CREW:
-        (root/'configs/crew/dossiers'/f"{d['crew_id']}.json").write_text(json.dumps(d))
+        add_synthetic_crew(root,d)
     return td,root,PilotGorXu(root,reasoner=None)
 
 
