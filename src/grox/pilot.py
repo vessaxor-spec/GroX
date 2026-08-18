@@ -117,12 +117,18 @@ class PilotGorXu:
         operation=str(order.parameters.get('operation') or '')
         verification_scope='bounded_execution_evidence' if verification else None
         if result.status!='completed':
+            rollback=next((ev.content for ev in reversed(result.evidence) if ev.kind=='mutation_rollback'),None)
+            rollback_completed=isinstance(rollback,dict) and rollback.get('status')=='rolled_back'
+            exception_type=str((result.exception or {}).get('type') or '')
+            mutation_observed='mutation' in kinds
+            mutation_unresolved=(mutation_observed and not rollback_completed) or exception_type=='mutation_state_diverged'
+            effect='mutation_rolled_back' if mutation_observed and rollback_completed else ('mutation_state_unresolved' if mutation_unresolved else 'exception')
             return {
                 'execution':result.status,
-                'effect':'exception',
+                'effect':effect,
                 'objective':'not_delivered',
-                'mutation':False,
-                'next_authority':None,
+                'mutation':mutation_unresolved,
+                'next_authority':'pilot_recovery' if mutation_unresolved else None,
                 'verification_scope':verification_scope,
             }
         if order.mode is MissionMode.execute and 'inventory' in kinds:
