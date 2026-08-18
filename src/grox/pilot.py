@@ -112,6 +112,56 @@ class PilotGorXu:
         self.store.add_evidence(mission_id,'GORXU-FAULT',Evidence('unexpected_defect',payload))
         return payload
 
+    def _mission_outcome(self, order:MissionOrder, result:TourResult, verification:dict|None)->dict[str,Any]:
+        kinds={ev.kind for ev in result.evidence}
+        operation=str(order.parameters.get('operation') or '')
+        verification_scope='bounded_execution_evidence' if verification else None
+        if result.status!='completed':
+            return {
+                'execution':result.status,
+                'effect':'exception',
+                'objective':'not_delivered',
+                'mutation':False,
+                'next_authority':None,
+                'verification_scope':verification_scope,
+            }
+        if order.mode is MissionMode.execute and 'inventory' in kinds:
+            return {
+                'execution':'completed',
+                'effect':'scan_only',
+                'objective':'not_delivered',
+                'mutation':False,
+                'next_authority':'explicit_operation_or_repair',
+                'verification_scope':verification_scope,
+            }
+        if order.mode is MissionMode.repair and operation=='write_text':
+            mutated='mutation' in kinds
+            return {
+                'execution':'completed',
+                'effect':'mutation_applied' if mutated else 'mutation_verified',
+                'objective':'satisfied',
+                'mutation':mutated,
+                'next_authority':None,
+                'verification_scope':verification_scope,
+            }
+        if order.mode in {MissionMode.inspect,MissionMode.verify}:
+            return {
+                'execution':'completed',
+                'effect':'inspection',
+                'objective':'not_proven',
+                'mutation':False,
+                'next_authority':None,
+                'verification_scope':verification_scope,
+            }
+        return {
+            'execution':'completed',
+            'effect':operation or 'governed_execute',
+            'objective':'not_proven',
+            'mutation':False,
+            'next_authority':None,
+            'verification_scope':verification_scope,
+        }
+
     def command(self, directive:str, *, mode:MissionMode|None=None, risk:RiskClass|None=None, crew_id:str|None=None, scope:str='.', parameters:dict|None=None)->dict:
         brief,cognition_error,cognition_usage=self._interpret(directive)
         mode=self._reconcile_mode(directive,mode,brief)
@@ -172,13 +222,27 @@ class PilotGorXu:
                 crew_id=crew.crew_id,mission_id=mission_id,order_id=order.order_id,task_class=order.parameters['_task_class'],
                 result=result,latency_ms=elapsed_ms,risk=risk,verified=verification['ok'] if verification else None,
             )
+            outcome=self._mission_outcome(order,result,verification)
+            self.store.add_evidence(mission_id,order.order_id,Evidence('mission_outcome',outcome))
             summary=f"GorXu: {result.summary}"
             if brief: summary += f" | Cognitive strategy: {brief.recommended_option or 'structured interpretation'} ({brief.confidence:.2f})"
             if cognition_error: summary += " | Cognitive provider degraded; deterministic fallback used"
             if result.exception: summary += f" | Exception returned to Pilot: {result.exception['type']}"
-            if verification: summary += f" | Verification: {'PASS' if verification['ok'] else 'FAIL'} by {verification['verifier']}"
-            self.store.update_mission(mission_id,'completed' if result.status=='completed' else 'needs_pilot_decision',summary)
-            return {'mission_id':mission_id,'mode':mode.value,'risk':risk.value,'crew':crew.crew_id,'status':result.status,'summary':summary,'verification':verification,'exception':result.exception,'cognition':brief.to_dict() if brief else None,'cognition_error':cognition_error}
+            summary += (
+                f" | Outcome: effect={outcome['effect']}; objective={outcome['objective']}; "
+                f"mutation={'yes' if outcome['mutation'] else 'no'}"
+            )
+            if outcome['next_authority']:
+                summary += f"; next_authority={outcome['next_authority']}"
+            if verification:
+                scope_note='; bounded execution evidence only' if outcome['objective']!='satisfied' else ''
+                summary += f" | Verification: {'PASS' if verification['ok'] else 'FAIL'} by {verification['verifier']}{scope_note}"
+            mission_status='scan_only' if result.status=='completed' and outcome['effect']=='scan_only' else ('completed' if result.status=='completed' else 'needs_pilot_decision')
+            self.store.update_mission(mission_id,mission_status,summary)
+            public_status=mission_status if mission_status=='scan_only' else result.status
+            return {'mission_id':mission_id,'mode':mode.value,'risk':risk.value,'crew':crew.crew_id,'status':public_status,'execution_status':result.status,
+                    'mission_status':mission_status,'outcome':outcome,'summary':summary,'verification':verification,'exception':result.exception,
+                    'cognition':brief.to_dict() if brief else None,'cognition_error':cognition_error}
         except LookupError as exc:
             summary=f"GorXu bounded routing exception: {exc}"
             self.store.add_graph_event(
