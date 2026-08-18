@@ -2,7 +2,7 @@
 
 ## Current position
 
-GroX `v0.8.0` is the current published Post-Apex Operational Evolution baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, a source-backed privacy-safe Mission-to-source provenance design, an implemented private receipt/public commitment capability with continuous detector proof, a canonical independently verified integrated Post-Apex qualification, a compact 82/82 Standing Crew cognitive directory with provider-neutral usage telemetry and cache-friendly framing, and post-release Mission Outcome Truthfulness that distinguishes bounded execution from Commander-objective delivery without widening authority.
+GroX `v0.8.0` is the current published Post-Apex Operational Evolution baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, project/session-bound GorXu cognition, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, a controlled evidence-supported HOT/WARM/COLD context policy that is not activated in Pilot runtime, digest-bound A6 longitudinal operational drift analysis with advisory-only findings, a source-backed privacy-safe Mission-to-source provenance design, an implemented private receipt/public commitment capability with continuous detector proof, a canonical independently verified integrated Post-Apex qualification, a compact 82/82 Standing Crew cognitive directory with provider-neutral usage telemetry and cache-friendly framing, post-release Mission Outcome Truthfulness, and a canonical bounded provider-neutral Inspect Crew cognition seam that consumes selective specialist craft plus bounded Crew memory without widening authority. Live model-backed Standing Crew cognition remains separately unqualified.
 
 Native command architecture:
 
@@ -32,6 +32,7 @@ Native command architecture:
 - A6 longitudinal operational drift analysis is operational with frozen evidence bindings, fail-closed UNKNOWN semantics, first-class invariant regressions, routing concentration signals, and continuous 4/4 mutation proof.
 - Privacy-safe source authorization receipts are implemented in the existing private StateStore plane with exact Repair/scope gating, nonce-bound public commitments, exact-head verification, replay/class-downgrade protection, and continuous 6/6 mutation proof.
 - GorXu cognitive context now uses an 82/82 descriptive Standing Crew Directory rather than serializing capability grants and expanded routing tags on every cognitive call; provider usage telemetry is observational only and provider caching remains optional.
+- Inspect tours may now receive bounded Mission-relevant specialist craft with explicit `craft_selection` evidence and may use the CI-qualified provider-neutral read-only Crew cognition seam when a separately supplied provider is present; Verify, Repair, and Execute remain on their existing deterministic paths.
 
 ## Apex critical path
 
@@ -103,7 +104,7 @@ Qualification evidence:
 
 Decision gate: hierarchical shortlist routing, embeddings, vector databases, and extra model-routing stages remain deferred because the bounded compact-directory optimization produced a material reduction without adding architecture. Reconsider only if real provider usage evidence shows further need.
 
-Adjacent but separate: future model-backed Standing Crew cognition should activate Mission-relevant craft sections plus bounded relevant Crew memory rather than inject complete deep craft cards per summon. Issue #60 does not activate that future capability.
+The adjacent capability identified here has since advanced through issue #73 / PR #74: GroX now activates bounded Mission-relevant craft plus bounded Crew memory for Inspect tours and has a controlled provider-neutral read-only Crew cognition seam. This does **not** establish live model-backed Standing Crew; live provider qualification remains separate.
 
 Preserved invariants:
 
@@ -175,11 +176,42 @@ Qualification evidence:
 
 No separate post-merge push run is claimed because none was observable through the available GitHub interface. Commander/GorXu authority, Repair boundaries, verifier independence, Mission Graph semantics, Crew membership, package version, published release, and Apex-stage state are unchanged.
 
+## Selective Deep-Craft Crew Cognition — issue #73 / PR #74
+
+**Status: COMPLETE — CANONICAL MERGED AND EXACT-TREE QUALIFIED.** This is bounded protected-main post-Apex evolution. It is not A8, does not move the `v0.8.0` release tag, and does not establish live model-backed Standing Crew.
+
+Implemented:
+
+1. Inspect-only selective specialist craft reads only the routed Standing Crew member's canonical craft card and selects at most **6 sections / 4,500 characters** by default;
+2. `Purpose`, `Safety Boundaries`, and `GroX Operational Binding` must fit in full when present or craft selection fails closed;
+3. complete deep craft cards are never injected by default; Verify, Repair, and Execute do not carry unused deep craft from this seam;
+4. Inspect execution emits attributable `craft_selection` evidence with full-card digest, selected headings/size, source revision, and freshness policy;
+5. a provider-neutral Inspect-only Crew cognition seam may consume the sealed Order envelope copy, selective craft, bounded Crew memory, and governed observations;
+6. cognitive action requests are limited to already-authorized `fs_list`, `fs_read`, and `test_run` through the existing Mission Order + Tool Gateway boundary;
+7. default cognitive bounds are **4 steps**, **1 test run**, **8,000 observation characters**, and **4,000 work-product characters**;
+8. mutation/scope escape fails closed; known recoverable provider failure degrades only to the existing deterministic Inspect path; provider-local mutation cannot alter executor-owned context;
+9. cognition/context bookkeeping is excluded from Living Company evidence-quality scoring so the seam cannot improve routing history merely by creating extra evidence kinds;
+10. controlled fake-provider tests exercise the seam for single Missions and Mission Graph Inspect nodes while Verify remains independently deterministic.
+
+Qualification evidence:
+
+- canonical starting point `main@8ffbee2f14e0e915e721835e9e84cc2289fc9661`;
+- final implementation head `db83c557e378e6e3a3471318b50e6b82a5d68641`;
+- exact-head CI `32166921610` / run 232: PASS all five required jobs;
+- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **235 passed, 2 skipped, 354 subtests**, unittest **237 OK, 2 skipped**;
+- critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6** killed; integrated Post-Apex qualification PASS;
+- independent exact-head review: PASS with no remaining material blocker;
+- PR #74 merged as `main@8420b9cbe5ca046ded87c8feaec83eca7cfdc475` and issue #73 closed as completed;
+- canonical merge tree `170bbfb9fe483b1faae362adc15ec944ca5c96c9` exactly matches the CI-tested synthetic PR merge tree, proving exact source equivalence;
+- no separate post-merge push run is claimed because none was observable through the available GitHub interface.
+
+Claim boundary: GroX now has a **canonical CI-qualified provider-neutral controlled Crew cognition seam**. A live project/session or external model provider has **not** yet been operationally qualified for Standing Crew and remains a separate future evidence gate.
+
 ## Post-Apex operating posture
 
-There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** `v0.8.0` is published from the verified Program 001 baseline. Later protected-main hardening such as Mission Outcome Truthfulness remains source evolution beyond the immutable release and does not itself create a new program stage or release. Future evolution requires new Commander intent. External ideas do not become authority or qualification evidence merely by being useful elsewhere.
+There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** `v0.8.0` is published from the verified Program 001 baseline. Later protected-main hardening and evolution, including Mission Outcome Truthfulness and Selective Deep-Craft Crew Cognition, remain source evolution beyond the immutable release and do not themselves create a new program stage or release. Future evolution requires new Commander intent. External ideas do not become authority or qualification evidence merely by being useful elsewhere.
 
-Known deliberate limits remain candidates, not automatic commitments: autonomous memory consolidation, generic external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP, and optional external-agent interoperability.
+The immediate adjacent evidence candidate is **live Crew cognition provider qualification** using the already-bounded Inspect seam. It is not automatically authorized or claimed. Other known deliberate limits remain candidates, not commitments: autonomous memory consolidation, generic external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP, and optional external-agent interoperability.
 
 ## Post-Apex Operational Evolution Program 001
 
@@ -205,8 +237,10 @@ Do not:
 - retain non-standing Crew as sleeping operational identities;
 - remove `orchestration-evaluation-analyst` based only on ClaudX naming decisions;
 - treat ClaudX synthetic token-savings as GroX proof;
-- let health, reconstitution, context heat, evaluation, telemetry, or provenance metadata grant mutation authority.
+- let health, reconstitution, context heat, evaluation, telemetry, provenance, craft, or cognition metadata grant mutation authority;
+- let craft/cognition bookkeeping improve Living Company routing history merely by adding evidence kinds;
+- claim live model-backed Standing Crew from controlled-provider CI.
 
 ## Release posture
 
-Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. `v0.8.0` is published from `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` after exact-head candidate CI `32014558365` and canonical post-merge CI `32015076306` passed. Issue #55 is complete. Canonical source has since advanced through protected-main hardening without moving the immutable release tag. Future release or evolution decisions remain Commander-controlled. No new Apex stage or A8 is implied.
+Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. `v0.8.0` is published from `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` after exact-head candidate CI `32014558365` and canonical post-merge CI `32015076306` passed. Issue #55 is complete. Canonical source has since advanced through protected-main hardening and bounded post-Apex evolution without moving the immutable release tag. Future release or evolution decisions remain Commander-controlled. No new Apex stage or A8 is implied.
