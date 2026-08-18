@@ -7,6 +7,7 @@ from typing import Any, Iterable
 
 from .contracts import MissionOrder, RiskClass, TourResult
 from .crew.roster import CrewDossier, CrewRoster
+from .craft_context import select_craft_context
 from .state import StateStore
 
 _GENERIC_TAGS = {
@@ -54,11 +55,22 @@ class RoutingDecision:
 class LivingCompanyIntelligence:
     """Evidence-backed memory retrieval and experienced Crew ranking under GorXu."""
 
-    def __init__(self, store: StateStore, roster: CrewRoster, *, memory_items: int = 6, memory_chars: int = 3000):
+    def __init__(
+        self,
+        store: StateStore,
+        roster: CrewRoster,
+        *,
+        memory_items: int = 6,
+        memory_chars: int = 3000,
+        craft_sections: int = 6,
+        craft_chars: int = 4500,
+    ):
         self.store = store
         self.roster = roster
         self.memory_items = max(1, int(memory_items))
         self.memory_chars = max(256, int(memory_chars))
+        self.craft_sections = max(1, int(craft_sections))
+        self.craft_chars = max(256, int(craft_chars))
         self._known_tags = {tag for crew in roster.all() for tag in crew.tags}
 
     def task_class(self, objective: str) -> str:
@@ -159,15 +171,33 @@ class LivingCompanyIntelligence:
                 break
         return selected
 
+    def craft_context(self, crew_id: str, objective: str) -> dict[str, Any]:
+        card = self.roster.craft_card(crew_id)
+        return select_craft_context(
+            card,
+            objective,
+            max_sections=self.craft_sections,
+            max_chars=self.craft_chars,
+        )
+
     def inject_order_context(self, order: MissionOrder, objective: str) -> dict[str, Any]:
         task_class = self.task_class(objective)
         memory = self.memory_context(order.assigned_crew, objective, task_class=task_class)
+        craft = self.craft_context(order.assigned_crew, objective)
+        craft_meta = {key: value for key, value in craft.items() if key != "selected_sections"}
         order.parameters = {
             **dict(order.parameters),
             "_task_class": task_class,
             "_memory_context": memory,
+            "_craft_context": craft["selected_sections"],
+            "_craft_context_meta": craft_meta,
         }
-        return {"task_class": task_class, "memory_count": len(memory), "memory_ids": [m["memory_id"] for m in memory if m["memory_id"] is not None]}
+        return {
+            "task_class": task_class,
+            "memory_count": len(memory),
+            "memory_ids": [m["memory_id"] for m in memory if m["memory_id"] is not None],
+            "craft": craft_meta,
+        }
 
     def record_performance(
         self,
