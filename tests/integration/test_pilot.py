@@ -16,7 +16,32 @@ class PilotTest(unittest.TestCase):
         try:
             result = p.command("Inspect architecture and report", mode=MissionMode.inspect)
             self.assertEqual(result["status"], "completed")
+            self.assertEqual(result["execution_status"], "completed")
+            self.assertEqual(result["mission_status"], "completed")
+            self.assertEqual(result["outcome"]["effect"], "inspection")
+            self.assertEqual(result["outcome"]["objective"], "not_proven")
             self.assertEqual(result["crew"], "test-architecture-specialist")
+        finally:
+            td.cleanup()
+
+    def test_generic_execute_scan_is_not_reported_as_objective_delivery(self):
+        td, root, p = temp_vessel()
+        try:
+            result = p.command("Build the ship and pilot it. Make me a working AI agent company.")
+            self.assertEqual(result["status"], "scan_only")
+            self.assertEqual(result["execution_status"], "completed")
+            self.assertEqual(result["mission_status"], "scan_only")
+            self.assertEqual(result["outcome"]["effect"], "scan_only")
+            self.assertEqual(result["outcome"]["objective"], "not_delivered")
+            self.assertFalse(result["outcome"]["mutation"])
+            self.assertEqual(result["outcome"]["next_authority"], "explicit_operation_or_repair")
+            self.assertIn("objective=not_delivered", result["summary"])
+            mission = p.store.mission(result["mission_id"])
+            self.assertEqual(mission["mission"]["status"], "scan_only")
+            outcomes = [e for e in mission["evidence"] if e["kind"] == "mission_outcome"]
+            self.assertEqual(len(outcomes), 1)
+            persisted = json.loads(outcomes[0]["content"])
+            self.assertEqual(persisted, result["outcome"])
         finally:
             td.cleanup()
 
@@ -25,9 +50,19 @@ class PilotTest(unittest.TestCase):
         try:
             result = p.repair_write("docs/x.txt", "hello")
             self.assertEqual(result["status"], "completed")
+            self.assertEqual(result["execution_status"], "completed")
+            self.assertEqual(result["mission_status"], "completed")
+            self.assertEqual(result["outcome"]["effect"], "mutation_applied")
+            self.assertEqual(result["outcome"]["objective"], "satisfied")
+            self.assertTrue(result["outcome"]["mutation"])
+            self.assertEqual(result["outcome"]["verification_scope"], "bounded_execution_evidence")
             self.assertTrue(result["verification"]["ok"])
             self.assertNotEqual(result["crew"], result["verification"]["verifier"])
             self.assertEqual((root / "docs/x.txt").read_text(), "hello")
+            mission = p.store.mission(result["mission_id"])
+            outcomes = [e for e in mission["evidence"] if e["kind"] == "mission_outcome"]
+            self.assertEqual(len(outcomes), 1)
+            self.assertEqual(json.loads(outcomes[0]["content"]), result["outcome"])
         finally:
             td.cleanup()
 
@@ -41,10 +76,24 @@ class PilotTest(unittest.TestCase):
                 scope="docs/implicit.txt",
             )
             self.assertEqual(result["mode"], "execute")
+            self.assertEqual(result["status"], "scan_only")
+            self.assertEqual(result["execution_status"], "completed")
+            self.assertEqual(result["mission_status"], "scan_only")
+            self.assertEqual(result["outcome"]["effect"], "scan_only")
+            self.assertEqual(result["outcome"]["objective"], "not_delivered")
+            self.assertFalse(result["outcome"]["mutation"])
+            self.assertEqual(result["outcome"]["next_authority"], "explicit_operation_or_repair")
+            self.assertEqual(result["outcome"]["verification_scope"], "bounded_execution_evidence")
+            self.assertTrue(result["verification"]["ok"])
+            self.assertIn("bounded execution evidence only", result["summary"])
             self.assertFalse(target.exists())
             mission = p.store.mission(result["mission_id"])
+            self.assertEqual(mission["mission"]["status"], "scan_only")
             payload = json.loads(mission["orders"][0]["payload"])
             self.assertNotIn("fs_write", payload["allowed_actions"])
+            outcomes = [e for e in mission["evidence"] if e["kind"] == "mission_outcome"]
+            self.assertEqual(len(outcomes), 1)
+            self.assertEqual(json.loads(outcomes[0]["content"]), result["outcome"])
         finally:
             td.cleanup()
 
