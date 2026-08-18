@@ -4,14 +4,43 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Runtime baseline before this documentation synchronization:** `main@1409605a98e0fd805a55839321f28364505773f5`
+**Runtime baseline before this documentation synchronization:** `main@8420b9cbe5ca046ded87c8feaec83eca7cfdc475`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED — OPERATIONAL AUDIT 001 CLOSED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **218 passed, 2 skipped, 354 subtests**; unittest **220 OK, 2 skipped**
+**Current verified regression:** pytest **235 passed, 2 skipped, 354 subtests**; unittest **237 OK, 2 skipped**
+
+## Selective Deep-Craft Crew Cognition — issue #73 / PR #74
+
+**Status: COMPLETE — CANONICAL MERGED AND EXACT-TREE QUALIFIED**
+
+- Commander authorized the strongest repository-backed post-Apex candidate after Mission Outcome Truthfulness: bounded Mission-relevant specialist craft plus bounded Crew memory, without creating A8 or another command layer;
+- canonical starting source was `main@8ffbee2f14e0e915e721835e9e84cc2289fc9661`;
+- Inspect-only selective craft now reads only the routed Standing Crew member's canonical craft card, defaults to at most **6 sections / 4,500 characters**, and never injects the complete deep card by default;
+- `Purpose`, `Safety Boundaries`, and `GroX Operational Binding` must fit in full when present; insufficient mandatory-context budget fails closed rather than truncating safety or operational binding;
+- Verify, Repair, and Execute retain their existing task/memory context without unused deep craft from this seam;
+- Inspect execution emits explicit attributable `craft_selection` evidence containing full-card digest, selected headings/size, source revision, and freshness policy;
+- a provider-neutral Inspect-only Crew cognition seam may consume a sanitized copy of the sealed Order envelope, selected craft, bounded Crew memory, and governed observations;
+- cognitive action requests are limited to already-authorized `fs_list`, `fs_read`, and `test_run` through the existing Mission Order + Tool Gateway boundary;
+- default cognitive bounds are **4 steps**, **1 cognitive test run**, **8,000 observation characters**, and **4,000 work-product characters**;
+- mutating requests and scope/root escapes fail closed; known recoverable provider/contract failure degrades only to the existing deterministic Inspect executor without authority widening;
+- provider-facing Order/craft/memory/observation structures are copied per call; provider-local mutation cannot alter executor-owned authority/context or prior observation history;
+- governed cognitive observations remain evidenced if the provider later degrades; persistent read-observation evidence stores bounded metadata/hashes rather than raw file content;
+- craft/cognition bookkeeping evidence is excluded from Living Company evidence-quality scoring, preventing the seam from improving routing history merely by creating extra evidence kinds;
+- controlled fake-provider regressions cover single Missions, Mission Graph Inspect nodes, mutation denial, scope escape, provider degradation, observation persistence, provider-input mutability, test-run ceiling, work-product ceiling, Inspect-only craft injection, complete mandatory craft preservation across all 82 canonical cards, and routing neutrality;
+- material blockers found during implementation/review were repaired rather than waived, including synthetic fixture craft gaps, mandatory-context starvation/truncation, provider-input mutability, lost pre-degradation observations, repeated cognitive test cost, unbounded work products, unnecessary non-Inspect craft injection, weak craft-selection observability, and routing-score inflation;
+- final implementation head `db83c557e378e6e3a3471318b50e6b82a5d68641` passed exact-head CI `32166921610` / run 232 across all five required jobs;
+- Python 3.12 qualification: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **235 passed, 2 skipped, 354 subtests**, unittest **237 OK, 2 skipped**, critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6**, and integrated Post-Apex qualification PASS;
+- integrated qualification retained `new_apex_stage=false`, `qualification_claim=false`, and `release_decision=false`;
+- independent final review on the exact head returned PASS with no remaining material blocker;
+- PR #74 merged as canonical `main@8420b9cbe5ca046ded87c8feaec83eca7cfdc475` and issue #73 closed as completed;
+- canonical merge tree `170bbfb9fe483b1faae362adc15ec944ca5c96c9` exactly matches the CI-tested synthetic PR merge tree, proving exact source equivalence;
+- no separate post-merge push run is claimed because none was observable through the available GitHub interface;
+- this qualification proves the **provider-neutral controlled seam only**. No live project/session or external model provider is yet qualified for Standing Crew cognition;
+- Commander authority, GorXu sole-orchestrator status, Repair boundaries, verifier independence, Mission Graph authority, package `0.8.0`, published `v0.8.0`, 82-Crew company, and no-A8 posture remain unchanged.
 
 ## Mission Outcome Truthfulness — issue #70 / PR #71
 
@@ -81,7 +110,7 @@
 - Python 3.12 qualification remained fully green: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **205 passed, 2 skipped, 354 subtests**, unittest **207 OK, 2 skipped**, critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6**, and integrated Post-Apex qualification PASS.
 - existing A1 behavior remains intact: invalid cognitive Crew recommendations cannot create eligibility and fall safely through the qualified deterministic routing path.
 - hierarchical shortlist routing, embeddings, vector databases, and extra model-routing stages remain deferred because the compact-directory change produced a material reduction without adding architecture; revisit only if real provider usage evidence shows further need.
-- future selective deep-craft activation for model-backed Crew cognition remains adjacent but separate: Mission-relevant craft plus bounded Crew memory should be activated instead of injecting complete craft cards per summon.
+- the selective deep-craft adjacency identified by issue #60 has since advanced through issue #73 / PR #74 as a controlled provider-neutral Inspect seam; live model-backed Standing Crew remains separately unqualified.
 - hard invariants remained unchanged: Commander intent is verbatim; GorXu remains sole operational orchestrator; deterministic capability, risk, Repair, Tool Gateway, and verifier-independence controls remain authoritative; caching and usage telemetry cannot grant authority; no tag/release moved and no A8 was created or implied.
 
 ## Verified Vessel baseline
@@ -118,6 +147,7 @@ Verified by source, qualification evidence, and automated testing:
 - package/source version metadata is aligned to released `v0.8.0` and remains guarded by both pytest and unittest
 - current published release `v0.8.0` is pinned to `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`; canonical source may advance beyond that immutable release through the protected PR/CI path
 - current protected source includes Mission Outcome Truthfulness with explicit scan-only and mutation-state outcome evidence while package version remains `0.8.0`
+- current protected source also includes Inspect-only selective deep craft and a CI-qualified provider-neutral controlled Crew cognition seam; live model-backed Standing Crew is not claimed.
 
 ## Company state
 
@@ -278,6 +308,7 @@ Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.
 ## Known deliberate limits
 
 - GorXu cognition is project-hosted through GPT-5.6 Sol when a capable Space Exploration session is active; deterministic control remains the safe fallback when cognition is unavailable.
+- Standing Crew now have a CI-qualified provider-neutral Inspect cognition seam with selective craft + bounded memory, but no live project/session or external model provider is yet operationally qualified for Crew cognition.
 - A3 episodic retrieval plus attributable semantic, procedural, and Vessel-wide memory are live with bounded selective retrieval; autonomous consolidation remains future evolution.
 - A4 durable Mission Graph resume, checkpointing, bounded cancellation/retry, and text-Repair compensation are live; generic compensation for arbitrary external systems remains intentionally unclaimed.
 - A5 qualifies bounded workspace shell/code execution, memory-only secret aliases, exact-origin read-only HTTP(S), offline browser evidence capture, and pre-registered stdio MCP. Unrestricted interactive desktop control, arbitrary/networked MCP processes, runtime image pulls/builds, and optional A2A delegation remain outside the qualified boundary.
@@ -287,7 +318,7 @@ Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.
 
 **Current status: APEX QUALIFIED**
 
-The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot through A7 Apex Qualification have qualified, and Post-Apex Operational Evolution Program 001 has completed. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, attributable organizational memory, experienced routing, bounded selective memory, same-Mission crash recovery, checkpointed execution, bounded executive consultation/replanning, cancellation, journaled text-Repair compensation, governed multi-tool execution through Tool Gateway v2, replayable evidence-backed orchestration evaluation whose proposals cannot self-activate, continuous health/reconstitution/drift/provenance mutation proof, and truthful single-Mission outcome classification that does not overstate bounded execution.
+The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot through A7 Apex Qualification have qualified, and Post-Apex Operational Evolution Program 001 has completed. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, attributable organizational memory, experienced routing, bounded selective memory, same-Mission crash recovery, checkpointed execution, bounded executive consultation/replanning, cancellation, journaled text-Repair compensation, governed multi-tool execution through Tool Gateway v2, replayable evidence-backed orchestration evaluation whose proposals cannot self-activate, continuous health/reconstitution/drift/provenance mutation proof, truthful single-Mission outcome classification that does not overstate bounded execution, and a canonical provider-neutral controlled Inspect Crew cognition seam using selective deep craft + bounded Crew memory without widening authority.
 
 The canonical evolution path is recorded in `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md`.
 
