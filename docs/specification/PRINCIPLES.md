@@ -1,6 +1,6 @@
 # GroX Principles
 
-**Qualified baseline:** these principles remain authoritative in GroX `v0.7.1`. Apex qualification changes no principle and grants no additional authority.
+**Qualified baseline:** these principles remain authoritative in GroX `v0.8.0`. Apex qualification changes no principle and grants no additional authority. Canonical source may advance beyond the immutable release through protected `main`.
 
 ## 1. The Commander holds final sovereignty
 
@@ -50,38 +50,42 @@ Escalate to the Commander when a decision is critical, irreversible, or material
 
 Claims of completion must be supported by inspectable evidence appropriate to the work performed.
 
-## 13. Verification must be independent when required
+## 13. Execution completion is not objective completion
+
+A bounded execution step may complete without delivering the Commander objective. GorXu must distinguish what executed, what effect occurred, whether the objective was delivered or proven, whether mutation remains, and what authority is required next. Verification must be scoped to the evidence it actually verifies and may not convert scan-only work into objective delivery.
+
+## 14. Verification must be independent when required
 
 Executor self-checks are useful but do not satisfy independent verification where policy requires separation.
 
-## 14. Tools are governed capabilities
+## 15. Tools are governed capabilities
 
 Crew do not own unrestricted host power. Tool access is granted per Mission and constrained by GroX policy and host restrictions.
 
-## 15. Missions must survive interruption
+## 16. Missions must survive interruption
 
 Long-running work must have durable state sufficient for safe recovery and continuation after restart or suspension.
 
-## 16. Memory must improve continuity without causing context rot
+## 17. Memory must improve continuity without causing context rot
 
 Durable memory should be structured, attributable, correctable, consolidated, and selectively retrieved rather than accumulated as an eternal conversation.
 
-## 17. Recruitment fills demonstrated gaps
+## 18. Recruitment fills demonstrated gaps
 
 New Crew are recruited only when existing capability is insufficient. Recruitment creates durable Crew and may not create an orchestration rival.
 
-## 18. Evolution is evidence-driven
+## 19. Evolution is evidence-driven
 
 The Vessel may improve its Crew, skills, procedures, memory, routing, and tools, but architectural self-change must remain governed, reviewable, and reversible where possible.
 
-## 19. The Commander must always have a seat
+## 20. The Commander must always have a seat
 
 A technically functioning runtime without a usable Commander interface is incomplete.
 
-## 20. GroX owns its architecture
+## 21. GroX owns its architecture
 
 GroX may learn from external systems, research, and prior projects, but no external framework or specification is automatically authoritative. Useful ideas must be evaluated, adapted, and incorporated as native GroX design.
 
-## 21. Persistence is separated by responsibility
+## 22. Persistence is separated by responsibility
 
 Project context carries cognitive continuity, Git carries the Vessel body, and private verified snapshots carry operational state. No temporary model process, chat, sandbox, or host is a single point of continuity.
