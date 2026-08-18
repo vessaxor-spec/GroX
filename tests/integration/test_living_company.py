@@ -3,7 +3,7 @@ import unittest
 
 from grox.contracts import MissionMode, TourResult
 from grox.pilot import PilotGorXu
-from tests._support import temp_vessel
+from tests._support import add_synthetic_crew, temp_vessel
 
 
 EXPERIENCED_BACKEND = {
@@ -27,8 +27,8 @@ def experienced_vessel():
     td,root,_=temp_vessel()
     original=dict(EXPERIENCED_BACKEND)
     original['crew_id']='backend-engineer'; original['title']='Backend Engineer'
-    (root/'configs/crew/dossiers/backend-engineer.json').write_text(json.dumps(original))
-    (root/'configs/crew/dossiers/backend-engineer-b.json').write_text(json.dumps(EXPERIENCED_BACKEND))
+    add_synthetic_crew(root,original)
+    add_synthetic_crew(root,EXPERIENCED_BACKEND)
     return td,root,PilotGorXu(root,reasoner=None)
 
 
