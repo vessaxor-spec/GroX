@@ -85,6 +85,20 @@ class MutatingInputProvider:
         return {'action':'finish','work_product':'Provider-local mutations did not alter executor-owned context.'}
 
 
+class RepeatTestProvider:
+    name='fake-repeat-test'
+
+    def next_step(self, **kwargs):
+        return {'action':'test_run'}
+
+
+class OversizedWorkProductProvider:
+    name='fake-oversized-output'
+
+    def next_step(self, **kwargs):
+        return {'action':'finish','work_product':'x'*5000}
+
+
 class CountingProvider:
     name='fake-counting-provider'
 
@@ -137,6 +151,7 @@ class CrewCognitionIntegrationTests(unittest.TestCase):
             self.assertGreater(cognition['selected_chars'],0)
             self.assertIn('GroX Operational Binding',cognition['selected_headings'])
             self.assertGreaterEqual(cognition['observation_count'],1)
+            self.assertEqual(cognition['test_run_count'],0)
         finally:
             td.cleanup()
 
@@ -218,6 +233,38 @@ class CrewCognitionIntegrationTests(unittest.TestCase):
             mission=p.store.mission(result['mission_id'])
             cognition=_evidence_content(next(e for e in mission['evidence'] if e['kind']=='crew_cognition'))
             self.assertEqual(cognition['observation_count'],1)
+        finally:
+            td.cleanup()
+
+    def test_cognitive_test_run_is_limited_to_one_per_tour(self):
+        td,root,p=temp_vessel()
+        try:
+            p.executor.cognition_provider=RepeatTestProvider()
+            result=p.command('Inspect and test the Vessel',mode=MissionMode.inspect,crew_id='backend-engineer')
+            self.assertEqual(result['status'],'exception')
+            self.assertEqual(result['exception']['type'],'crew_cognition_denied')
+            self.assertIn('test_run budget exceeded: 1',result['summary'])
+            mission=p.store.mission(result['mission_id'])
+            observations=[_evidence_content(e) for e in mission['evidence'] if e['kind']=='crew_cognition_observation']
+            self.assertEqual(len(observations),1)
+            self.assertEqual(observations[0]['action'],'test_run')
+            self.assertIn('crew_cognition_denied',{e['kind'] for e in mission['evidence']})
+        finally:
+            td.cleanup()
+
+    def test_oversized_work_product_degrades_without_persisting_unbounded_output(self):
+        td,root,p=temp_vessel()
+        try:
+            p.executor.cognition_provider=OversizedWorkProductProvider()
+            result=p.command('Inspect the Vessel',mode=MissionMode.inspect,crew_id='backend-engineer')
+            self.assertEqual(result['status'],'completed')
+            self.assertNotIn('x'*256,result['summary'])
+            mission=p.store.mission(result['mission_id'])
+            kinds={e['kind'] for e in mission['evidence']}
+            self.assertIn('crew_cognition_degraded',kinds)
+            self.assertNotIn('crew_cognition',kinds)
+            degraded=_evidence_content(next(e for e in mission['evidence'] if e['kind']=='crew_cognition_degraded'))
+            self.assertIn('work product exceeds bounded size',degraded['error'])
         finally:
             td.cleanup()
 
