@@ -2,6 +2,7 @@ import unittest
 
 from grox.crew_provider import (
     CrewProviderBindingError,
+    _content,
     bind_crew_cognition_provider,
     bound_crew_cognition_provider,
     qualify_bound_crew_cognition_provider,
@@ -69,6 +70,10 @@ class CrewProviderQualificationTests(unittest.TestCase):
             self.assertFalse(report['live_provider_claim'])
         finally:
             td.cleanup()
+
+    def test_malformed_persisted_cognition_evidence_fails_closed(self):
+        self.assertEqual(_content({'content':'{malformed'}),{})
+        self.assertEqual(_content({'content':'[]'}),{})
 
     def test_binding_rejects_missing_or_unnamed_provider(self):
         td,root,p=temp_vessel()
