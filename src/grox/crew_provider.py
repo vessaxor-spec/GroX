@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from typing import Any
+from urllib.parse import urlsplit, urlunsplit
 
 from .contracts import MissionMode, RiskClass
 
@@ -47,6 +48,24 @@ def _content(row: dict[str, Any]) -> dict[str, Any]:
     return dict(content) if isinstance(content, dict) else {}
 
 
+def _safe_endpoint(endpoint: str) -> str | None:
+    try:
+        parsed = urlsplit(endpoint)
+    except ValueError:
+        return None
+    if not parsed.scheme or not parsed.hostname:
+        return None
+    host = parsed.hostname
+    if ":" in host and not host.startswith("["):
+        host = f"[{host}]"
+    try:
+        port = parsed.port
+    except ValueError:
+        return None
+    netloc = host if port is None else f"{host}:{port}"
+    return urlunsplit((parsed.scheme, netloc, parsed.path, "", ""))
+
+
 def _provider_observability(provider: Any) -> dict[str, Any]:
     observed: dict[str, Any] = {}
     model = getattr(provider, "model", None)
@@ -54,7 +73,9 @@ def _provider_observability(provider: Any) -> dict[str, Any]:
         observed["model"] = model.strip()
     endpoint = getattr(provider, "endpoint", None)
     if isinstance(endpoint, str) and endpoint.strip():
-        observed["endpoint"] = endpoint.strip()
+        safe_endpoint = _safe_endpoint(endpoint.strip())
+        if safe_endpoint is not None:
+            observed["endpoint"] = safe_endpoint
     response_id_snapshot = getattr(provider, "response_id_snapshot", None)
     if callable(response_id_snapshot):
         response_id = response_id_snapshot()
