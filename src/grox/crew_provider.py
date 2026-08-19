@@ -90,6 +90,11 @@ def _provider_observability(provider: Any) -> dict[str, Any]:
                 usage = to_dict()
             if isinstance(usage, dict):
                 observed["usage"] = dict(usage)
+    disclosure_snapshot = getattr(provider, "disclosure_policy_snapshot", None)
+    if callable(disclosure_snapshot):
+        disclosure = disclosure_snapshot()
+        if isinstance(disclosure, dict):
+            observed["disclosure_policy"] = dict(disclosure)
     return observed
 
 
