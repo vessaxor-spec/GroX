@@ -93,8 +93,12 @@ class OpenAICrewDisclosurePolicy:
         }
 
 
-def _step_schema(policy: OpenAICrewDisclosurePolicy) -> dict[str, Any]:
-    actions = ["finish"] + [action for action in _ACTION_ORDER if action in policy.allowed_observation_actions]
+def _step_schema(policy: OpenAICrewDisclosurePolicy, order_actions: set[str]) -> dict[str, Any]:
+    actions = ["finish"] + [
+        action
+        for action in _ACTION_ORDER
+        if action in policy.allowed_observation_actions and action in order_actions
+    ]
     return {
         "type": "object",
         "properties": {
@@ -238,11 +242,7 @@ class OpenAICrewCognitionProvider:
                 raise CrewCognitionError("Mission Order scope exceeds external cognition disclosure policy")
 
     def _external_order(self, order: dict[str, Any]) -> dict[str, Any]:
-        allowed = {
-            key: value
-            for key, value in order.items()
-            if key not in {"commander_intent", "objective"}
-        }
+        allowed = {key: value for key, value in order.items() if key not in {"commander_intent", "objective"}}
         if self.disclosure_policy.allow_order_text:
             for key in ("commander_intent", "objective"):
                 if key in order:
@@ -255,18 +255,12 @@ class OpenAICrewCognitionProvider:
             if not isinstance(observation, dict):
                 continue
             action = observation.get("action")
-            safe = {
-                key: value
-                for key, value in observation.items()
-                if key not in {"files", "content", "stdout", "stderr"}
-            }
             if action not in self.disclosure_policy.allowed_observation_actions:
-                external.append(safe)
                 continue
             path = observation.get("path")
             if isinstance(path, str) and not self.disclosure_policy.permits_scope(path):
-                external.append(safe)
                 continue
+            safe = {key: value for key, value in observation.items() if key not in {"files", "content", "stdout", "stderr"}}
             if action == "fs_list" and isinstance(observation.get("files"), list):
                 safe["files"] = list(observation["files"])
             elif action == "fs_read" and isinstance(observation.get("content"), str):
@@ -294,7 +288,9 @@ class OpenAICrewCognitionProvider:
         external_craft = craft_context if self.disclosure_policy.allow_craft else []
         external_memory = memory_context if self.disclosure_policy.allow_memory else []
         external_observations = self._external_observations(observations)
-        schema = _step_schema(self.disclosure_policy)
+        raw_order_actions = order.get("allowed_actions")
+        order_actions = set(raw_order_actions) if isinstance(raw_order_actions, list) else set()
+        schema = _step_schema(self.disclosure_policy, order_actions)
         stable_context = {
             "sealed_order": external_order,
             "selected_craft": external_craft,
@@ -310,15 +306,7 @@ class OpenAICrewCognitionProvider:
             + observations_json
             + "\n\nChoose the single next bounded step. Use null for path/work_product when irrelevant."
         )
-        cache_material = (
-            self.model
-            + "\n"
-            + _SYSTEM
-            + "\n"
-            + stable_json
-            + "\n"
-            + json.dumps(schema, separators=(",", ":"), sort_keys=True)
-        )
+        cache_material = self.model + "\n" + _SYSTEM + "\n" + stable_json + "\n" + json.dumps(schema, separators=(",", ":"), sort_keys=True)
         cache_key = "grox-crew-" + hashlib.sha256(cache_material.encode("utf-8")).hexdigest()[:32]
         body = {
             "model": self.model,
@@ -327,22 +315,12 @@ class OpenAICrewCognitionProvider:
             "input": user,
             "prompt_cache_key": cache_key,
             "max_output_tokens": self.max_output_tokens,
-            "text": {
-                "format": {
-                    "type": "json_schema",
-                    "name": "grox_crew_cognition_step",
-                    "strict": True,
-                    "schema": schema,
-                }
-            },
+            "text": {"format": {"type": "json_schema", "name": "grox_crew_cognition_step", "strict": True, "schema": schema}},
         }
         req = Request(
             self.endpoint,
             data=json.dumps(body).encode("utf-8"),
-            headers={
-                "Authorization": f"Bearer {self._api_key}",
-                "Content-Type": "application/json",
-            },
+            headers={"Authorization": f"Bearer {self._api_key}", "Content-Type": "application/json"},
             method="POST",
         )
         try:
