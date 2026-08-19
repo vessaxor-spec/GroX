@@ -35,10 +35,10 @@ class OpenAICrewCognitionProviderTests(unittest.TestCase):
         captured={}; restricted=OpenAICrewDisclosurePolicy(allowed_scopes=('README.md',)); provider=OpenAICrewCognitionProvider(api_key='k',model='gpt-5.6-luna',disclosure_policy=restricted)
         payload={'output_text':json.dumps({'action':'finish','path':None,'work_product':'done'})}
         def fake(request,timeout): captured['body']=json.loads(request.data.decode()); return _Response(payload)
-        order={'mission_id':'MSN-1','scope':['README.md'],'commander_intent':'SECRET-INTENT','objective':'SECRET-OBJECTIVE','allowed_actions':['fs_read']}
+        order={'mission_id':'MSN-1','scope':['README.md'],'commander_intent':'SECRET-INTENT','objective':'SECRET-OBJECTIVE','allowed_actions':['fs_read'],'parameters':{'nested':'SECRET-PARAMETERS'}}
         with patch('grox.openai_crew_cognition.urlopen',side_effect=fake): provider.next_step(order=order,craft_context=[{'content':'SECRET-CRAFT'}],memory_context=[{'text':'SECRET-MEMORY'}],observations=[{'action':'fs_read','path':'README.md','content':'SECRET-FILE'}])
         text=captured['body']['input']
-        for sentinel in ('SECRET-INTENT','SECRET-OBJECTIVE','SECRET-CRAFT','SECRET-MEMORY','SECRET-FILE'): self.assertNotIn(sentinel,text)
+        for sentinel in ('SECRET-INTENT','SECRET-OBJECTIVE','SECRET-PARAMETERS','SECRET-CRAFT','SECRET-MEMORY','SECRET-FILE'): self.assertNotIn(sentinel,text)
         self.assertEqual(captured['body']['text']['format']['schema']['properties']['action']['enum'],['finish'])
         with patch('grox.openai_crew_cognition.urlopen') as network:
             with self.assertRaisesRegex(CrewCognitionError,'scope exceeds'): provider.next_step(order={'scope':['docs']},craft_context=[],memory_context=[],observations=[])
