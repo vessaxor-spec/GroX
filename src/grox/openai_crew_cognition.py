@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from typing import Any, Mapping
 from urllib.error import HTTPError, URLError
+from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 from .crew_cognition import CrewCognitionError
 from .reasoning.base import CognitiveUsage
 
+
+_OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses"
 
 _SYSTEM = """You are one assigned Standing Crew member inside GroX executing one bounded Inspect tour under GorXu.
 You do not possess command, routing, mutation, verification, or permission-granting authority.
@@ -34,6 +38,59 @@ _STEP_SCHEMA: dict[str, Any] = {
 }
 
 
+def _validated_endpoint(endpoint: str) -> str:
+    if not isinstance(endpoint, str) or not endpoint.strip():
+        raise ValueError("endpoint is required")
+    try:
+        parsed = urlsplit(endpoint.strip())
+    except ValueError as exc:
+        raise ValueError("OpenAI Crew endpoint must be the official HTTPS Responses endpoint") from exc
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError("OpenAI Crew endpoint must be the official HTTPS Responses endpoint") from exc
+    if (
+        parsed.scheme.lower() != "https"
+        or (parsed.hostname or "").lower() != "api.openai.com"
+        or port not in {None, 443}
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.path.rstrip("/") != "/v1/responses"
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ValueError("OpenAI Crew endpoint must be the official HTTPS Responses endpoint")
+    return _OPENAI_RESPONSES_ENDPOINT
+
+
+def _safe_error_label(value: Any) -> str | None:
+    if not isinstance(value, str):
+        return None
+    value = value.strip()
+    if not value or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,120}", value):
+        return None
+    return value
+
+
+def _http_error_summary(exc: HTTPError) -> str:
+    labels: list[str] = []
+    try:
+        raw = exc.read().decode("utf-8", errors="replace")
+        payload = json.loads(raw)
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        payload = None
+    error = payload.get("error") if isinstance(payload, dict) else None
+    if isinstance(error, dict):
+        error_type = _safe_error_label(error.get("type"))
+        error_code = _safe_error_label(error.get("code"))
+        if error_type is not None:
+            labels.append(f"type={error_type}")
+        if error_code is not None:
+            labels.append(f"code={error_code}")
+    suffix = " " + " ".join(labels) if labels else ""
+    return f"Crew cognition provider HTTP {exc.code}{suffix}"
+
+
 class OpenAICrewCognitionProvider:
     """Optional Responses-API adapter for the bounded Crew cognition seam.
 
@@ -48,7 +105,7 @@ class OpenAICrewCognitionProvider:
         *,
         api_key: str,
         model: str,
-        endpoint: str = "https://api.openai.com/v1/responses",
+        endpoint: str = _OPENAI_RESPONSES_ENDPOINT,
         timeout: int = 90,
         max_output_tokens: int = 2048,
     ):
@@ -56,11 +113,9 @@ class OpenAICrewCognitionProvider:
             raise ValueError("api_key is required")
         if not isinstance(model, str) or not model.strip():
             raise ValueError("model is required")
-        if not isinstance(endpoint, str) or not endpoint.strip():
-            raise ValueError("endpoint is required")
         self._api_key = api_key.strip()
         self.model = model.strip()
-        self.endpoint = endpoint.strip()
+        self.endpoint = _validated_endpoint(endpoint)
         self.timeout = max(1, min(300, int(timeout)))
         self.max_output_tokens = max(256, min(8192, int(max_output_tokens)))
         self._last_usage: CognitiveUsage | None = None
@@ -160,8 +215,7 @@ class OpenAICrewCognitionProvider:
             with urlopen(req, timeout=self.timeout) as response:
                 payload = json.loads(response.read().decode("utf-8"))
         except HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")[:1000]
-            raise CrewCognitionError(f"Crew cognition provider HTTP {exc.code}: {detail}") from exc
+            raise CrewCognitionError(_http_error_summary(exc)) from exc
         except (URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
             raise CrewCognitionError(f"Crew cognition provider failure: {exc}") from exc
         if not isinstance(payload, dict):
