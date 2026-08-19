@@ -3,10 +3,13 @@ import unittest
 from grox.crew_provider import (
     CrewProviderBindingError,
     _content,
+    _provider_observability,
+    _safe_endpoint,
     bind_crew_cognition_provider,
     bound_crew_cognition_provider,
     qualify_bound_crew_cognition_provider,
 )
+from grox.reasoning.base import CognitiveUsage
 from grox.session_crew_cognition import SessionCrewCognitionProvider
 from tests._support import temp_vessel
 
@@ -41,6 +44,7 @@ class CrewProviderQualificationTests(unittest.TestCase):
             self.assertEqual(report['status'],'PASS')
             self.assertTrue(all(report['checks'].values()))
             self.assertEqual(report['provider'],'controlled-session-provider')
+            self.assertEqual(report['provider_observability'],{})
             self.assertFalse(report['live_provider_claim'])
             self.assertGreaterEqual(len(calls),2)
             self.assertIn('craft_selection',report['evidence_kinds'])
@@ -74,6 +78,27 @@ class CrewProviderQualificationTests(unittest.TestCase):
     def test_malformed_persisted_cognition_evidence_fails_closed(self):
         self.assertEqual(_content({'content':'{malformed'}),{})
         self.assertEqual(_content({'content':'[]'}),{})
+
+    def test_provider_observability_is_optional_sanitized_and_non_authoritative(self):
+        class ObservableProvider:
+            model='gpt-test'
+            endpoint='https://user:secret@example.test:8443/v1/responses?api_key=secret#fragment'
+            def response_id_snapshot(self):
+                return 'resp_test'
+            def usage_snapshot(self):
+                return CognitiveUsage(provider='test',model='gpt-test',input_tokens=10,total_tokens=12)
+
+        observed=_provider_observability(ObservableProvider())
+        self.assertEqual(observed['model'],'gpt-test')
+        self.assertEqual(observed['endpoint'],'https://example.test:8443/v1/responses')
+        self.assertEqual(observed['response_id'],'resp_test')
+        self.assertEqual(observed['usage']['input_tokens'],10)
+        self.assertEqual(observed['usage']['total_tokens'],12)
+        self.assertEqual(
+            _safe_endpoint('https://example.test/v1/responses?token=secret'),
+            'https://example.test/v1/responses',
+        )
+        self.assertIsNone(_safe_endpoint('not-an-endpoint'))
 
     def test_binding_rejects_missing_or_unnamed_provider(self):
         td,root,p=temp_vessel()
