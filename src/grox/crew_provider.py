@@ -39,7 +39,10 @@ def bound_crew_cognition_provider(pilot: Any) -> str | None:
 def _content(row: dict[str, Any]) -> dict[str, Any]:
     content = row.get("content")
     if isinstance(content, str):
-        decoded = json.loads(content)
+        try:
+            decoded = json.loads(content)
+        except (json.JSONDecodeError, TypeError):
+            return {}
         return decoded if isinstance(decoded, dict) else {}
     return dict(content) if isinstance(content, dict) else {}
 
@@ -87,7 +90,7 @@ def qualify_bound_crew_cognition_provider(
         "craft_selection_evidenced": "craft_selection" in kinds,
         "memory_selection_evidenced": "memory_selection" in kinds,
         "governed_observation_evidenced": "crew_cognition_observation" in kinds,
-        "crew_work_product_evidenced": bool(cognition_rows),
+        "crew_work_product_evidenced": bool(cognition_rows) and bool(cognition),
         "provider_identity_matches": cognition.get("provider") == provider,
         "read_only_mode_evidenced": cognition.get("mode") == "read_only_inspect",
         "bounded_work_product": isinstance(cognition.get("work_product"), str)
