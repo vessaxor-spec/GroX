@@ -23,11 +23,20 @@ class _Response:
 
 
 class OpenAICrewCognitionProviderTests(unittest.TestCase):
-    def test_requires_runtime_credentials_and_model(self):
+    def test_requires_runtime_credentials_model_and_official_endpoint(self):
         with self.assertRaises(ValueError):
             OpenAICrewCognitionProvider(api_key='', model='gpt-5.6-luna')
         with self.assertRaises(ValueError):
             OpenAICrewCognitionProvider(api_key='test-key', model='')
+        for endpoint in (
+            'http://api.openai.com/v1/responses',
+            'https://example.test/v1/responses',
+            'https://user:secret@api.openai.com/v1/responses',
+            'https://api.openai.com/v1/responses?token=secret',
+        ):
+            with self.subTest(endpoint=endpoint):
+                with self.assertRaises(ValueError):
+                    OpenAICrewCognitionProvider(api_key='test-key', model='gpt-5.6-luna', endpoint=endpoint)
 
     def test_responses_request_is_structured_read_only_and_context_bounded(self):
         captured = {}
@@ -127,18 +136,31 @@ class OpenAICrewCognitionProviderTests(unittest.TestCase):
             with self.assertRaises(CrewCognitionError):
                 provider.next_step(order={}, craft_context=[], memory_context=[], observations=[])
 
-    def test_http_and_network_failures_are_bounded_provider_errors(self):
+    def test_http_and_network_failures_are_bounded_and_http_body_is_not_persisted(self):
         provider = OpenAICrewCognitionProvider(api_key='test-key', model='gpt-5.6-luna')
+        secret_sentinel = 'sensitive-provider-message-must-not-persist'
+        body = json.dumps({
+            'error': {
+                'message': secret_sentinel,
+                'type': 'rate_limit_error',
+                'code': 'rate_limit_exceeded',
+            }
+        }).encode('utf-8')
         http_error = HTTPError(
             'https://api.openai.com/v1/responses',
             429,
             'rate limited',
             {},
-            io.BytesIO(b'bounded rate limit detail'),
+            io.BytesIO(body),
         )
         with patch('grox.openai_crew_cognition.urlopen', side_effect=http_error):
-            with self.assertRaisesRegex(CrewCognitionError, 'HTTP 429'):
+            with self.assertRaises(CrewCognitionError) as caught:
                 provider.next_step(order={}, craft_context=[], memory_context=[], observations=[])
+        message = str(caught.exception)
+        self.assertIn('HTTP 429', message)
+        self.assertIn('type=rate_limit_error', message)
+        self.assertIn('code=rate_limit_exceeded', message)
+        self.assertNotIn(secret_sentinel, message)
         with patch('grox.openai_crew_cognition.urlopen', side_effect=URLError('offline')):
             with self.assertRaisesRegex(CrewCognitionError, 'provider failure'):
                 provider.next_step(order={}, craft_context=[], memory_context=[], observations=[])
