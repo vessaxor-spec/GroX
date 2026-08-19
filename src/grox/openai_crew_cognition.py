@@ -242,7 +242,8 @@ class OpenAICrewCognitionProvider:
                 raise CrewCognitionError("Mission Order scope exceeds external cognition disclosure policy")
 
     def _external_order(self, order: dict[str, Any]) -> dict[str, Any]:
-        allowed = {key: value for key, value in order.items() if key not in {"commander_intent", "objective"}}
+        excluded = {"commander_intent", "objective", "parameters"}
+        allowed = {key: value for key, value in order.items() if key not in excluded}
         if self.disclosure_policy.allow_order_text:
             for key in ("commander_intent", "objective"):
                 if key in order:
