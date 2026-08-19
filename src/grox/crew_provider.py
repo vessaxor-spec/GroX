@@ -47,6 +47,31 @@ def _content(row: dict[str, Any]) -> dict[str, Any]:
     return dict(content) if isinstance(content, dict) else {}
 
 
+def _provider_observability(provider: Any) -> dict[str, Any]:
+    observed: dict[str, Any] = {}
+    model = getattr(provider, "model", None)
+    if isinstance(model, str) and model.strip():
+        observed["model"] = model.strip()
+    endpoint = getattr(provider, "endpoint", None)
+    if isinstance(endpoint, str) and endpoint.strip():
+        observed["endpoint"] = endpoint.strip()
+    response_id_snapshot = getattr(provider, "response_id_snapshot", None)
+    if callable(response_id_snapshot):
+        response_id = response_id_snapshot()
+        if isinstance(response_id, str) and response_id.strip():
+            observed["response_id"] = response_id.strip()
+    usage_snapshot = getattr(provider, "usage_snapshot", None)
+    if callable(usage_snapshot):
+        usage = usage_snapshot()
+        if usage is not None:
+            to_dict = getattr(usage, "to_dict", None)
+            if callable(to_dict):
+                usage = to_dict()
+            if isinstance(usage, dict):
+                observed["usage"] = dict(usage)
+    return observed
+
+
 def qualify_bound_crew_cognition_provider(
     pilot: Any,
     *,
@@ -61,9 +86,10 @@ def qualify_bound_crew_cognition_provider(
     prove that the provider was a live external/session model; that fact must be
     established by the host/operator evidence for the invocation environment.
     """
-    provider = bound_crew_cognition_provider(pilot)
-    if provider is None:
+    provider_name = bound_crew_cognition_provider(pilot)
+    if provider_name is None:
         raise CrewProviderBindingError("No Crew cognition provider is bound")
+    provider = pilot.executor.cognition_provider
     if not isinstance(directive, str) or not directive.strip():
         raise ValueError("directive must be a non-empty string")
     if not isinstance(crew_id, str) or not crew_id.strip():
@@ -91,7 +117,7 @@ def qualify_bound_crew_cognition_provider(
         "memory_selection_evidenced": "memory_selection" in kinds,
         "governed_observation_evidenced": "crew_cognition_observation" in kinds,
         "crew_work_product_evidenced": bool(cognition_rows) and bool(cognition),
-        "provider_identity_matches": cognition.get("provider") == provider,
+        "provider_identity_matches": cognition.get("provider") == provider_name,
         "read_only_mode_evidenced": cognition.get("mode") == "read_only_inspect",
         "bounded_work_product": isinstance(cognition.get("work_product"), str)
         and len(cognition.get("work_product", "")) <= int(pilot.executor.cognition_work_product_chars),
@@ -105,7 +131,8 @@ def qualify_bound_crew_cognition_provider(
     return {
         "schema": "grox-crew-cognition-provider-qualification-v1",
         "status": "PASS" if passed else "FAIL",
-        "provider": provider,
+        "provider": provider_name,
+        "provider_observability": _provider_observability(provider),
         "mission_id": result["mission_id"],
         "crew_id": result.get("crew"),
         "checks": checks,
