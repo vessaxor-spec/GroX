@@ -23,6 +23,14 @@ package-dir = {"" = "src"}
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.data-files]
+"share/grox/configs" = ["configs/tool-policy.json"]
+"share/grox/configs/crew" = ["configs/crew/company-manifest.json"]
+"share/grox/configs/crew/dossiers" = ["configs/crew/dossiers/*.json"]
+"share/grox/configs/crew/specialists" = ["configs/crew/specialists/*.md"]
+"share/grox/configs/persistence" = ["configs/persistence/*.json"]
+"share/grox/configs/reasoning" = ["configs/reasoning/*.md"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
