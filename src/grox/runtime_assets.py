@@ -101,5 +101,6 @@ def packaged_asset_root() -> Path:
         return validate_asset_root(policy.parent.parent)
 
     raise RuntimeAssetError(
-        "Installed GroX distribution does not contain the packaged runtime asset bundle"
+        "GroX packaged runtime assets are incomplete or unavailable; "
+        "the installed distribution does not contain the required runtime asset bundle"
     )
