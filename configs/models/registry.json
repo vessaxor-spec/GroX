@@ -1,0 +1,44 @@
+{
+  "models": [
+    {
+      "artifact": {
+        "bytes": 552,
+        "path": "configs/models/tiny-mlp-policy-5x8x3-v1.json",
+        "sha256": "7387333f814c63bbc9f18afb96fe3e61db2c47b58a606aa42e89416dd1b76174"
+      },
+      "backend": "tiny-mlp-python-v1",
+      "claims": {
+        "general_purpose_llm": false,
+        "language_capable": false,
+        "network_required": false,
+        "qualified_mode": "inspect",
+        "qualified_role": "crew-action-selection"
+      },
+      "format": "grox-json-tiny-mlp-v1",
+      "lineage": {
+        "generation": 1,
+        "parent_model_id": null
+      },
+      "model_id": "tiny-mlp-policy-5x8x3-v1",
+      "model_kind": "locally-trained-neural-action-selection-policy",
+      "parameter_count": 75,
+      "placements": [
+        "crew"
+      ],
+      "provenance": {
+        "held_out_examples": 100,
+        "provider": "local-neural-session-crew-v1",
+        "qualification_issue": 76,
+        "qualification_pr": 79,
+        "trained_weights_sha256": "7b44fffbc0840d0572194649e47a79c0b1466253e0b93940584dfd5de1beda60",
+        "training_examples": 240,
+        "training_seed": 7601
+      },
+      "resources": {
+        "min_ram_bytes": 1048576,
+        "required_accelerator": null
+      }
+    }
+  ],
+  "schema": "grox-model-registry-v1"
+}
