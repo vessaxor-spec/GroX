@@ -1,6 +1,6 @@
 # GroX Living Company Intelligence
 
-**Qualification status:** **A3 QUALIFIED** in GroX `v0.8.0`. Memory, craft, experience, and Crew cognition remain advisory to GorXu and can never grant eligibility, authority, Repair permission, or verifier independence. Later protected-main evolution may strengthen these surfaces without creating a new Apex stage.
+**Qualification status:** **A3 QUALIFIED** in GroX `v0.8.0`. Memory, craft, experience, and Crew cognition remain advisory to GorXu and can never grant eligibility, authority, Repair permission, command rank, or verifier independence. Later protected-main evolution may strengthen these surfaces without creating a new Apex stage.
 
 A3 established the Standing Crew as an experienced organization without changing GroX command authority.
 
@@ -13,13 +13,17 @@ Living Company Intelligence is a native advisory service under Pilot GorXu.
 The intelligence service may rank eligible Crew and retrieve relevant memory and, for bounded Inspect tours, selective craft context. It may not:
 
 - create a new command layer;
+- place Crew, Crew cognition, a native model, or an external provider above/parallel to GorXu;
+- insert a cognition/provider layer between GorXu and Crew as command authority;
 - grant capabilities or mutation authority;
 - lower Mission Control risk;
 - bypass verifier independence;
 - alter Commander intent;
-- make memory, craft prose, or provider output authoritative merely because it was supplied to a Crew tour.
+- make memory, craft prose, provider output, model confidence, or filesystem placement authoritative merely because it was supplied to a Crew tour.
 
 Crew competence and Mission authority remain hard eligibility gates. Experience affects ranking only after those gates pass.
+
+Native or external cognition may supply bounded cognitive capability to an already-routed Crew tour, but the provider/model does not select its own Crew assignment, issue its own Mission Order, own Tool Gateway authority, or become an organizational superior. GorXu remains the sole operational orchestrator.
 
 ## Memory planes
 
@@ -32,6 +36,8 @@ A3 retains existing episodic Crew notes and adds durable records for:
 Every durable memory record carries explicit non-empty provenance, confidence, scope, task class when known, timestamps, and an active/superseded state. Unattributed durable memory is rejected. Vessel-memory records may only use Vessel scope. Reusing a memory key supersedes the previous active record rather than silently rewriting history. Records may be explicitly forgotten by deactivation.
 
 Memory is retrieved by relevance. A tour receives only a bounded slice selected for its Crew, objective, and task class. Unrelated memory is not injected and the complete historical memory store is never copied into a tour context.
+
+Memory is infrastructure/context. Persistence location does not create command authority.
 
 ## Performance history
 
@@ -67,6 +73,8 @@ Eligible Crew are then ranked with an auditable score containing these dimension
 
 Historical performance may change the winner among otherwise eligible Crew. It can never make an ineligible Crew member eligible. Replanned graph nodes use the effective Mission/node risk floor when experience affects replacement ranking.
 
+Routing remains GorXu-owned. A model/provider recommendation is candidate context to GorXu's governed routing path, not a command decision that can bypass deterministic eligibility.
+
 ## Context-isolated tours
 
 Every Mission Order remains a fresh bounded tour. Living Company Intelligence continues to add:
@@ -92,6 +100,8 @@ The selected context carries the full-card SHA-256 plus source revision and fres
 
 The complete craft card is never injected by default. Craft context is competence context only: a craft card cannot add a capability, widen scope, lower risk, authorize Repair, override a forbidden action, self-route Crew, or satisfy verifier independence.
 
+Under NCI-1B separated operation, canonical Crew dossiers/craft may be read from the runtime/assets root while Commander work and private state occupy different filesystem roots. This storage topology does not alter the `Commander → Pilot GorXu → Divisions → Standing Crew` hierarchy.
+
 ## Bounded read-only Crew cognition
 
 GroX exposes a provider-neutral Crew cognition seam for **Inspect** tours when a Crew cognition provider is separately supplied. The seam consumes:
@@ -109,7 +119,7 @@ Within an Inspect tour, a cognitive Crew provider may request only:
 - `fs_read`;
 - `test_run`.
 
-Every request is still checked against the issued Mission Order, forbidden actions, Mission scope, Vessel-root confinement, Crew capability, Tool Gateway policy, and host restrictions. The provider does not receive an alternate tool path. Requests for mutation or scope escape fail closed rather than falling back to broader execution.
+Every request is still checked against the issued Mission Order, forbidden actions, Mission scope, Commander-work/Vessel-root confinement appropriate to the active layout, Crew capability, Tool Gateway policy, and host restrictions. The provider does not receive an alternate tool path. Requests for mutation or scope escape fail closed rather than falling back to broader execution.
 
 Default resource limits are:
 
@@ -124,7 +134,9 @@ Governed cognitive observations are persisted as attributable evidence even if t
 
 Known recoverable provider/contract failures degrade to the existing deterministic Crew executor without widening authority. A policy or authority denial does not silently fall back. Unexpected programming defects remain defects rather than being normalized as ordinary provider failure.
 
-Controlled fake-provider CI can qualify this provider-neutral seam and its boundaries. **That evidence does not by itself establish live model-backed Crew operation.** Any project/session or external model provider requires a separate operational qualification before GroX may claim live model-backed Crew cognition.
+Controlled fake-provider CI can qualify this provider-neutral seam and its boundaries. **That evidence does not by itself establish live model-backed Crew operation.** Any project/session, local, or external model provider requires separate operational qualification before GroX may claim the corresponding live model-backed Crew cognition capability.
+
+The current protected source separately qualifies one exact live locally trained neural action-selection provider through this Inspect seam. That provider is a bounded cognitive resource inside an issued Crew tour; it is not a Crew commander, general-purpose LLM, or alternate Pilot.
 
 ## Qualified A3 gate
 
@@ -141,4 +153,4 @@ A3 qualification was established by demonstrating all of the following:
 
 **Exit gate:** repeated Missions measurably improve routing and execution without indiscriminate context growth.
 
-**Current A3 status:** QUALIFIED. Later selective-craft and controlled Crew-cognition hardening are post-Apex extensions and do not redefine the historical A3 gate. Autonomous memory consolidation remains outside the released Apex baseline until separately evidenced and governed.
+**Current A3 status:** QUALIFIED. Later selective-craft, controlled Crew-cognition hardening, live local neural Crew cognition, and NCI filesystem/install foundations are post-Apex extensions and do not redefine the historical A3 gate. Autonomous memory consolidation remains outside the released Apex baseline until separately evidenced and governed.
