@@ -302,17 +302,15 @@ def commission_workspace(
     if marker_exists:
         _validate_workspace_marker(marker, target)
 
+    if target.exists():
+        for name in WORKSPACE_DIRECTORIES:
+            child = target / name
+            if child.exists() and not child.is_dir():
+                raise InstallationError(
+                    f"GroX workspace layout collision: expected directory at {child}"
+                )
+
     target.mkdir(parents=True, exist_ok=True)
-    created: list[str] = []
-    for name in WORKSPACE_DIRECTORIES:
-        child = target / name
-        if child.exists() and not child.is_dir():
-            raise InstallationError(
-                f"GroX workspace layout collision: expected directory at {child}"
-            )
-        if not child.exists():
-            child.mkdir(parents=False)
-            created.append(name)
 
     if not marker_exists:
         _atomic_write_json(
@@ -323,6 +321,17 @@ def commission_workspace(
                 "workspace": str(target),
             },
         )
+
+    created: list[str] = []
+    for name in WORKSPACE_DIRECTORIES:
+        child = target / name
+        if child.exists() and not child.is_dir():
+            raise InstallationError(
+                f"GroX workspace layout collision: expected directory at {child}"
+            )
+        if not child.exists():
+            child.mkdir(parents=False)
+            created.append(name)
 
     _atomic_write_json(
         binding,
