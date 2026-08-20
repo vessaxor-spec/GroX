@@ -136,7 +136,31 @@ jobs:
           /tmp/grox-wheel-env/bin/python -m grox.cli status | tee /tmp/grox-wheel-status.txt
           grep -q 'Standing Crew: 82' /tmp/grox-wheel-status.txt
           grep -q "Vessel root: $GITHUB_WORKSPACE" /tmp/grox-wheel-status.txt
-      - name: Unbound installed CLI fails closed
+      - name: Installed CLI commissions workspace outside checkout
+        run: |
+          rm -rf /tmp/grox-user-config /tmp/grox-user-vessel
+          (cd /tmp && /tmp/grox-wheel-env/bin/python -m grox.cli init \
+            --workspace /tmp/grox-user-vessel \
+            --config-dir /tmp/grox-user-config \
+            --non-interactive \
+            --json) | tee /tmp/grox-init.json
+          test -f /tmp/grox-user-vessel/.grox/workspace.json
+          test -f /tmp/grox-user-config/workspace.json
+          (cd /tmp && /tmp/grox-wheel-env/bin/python -m grox.cli workspace \
+            --config-dir /tmp/grox-user-config \
+            --json) | tee /tmp/grox-workspace.json
+          /tmp/grox-wheel-env/bin/python - <<'PY'
+          import json
+          from pathlib import Path
+          initialized = json.loads(Path('/tmp/grox-init.json').read_text())
+          reported = json.loads(Path('/tmp/grox-workspace.json').read_text())
+          assert initialized['status'] == 'created', initialized
+          assert initialized['workspace'] == '/tmp/grox-user-vessel', initialized
+          assert reported['configured'] is True, reported
+          assert reported['commissioned'] is True, reported
+          assert reported['workspace'] == '/tmp/grox-user-vessel', reported
+          PY
+      - name: Unbound operational CLI still fails closed
         run: |
           set +e
           output=$(cd /tmp && /tmp/grox-wheel-env/bin/python -m grox.cli status 2>&1)
