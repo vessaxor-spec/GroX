@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-import random
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
@@ -19,22 +18,21 @@ TINY_PROVIDER_NAME = "local-neural-session-crew-v1"
 TINY_ACTIONS = ("fs_read", "test_run", "finish")
 
 
-@dataclass(slots=True)
+@dataclass(frozen=True, slots=True)
 class _TinyMLPHandle:
     model_id: str
-    w1: list[list[float]]
-    b1: list[float]
-    w2: list[list[float]]
-    b2: list[float]
+    w1: tuple[tuple[float, ...], ...]
+    b1: tuple[float, ...]
+    w2: tuple[tuple[float, ...], ...]
+    b2: tuple[float, ...]
 
 
 class TinyMLPPythonBackend:
-    """Dependency-free backend for the previously qualified tiny neural policy.
+    """Dependency-free inference backend for the previously qualified tiny policy.
 
-    The tiny artifact is a deterministic reconstruction recipe, not a claim that
-    future GroX models must train at load time. This special backend replays the
-    exact qualified seed/corpus procedure, verifies both the initial and trained
-    weight digests, and then exposes inference through the generic runtime.
+    Training remains provenance. Runtime loading consumes the exact qualified
+    trained weights, so model identity does not depend on floating-point training
+    reproduction across Python versions.
     """
 
     name = TINY_BACKEND_NAME
@@ -62,40 +60,26 @@ class TinyMLPPythonBackend:
             raise ValueError("tiny model artifact parameter count is not 75")
 
         training = raw.get("training")
-        if not isinstance(training, dict):
-            raise ValueError("tiny model training/reconstruction evidence is malformed")
-        expected = {
-            "seed": 7601,
-            "training_examples": 240,
-            "held_out_examples": 100,
-            "initial_held_out_accuracy": 0.44,
-            "final_held_out_accuracy": 1.0,
-            "initial_weights_sha256": "f5c197881e1fbdf90395bbc09d2c1ac7097691ac68101cf573c64a90b419b6b6",
-            "trained_weights_sha256": "7b44fffbc0840d0572194649e47a79c0b1466253e0b93940584dfd5de1beda60",
-        }
-        if training != expected:
-            raise ValueError("tiny model deterministic reconstruction recipe differs from qualified evidence")
+        weights = raw.get("weights")
+        if not isinstance(training, dict) or not isinstance(weights, dict):
+            raise ValueError("tiny model artifact training/weights evidence is malformed")
+        expected_digest = training.get("trained_weights_sha256")
+        if expected_digest != manifest.provenance.get("trained_weights_sha256"):
+            raise ValueError("tiny model trained-weight identity differs from registry provenance")
+        weights_digest = hashlib.sha256(
+            json.dumps(weights, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        if weights_digest != expected_digest:
+            raise ValueError("tiny model internal trained-weight digest mismatch")
 
-        handle = self._initial_handle(seed=training["seed"])
-        if self._digest(handle) != training["initial_weights_sha256"]:
-            raise ValueError("tiny model initial-weight digest mismatch")
-
-        rng = random.Random(training["seed"])
-        examples = [self._training_example(rng) for _ in range(training["training_examples"])]
-        held_out = [self._training_example(rng) for _ in range(training["held_out_examples"])]
-        if round(self._accuracy(handle, held_out), 12) != training["initial_held_out_accuracy"]:
-            raise ValueError("tiny model initial held-out accuracy does not reproduce")
-
-        for _ in range(90):
-            rng.shuffle(examples)
-            for order, craft, memory, observations, target in examples:
-                self._train_one(handle, self._features(order, craft, memory, observations), target)
-
-        if self._digest(handle) != training["trained_weights_sha256"]:
-            raise ValueError("tiny model trained-weight digest does not reproduce")
-        if round(self._accuracy(handle, held_out), 12) != training["final_held_out_accuracy"]:
-            raise ValueError("tiny model final held-out accuracy does not reproduce")
-        return handle
+        w1 = self._matrix(weights.get("w1"), rows=8, cols=5, label="w1")
+        b1 = self._vector(weights.get("b1"), length=8, label="b1")
+        w2 = self._matrix(weights.get("w2"), rows=3, cols=8, label="w2")
+        b2 = self._vector(weights.get("b2"), length=3, label="b2")
+        parameter_count = sum(len(row) for row in w1) + len(b1) + sum(len(row) for row in w2) + len(b2)
+        if parameter_count != 75:
+            raise ValueError(f"tiny model loaded parameter count is not 75: {parameter_count}")
+        return _TinyMLPHandle(model_id=manifest.model_id, w1=w1, b1=b1, w2=w2, b2=b2)
 
     def invoke(self, handle: _TinyMLPHandle, payload: Mapping[str, Any]) -> Mapping[str, Any]:
         order = payload.get("order")
@@ -106,8 +90,27 @@ class TinyMLPPythonBackend:
             raise ValueError("tiny Crew policy requires an order mapping")
         if not isinstance(craft_context, list) or not isinstance(memory_context, list) or not isinstance(observations, list):
             raise ValueError("tiny Crew policy context inputs must be lists")
-        features = self._features(order, craft_context, memory_context, observations)
-        _, probabilities = self._forward(handle, features)
+
+        directive = str(order.get("directive") or order.get("objective") or "").lower()
+        features = (
+            1.0 if observations else 0.0,
+            min(len(observations), 4) / 4.0,
+            1.0 if "test" in directive else 0.0,
+            1.0 if craft_context else 0.0,
+            1.0 if memory_context else 0.0,
+        )
+        hidden = tuple(
+            math.tanh(sum(weight * value for weight, value in zip(row, features)) + bias)
+            for row, bias in zip(handle.w1, handle.b1)
+        )
+        logits = tuple(
+            sum(weight * value for weight, value in zip(row, hidden)) + bias
+            for row, bias in zip(handle.w2, handle.b2)
+        )
+        maximum = max(logits)
+        exponentials = tuple(math.exp(value - maximum) for value in logits)
+        total = sum(exponentials)
+        probabilities = tuple(value / total for value in exponentials)
         action_index = max(range(len(probabilities)), key=lambda index: probabilities[index])
         return {
             "action": TINY_ACTIONS[action_index],
@@ -118,89 +121,19 @@ class TinyMLPPythonBackend:
         return None
 
     @staticmethod
-    def _initial_handle(*, seed: int) -> _TinyMLPHandle:
-        rng = random.Random(seed)
-        return _TinyMLPHandle(
-            model_id=TINY_MODEL_ID,
-            w1=[[rng.uniform(-0.35, 0.35) for _ in range(5)] for _ in range(8)],
-            b1=[0.0] * 8,
-            w2=[[rng.uniform(-0.35, 0.35) for _ in range(8)] for _ in range(3)],
-            b2=[0.0] * 3,
-        )
-
-    @staticmethod
-    def _features(order: Mapping[str, Any], craft_context: list[Any], memory_context: list[Any], observations: list[Any]) -> list[float]:
-        directive = str(order.get("directive") or order.get("objective") or "").lower()
-        return [
-            1.0 if observations else 0.0,
-            min(len(observations), 4) / 4.0,
-            1.0 if "test" in directive else 0.0,
-            1.0 if craft_context else 0.0,
-            1.0 if memory_context else 0.0,
-        ]
-
-    @staticmethod
-    def _forward(handle: _TinyMLPHandle, features: list[float]) -> tuple[list[float], list[float]]:
-        hidden = [
-            math.tanh(sum(weight * value for weight, value in zip(row, features)) + bias)
-            for row, bias in zip(handle.w1, handle.b1)
-        ]
-        logits = [
-            sum(weight * value for weight, value in zip(row, hidden)) + bias
-            for row, bias in zip(handle.w2, handle.b2)
-        ]
-        maximum = max(logits)
-        exponentials = [math.exp(value - maximum) for value in logits]
-        total = sum(exponentials)
-        return hidden, [value / total for value in exponentials]
+    def _vector(raw: Any, *, length: int, label: str) -> tuple[float, ...]:
+        if not isinstance(raw, list) or len(raw) != length:
+            raise ValueError(f"tiny model {label} shape is invalid")
+        values = tuple(float(value) for value in raw)
+        if not all(math.isfinite(value) for value in values):
+            raise ValueError(f"tiny model {label} contains non-finite values")
+        return values
 
     @classmethod
-    def _train_one(cls, handle: _TinyMLPHandle, features: list[float], target: int, *, learning_rate: float = 0.08) -> None:
-        hidden, probabilities = cls._forward(handle, features)
-        output_gradient = list(probabilities)
-        output_gradient[target] -= 1.0
-        hidden_gradient = [
-            sum(handle.w2[action][index] * output_gradient[action] for action in range(3))
-            * (1.0 - hidden[index] * hidden[index])
-            for index in range(len(hidden))
-        ]
-        for action in range(3):
-            for index in range(len(hidden)):
-                handle.w2[action][index] -= learning_rate * output_gradient[action] * hidden[index]
-            handle.b2[action] -= learning_rate * output_gradient[action]
-        for index in range(len(hidden)):
-            for feature_index in range(len(features)):
-                handle.w1[index][feature_index] -= learning_rate * hidden_gradient[index] * features[feature_index]
-            handle.b1[index] -= learning_rate * hidden_gradient[index]
-
-    @classmethod
-    def _training_example(cls, rng: random.Random):
-        wants_test = rng.random() < 0.30
-        observed = rng.random() < 0.50
-        order = {"objective": "Inspect " + ("test evidence" if wants_test else "README evidence")}
-        craft = [{"heading": "Safety Boundaries", "content": "read only"}] if rng.random() > 0.10 else []
-        memory = [{"kind": "semantic", "content": "bounded evidence"}] if rng.random() > 0.10 else []
-        observations = [{"action": "fs_read", "path": "README.md", "status": "ok"}] if observed else []
-        target = 2 if observed else (1 if wants_test else 0)
-        return order, craft, memory, observations, target
-
-    @classmethod
-    def _accuracy(cls, handle: _TinyMLPHandle, examples: list[Any]) -> float:
-        correct = 0
-        for order, craft, memory, observations, target in examples:
-            _, probabilities = cls._forward(handle, cls._features(order, craft, memory, observations))
-            action_index = max(range(len(probabilities)), key=lambda index: probabilities[index])
-            correct += action_index == target
-        return correct / len(examples)
-
-    @staticmethod
-    def _digest(handle: _TinyMLPHandle) -> str:
-        payload = json.dumps(
-            {"w1": handle.w1, "b1": handle.b1, "w2": handle.w2, "b2": handle.b2},
-            sort_keys=True,
-            separators=(",", ":"),
-        )
-        return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    def _matrix(cls, raw: Any, *, rows: int, cols: int, label: str) -> tuple[tuple[float, ...], ...]:
+        if not isinstance(raw, list) or len(raw) != rows:
+            raise ValueError(f"tiny model {label} shape is invalid")
+        return tuple(cls._vector(row, length=cols, label=label) for row in raw)
 
 
 class TinyMLPCrewCognitionProvider:

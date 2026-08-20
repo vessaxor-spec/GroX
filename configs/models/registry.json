@@ -2,9 +2,9 @@
   "models": [
     {
       "artifact": {
-        "bytes": 552,
+        "bytes": 2104,
         "path": "configs/models/tiny-mlp-policy-5x8x3-v1.json",
-        "sha256": "7387333f814c63bbc9f18afb96fe3e61db2c47b58a606aa42e89416dd1b76174"
+        "sha256": "a56d80628797438d4ad876939c7290b149bbbaab76337775eed755d7065f7a84"
       },
       "backend": "tiny-mlp-python-v1",
       "claims": {

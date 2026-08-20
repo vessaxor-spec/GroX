@@ -38,11 +38,19 @@ The first registered model is the already-qualified narrow neural action-selecti
 - placement: Crew only;
 - qualified boundary: bounded Inspect Crew cognition only.
 
-The candidate packages the deterministic reconstruction recipe corresponding to the prior live local neural qualification. The tiny backend replays that exact seed/training procedure locally and refuses the artifact if the reconstructed initial/trained weight digests or held-out accuracies differ. The trained model identity remains:
+The candidate packages the exact trained weights corresponding to the prior live local neural qualification. The artifact retains the prior training provenance and the trained model identity:
 
 `7b44fffbc0840d0572194649e47a79c0b1466253e0b93940584dfd5de1beda60`
 
+Runtime loading verifies the outer artifact SHA-256/byte size and the internal trained-weight digest before inference. Training is not replayed during startup, so model identity does not depend on floating-point training reproduction across Python versions.
+
 Registration does not bind the provider to Pilot GorXu. An explicit runtime load and the existing separate Pilot-owned Crew cognition binding are both still required.
+
+## Preserved red evidence
+
+The first candidate head `1833310769d443ef18f0fb8fce6262e92b5ab712` used the correct deterministic training recipe but reconstructed the trained weights during model load. Protected CI run `32392662853` / run **280** exposed that design as insufficiently portable: Python 3.11 reproduced the initial digest and held-out setup but not the exact final trained-weight digest, while later Python versions followed a different floating-point path.
+
+The failure was contained by the digest gate; no mismatched model was activated. The design was corrected by packaging the already-qualified trained weights directly rather than weakening the integrity assertion or accepting version-dependent model identities.
 
 ## Required qualification
 
@@ -67,7 +75,7 @@ Protected CI must prove:
 
 ## Evidence state
 
-This file intentionally contains no PASS result, CI run identifier, final candidate head, canonical merge SHA, or qualified tree yet.
+This file intentionally contains no PASS result, final successful CI run identifier, final candidate head, canonical merge SHA, or qualified tree yet.
 
 Those facts will be recorded only after they actually occur.
 
