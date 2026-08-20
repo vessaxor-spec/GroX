@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from contextlib import redirect_stdout
+import io
 import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
+from grox import cli
 from grox.installation import (
     InstallationError,
     WORKSPACE_DIRECTORIES,
@@ -121,6 +125,21 @@ class InstallationTests(unittest.TestCase):
             self.assertEqual(second.created_directories, ())
             self.assertEqual(load_workspace_binding(config_dir=config), workspace.resolve())
 
+    def test_marked_partial_workspace_can_be_completed_on_retry(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            workspace = root / "vessel"
+            config = root / "config"
+            commission_workspace(workspace, config_dir=config)
+            workspace_binding_file(config_dir=config).unlink()
+            missing = workspace / "models"
+            missing.rmdir()
+            retried = commission_workspace(workspace, config_dir=config)
+            self.assertEqual(retried.status, "existing")
+            self.assertEqual(retried.created_directories, ("models",))
+            self.assertTrue(missing.is_dir())
+            self.assertEqual(load_workspace_binding(config_dir=config), workspace.resolve())
+
     def test_nonempty_unrelated_directory_is_not_claimed(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -226,6 +245,42 @@ class InstallationTests(unittest.TestCase):
                 commission_workspace(second, config_dir=config)
             self.assertFalse(second.exists())
             self.assertEqual(load_workspace_binding(config_dir=config), first.resolve())
+
+    def test_cli_init_and_workspace_do_not_require_operational_vessel_root(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            workspace = root / "vessel"
+            config = root / "config"
+            init_out = io.StringIO()
+            with patch(
+                "grox.cli.resolve_vessel_root",
+                side_effect=AssertionError("operational Vessel root must not resolve"),
+            ), redirect_stdout(init_out):
+                cli.main(
+                    [
+                        "init",
+                        "--workspace",
+                        str(workspace),
+                        "--config-dir",
+                        str(config),
+                        "--non-interactive",
+                        "--json",
+                    ]
+                )
+            initialized = json.loads(init_out.getvalue())
+            self.assertEqual(initialized["status"], "created")
+            self.assertEqual(initialized["workspace"], str(workspace.resolve()))
+
+            status_out = io.StringIO()
+            with patch(
+                "grox.cli.resolve_vessel_root",
+                side_effect=AssertionError("operational Vessel root must not resolve"),
+            ), redirect_stdout(status_out):
+                cli.main(["workspace", "--config-dir", str(config), "--json"])
+            reported = json.loads(status_out.getvalue())
+            self.assertTrue(reported["configured"])
+            self.assertTrue(reported["commissioned"])
+            self.assertEqual(reported["workspace"], str(workspace.resolve()))
 
 
 if __name__ == "__main__":
