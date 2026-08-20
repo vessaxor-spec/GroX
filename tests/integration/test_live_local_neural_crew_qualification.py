@@ -106,21 +106,37 @@ def _training_example(rng: random.Random):
     return order, craft, memory, observations, target
 
 
+def _accuracy(model, examples) -> float:
+    correct = 0
+    for order, craft, memory, observations, target in examples:
+        action, _ = model.predict(order, craft, memory, observations)
+        correct += _ACTIONS.index(action) == target
+    return correct / len(examples)
+
+
 def _train_local_policy():
     rng = random.Random(_SEED)
     training = [_training_example(rng) for _ in range(240)]
     held_out = [_training_example(rng) for _ in range(100)]
     model = _TinyNeuralCrewPolicy()
+    initial_digest = model.digest()
+    initial_accuracy = _accuracy(model, held_out)
+
     for _ in range(90):
         rng.shuffle(training)
         for order, craft, memory, observations, target in training:
             model.train_one(model.features(order, craft, memory, observations), target)
 
-    correct = 0
-    for order, craft, memory, observations, target in held_out:
-        action, _ = model.predict(order, craft, memory, observations)
-        correct += _ACTIONS.index(action) == target
-    return model, correct / len(held_out), len(training), len(held_out)
+    final_accuracy = _accuracy(model, held_out)
+    return {
+        "model": model,
+        "initial_digest": initial_digest,
+        "final_digest": model.digest(),
+        "initial_accuracy": initial_accuracy,
+        "final_accuracy": final_accuracy,
+        "training_count": len(training),
+        "held_out_count": len(held_out),
+    }
 
 
 class _LocalNeuralSessionProvider(SessionCrewCognitionProvider):
@@ -158,8 +174,11 @@ class _LocalNeuralSessionProvider(SessionCrewCognitionProvider):
 
 class LiveLocalNeuralCrewQualificationTests(unittest.TestCase):
     def test_locally_trained_neural_provider_passes_canonical_bounded_gate(self):
-        policy, held_out_accuracy, training_count, held_out_count = _train_local_policy()
-        self.assertGreaterEqual(held_out_accuracy, 0.95)
+        training = _train_local_policy()
+        policy = training["model"]
+        self.assertGreaterEqual(training["final_accuracy"], 0.95)
+        self.assertGreaterEqual(training["final_accuracy"] - training["initial_accuracy"], 0.25)
+        self.assertNotEqual(training["initial_digest"], training["final_digest"])
         self.assertGreater(policy.parameter_count, 0)
 
         td, root, pilot = temp_vessel()
@@ -201,11 +220,17 @@ class LiveLocalNeuralCrewQualificationTests(unittest.TestCase):
                 "training_runtime": "current-python-process",
                 "network_required": False,
                 "external_disclosure": False,
-                "training_examples": training_count,
-                "held_out_examples": held_out_count,
-                "held_out_accuracy": round(held_out_accuracy, 6),
+                "training_examples": training["training_count"],
+                "held_out_examples": training["held_out_count"],
+                "initial_held_out_accuracy": round(training["initial_accuracy"], 6),
+                "held_out_accuracy": round(training["final_accuracy"], 6),
+                "held_out_accuracy_improvement": round(
+                    training["final_accuracy"] - training["initial_accuracy"], 6
+                ),
                 "learned_parameters": policy.parameter_count,
-                "model_sha256": policy.digest(),
+                "initial_model_sha256": training["initial_digest"],
+                "model_sha256": training["final_digest"],
+                "weights_changed_by_training": training["initial_digest"] != training["final_digest"],
                 "inference_count": len(provider.inference_trace),
                 "inference_trace": provider.inference_trace,
                 "canonical_qualification": report,
