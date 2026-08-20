@@ -1,12 +1,14 @@
 # GroX Architecture
 
-**Qualified release baseline:** GroX `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`. Canonical source continues on protected `main` and may advance beyond that immutable release through governed PR/CI. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. A1–A7 are qualified for the current project-hosted operating model.
+**Qualified release baseline:** GroX `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`. Canonical source continues on protected `main` and may advance beyond that immutable release through governed PR/CI. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. A1–A7 are qualified for the current project-hosted operating model. Protected source additionally contains NCI-1A installed-workspace commissioning and NCI-1B runtime/state/work filesystem-role separation; those post-release foundations do not create a new command layer, Apex stage, or release.
 
 ## Purpose
 
-GroX is an independent persistent AI command environment. The running system is the Vessel. The human Commander directs the Vessel through Pilot GorXu, the primary orchestrator and second-in-command.
+GroX is an independent persistent AI personal assistant and command environment. The running system is the Vessel. The human Commander directs the Vessel through Pilot GorXu, the principal personal-assistant interface, sole operational orchestrator, and second-in-command.
 
 ## Command architecture
+
+The canonical command hierarchy is deliberately small and must remain visually and operationally distinct from infrastructure:
 
 ```text
 Commander
@@ -30,38 +32,129 @@ Pilot GorXu
 
 GorXu is the single operational orchestrator. Mission Control is a native GroX subsystem managed by GorXu. It may enforce GroX constitutional constraints, but it does not create an independent command hierarchy.
 
-## Authority flow
+No model, runtime, installer, launcher, state store, workspace, tool, memory system, evaluator, trainer, or other capability may be inserted above GorXu, made a command peer to GorXu, or placed between GorXu and Divisions/Standing Crew as an authority layer.
+
+## Command versus infrastructure boundary
+
+GroX distinguishes **authority flow** from **resource flow**.
+
+### Authority flow
+
+```text
+Commander
+    ↓
+Pilot GorXu
+    ↓
+Divisions
+    ↓
+Standing Crew
+```
+
+### Infrastructure/resources used by that authority flow
+
+```text
+native/local cognition            optional external intelligence
+runtime assets / Crew definitions private Vessel state
+Commander work root               Tool Gateway / governed tools
+memory / evidence                 training / evaluation / lineage
+inference backends                installer / CLI / desktop launcher
+```
+
+The infrastructure block has no command rank. It exists to let GorXu and authorized Crew perform work.
+
+Consequences:
+
+- Crew dossiers and craft can be stored under runtime assets without placing Crew above GorXu;
+- a native model may power Pilot cognition and authorized Crew cognition without becoming the Pilot or an intermediate command layer;
+- an external model remains a governed capability selected by GorXu, not an inherited authority source;
+- a CLI, bridge, or desktop launcher is a Commander Seat entry path into the same GorXu-led Vessel, not another orchestrator;
+- private state records and restores Vessel activity but does not decide Commander intent;
+- the Commander workspace is a bounded work surface, not a source of command authority.
+
+Physical storage placement, process topology, model dependency, or data flow must never be interpreted as organizational rank.
+
+## Authority flow in operation
 
 1. The Commander provides intent.
 2. GorXu interprets the directive and determines the work required.
-3. GorXu consults Mission Control and relevant Crew for risk, capability, research, and verification needs.
-4. GorXu issues bounded Mission Orders to selected Crew.
-5. Crew execute only within the granted authority.
+3. GorXu consults Mission Control and relevant Crew/capabilities for risk, capability, research, and verification needs.
+4. GorXu selects eligible Crew and issues bounded Mission Orders.
+5. Crew execute only within the granted authority through governed capabilities.
 6. Exceptions return to GorXu. GorXu may consult additional Crew before deciding.
 7. Critical, irreversible, or material intent-changing decisions escalate to the Commander.
 8. Evidence and verification return through GorXu for synthesis and closure.
 
 Authority may narrow as it travels downward. It may not widen without a new decision from the appropriate authority.
 
-## Runtime layers
+## Runtime components
 
-1. **Commander Seat:** CLI/bridge for directives, status, intervention, and review.
-2. **Pilot GorXu:** interprets intent, plans, consults Mission Control, selects Crew, issues Orders, and synthesizes outcomes.
-3. **Mission Control:** risk, authority, routing, verification, evidence, and advisory policy.
-4. **Standing Crew:** durable organizational identity with fresh mission-specific tours, bounded relevant memory, selective deep craft on Inspect tours, and optional governed read-only cognition when separately configured.
-5. **Tool Gateway:** deny-wins capability enforcement and host/Vessel confinement.
-6. **Mission Store:** durable Mission, Order, Evidence, Crew, memory, and performance state.
-7. **Living Company Intelligence:** advisory memory retrieval, Inspect-only selective specialist craft context, and experienced eligible-Crew ranking under GorXu.
-8. **Durable Operations:** private graph-run/checkpoint/exception/mutation ledger for safe resume and compensation under GorXu.
-9. **Executive Exception Loop:** deterministic classification and bounded consultation/replan policy under GorXu.
-10. **Verification:** independent verification path where policy requires it.
-11. **Persistence Manager:** private operational-state snapshots, integrity checking, and confirmation-gated restore.
+The following list describes runtime components, **not command rank**. Component numbering does not imply that one component commands another.
+
+1. **Commander Seat:** CLI/bridge and future launcher/UI surfaces for directives, status, intervention, and review.
+2. **Pilot GorXu:** interprets intent, plans, consults Mission Control, selects Crew, issues Orders, governs cognition/capability use, and synthesizes outcomes.
+3. **Mission Control:** risk, authority, routing, verification, evidence, and advisory policy under GorXu.
+4. **Standing Crew:** durable organizational identities with fresh mission-specific tours, bounded relevant memory, selective deep craft on Inspect tours, and optional governed read-only cognition when separately configured.
+5. **Native/external cognition resources:** provider/model capabilities that may advise Pilot GorXu or operate inside explicitly authorized Crew cognition placements; never command layers.
+6. **Tool Gateway:** deny-wins capability enforcement and Commander-work/host confinement.
+7. **Mission Store:** durable Mission, Order, Evidence, Crew, memory, and performance state.
+8. **Living Company Intelligence:** advisory memory retrieval, Inspect-only selective craft context, and experienced eligible-Crew ranking under GorXu.
+9. **Durable Operations:** private graph-run/checkpoint/exception/mutation ledger for safe resume and compensation under GorXu.
+10. **Executive Exception Loop:** deterministic classification and bounded consultation/replan policy under GorXu.
+11. **Verification:** independent verification path where policy requires it.
+12. **Persistence Manager:** private operational-state snapshots, integrity checking, and confirmation-gated restore.
+13. **Installation/runtime layout:** host configuration, runtime assets, private state, Commander work, and future launcher/model provisioning used to materialize the same Vessel on supported hosts.
 
 Selective Crew cognition is not another runtime command layer. It is an optional bounded working mode inside an already-issued Standing Crew Inspect tour and remains subordinate to the same Mission Order and Tool Gateway.
 
+## NCI filesystem-role architecture
+
+NCI-1A and NCI-1B establish the local-installation/runtime foundation beneath the existing command model.
+
+### NCI-1A — commissioned workspace
+
+Current protected source can commission a dedicated local workspace with:
+
+- default `~/GroX`;
+- Commander-selected alternative path;
+- platform-aware Linux/macOS host configuration;
+- versioned workspace ownership marker and host binding;
+- collision and implicit-rebind refusal;
+- atomic configuration writes;
+- idempotent same-workspace commissioning;
+- marked partial-workspace recovery.
+
+This commissioning layer does not create a second Vessel or Pilot.
+
+### NCI-1B — separated runtime, state, and work
+
+`VesselLayout` distinguishes three filesystem roles:
+
+```text
+runtime/assets root      private state root      Commander work root
+       │                        │                       │
+Crew dossiers/craft       grox.sqlite3             Mission files
+policy / schemas           browser evidence         Tool Gateway fs scope
+versioned app assets       isolated scratch         bounded tests/work
+```
+
+Separated layouts require the three roots not to overlap. Legacy `PilotGorXu(vessel_root)` behavior remains supported through a one-root compatibility layout, including the historical `configs/state/grox.sqlite3` path.
+
+In separated mode:
+
+- Pilot GorXu loads the Standing Crew roster and runtime policy from `asset_root`;
+- private SQLite state lives under `state_root`;
+- browser evidence and isolated-workspace scratch use private state rather than Commander work;
+- Tool Gateway ordinary filesystem authority is rooted only at `work_root`;
+- runtime assets and private state are outside normal Commander-work filesystem traversal;
+- path escape from Commander work into state/assets fails closed.
+
+This is a filesystem/security architecture **below Pilot GorXu**. Crew definitions residing in `asset_root` remain subordinate to GorXu. Model artifacts later placed in runtime/model resources will likewise remain governed capabilities rather than authority layers.
+
+NCI-1C is the next installation blocker: package the canonical runtime assets required by Pilot GorXu and bind them to the commissioned workspace so an installed non-editable GroX can start the real Vessel without a source checkout or `GROX_VESSEL_ROOT`. That future slice must preserve the same command hierarchy.
+
 ## Standing Crew model
 
-Crew are logically persistent organizational identities with durable dossiers, competencies, procedures, history, memory, and canonical specialist craft. They need not remain as live model processes while asleep.
+Crew are logically persistent organizational identities with durable dossiers, competencies, procedures, history, memory, and canonical craft. They need not remain as live model processes while asleep.
 
 Each wake creates a fresh tour context containing only what is needed for the current Mission plus relevant retrieved memory. A bounded Inspect tour may additionally receive Mission-relevant craft sections from that Crew member's canonical craft card. Verify, Repair, and Execute do not carry unused deep craft in the first cognition seam. The complete historical memory store and complete deep craft card are never injected by default.
 
@@ -70,7 +163,7 @@ Crew competence and Mission authority are separate:
 - Competence describes what a Crew member knows how to do.
 - Mission authority describes what that Crew member may do now.
 
-Craft, memory, provider output, confidence, and prior performance belong to the competence/advisory side of that boundary. They cannot manufacture authority.
+Craft, memory, provider output, confidence, prior performance, and model quality belong to the competence/advisory side of that boundary. They cannot manufacture authority or alter Crew position beneath GorXu.
 
 ## Mission Control
 
@@ -209,6 +302,8 @@ A5 browser capture deliberately keeps network authority in the Gateway: approved
 
 The Crew cognition seam reuses this same Gateway. It does not add direct provider tool ownership, an alternate filesystem API, broader network access, or an MCP/desktop path.
 
+NCI-1B further binds ordinary filesystem access to the Commander work root in separated mode. Private state and runtime assets are outside that root and may not be reached through path escape.
+
 Unrestricted interactive desktop actuation, arbitrary third-party/networked MCP transports, runtime image pulls/builds, and optional external-agent delegation remain outside the A5-qualified boundary.
 
 ## Memory architecture
@@ -233,7 +328,9 @@ GorXu may use a provider-neutral reasoning layer for interpretation, uncertainty
 
 Deterministic Mission Control and Tool Gateway policy remain capable of denying model proposals. A model may raise caution but cannot lower the risk floor or grant itself mutation authority.
 
-Pilot cognition and Crew cognition are distinct placements under the same authority doctrine. Pilot cognition advises GorXu before or during orchestration. Optional Crew cognition operates only inside an already-issued bounded Inspect tour. Neither placement can create authority, and external intelligence does not inherit command merely because a provider can reason.
+Pilot cognition and Crew cognition are distinct placements under the same authority doctrine. Pilot cognition supplies cognitive energy/advice to GorXu before or during orchestration. Optional Crew cognition operates only inside an already-issued bounded Inspect tour. Neither placement can create authority, and external intelligence does not inherit command merely because a provider can reason.
+
+The Native Cognition Independence program changes **who owns and can supply the cognitive engine**, not who is Pilot. Native local cognition exists to make GorXu a stronger, more independent orchestrator and personal assistant. It does not replace GorXu or sit between GorXu and Crew as command authority.
 
 ## Recruitment and evolution
 
@@ -246,15 +343,17 @@ A recruit becomes durable standing Crew with a canonical dossier. Recruitment mu
 - silently duplicate an existing Crew role;
 - bypass inspection, validation, or roster integrity checks.
 
-Evolution should modify skills, procedures, routing metadata, and memory through evidence-backed processes rather than uncontrolled self-rewriting.
+Evolution should modify skills, procedures, routing metadata, memory, and cognition through evidence-backed processes rather than uncontrolled self-rewriting. Model evolution cannot self-authorize promotion or change the command hierarchy.
 
 ## Persistence planes
 
-GroX separates persistence into three planes:
+GroX separates persistence into three responsibility planes:
 
-1. **Cognitive continuity:** the `Space Exploration` ChatGPT project is the current reconstitution home for Pilot GorXu and durable project context.
+1. **Cognitive continuity:** the `Space Exploration` ChatGPT project is the current reconstitution home for Pilot GorXu and durable project context while native local cognition remains under development.
 2. **Vessel source:** the GroX GitHub repository is the durable body for code, doctrine, Crew dossiers, tests, and source-controlled history.
 3. **Operational state:** private Mission, evidence, Crew, and runtime-memory state is persisted locally and exported as verified private `.groxstate` snapshots.
+
+These persistence planes are separate from NCI-1B's runtime/assets, private-state, and Commander-work filesystem roles. Neither construct is a command hierarchy.
 
 The active sandbox is a replaceable flight computer, not the permanent Vessel. Full rules and recovery gates are defined in `docs/architecture/PERSISTENCE_ARCHITECTURE.md`.
 
@@ -270,7 +369,7 @@ GroX is incomplete without a usable Commander Seat. The Commander must be able t
 - suspend or terminate a Mission;
 - review the Vessel's current condition.
 
-CLI is the initial interface. Other interfaces can be added without changing the command architecture.
+CLI is the initial interface. Other interfaces and desktop launchers can be added without changing the command architecture. Every interface must enter the same Pilot GorXu authority plane.
 
 ## Apex synthesis and budget integrity
 
@@ -286,3 +385,9 @@ The A7-qualified Mission Graph extends structural synthesis with attributable co
 - Equal-weight conflict remains unresolved rather than manufacturing certainty.
 
 These controls improve orchestration quality without changing the command relationship or granting new authority.
+
+## Architecture non-regression statement
+
+All future NCI, model, installer, launcher, persistence, Crew, and capability work must preserve the following interpretation without ambiguity:
+
+> **The Commander directs Pilot GorXu. Pilot GorXu orchestrates Divisions and Standing Crew. Models and infrastructure supply capabilities and energy to that GorXu-led Vessel; they do not command it.**

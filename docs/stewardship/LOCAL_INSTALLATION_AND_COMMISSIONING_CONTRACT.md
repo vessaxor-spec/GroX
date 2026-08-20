@@ -1,7 +1,7 @@
 # Local Installation and Commissioning Contract
 
-**Status:** AUTHORIZED NCI REQUIREMENT — NOT YET IMPLEMENTED OR QUALIFIED  
-**Issue:** #88  
+**Status:** AUTHORIZED NCI REQUIREMENT — NCI-1A / NCI-1B FOUNDATION CANONICAL; FULL LOCAL INSTALLATION NOT YET QUALIFIED  
+**Originating issue:** #88  
 **Program:** Native Cognition Independence Program 001
 
 ## Purpose
@@ -14,7 +14,7 @@ The public installation objective is:
 
 > A user on a supported macOS or Linux host should be able to install GroX from one documented README command, invoke `grox`, commission a local Vessel, converse with Pilot GorXu, and later reconstitute the same Vessel without requiring a paid AI subscription or a source checkout.
 
-This contract defines the installation and first-run boundary that NCI implementation must satisfy. It does not claim that the complete installer, native language model, desktop launcher, or offline qualification already exists.
+This contract defines the installation and first-run boundary that NCI implementation must satisfy. NCI-1A and NCI-1B now implement important foundations of this contract, but they do not yet prove the complete installer, packaged runtime assets, native language model, desktop launcher, standalone installed GorXu, or offline qualification.
 
 ## Preserved command architecture
 
@@ -22,9 +22,36 @@ Installation does not alter GroX command authority:
 
 > **Commander → Pilot GorXu → Divisions → Standing Crew**
 
-Pilot GorXu remains second-in-command, principal personal-assistant interface, and sole operational orchestrator. The CLI, desktop launcher, installer, workspace manager, model runtime, and external providers are entry points or capabilities, not command layers.
+Pilot GorXu remains second-in-command, principal personal-assistant interface, and sole operational orchestrator. The CLI, desktop launcher, installer, workspace manager, model runtime, local/native models, external providers, filesystem roots, state stores, and runtime assets are entry paths, capabilities, or infrastructure—not command layers.
 
 Every supported entry path must reach the same Vessel and the same GorXu authority plane.
+
+### Command is not installation layout
+
+Installation and filesystem diagrams must never be read as organizational charts. The installed/runtime layout exists beneath the command spine:
+
+```text
+COMMAND
+
+Commander
+    ↓
+Pilot GorXu
+    ↓
+Divisions
+    ↓
+Standing Crew
+
+INFRASTRUCTURE / RESOURCES USED BY THAT COMMAND SPINE
+
+runtime assets   private state   Commander work   native/external models
+      │               │               │                    │
+Crew/craft       memory/evidence   Tool Gateway       cognitive energy
+policy/schemas   mutable runtime   Mission files      governed capability
+```
+
+A Crew dossier being stored in runtime assets does not place Crew above GorXu. A native model powering GorXu or a Crew tour does not become a command layer between GorXu and Crew. A desktop launcher starts the same GorXu-led Vessel; it does not create another Pilot.
+
+This is a non-regression requirement for all installation/NCI work.
 
 ## Target normal-user flow
 
@@ -56,7 +83,7 @@ Pilot GorXu online
 Commander>
 ```
 
-The eventual README should place this user path before source/developer installation.
+The eventual README should place this user path before source/developer installation once the path actually exists and is qualified.
 
 ## Supported host target
 
@@ -96,17 +123,20 @@ Where should GroX establish its dedicated workspace?
 Create a desktop launcher? [Y/n]:
 ```
 
-Non-interactive commissioning must eventually provide an explicit path flag or configuration mechanism rather than guessing.
+NCI-1A already provides a non-interactive `grox init` commissioning primitive and explicit workspace binding. The fully interactive no-argument first-run wizard remains future work.
 
 ## Installed runtime and Vessel workspace are separate
 
-GroX must distinguish at least these concepts:
+GroX distinguishes these concepts:
 
-1. **Installed application/runtime** — replaceable/versioned GroX executable, Python/runtime assets, schemas, built-in Crew definitions, and other immutable application resources.
-2. **Host configuration** — the minimal platform-appropriate configuration required to locate the active commissioned Vessel workspace and installation metadata.
-3. **Vessel workspace** — mutable Commander/Vessel state that must survive normal application upgrades.
+1. **Installed application/runtime assets** — replaceable/versioned GroX executable, Python/runtime assets, schemas, built-in Crew definitions, policy, and other immutable application resources.
+2. **Host configuration** — minimal platform-appropriate configuration required to locate the active commissioned Vessel workspace and installation metadata.
+3. **Private Vessel state** — mutable internal state such as SQLite, evidence/runtime scratch, memory, snapshots, and later model/runtime state that ordinary Commander-work filesystem authority must not expose.
+4. **Commander work** — the user/Mission filesystem boundary within which Tool Gateway performs authorized ordinary work.
 
-The target workspace may contain, as implementation evolves:
+NCI-1B expresses the runtime/state/work separation through `VesselLayout`. Separated operation requires runtime/assets, private state, and Commander work roots not to overlap. Legacy one-root source-checkout behavior remains supported for compatibility.
+
+A commissioned workspace may contain, as implementation evolves:
 
 ```text
 ~/GroX/
@@ -128,20 +158,21 @@ Exact internal layout remains an implementation decision and must not duplicate 
 - upgrading the GroX application must not silently erase or replace the Commander's persistent Vessel workspace;
 - uninstalling the executable must not silently destroy the workspace;
 - destructive workspace removal requires an explicit, separately authorized user action;
-- source/runtime version changes must remain subject to compatibility, health, and reconstitution checks.
+- source/runtime version changes must remain subject to compatibility, health, and reconstitution checks;
+- upgrade or uninstall behavior may not move command authority away from GorXu or create an alternate state authority.
 
-## Host configuration target
+## Host configuration
 
-GroX should use platform-appropriate per-user configuration locations to remember the commissioned workspace rather than requiring a global `/home/Grox` path.
+GroX uses platform-appropriate per-user configuration locations to remember the commissioned workspace rather than requiring a global `/home/Grox` path.
 
-Target conventions:
+NCI-1A established the current path contract:
 
-- Linux: XDG-style per-user configuration, such as `$XDG_CONFIG_HOME/grox/` when set or the corresponding user config default;
-- macOS: a per-user Application Support/configuration location appropriate to macOS.
+- Linux: XDG-style per-user configuration, honoring an absolute `$XDG_CONFIG_HOME` when set and otherwise using the platform default user configuration location;
+- macOS: per-user Application Support configuration.
 
-The exact config filename/schema belongs to NCI-1 implementation and must be versioned and recoverable. The visible default Vessel workspace remains `~/GroX` unless the Commander chooses another path.
+The binding schema is versioned and fail-closed. The visible default Vessel workspace remains `~/GroX` unless the Commander chooses another path.
 
-Environment variables may remain useful for development, testing, recovery, or explicit host overrides, but ordinary installed operation should not require users to manually set `GROX_VESSEL_ROOT` merely to start GroX.
+Environment variables remain useful for development, testing, recovery, or explicit host overrides, but ordinary installed operation should ultimately not require users to manually set `GROX_VESSEL_ROOT` merely to start GroX.
 
 ## CLI contract
 
@@ -155,7 +186,14 @@ Normal no-argument invocation should ultimately mean: enter or start the commiss
 
 If no Vessel has been commissioned, `grox` should route into safe first-run commissioning rather than constructing an empty company silently or failing only because the user is outside a Git checkout.
 
-Target lifecycle surface, subject to implementation review:
+Current NCI-1A commissioning surface includes:
+
+```text
+grox init
+grox workspace
+```
+
+The broader target lifecycle surface, subject to implementation review, remains:
 
 ```text
 grox
@@ -178,7 +216,7 @@ Only the smallest useful command set should be implemented at each stage. This l
 
 Existing Mission, Crew, health, snapshot, and Commander-bridge commands remain part of the same CLI rather than being replaced by another command system.
 
-## First-run commissioning responsibilities
+## Commissioning responsibilities
 
 Commissioning should eventually perform, in a bounded and observable sequence:
 
@@ -193,6 +231,8 @@ Commissioning should eventually perform, in a bounded and observable sequence:
 9. optionally install the desktop launcher;
 10. run Vessel health/readiness checks;
 11. enter Pilot GorXu only after commissioning is safe enough for the claimed operating mode.
+
+NCI-1A currently implements bounded workspace selection/defaulting, workspace ownership markers, platform-aware host configuration, atomic binding writes, idempotent same-workspace commissioning, collision/refusal rules, and marked partial-commissioning recovery. Hardware/model provisioning, launcher installation, packaged runtime assets, and first standalone installed Pilot boot remain outstanding.
 
 Failure during commissioning must fail closed or leave a recoverable partial state. It must not widen Crew authority or silently bypass health/integrity gates.
 
@@ -214,7 +254,7 @@ verified model/runtime provisioning
 commissioned Vessel
 ```
 
-This permits multiple hardware profiles while retaining one GroX command architecture.
+This is a provisioning flow, **not a command hierarchy**. The resulting cognition remains a governed capability under Pilot GorXu.
 
 Potential profile labels such as Compact, Standard, or Enhanced are not canonical until model selection and hardware evidence support them.
 
@@ -229,7 +269,7 @@ Model artifacts require:
 - health/readiness evidence;
 - explicit qualification status.
 
-A larger model does not acquire more GroX authority.
+A larger model does not acquire more GroX authority. A native model does not become the Pilot. External models remain optional governed resources that GorXu may select for relevant Missions/Crew when available and useful.
 
 ## Desktop launcher contract
 
@@ -248,6 +288,7 @@ Provide a desktop entry compatible with common desktop environments that starts 
 - one Vessel;
 - one Pilot GorXu;
 - same workspace binding;
+- same `Commander → Pilot GorXu → Divisions → Standing Crew` command spine;
 - same authority, persistence, evidence, and verification rules;
 - no hidden alternative state store;
 - no additional orchestration layer.
@@ -291,18 +332,51 @@ grox
 
 The first run should explain that the default workspace is `~/GroX` and that it can be changed during commissioning.
 
-Developer/source installation should appear separately and remain clearly labeled as the development path.
+Until then, README must accurately describe the current source/developer path and separately show the implemented installed-wheel commissioning foundation without implying standalone installed GorXu is already available.
 
-## NCI stage integration
+Developer/source installation should remain clearly labeled as the development path.
 
-### NCI-1
+## NCI implementation integration
 
-NCI-1 must define both:
+### NCI-1A — installed workspace commissioning foundation
 
-- the native cognition runtime/model contract; and
-- the installed-runtime / commissioned-workspace contract.
+**Canonical foundation complete.** Current protected source provides:
 
-NCI-1 should establish the boundaries needed for model registry/lineage, local inference, hardware discovery, resource ceilings, health/reconstitution, application installation, workspace binding, and persistent state placement without changing GorXu's command role.
+- `grox init` and `grox workspace` without requiring operational Vessel-root resolution merely to commission/inspect the workspace binding;
+- `~/GroX` default workspace;
+- Linux/macOS per-user host configuration;
+- versioned workspace marker and host binding;
+- atomic binding writes;
+- idempotent same-workspace commissioning;
+- collision, malformed binding, path mismatch, implicit rebind, and unsupported-platform fail-closed behavior;
+- marked partial-workspace recovery;
+- non-editable wheel commissioning outside a checkout while unbound operational commands continue to fail closed.
+
+NCI-1A was merged through PR #91 as canonical source `2b4e1c8f3fff8081a30dab4702738cf8b5c01480` before later NCI-1B evolution.
+
+### NCI-1B — runtime/state/work separation
+
+**Canonical foundation complete.** Current protected source provides:
+
+- explicit `VesselLayout` with runtime/assets, private state, and Commander work roles;
+- strict non-overlap for separated layouts;
+- legacy one-root compatibility;
+- Pilot GorXu loading Standing Crew/runtime policy from runtime assets;
+- private SQLite/browser/workspace scratch placement outside Commander work in separated mode;
+- Tool Gateway filesystem authority rooted only in Commander work;
+- regression proof that all 82 Crew load and bounded Inspect work cannot path-escape into private state or runtime assets.
+
+NCI-1B was merged through PR #93 as canonical source `55c98b13a169476cfedad89c1db2c2c36e9536fd` after exact-head CI run `32356241254` / run 270 passed all five required jobs. Its canonical tree `fa4255792801a2b45a2b1daad2ecee334a55484d` exactly matches the CI-tested synthetic merge tree.
+
+### NCI-1C — next installation blocker
+
+The next local-installation slice is to package the canonical runtime assets required by Pilot GorXu and connect them to the commissioned workspace through the separated layout so a non-editable installed GroX can start the real Vessel without a source checkout or `GROX_VESSEL_ROOT`.
+
+This slice must preserve GorXu above and orchestrating Divisions/Crew. Packaging Crew definitions or a native model alongside the installed runtime does not create a command layer.
+
+### Remaining NCI-1 runtime work
+
+The broader NCI-1 exit still includes the native model/runtime contract: model registry and lineage, local inference-provider interface, hardware/runtime discovery, deterministic resource/context ceilings, cognition placement, model health/readiness evidence, fail-closed fallback, and reconstitution. NCI-1 as a whole is therefore **not yet qualified** merely because NCI-1A and NCI-1B are canonical.
 
 ### NCI-2
 
@@ -310,7 +384,7 @@ Built-in local seed cognition must be provisionable into an installed/commission
 
 ### NCI-3
 
-Offline GorXu qualification must run from the installed local Vessel path rather than relying on a developer checkout as the product architecture.
+Offline GorXu qualification must run from the installed local Vessel path rather than relying on a developer checkout as the product architecture. It must preserve direct Commander↔GorXu interaction and GorXu's Crew-orchestration role.
 
 ### NCI-8
 
@@ -331,7 +405,7 @@ create/verify launcher where in scope
     ↓
 Pilot GorXu online
     ↓
-Commander conversation + Crew delegation + bounded Mission
+Commander conversation + GorXu Crew delegation + bounded Mission
     ↓
 evidence + independent verification
     ↓
@@ -359,25 +433,28 @@ External models, remote compute, network tools, and paid intelligence remain val
 
 ## Current claim boundary
 
-As of this contract's authorization:
+Current protected source now establishes more than the original contract did, but the consumer installation journey is not finished:
 
-- GroX already exposes a Python `grox` CLI entry point;
-- current non-editable installed operation still requires binding to a valid GroX source/Vessel root;
-- the current README source quick start remains a developer/source installation path;
-- the one-command normal-user installer is not yet qualified;
-- first-run commissioning is not yet implemented as described here;
-- a self-contained native language model is not yet shipped;
+- GroX exposes a Python `grox` CLI entry point;
+- `grox init` and `grox workspace` implement real commissioning/binding foundations;
+- a non-editable installed wheel has been proven able to commission a workspace outside a checkout;
+- NCI-1B provides separated runtime/assets, private-state, and Commander-work roles beneath Pilot GorXu;
+- the existing operational CLI still requires valid runtime/source assets; standalone installed Pilot GorXu is not yet qualified;
+- canonical runtime assets are not yet packaged for standalone installed operation;
+- the current README source quick start remains the truthful operational/developer path;
+- the public one-command normal-user installer is not yet qualified;
+- automatic no-argument interactive first-run commissioning is not yet complete;
+- a self-contained native general-purpose language model is not yet shipped;
 - desktop launchers are not yet qualified;
-- NCI offline personal-assistant qualification is not yet complete.
-
-This contract converts those gaps into explicit NCI requirements without representing them as completed capability.
+- NCI offline personal-assistant + Crew-orchestration qualification is not yet complete.
 
 ## Preserved Vessel state
 
 - Commander retains ultimate authority.
 - Pilot GorXu remains principal assistant interface and sole operational orchestrator.
 - Divisions and Standing Crew remain under GorXu.
-- models, installers, launchers, workspaces, and external providers remain capabilities/infrastructure rather than command layers.
+- models, installers, launchers, runtime assets, private state, Commander workspace, tools, and external providers remain capabilities/infrastructure rather than command layers.
+- native cognition is an engine/capability of the Vessel, not an intermediate command authority between GorXu and Crew.
 - Standing Crew remain 82.
 - package remains 0.8.0 until a separately authorized release/version change.
 - published release remains v0.8.0 until a separately authorized release decision.
