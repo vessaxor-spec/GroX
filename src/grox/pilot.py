@@ -8,7 +8,8 @@ from .contracts import MissionOrder, MissionMode, RiskClass, Evidence, TourResul
 from .state import StateStore
 from .durable_state import DurableState
 from .crew.roster import CrewRoster
-from .tools.gateway import ToolGateway
+from .runtime_layout import VesselLayout
+from .tools.layout_gateway import LayoutToolGateway
 from .runtime.executor import CrewExecutor
 from .mission_control.core import MissionControl
 from .verification.core import IndependentVerifier
@@ -25,16 +26,20 @@ _RISK_RANK = {RiskClass.low:0, RiskClass.medium:1, RiskClass.high:2, RiskClass.c
 class PilotGorXu:
     """GroX's sole operational orchestrator."""
     def __init__(
-        self, vessel_root:Path, *, reasoner:Any=_AUTO, gateway_policy=None,
+        self, vessel_root:Path|VesselLayout, *, reasoner:Any=_AUTO, gateway_policy=None,
         extra_allowed_origins=(), secret_broker=None, mcp_registry=None,
     ):
-        self.root=vessel_root.resolve()
-        self.store=StateStore(self.root/'configs/state/grox.sqlite3')
+        layout=vessel_root if isinstance(vessel_root,VesselLayout) else VesselLayout.legacy(vessel_root)
+        self.layout=layout
+        self.root=layout.work_root
+        self.asset_root=layout.asset_root
+        self.state_root=layout.state_root
+        self.store=StateStore(layout.state_path('grox.sqlite3'))
         self.durable=DurableState(self.store)
-        self.roster=CrewRoster(self.root/'configs/crew/dossiers',self.store)
+        self.roster=CrewRoster(layout.asset_path('configs/crew/dossiers'),self.store)
         self.mission_control=MissionControl()
-        self.gateway=ToolGateway(
-            self.root, policy=gateway_policy, extra_allowed_origins=extra_allowed_origins,
+        self.gateway=LayoutToolGateway(
+            layout, policy=gateway_policy, extra_allowed_origins=extra_allowed_origins,
             secret_broker=secret_broker, mcp_registry=mcp_registry,
         )
         self.executor=CrewExecutor(self.gateway,self.durable)
