@@ -48,9 +48,9 @@
 
 ## Prime Function doctrine — issue #83
 
-**Status: COMMANDER DIRECTIVE — DOCUMENTATION SYNCHRONIZATION IN PROGRESS**
+**Status: COMPLETE — CANONICAL MERGED AND EXACT-TREE VERIFIED**
 
-Commander intent now makes GroX's purpose ordering explicit:
+Commander intent makes GroX's purpose ordering explicit:
 
 > **GroX exists first to serve as the Commander's persistent AI personal assistant and operating partner.**
 
@@ -64,6 +64,13 @@ Operational meaning:
 - no Crew member, model, trainer, evaluator, memory system, or evolutionary process may acquire a purpose or authority that supersedes the Commander;
 - model-centric benchmark improvement is insufficient if a candidate degrades conversational usefulness, task completion, reliability, latency, affordability, maintainability, recovery, or Commander control;
 - a more capable GroX must remain a more capable personal assistant.
+
+Canonical doctrine evidence:
+
+- PR #84 final head `94c7e708fb716dbec161065eae12825ddba02d9d`;
+- exact-head CI `32343643297` / run **258** passed all five required jobs;
+- PR #84 merged as `main@55260f4753f02ec3d1daf4c5e04df1697a07fa35`;
+- canonical merge tree `3427e3f4fd3181fbdecc3871aa8292da359ed12f` exactly matches CI-tested synthetic merge `5633068297a90f620e19586cbb0f3b640feeb46e`.
 
 This doctrine constrains NCI-1 onward. It adds no runtime authority, does not claim currently unqualified assistant/tool surfaces, creates no A8, and does not move package/release state.
 
@@ -401,7 +408,7 @@ Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.
 
 ## Known deliberate limits
 
-- the Prime Function is now explicit Commander doctrine, but documentation does not itself qualify every OpenClaw/Hermes-like personal-assistant surface; actual tools, integrations, autonomy, and external-system operations remain bounded by their implementation and evidence;
+- the Prime Function is explicit Commander doctrine, but documentation does not itself qualify every OpenClaw/Hermes-like personal-assistant surface; actual tools, integrations, autonomy, and external-system operations remain bounded by their implementation and evidence;
 - GorXu's currently qualified cognitive operating mode remains project/session-hosted through GPT-5.6 Sol when a capable Space Exploration session is active; deterministic control remains the safe fallback when cognition is unavailable. **Native offline GorXu personal-assistant cognition is now an authorized roadmap target, not a completed capability.**
 - Standing Crew have a provider-neutral Inspect cognition seam with selective craft + bounded memory, and one live locally trained neural action-selection provider is operationally qualified through that seam. The qualified provider is narrow; no general-purpose local language model is yet qualified for Standing Crew.
 - GroX does not yet ship a complete built-in cognition runtime and local language model sufficient to replace project/vendor cognition for the qualified personal-assistant Mission set.

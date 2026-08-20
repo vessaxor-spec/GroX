@@ -255,7 +255,7 @@ Claim boundary: GroX has qualified **one live locally trained neural action-sele
 
 ## Prime Function doctrine — issue #83
 
-**Status: COMMANDER DIRECTIVE — DOCUMENTATION SYNCHRONIZATION IN PROGRESS.** This doctrine constrains Native Cognition Independence Program 001 and future evolution. It does not widen runtime authority or claim new implementation capability.
+**Status: COMPLETE — CANONICAL MERGED AND EXACT-TREE VERIFIED.** The Commander directive is canonical through PR #84 and constrains Native Cognition Independence Program 001 and future evolution. It does not widen runtime authority or claim new implementation capability.
 
 Prime Function:
 
@@ -271,6 +271,13 @@ Required consequences:
 6. **No independent evolutionary objective.** Models, trainers, evaluators, memories, Crew, and evolutionary processes cannot acquire authority to redefine GroX's purpose or promote their own objectives.
 7. **Capability growth must preserve product usefulness.** A descendant or architecture that improves model metrics while materially degrading conversational usefulness, task completion, reliability, maintainability, latency, affordability, or Commander control is a regression candidate, not an automatic improvement.
 8. **A more capable GroX remains a more capable assistant.** Native/offline evolution succeeds only if the Commander's usable assistant experience survives and improves.
+
+Qualification evidence for the doctrine synchronization:
+
+- PR #84 final head `94c7e708fb716dbec161065eae12825ddba02d9d`;
+- exact-head CI `32343643297` / run **258**: PASS all five required jobs;
+- PR #84 merged as canonical `main@55260f4753f02ec3d1daf4c5e04df1697a07fa35`;
+- canonical merge tree `3427e3f4fd3181fbdecc3871aa8292da359ed12f` exactly matches CI-tested synthetic merge `5633068297a90f620e19586cbb0f3b640feeb46e`, proving exact source equivalence.
 
 This purpose ordering is a design constraint for NCI-1 onward and a qualification dimension for later model/runtime promotion.
 
