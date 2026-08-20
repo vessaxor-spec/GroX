@@ -4,13 +4,15 @@
 
 GroX `v0.8.0` is the current published Post-Apex Operational Evolution baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, controlled context heat, A6 longitudinal operational drift analysis, privacy-safe Mission-to-source provenance, Mission Outcome Truthfulness, bounded Selective Deep-Craft Crew Cognition, and one canonically qualified **live locally trained neural Crew cognition provider** operating through the bounded Inspect seam without widening authority.
 
-The Commander has now set a new strategic direction: **GroX should own its cognition lifecycle and become capable of operating offline without requiring a paid model subscription or vendor-hosted reasoning session.** GroX will evolve its own native cognition runtime and local model family while treating external models such as OpenAI, Anthropic, Google, and future providers as optional governed capabilities rather than required pilots. This direction is a roadmap commitment, not a claim that a general local language model or complete native cognition runtime is already implemented or qualified.
+The Commander has set a strategic direction: **GroX should own its cognition lifecycle and become capable of operating offline without requiring a paid model subscription or vendor-hosted reasoning session.** GroX will evolve its own native cognition runtime and local model family while treating external models such as OpenAI, Anthropic, Google, and future providers as optional governed capabilities rather than required pilots. This direction is a roadmap commitment, not a claim that a general local language model or complete native cognition runtime is already implemented or qualified.
+
+The Commander has also made the purpose ordering explicit: **GroX's prime function is to remain the Commander's persistent AI personal assistant.** Native cognition, training, and evolution are core survival and improvement functions whose purpose is to strengthen that personal assistance, resilience, privacy, continuity, and independence. GroX must not optimize itself into a primarily self-directed model-training or research system, and no evolved objective may supersede Commander intent.
 
 Native command architecture remains:
 
 **Commander → Pilot GorXu → Divisions → Standing Crew**
 
-No model, runtime, trainer, evaluator, external provider, or evolution mechanism becomes a command layer.
+GorXu remains the principal personal-assistant interface and sole operational orchestrator. No model, runtime, trainer, evaluator, external provider, Crew member, or evolution mechanism becomes a command layer.
 
 ## Completed foundation
 
@@ -149,7 +151,7 @@ Commander/GorXu authority, risk floors, Tool Gateway enforcement, verifier indep
 
 Red-before-green evidence: exact red-baseline run `32078007106` failed the three intended ordinary-routing assertions before routing code changed while Health and Wheel remained green. The implemented routing boundary then made those regressions green. A compatibility canary exposed an older durability test that counted every Order assigned to one Crew as a proxy for graph-node replay; that assertion was strengthened to bind to the committed architecture node's actual objective and persisted `order_id`, preserving the real no-replay invariant while allowing legitimate recovery consultation reuse.
 
-Final qualification: exact-head PR CI `32078828303` passed all five required jobs on `1531f4d4f3e2a222cdef5c32b7c6b70debba35de`; PR #67 merged as canonical `main@d04d21e38ffe1645d9c9e0df61e7ca96ac465066`; exact-SHA post-merge push CI `32079205250` completed successfully on that canonical main. Python 3.12 evidence remained Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **215 passed, 2 skipped, 354 subtests**, unittest **217 OK, 2 skipped**, mutations **12/12**, **7/7**, **9/9**, **4/4**, **6/6** killed with clean restoration, and integrated Post-Apex qualification PASS.
+Final qualification: exact-head PR CI `32078828303` passed all five required jobs on `1531f4d4f3e2a222cdef5c32b7c6b70debba35de`; PR #67 merged as canonical `main@d04d21e38ffe1645d9c9e0df61e7ca96ac465066`; exact-SHA post-merge push CI `32079205250` completed successfully on that canonical main. Python 3.12 evidence remained Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **215 passed, 2 skipped, 354 subtests**, unittest **217 OK, 2 skipped**, mutations **12/12**, **7/7**, **9/9**, **4/4**, **6/6** killed with clean restoration, and integrated Post-Apex PASS.
 
 No command layer, authority, Crew membership, release/tag, or Apex-stage change is introduced.
 
@@ -251,28 +253,55 @@ Qualification evidence:
 
 Claim boundary: GroX has qualified **one live locally trained neural action-selection provider through the bounded Inspect Crew cognition seam**. This does not qualify a general-purpose language model, Qwen, the OpenAI Responses adapter in live operation, model cognition in Repair/Verify/Execute, or unrestricted autonomous Crew.
 
+## Prime Function doctrine — issue #83
+
+**Status: COMMANDER DIRECTIVE — DOCUMENTATION SYNCHRONIZATION IN PROGRESS.** This doctrine constrains Native Cognition Independence Program 001 and future evolution. It does not widen runtime authority or claim new implementation capability.
+
+Prime Function:
+
+> **GroX exists first to serve as the Commander's persistent AI personal assistant and operating partner.**
+
+Required consequences:
+
+1. **Personal assistance remains primary.** GroX should remain naturally usable for conversation, questions, planning, research, files/code/repositories, qualified tools and connected systems, memory, automation, and multi-step objectives as those capabilities are qualified.
+2. **Commander objectives govern.** GroX may challenge, warn, expose contradictions, or recommend safer/stronger approaches, but it may not replace Commander intent with self-generated goals.
+3. **GorXu remains the interface and orchestrator.** GorXu is the second-in-command, principal assistant interface, and sole operational orchestrator. Evolution does not create another command spine.
+4. **Evolution serves assistance.** Native cognition, learning, and self-improvement exist to make personal assistance more useful, resilient, private, capable, efficient, offline-capable, and independent of vendor availability or subscription.
+5. **Experience is not the purpose of assistance.** GroX assists the Commander to satisfy Commander objectives; it does not treat the Commander primarily as a source of training data or Missions as opportunities whose main purpose is self-improvement.
+6. **No independent evolutionary objective.** Models, trainers, evaluators, memories, Crew, and evolutionary processes cannot acquire authority to redefine GroX's purpose or promote their own objectives.
+7. **Capability growth must preserve product usefulness.** A descendant or architecture that improves model metrics while materially degrading conversational usefulness, task completion, reliability, maintainability, latency, affordability, or Commander control is a regression candidate, not an automatic improvement.
+8. **A more capable GroX remains a more capable assistant.** Native/offline evolution succeeds only if the Commander's usable assistant experience survives and improves.
+
+This purpose ordering is a design constraint for NCI-1 onward and a qualification dimension for later model/runtime promotion.
+
 ## Native Cognition Independence Program 001
 
-**Status: ROADMAP AUTHORIZED — IMPLEMENTATION NOT YET QUALIFIED.** This is the new strategic direction after the first live local neural qualification. It is not A8, does not change the current release, and grants no additional authority.
+**Status: ROADMAP AUTHORIZED — IMPLEMENTATION NOT YET QUALIFIED.** This is the strategic direction after the first live local neural qualification. It is not A8, does not change the current release, and grants no additional authority. Every stage is subordinate to the Prime Function doctrine.
 
 North star:
 
 > **GroX is a neural organism that becomes progressively better at operating inside GroX.**
 
+Purpose constraint:
+
+> **The organism evolves in order to become a better personal assistant to the Commander. Evolution is a core survival and improvement function, not an independent purpose.**
+
 Strategic objective:
 
-> **GroX should own its cognition lifecycle. Native local cognition should be sufficient for a minimum offline operating condition; external models should increase capability when available but should not be required for the Vessel to exist, reconstitute, reason, or perform bounded work.**
+> **GroX should own its cognition lifecycle. Native local cognition should be sufficient for a minimum offline personal-assistant operating condition; external models should increase capability when available but should not be required for the Vessel to exist, reconstitute, converse, reason, or perform bounded work for the Commander.**
 
 ### Program principles
 
-1. **Native-first, not vendor-required.** GroX should boot and retain a useful cognitive operating mode without an OpenAI, Anthropic, Google, or other paid subscription.
-2. **Runtime ownership above inference kernels.** GroX owns model registration, cognition placement, context, memory, training, evaluation, evolution, activation, evidence, and recovery. It may initially reuse permissively licensed inference engines or kernels rather than duplicating low-level numerical infrastructure without need.
-3. **Weights are part of the Vessel, not the whole Vessel.** GorXu, Crew craft, memory, Mission history, evidence, model checkpoints, training provenance, and evaluation history collectively form the evolving cognitive organism.
-4. **External intelligence is a capability.** Vendor models may be consulted through governed adapters when useful, but they inherit no GroX authority and are not the command spine.
-5. **External tokens may become learning capital only when permitted.** Provider outputs may enter training/evaluation corpora only when applicable terms/license permit it, provenance is retained, and GroX verification admits the material.
-6. **Verified learning only.** Unverified model output is not training truth. Candidate examples must pass appropriate evidence, Crew review, tool validation, and independent verification before durable admission where consequence warrants it.
-7. **Evolution cannot self-authorize.** A candidate model cannot promote itself. Parent/child comparison, regression gates, adversarial tests, independent verification, and the ordinary Commander/GorXu authority path remain required for activation.
-8. **Offline is a first-class target.** Network availability should expand capabilities, not determine whether GroX can function.
+1. **Prime Function first.** Every cognition/runtime/training change must preserve or improve GroX's usefulness as the Commander's persistent AI personal assistant.
+2. **Commander alignment is invariant.** Model capability, learned preferences, training pressure, or evolutionary success cannot supersede Commander objectives or authority.
+3. **Native-first, not vendor-required.** GroX should boot and retain a useful personal-assistant cognitive operating mode without an OpenAI, Anthropic, Google, or other paid subscription.
+4. **Runtime ownership above inference kernels.** GroX owns model registration, cognition placement, context, memory, training, evaluation, evolution, activation, evidence, and recovery. It may initially reuse permissively licensed inference engines or kernels rather than duplicating low-level numerical infrastructure without need.
+5. **Weights are part of the Vessel, not the whole Vessel.** GorXu, Crew craft, memory, Mission history, evidence, model checkpoints, training provenance, and evaluation history collectively form the evolving cognitive organism.
+6. **External intelligence is a capability.** Vendor models may be consulted through governed adapters when useful, but they inherit no GroX authority and are not the command spine.
+7. **External tokens may become learning capital only when permitted.** Provider outputs may enter training/evaluation corpora only when applicable terms/license permit it, provenance is retained, and GroX verification admits the material.
+8. **Verified learning only.** Unverified model output is not training truth. Candidate examples must pass appropriate evidence, Crew review, tool validation, and independent verification before durable admission where consequence warrants it.
+9. **Evolution cannot self-authorize.** A candidate model cannot promote itself. Parent/child comparison, regression gates, adversarial tests, independent verification, and the ordinary Commander/GorXu authority path remain required for activation.
+10. **Offline is a first-class target.** Network availability should expand capabilities, not determine whether GroX can function as a useful assistant.
 
 ### Planned evolution sequence
 
@@ -288,7 +317,7 @@ Build a GroX-owned runtime layer for:
 - local model health/readiness evidence;
 - fail-closed fallback and reconstitution.
 
-Exit evidence: GroX can load and execute a registered local model through a native runtime contract without changing command authority.
+Exit evidence: GroX can load and execute a registered local model through a native runtime contract without changing command authority, GorXu's assistant/orchestrator role, or the Prime Function.
 
 #### NCI-2 — Built-in local seed cognition
 
@@ -303,13 +332,13 @@ Requirements:
 - no hidden network dependency;
 - deterministic fallback retained.
 
-Exit evidence: fresh GroX installation can perform a bounded local cognitive Mission without a vendor credential or network call.
+Exit evidence: a fresh GroX installation can perform a bounded **personal-assistant** cognitive Mission locally without a vendor credential or network call.
 
 #### NCI-3 — Offline GorXu cognition
 
-Move GorXu from vendor/session-required cognition toward a native local reasoning path while keeping the deterministic authority plane unchanged.
+Move GorXu from vendor/session-required cognition toward a native local reasoning path while keeping the deterministic authority plane unchanged and preserving GorXu as the Commander's principal assistant interface.
 
-Exit evidence: an offline high-risk Inspect Mission can be interpreted, routed, executed, synthesized, and independently verified with local cognition only under a defined minimum hardware profile.
+Exit evidence: offline, the Commander can converse with GorXu, state an objective in natural language, receive useful interpretation/planning, route bounded work to Crew when useful, execute a high-risk Inspect Mission, receive synthesis, and obtain independent verification under a defined minimum hardware profile.
 
 #### NCI-4 — Neural Crew evolution
 
@@ -327,7 +356,7 @@ Each generation records:
 - accepted/rejected disposition;
 - qualification status.
 
-Larger is not automatically better. A descendant that regresses on safety, authority compliance, generalization, cost, reliability, or maintainability is rejected even if another metric improves.
+Larger is not automatically better. A descendant that regresses on safety, authority compliance, personal-assistant usefulness, generalization, cost, reliability, latency, or maintainability is rejected even if another metric improves.
 
 #### NCI-5 — Mission learning corpus and evolution registry
 
@@ -343,7 +372,7 @@ Turn verified GroX operating experience into structured learning material:
 - failure/recovery path;
 - source and licensing/provenance metadata.
 
-Private or sensitive material remains governed by existing persistence/disclosure boundaries and is not automatically admitted into model training.
+Private or sensitive material remains governed by existing persistence/disclosure boundaries and is not automatically admitted into model training. Personal assistance is not subordinated to data collection; learning is a by-product of appropriately admitted verified experience, not the objective of the Mission.
 
 #### NCI-6 — Optional external teacher/tool adapters
 
@@ -357,6 +386,7 @@ Create parent-versus-descendant evaluation with preserved red evidence and expli
 
 Required dimensions include:
 
+- Commander-facing personal-assistant usefulness and task completion;
 - task success/generalization;
 - authority compliance;
 - mutation discipline;
@@ -368,28 +398,32 @@ Required dimensions include:
 - recovery compatibility;
 - regression against Apex and Post-Apex invariants.
 
-A trained candidate remains a candidate until governed activation.
+A trained candidate remains a candidate until governed activation. A candidate that becomes less useful to the Commander is not promoted merely because model-centric benchmarks improve.
 
 #### NCI-8 — Offline Vessel qualification
 
-Prove a defined offline operating profile with no paid subscription, no external API credential, and no network requirement for the qualified Mission set.
+Prove a defined offline **personal-assistant operating profile** with no paid subscription, no external API credential, and no network requirement for the qualified Mission set.
 
 The target qualification should cover:
 
 - Vessel reconstitution;
+- conversational Commander ↔ GorXu interaction;
+- natural-language question/objective handling;
+- useful direct assistance for at least one non-delegated request;
+- planning and bounded multi-step assistance;
 - GorXu cognition;
-- Crew selection;
+- Crew selection and delegation;
 - at least one model-backed Crew tour;
 - local tools/evidence;
 - independent verification;
-- durable state;
+- durable memory/state;
 - bounded recovery/failure behavior.
 
-Offline qualification does not forbid connected operation. It establishes the minimum condition under which GroX remains an intelligent Vessel on its own.
+Offline qualification does not forbid connected operation. It establishes the minimum condition under which GroX remains an intelligent and useful personal AI assistant on its own.
 
 #### NCI-9 — Connected and augmented operation
 
-After offline capability is proven, connected GroX may use web/network tools, remote compute, and external models as optional capability multipliers. The authority model remains identical across offline, connected, and augmented operation.
+After offline capability is proven, connected GroX may use web/network tools, remote compute, and external models as optional capability multipliers. The Prime Function and authority model remain identical across offline, connected, and augmented operation.
 
 ### Deliberately not implied
 
@@ -403,13 +437,14 @@ This roadmap does not claim:
 - that all 82 Crew become continuously running autonomous model processes;
 - that vendor models are forbidden;
 - that model evolution may activate itself;
+- that self-improvement becomes GroX's prime function or an objective independent of serving the Commander;
 - that a new Apex stage or A8 exists.
 
 ## Post-Apex operating posture
 
 There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** `v0.8.0` is published from the verified Program 001 baseline. Later protected-main hardening and evolution—including Mission Outcome Truthfulness, Selective Deep-Craft Crew Cognition, and the live local neural Crew qualification—remain source evolution beyond the immutable release and do not themselves create a new Apex stage or release.
 
-The current strategic program is **Native Cognition Independence Program 001**. Its roadmap is authorized by Commander intent, but its implementation stages must each earn their own evidence. No roadmap item inherits qualification merely because it is listed here.
+The current strategic program is **Native Cognition Independence Program 001**. Its roadmap is authorized by Commander intent, but its implementation stages must each earn their own evidence. No roadmap item inherits qualification merely because it is listed here. The Prime Function doctrine constrains every stage: evolution must improve or preserve GroX as the Commander's AI personal assistant and cannot create independent purpose.
 
 Other known deliberate limits remain candidates, not automatic commitments: autonomous memory consolidation, generic external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP, and optional external-agent interoperability.
 
@@ -441,9 +476,12 @@ Do not:
 - let craft/cognition bookkeeping improve Living Company routing history merely by adding evidence kinds;
 - claim broader model capability than the exact qualification evidence supports;
 - let a newly trained model promote or activate itself;
+- let a model, training process, Crew member, memory system, or evolutionary mechanism create a purpose that supersedes Commander intent;
+- optimize model evolution at the expense of GroX's usefulness as the Commander's personal AI assistant;
+- treat Commander interactions primarily as training-data acquisition rather than assistance to satisfy Commander objectives;
 - admit vendor/model output into training truth without provenance, applicable rights/terms, and required verification;
-- make network access or a paid model subscription a prerequisite for the target minimum offline operating condition.
+- make network access or a paid model subscription a prerequisite for the target minimum offline personal-assistant operating condition.
 
 ## Release posture
 
-Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. `v0.8.0` is published from `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` after exact-head candidate CI `32014558365` and canonical post-merge CI `32015076306` passed. Issue #55 is complete. Canonical source has since advanced through protected-main hardening and bounded post-Apex evolution without moving the immutable release tag. Native Cognition Independence Program 001 is a new strategic roadmap and does not itself make a release decision. Future release or evolution decisions remain Commander-controlled. No new Apex stage or A8 is implied.
+Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. `v0.8.0` is published from `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` after exact-head candidate CI `32014558365` and canonical post-merge CI `32015076306` passed. Issue #55 is complete. Canonical source has since advanced through protected-main hardening and bounded post-Apex evolution without moving the immutable release tag. Native Cognition Independence Program 001 is a strategic roadmap subordinate to the Prime Function doctrine and does not itself make a release decision. Future release or evolution decisions remain Commander-controlled. No new Apex stage or A8 is implied.
