@@ -8,6 +8,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping
 
+from .runtime_assets import RuntimeAssetError, packaged_asset_root, validate_asset_root
+from .runtime_layout import RuntimeLayoutError, VesselLayout
+
 
 CONFIG_SCHEMA_VERSION = 1
 WORKSPACE_SCHEMA_VERSION = 1
@@ -349,3 +352,52 @@ def commission_workspace(
         marker_file=marker,
         created_directories=tuple(created),
     )
+
+
+def installed_vessel_layout(
+    *,
+    config_dir: Path | str | None = None,
+    system: str | None = None,
+    environ: Mapping[str, str] | None = None,
+    home: Path | str | None = None,
+    asset_root: Path | str | None = None,
+) -> VesselLayout:
+    """Resolve the commissioned installed Vessel into the NCI-1B layout.
+
+    The immutable runtime bundle is validated independently from the mutable
+    workspace. Private state and Commander work remain separate roots beneath
+    the same Pilot GorXu command plane.
+    """
+
+    workspace = load_workspace_binding(
+        config_dir=config_dir,
+        system=system,
+        environ=environ,
+        home=home,
+        require_marker=True,
+    )
+    if workspace is None:
+        raise InstallationError(
+            "No commissioned GroX workspace found. Run `grox init` before starting installed GorXu."
+        )
+
+    try:
+        assets = validate_asset_root(asset_root) if asset_root is not None else packaged_asset_root()
+    except RuntimeAssetError as exc:
+        raise InstallationError(str(exc)) from exc
+
+    state_root = workspace / "state"
+    work_root = workspace / "workspace"
+    if not state_root.is_dir() or not work_root.is_dir():
+        raise InstallationError(
+            "Commissioned GroX workspace is missing required state/workspace directories"
+        )
+
+    try:
+        return VesselLayout.separated(
+            asset_root=assets,
+            state_root=state_root,
+            work_root=work_root,
+        )
+    except RuntimeLayoutError as exc:
+        raise InstallationError(f"Unsafe installed GroX filesystem layout: {exc}") from exc

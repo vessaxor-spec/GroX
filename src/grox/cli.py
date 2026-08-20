@@ -1,5 +1,5 @@
 from __future__ import annotations
-import argparse, json
+import argparse, json, os
 from pathlib import Path
 from .pilot import PilotGorXu
 from .contracts import MissionMode, RiskClass
@@ -8,11 +8,13 @@ from .installation import (
     InstallationError,
     commission_workspace,
     default_workspace,
+    installed_vessel_layout,
     workspace_status,
 )
 from .persistence import PersistenceManager
 from .reconstitution import ReconstitutionPlanner
-from .vessel import resolve_vessel_root
+from .runtime_layout import VesselLayout
+from .vessel import VesselRootError, resolve_vessel_root
 
 
 # Compatibility/test override only. Normal installed operation leaves this null
@@ -26,7 +28,29 @@ def vessel_root():
     return resolve_vessel_root(module_file=__file__)
 
 
-def pilot(): return PilotGorXu(vessel_root())
+def operational_layout() -> VesselLayout:
+    """Resolve the one GorXu runtime layout for source or installed operation.
+
+    Explicit/source checkout binding remains the developer/recovery path. A
+    non-editable installed runtime outside a checkout falls back only to a
+    commissioned workspace plus the validated packaged runtime bundle.
+    """
+
+    if ROOT is not None:
+        return VesselLayout.legacy(vessel_root())
+
+    # An explicit source binding is authoritative. If it is invalid, preserve
+    # the fail-closed VesselRootError instead of silently switching modes.
+    if str(os.environ.get("GROX_VESSEL_ROOT", "")).strip():
+        return VesselLayout.legacy(vessel_root())
+
+    try:
+        return VesselLayout.legacy(vessel_root())
+    except VesselRootError:
+        return installed_vessel_layout()
+
+
+def pilot(): return PilotGorXu(operational_layout())
 
 def dump(x): print(json.dumps(x,indent=2,default=str))
 
@@ -34,7 +58,12 @@ def status(p):
     ms=p.store.recent_missions(5); states=p.store.crew_states()
     print("GroX Vessel: ONLINE")
     print("Command spine: Commander -> Pilot GorXu -> Divisions -> Standing Crew")
-    print(f"Vessel root: {p.root}")
+    if p.layout.legacy_single_root:
+        print(f"Vessel root: {p.root}")
+    else:
+        print(f"Runtime assets: {p.layout.asset_root}")
+        print(f"Private state: {p.layout.state_root}")
+        print(f"Commander workspace: {p.layout.work_root}")
     print(f"Standing Crew: {len(p.roster.all())} | Missions recorded: {len(p.store.recent_missions(1000))}")
     print(f"Cognitive Pilot: {p.cognitive_status}")
     active=[x for x in states if x['status']=='on_duty']; print(f"Crew on duty: {len(active)}")
@@ -82,7 +111,7 @@ def init_workspace(workspace=None,config_dir=None,non_interactive=False,json_out
         print(f"Created directories: {', '.join(result.created_directories)}")
     else:
         print("Created directories: none (existing commissioned foundation)")
-    print("Operational Pilot startup still requires a valid GroX Vessel source binding in NCI-1A.")
+    print("Installed GorXu can start when the GroX runtime bundle is present and validated.")
 
 def show_workspace(config_dir=None,json_output=False):
     report=workspace_status(config_dir=Path(config_dir).expanduser() if config_dir else None)
