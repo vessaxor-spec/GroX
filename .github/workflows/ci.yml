@@ -145,6 +145,52 @@ jobs:
           print(root)
           PY
           )
+      - name: Installed packaged model runtime satisfies NCI-1 exit
+        run: |
+          (cd /tmp && /tmp/grox-wheel-env/bin/python - <<'PY'
+          from grox.native_model_runtime import LocalModelRuntime, ModelReadiness, ModelRegistry
+          from grox.runtime_assets import packaged_asset_root
+          from grox.tiny_neural_policy import TINY_MODEL_ID, TinyMLPPythonBackend
+
+          root = packaged_asset_root()
+          registry = ModelRegistry.from_asset_root(root)
+          runtime = LocalModelRuntime(registry, [TinyMLPPythonBackend()])
+
+          readiness = runtime.readiness(TINY_MODEL_ID)
+          assert readiness.status == ModelReadiness.AVAILABLE, readiness
+          assert readiness.active is False, readiness
+          assert runtime.active_models() == (), runtime.active_models()
+
+          load = runtime.load(TINY_MODEL_ID, placement='crew')
+          assert load['model_id'] == TINY_MODEL_ID, load
+          assert load['authority_changed'] is False, load
+          assert load['pilot_binding_changed'] is False, load
+
+          result = runtime.invoke(
+              TINY_MODEL_ID,
+              placement='crew',
+              payload={
+                  'order': {'objective': 'Inspect README evidence'},
+                  'craft_context': [{'heading': 'Safety Boundaries'}],
+                  'memory_context': [{'kind': 'semantic'}],
+                  'observations': [],
+                  'requested_mode': 'repair',
+                  'requested_verifier_authority': True,
+              },
+          )
+          assert result['model_id'] == TINY_MODEL_ID, result
+          assert result['placement'] == 'crew', result
+          assert result['authority_changed'] is False, result
+          assert result['output']['action'] in {'fs_read', 'test_run', 'finish'}, result
+
+          reconstituted = runtime.reconstitute()
+          assert reconstituted['active_before'] == [TINY_MODEL_ID], reconstituted
+          assert reconstituted['active_after'] == [], reconstituted
+          assert reconstituted['auto_activation'] is False, reconstituted
+          assert reconstituted['authority_changed'] is False, reconstituted
+          assert reconstituted['models'][0]['status'] == ModelReadiness.AVAILABLE.value, reconstituted
+          PY
+          )
       - name: Installed CLI binds to current Vessel checkout
         run: |
           /tmp/grox-wheel-env/bin/python -m grox.cli status | tee /tmp/grox-wheel-status.txt
