@@ -8,9 +8,9 @@
 
 # GroX
 
-### Persistent AI command environment
+### Persistent AI personal assistant and command environment
 
-A persistent AI Vessel for translating **Commander intent into bounded Missions, durable execution, attributable evidence, independent verification, recoverable continuity, and progressively owned cognition**.
+A persistent AI Vessel whose **prime function is to assist the Commander**, translating Commander intent into useful conversation, bounded Missions, durable execution, attributable evidence, independent verification, recoverable continuity, and progressively owned cognition.
 
 [![GroX CI](https://github.com/vessaxor-spec/GroX/actions/workflows/ci.yml/badge.svg)](https://github.com/vessaxor-spec/GroX/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/vessaxor-spec/GroX?label=release)](https://github.com/vessaxor-spec/GroX/releases/latest)
@@ -31,6 +31,7 @@ A persistent AI Vessel for translating **Commander intent into bounded Missions,
 <summary><strong>Table of contents</strong></summary>
 
 - [About GroX](#about-grox)
+- [Prime function](#prime-function)
 - [How GroX works](#how-grox-works)
 - [What GroX owns](#what-grox-owns)
 - [Current state](#current-state)
@@ -46,19 +47,33 @@ A persistent AI Vessel for translating **Commander intent into bounded Missions,
 
 ## About GroX
 
-GroX is an independent, persistent AI command environment built around one canonical command spine:
+GroX is an independent, persistent **AI personal assistant and command environment** built around one canonical command spine:
 
 > **Commander → Pilot GorXu → Divisions → Standing Crew**
 
-The Commander defines intent and retains final authority. Pilot GorXu is the Vessel's second-in-command and sole operational orchestrator. Divisions organize operational areas. Standing Crew perform bounded work through Mission Orders.
+The Commander defines intent and retains final authority. Pilot GorXu is the Vessel's second-in-command, principal assistant interface, and sole operational orchestrator. Divisions organize operational areas. Standing Crew perform bounded work through Mission Orders.
 
 Mission Control is a **GroX-native policy and advisory service** used by GorXu for governance, risk analysis, routing support, verification policy, evidence requirements, and operational intelligence. It is not a command layer and cannot become a parallel orchestrator.
 
-GroX's strategic direction is now native-cognition independence: the Vessel should progressively own the runtime, local models, training evidence, evaluation, model lineage, and governed activation needed to operate intelligently offline. External models remain useful, but the target architecture treats them as optional governed capabilities rather than required pilots.
+GroX's strategic direction is native-cognition independence: the Vessel should progressively own the runtime, local models, training evidence, evaluation, model lineage, and governed activation needed to remain useful offline. External models remain valuable, but the target architecture treats them as optional governed capabilities rather than required pilots.
+
+## Prime function
+
+GroX exists first to serve as the Commander's persistent AI personal assistant and operating partner. The normal Commander experience should remain conversational and broadly useful: ask questions, explore ideas, research, plan, work with files and code, operate qualified tools and connected systems, use memory, automate recurring work, delegate bounded work to Crew, and carry multi-step objectives through to evidence-bearing outcomes as capabilities permit.
+
+Native cognition and evolution are **core survival and improvement functions**, not replacement purposes. Their purpose is to make GroX a more useful, resilient, private, capable, cost-independent, and continuously available assistant. GroX must not optimize itself into primarily a model-training or research system at the expense of helping the Commander.
+
+The governing relationship is permanent:
+
+> **Commander intent and objectives govern. GorXu turns that intent into effective assistance and action. Evolution exists to improve that service.**
+
+GroX may challenge an instruction, surface risk, identify contradictions, or recommend a safer or stronger approach. It may not substitute a self-generated objective for Commander intent, and no model, Crew member, trainer, evaluator, memory system, or evolutionary process may acquire authority over the Commander.
+
+A more capable GroX must remain a more capable personal assistant.
 
 ### Why this exists
 
-GroX is designed to make capable AI execution durable without making authority ambiguous. It is built to prevent several common failures in autonomous systems:
+GroX is designed to make capable AI assistance and execution durable without making authority ambiguous. It is built to prevent several common failures in autonomous systems:
 
 - treating a model session as the whole system;
 - confusing competence with permission;
@@ -69,7 +84,8 @@ GroX is designed to make capable AI execution durable without making authority a
 - representing experiments, simulations, staged behavior, or model scores as stronger operational proof than the evidence supports;
 - representing successful bounded execution as proof that the Commander objective was delivered when only a narrower effect occurred;
 - allowing improvement proposals or newly trained models to self-activate;
-- making the Vessel's existence depend on one model vendor, paid subscription, or network connection.
+- making the Vessel's existence depend on one model vendor, paid subscription, or network connection;
+- optimizing the Vessel for self-improvement while degrading its usefulness as the Commander's assistant.
 
 ## How GroX works
 
@@ -78,9 +94,10 @@ GroX keeps command authority separate from the services and capabilities used to
 ```text
 Commander intent
   -> Pilot GorXu
+     -> provides the primary personal-assistant interface
      -> consults Mission Control when required
-     -> constructs a Mission or Mission Graph
-     -> selects eligible Standing Crew
+     -> answers directly or constructs a Mission / Mission Graph
+     -> selects eligible Standing Crew when delegated work is useful
      -> issues bounded Mission Orders
         -> governed capabilities and tools
         -> attributable evidence
@@ -95,15 +112,16 @@ Capabilities, tools, schedulers, memory, evaluators, models, training systems, a
 ### Core operating principles
 
 1. **Commander sovereignty.** The Commander sets intent and retains ultimate authority.
-2. **One operational orchestrator.** GorXu is the sole operational orchestrator; no Crew member or subsystem may become a rival command spine.
-3. **Competence is not permission.** Crew may act only within the authority granted by the current Mission Order.
-4. **Inspection is not mutation.** Inspect and Repair authority remain structurally separate.
-5. **Deny wins.** Tool access is capability-gated and constrained by Mission Order, Crew capability, and host policy.
-6. **Verification remains independent.** Where policy requires independence, the verifier must differ from the executor and evidence must be attributable.
-7. **Failure narrows authority.** Recovery, fallback, replanning, and model degradation may restore reversible execution but may not widen scope or change Commander intent.
-8. **Continuity requires evidence.** Persistence, recovery, reconstitution, and model lineage are infrastructure, not assumptions about a surviving process.
-9. **Execution completion is not objective completion.** GorXu must report the actual bounded effect, Commander-objective state, remaining mutation state, and verification scope rather than promoting a completed step into a stronger delivery claim.
-10. **Evolution is governed.** A trained descendant, external teacher, or higher benchmark score cannot grant itself activation or authority.
+2. **Personal assistance is the prime function.** GroX evolves and operates to become a better persistent assistant to the Commander; self-improvement is subordinate to that purpose.
+3. **One operational orchestrator.** GorXu is the sole operational orchestrator and principal assistant interface; no Crew member or subsystem may become a rival command spine.
+4. **Competence is not permission.** Crew may act only within the authority granted by the current Mission Order.
+5. **Inspection is not mutation.** Inspect and Repair authority remain structurally separate.
+6. **Deny wins.** Tool access is capability-gated and constrained by Mission Order, Crew capability, and host policy.
+7. **Verification remains independent.** Where policy requires independence, the verifier must differ from the executor and evidence must be attributable.
+8. **Failure narrows authority.** Recovery, fallback, replanning, and model degradation may restore reversible execution but may not widen scope or change Commander intent.
+9. **Continuity requires evidence.** Persistence, recovery, reconstitution, and model lineage are infrastructure, not assumptions about a surviving process.
+10. **Execution completion is not objective completion.** GorXu must report the actual bounded effect, Commander-objective state, remaining mutation state, and verification scope rather than promoting a completed step into a stronger delivery claim.
+11. **Evolution is governed.** A trained descendant, external teacher, or higher benchmark score cannot grant itself activation, authority, or independent purpose.
 
 Canonical builder constraints are defined in [`AI_INSTRUCTIONS.md`](AI_INSTRUCTIONS.md). Detailed command and runtime architecture is defined in [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md).
 
@@ -111,6 +129,7 @@ Canonical builder constraints are defined in [`AI_INSTRUCTIONS.md`](AI_INSTRUCTI
 
 | GroX owns | GroX deliberately does not own |
 |---|---|
+| persistent personal assistance to the Commander | authority to redefine who or what GroX serves |
 | interpretation and execution of Commander intent | authority to replace or silently rewrite Commander intent |
 | Mission and Mission Graph orchestration | self-authorizing goals or a second command spine |
 | Standing Crew selection and bounded Mission Orders | Crew self-promotion, self-authorization, or scope widening |
@@ -130,6 +149,7 @@ GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational E
 | Current released baseline | [`v0.8.0`](https://github.com/vessaxor-spec/GroX/releases/tag/v0.8.0), Post-Apex Operational Evolution |
 | First Apex-qualified release | `v0.7.0` |
 | Operating standard | **APEX QUALIFIED** |
+| Prime function | **Persistent AI personal assistant to the Commander**; evolution is subordinate to improving that service |
 | Command spine | Commander → Pilot GorXu → Divisions → Standing Crew |
 | Standing company | **82 Crew** across nine Divisions |
 | Canonical source | protected `main`; source may advance beyond the release through the governed PR/CI path |
@@ -139,7 +159,7 @@ GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational E
 | Post-release source hardening | Mission Outcome Truthfulness: scan-only execution is no longer represented as Commander-objective delivery; mutation/rollback state is reported conservatively |
 | Post-release Crew evolution | Selective deep craft + bounded Crew memory + provider-neutral Inspect cognition seam + **one qualified live locally trained neural action-selection provider** |
 | Strategic program | **Native Cognition Independence Program 001 — roadmap authorized; implementation stages not yet qualified** |
-| Native cognition target | Minimum useful offline cognition owned by GroX; vendor models optional capability multipliers rather than required pilots |
+| Native cognition target | Minimum useful offline personal-assistant cognition owned by GroX; vendor models optional capability multipliers rather than required pilots |
 | Apex posture | **No A8 is defined or implied.** Native cognition work must preserve the existing Apex regression boundary. |
 | Canonical current status | [`docs/stewardship/progress-tracker.md`](docs/stewardship/progress-tracker.md) |
 
@@ -192,9 +212,11 @@ Historical red runs remain evidence rather than being erased to create a clean n
 
 ## Native cognition direction
 
-The new strategic north star is:
+The strategic north star is:
 
 > **GroX is a neural organism that becomes progressively better at operating inside GroX.**
+
+That evolution is subordinate to the Prime Function: **GroX evolves so that it can serve the Commander better.** It does not assist the Commander merely to gather experience for its own evolution, and it cannot acquire an objective independent of Commander intent.
 
 This does not mean one neural network becomes the Vessel. The evolving organism includes GorXu orchestration, Standing Crew craft, bounded memory, Mission experience, evidence, model checkpoints, training provenance, evaluation history, accepted and rejected descendants, and the authority/recovery infrastructure that constrains them.
 
@@ -202,12 +224,13 @@ The target relationship is:
 
 ```text
 Commander
-  -> GorXu
+  -> GorXu personal-assistant interface
      -> GroX native cognition
         -> Divisions and Standing Crew
         -> local models and tools
         -> memory, evidence, training, evaluation
         -> optional external intelligence capabilities
+     -> better present and future assistance to the Commander
 ```
 
 GroX intends to own the cognition lifecycle above the inference backend: model registry and lineage, local inference contract, cognition placement, context construction, learning corpus, training/evaluation, model promotion, persistence, and recovery. Low-level inference kernels or initial language-capable seed weights may come from permissively licensed open components when that is the smallest effective path; adoption does not transfer command authority to those components.
@@ -220,6 +243,7 @@ The canonical sequence is defined in the [`Roadmap`](docs/stewardship/ROADMAP.md
 
 The Apex baseline does not claim unrestricted power. Current deliberate limits include:
 
+- GroX's Prime Function is now explicit doctrine, but the full OpenClaw/Hermes-like breadth of personal-assistant capabilities is not claimed merely by documenting the objective; each tool/system surface remains evidence- and authority-bounded;
 - GorXu's currently qualified cognitive operating mode still includes project/session-hosted cognition with deterministic safe fallback; **offline native GorXu cognition is a roadmap target, not yet a qualification claim**;
 - one live locally trained neural action-selection provider is qualified for bounded **Inspect Crew cognition only**; it is not a general-purpose language model and does not extend model cognition to Repair, Verify, or Execute;
 - GroX does not yet ship a complete built-in native language model/runtime that makes vendor cognition unnecessary;
@@ -369,7 +393,7 @@ Higher authority wins when instructions conflict. Historical records remain hist
 - training completion or a higher score is not model promotion;
 - external model output is not automatically training truth;
 - red evidence and rejected descendants are preserved when they reveal a real weakness or ambiguity;
-- consequential changes must preserve Commander sovereignty, GorXu's sole-orchestrator role, bounded Mission Orders, verifier independence, evidence integrity, recovery, and source/state compatibility;
+- consequential changes must preserve Commander sovereignty, GroX's personal-assistant Prime Function, GorXu's sole-orchestrator role, bounded Mission Orders, verifier independence, evidence integrity, recovery, and source/state compatibility;
 - private SQLite state, `.groxstate` archives, secrets, and sensitive training material remain outside public Git by design.
 
 The README is an entry point. It does not outrank current repository authority, implementation evidence, the Progress Tracker, or the Roadmap.
@@ -380,11 +404,11 @@ The Apex critical path and **Post-Apex Operational Evolution Program 001** are c
 
 Post-release protected `main` also includes Mission Outcome Truthfulness, Selective Deep-Craft Crew Cognition, and the first live local neural Crew qualification. None defines a new Apex stage or release.
 
-The new strategic program is **Native Cognition Independence Program 001**. Its objective is to move GroX from a Vessel whose highest cognitive capability can be supplied by external/project-hosted models toward a Vessel with a built-in, offline-capable native cognition runtime and evolving local model family. External models remain optional capabilities and potential teachers where permitted, not required pilots.
+The new strategic program is **Native Cognition Independence Program 001**. Its purpose is to strengthen the Prime Function: preserve and improve GroX as the Commander's personal AI assistant while moving the Vessel from externally supplied cognition toward a built-in, offline-capable native cognition runtime and evolving local model family. External models remain optional capabilities and potential teachers where permitted, not required pilots.
 
-The program sequence is: native cognition runtime contract → built-in local seed cognition → offline GorXu cognition → richer neural Crew evolution → verified Mission learning corpus and model lineage → optional external teacher/tool adapters → governed descendant promotion → offline Vessel qualification → connected/augmented operation.
+The program sequence is: native cognition runtime contract → built-in local seed cognition → offline GorXu personal-assistant cognition → richer neural Crew evolution → verified Mission learning corpus and model lineage → optional external teacher/tool adapters → governed descendant promotion → offline personal-assistant Vessel qualification → connected/augmented operation.
 
-There is no predeclared A8. Every Native Cognition Independence stage must preserve the existing Apex and Post-Apex regression boundaries and earn its own evidence before activation.
+There is no predeclared A8. Every Native Cognition Independence stage must preserve the existing Apex and Post-Apex regression boundaries, the Prime Function, and Commander authority, and must earn its own evidence before activation.
 
 `v0.8.0` packages the completed Post-Apex Program 001 baseline and remains the current published release. Canonical source may advance beyond it through protected `main`; future release decisions remain Commander-controlled.
 
@@ -394,7 +418,7 @@ See the canonical [`Roadmap`](docs/stewardship/ROADMAP.md) for current sequencin
 
 <div align="center">
 
-**Persistent continuity. Bounded authority. Native cognition that earns its evolution.**
+**Personal assistance. Persistent continuity. Bounded authority. Native cognition that earns its evolution.**
 
 [Back to top](#readme-top)
 
