@@ -15,7 +15,14 @@ from .reconstitution import ReconstitutionPlanner
 from .vessel import resolve_vessel_root
 
 
+# Compatibility/test override only. Normal installed operation leaves this null
+# so operational root discovery remains lazy and fail-closed.
+ROOT: Path | None = None
+
+
 def vessel_root():
+    if ROOT is not None:
+        return Path(ROOT).expanduser().resolve()
     return resolve_vessel_root(module_file=__file__)
 
 
