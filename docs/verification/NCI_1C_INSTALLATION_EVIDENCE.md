@@ -42,6 +42,10 @@ Protected CI must prove from a non-editable wheel outside the repository:
 9. deliberate removal of a required packaged policy asset causes fail-closed startup and recovery succeeds after restoration;
 10. Python 3.11–3.14 regressions, Wheel bootstrap, Health, reconstitution, context experiments, mutation suites, provenance, and integrated Post-Apex qualification all remain green.
 
+## Evidence state
+
+This file intentionally contains no PASS result yet. Exact-head CI run identifiers, final head/tree digests, and canonical merge/source-equivalence evidence will be added only after those events actually occur.
+
 ## Claim boundary
 
 Until exact-head protected CI and canonical merge/source equivalence pass, NCI-1C remains an implementation candidate only.
