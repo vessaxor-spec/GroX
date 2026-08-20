@@ -1,17 +1,85 @@
 # GroX Progress Tracker
 
-**Status date:** 2026-08-18
+**Status date:** 2026-08-20
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Runtime baseline before this documentation synchronization:** `main@8420b9cbe5ca046ded87c8feaec83eca7cfdc475`
+**Runtime baseline before this documentation synchronization:** `main@9ca37596c631771ccd0d7ebbab80762d42466179`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
 **Apex qualification merge:** `419cc73950f573c3e201106f7949c6bf7829f2af`
 **Current operating verdict:** **APEX QUALIFIED — OPERATIONAL AUDIT 001 CLOSED**
 **Standing Crew:** **82**
-**Current verified regression:** pytest **235 passed, 2 skipped, 354 subtests**; unittest **237 OK, 2 skipped**
+**Current verified regression:** pytest **252 passed, 2 skipped, 440 subtests**; unittest **254 OK, 2 skipped**
+**Current strategic program:** **Native Cognition Independence Program 001 — ROADMAP AUTHORIZED; IMPLEMENTATION STAGES NOT YET QUALIFIED**
+
+## Live Local Neural Crew Cognition — issue #76 / PR #79
+
+**Status: COMPLETE — CANONICAL MERGED AND EXACT-TREE QUALIFIED**
+
+- issue #76 bounded the remaining live-provider evidence gate after the provider-neutral Inspect Crew cognition seam was established;
+- the sandbox could not obtain Codex, Qwen, llama.cpp, or other downloadable model artifacts because outbound acquisition was blocked, so the qualification did not simulate a vendor model;
+- instead, a real neural action-selection model was trained locally in the executing Python process using actual gradient updates and then bound through the canonical `SessionCrewCognitionProvider` path;
+- exact provider: `local-neural-session-crew-v1`;
+- exact model: `tiny-mlp-policy-5x8x3-v1`;
+- architecture: **5 → 8 → 3 multilayer perceptron**;
+- learned parameters: **75**;
+- training examples: **240**;
+- held-out examples: **100**;
+- initial held-out accuracy: **0.44**;
+- final held-out accuracy: **1.00**;
+- initial model SHA-256: `f5c197881e1fbdf90395bbc09d2c1ac7097691ac68101cf573c64a90b419b6b6`;
+- trained model SHA-256: `7b44fffbc0840d0572194649e47a79c0b1466253e0b93940584dfd5de1beda60`;
+- the changed digest proves the learned parameter state changed during training;
+- the model performed two real inference calls through the canonical provider seam: before governed evidence it selected `fs_read` with probability **0.999859**; after the governed observation it selected `finish` with probability **0.999892**;
+- selected craft and bounded Crew memory were present in the live inference context;
+- the read remained governed by the existing sealed Mission Order + Tool Gateway path;
+- canonical provider qualification returned PASS with Inspect mode preserved, craft selection evidenced, memory selection evidenced, governed observation evidenced, bounded Crew work product, no cognition denial/degradation, no mutation evidence, `outcome.mutation=false`, and independent verification PASS;
+- final implementation head `c8be4d78f92466d3e66ec915b12dcec316396b6d` passed exact-head CI `32336799141` / run **252** across all five required jobs;
+- Python 3.12 qualification: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **252 passed, 2 skipped, 440 subtests**, unittest **254 OK, 2 skipped**, critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6**, and integrated Post-Apex qualification PASS;
+- PR #79 merged as canonical `main@d49f43246922c6d8c5e3a632423195ffecd9f161`;
+- canonical merge tree `109f7d7ddc9712e3d9eec009582025c82317794a` exactly matches the CI-tested synthetic merge tree;
+- issue #76 closed as completed;
+- Ship's Log 0059 was added through PR #81 and merged as `main@9ca37596c631771ccd0d7ebbab80762d42466179` after documentation-only CI passed;
+- the qualified claim is exactly: **GroX has qualified one live locally trained neural action-selection provider through the bounded Inspect Crew cognition seam**;
+- this does **not** qualify a general-purpose LLM, Qwen, Codex, the OpenAI Responses adapter in live operation, other external models, all 82 Crew as autonomous model agents, model cognition in Repair/Verify/Execute, unrestricted autonomy, A8, or a new Apex stage.
+
+## Native Cognition Independence Program 001 — strategic direction
+
+**Status: ROADMAP AUTHORIZED — IMPLEMENTATION NOT YET QUALIFIED**
+
+Commander intent now establishes a new long-term direction for the Vessel:
+
+> **GroX is a neural organism that becomes progressively better at operating inside GroX.**
+
+The intended architecture is native-first rather than vendor-required:
+
+- GroX should own its cognition lifecycle: runtime contract, model registry and lineage, local inference placement, context, learning corpus, training, evaluation, model promotion, persistence, and recovery;
+- the minimum target operating condition is useful **offline cognition** without a paid model subscription, external API credential, or required network connection;
+- external models such as OpenAI, Anthropic, Google, and future providers remain optional governed intelligence capabilities that GorXu may use when they materially improve a Mission;
+- vendor models do not become the Vessel's command authority, and external intelligence does not inherit GroX authority merely because it is more capable;
+- low-level inference kernels and initial language-capable seed weights may come from permissively licensed open components when that is the smallest effective implementation path; GroX ownership means owning the cognition lifecycle and operating contract, not duplicating numerical kernels without demonstrated need;
+- the existing 75-parameter local neural provider is the first canonically qualified GroX-trained learned component and becomes the seed evidence for richer native model evolution;
+- verified Mission trajectories may become learning material; unverified model output is not training truth;
+- outputs from vendor models may be admitted into training/evaluation only where applicable rights/terms permit it, provenance is retained, and GroX verification admits the material;
+- model descendants may be trained and compared, but **evolution cannot self-authorize**: a candidate cannot promote itself because its score improved;
+- accepted and rejected generations should retain parentage, architecture, parameter count, corpus/provenance digest, training configuration, model digests, benchmark results, regressions, and disposition;
+- larger models are not automatically better; regression in authority compliance, generalization, reliability, cost, maintainability, safety, or recovery is grounds for rejection.
+
+Canonical staged roadmap in `docs/stewardship/ROADMAP.md`:
+
+1. **NCI-1 — Native cognition runtime contract:** GroX-owned model registry, lineage, local inference interface, hardware/resource discovery, cognition placement, health evidence, fallback and reconstitution.
+2. **NCI-2 — Built-in local seed cognition:** package a practical local baseline with artifact integrity, license/provenance, CPU-first minimum profile, optional acceleration, and no hidden network dependency.
+3. **NCI-3 — Offline GorXu cognition:** qualify local interpretation/planning/synthesis while deterministic authority remains authoritative.
+4. **NCI-4 — Neural Crew evolution:** evolve the qualified policy toward richer action/path/evidence/test/confidence/failure decisions with generation-by-generation comparison.
+5. **NCI-5 — Mission learning corpus and evolution registry:** structure verified operational experience into provenance-bound learning material and model ancestry.
+6. **NCI-6 — Optional external teacher/tool adapters:** allow governed external intelligence for difficult work and, where permitted, candidate teaching material without dependency or inherited authority.
+7. **NCI-7 — Governed model evolution and promotion:** parent-versus-descendant benchmarks, adversarial tests, preserved red evidence, independent verification, and explicit activation gates.
+8. **NCI-8 — Offline Vessel qualification:** prove a defined Mission set with no paid subscription, external API credential, or network requirement.
+9. **NCI-9 — Connected and augmented operation:** after offline qualification, use network, remote compute, and external models as optional capability multipliers under the same authority model.
+
+No NCI stage is qualified merely because it is listed. No A8 is created or implied. Package/release remain `0.8.0` / `v0.8.0`; Standing Crew remain 82.
 
 ## Selective Deep-Craft Crew Cognition — issue #73 / PR #74
 
@@ -39,7 +107,7 @@
 - PR #74 merged as canonical `main@8420b9cbe5ca046ded87c8feaec83eca7cfdc475` and issue #73 closed as completed;
 - canonical merge tree `170bbfb9fe483b1faae362adc15ec944ca5c96c9` exactly matches the CI-tested synthetic PR merge tree, proving exact source equivalence;
 - no separate post-merge push run is claimed because none was observable through the available GitHub interface;
-- this qualification proves the **provider-neutral controlled seam only**. No live project/session or external model provider is yet qualified for Standing Crew cognition;
+- historical issue #73 qualification proved the **provider-neutral controlled seam only**. That boundary was later advanced by issue #76 / PR #79 to one qualified live local neural provider; it still does not imply a general-purpose language model or broader model authority;
 - Commander authority, GorXu sole-orchestrator status, Repair boundaries, verifier independence, Mission Graph authority, package `0.8.0`, published `v0.8.0`, 82-Crew company, and no-A8 posture remain unchanged.
 
 ## Mission Outcome Truthfulness — issue #70 / PR #71
@@ -110,7 +178,7 @@
 - Python 3.12 qualification remained fully green: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, pytest **205 passed, 2 skipped, 354 subtests**, unittest **207 OK, 2 skipped**, critical mutations **12/12**, health **7/7**, reconstitution **9/9**, operational drift **4/4**, source provenance **6/6**, and integrated Post-Apex qualification PASS.
 - existing A1 behavior remains intact: invalid cognitive Crew recommendations cannot create eligibility and fall safely through the qualified deterministic routing path.
 - hierarchical shortlist routing, embeddings, vector databases, and extra model-routing stages remain deferred because the compact-directory change produced a material reduction without adding architecture; revisit only if real provider usage evidence shows further need.
-- the selective deep-craft adjacency identified by issue #60 has since advanced through issue #73 / PR #74 as a controlled provider-neutral Inspect seam; live model-backed Standing Crew remains separately unqualified.
+- the selective deep-craft adjacency identified by issue #60 later advanced through issue #73 / PR #74 and then through issue #76 / PR #79 to one qualified live local neural provider; the historical issue #60 qualification itself remains unchanged.
 - hard invariants remained unchanged: Commander intent is verbatim; GorXu remains sole operational orchestrator; deterministic capability, risk, Repair, Tool Gateway, and verifier-independence controls remain authoritative; caching and usage telemetry cannot grant authority; no tag/release moved and no A8 was created or implied.
 
 ## Verified Vessel baseline
@@ -147,7 +215,7 @@ Verified by source, qualification evidence, and automated testing:
 - package/source version metadata is aligned to released `v0.8.0` and remains guarded by both pytest and unittest
 - current published release `v0.8.0` is pinned to `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`; canonical source may advance beyond that immutable release through the protected PR/CI path
 - current protected source includes Mission Outcome Truthfulness with explicit scan-only and mutation-state outcome evidence while package version remains `0.8.0`
-- current protected source also includes Inspect-only selective deep craft and a CI-qualified provider-neutral controlled Crew cognition seam; live model-backed Standing Crew is not claimed.
+- current protected source includes Inspect-only selective deep craft, a CI-qualified provider-neutral controlled Crew cognition seam, and one qualified live locally trained neural action-selection provider; a general native local language runtime remains a roadmap target rather than a completed capability.
 
 ## Company state
 
@@ -307,22 +375,25 @@ Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.
 
 ## Known deliberate limits
 
-- GorXu cognition is project-hosted through GPT-5.6 Sol when a capable Space Exploration session is active; deterministic control remains the safe fallback when cognition is unavailable.
-- Standing Crew now have a CI-qualified provider-neutral Inspect cognition seam with selective craft + bounded memory, but no live project/session or external model provider is yet operationally qualified for Crew cognition.
+- GorXu's currently qualified cognitive operating mode remains project/session-hosted through GPT-5.6 Sol when a capable Space Exploration session is active; deterministic control remains the safe fallback when cognition is unavailable. **Native offline GorXu cognition is now an authorized roadmap target, not a completed capability.**
+- Standing Crew have a provider-neutral Inspect cognition seam with selective craft + bounded memory, and one live locally trained neural action-selection provider is operationally qualified through that seam. The qualified provider is narrow; no general-purpose local language model is yet qualified for Standing Crew.
+- GroX does not yet ship a complete built-in cognition runtime and local language model sufficient to replace project/vendor cognition for the qualified Mission set.
 - A3 episodic retrieval plus attributable semantic, procedural, and Vessel-wide memory are live with bounded selective retrieval; autonomous consolidation remains future evolution.
 - A4 durable Mission Graph resume, checkpointing, bounded cancellation/retry, and text-Repair compensation are live; generic compensation for arbitrary external systems remains intentionally unclaimed.
 - A5 qualifies bounded workspace shell/code execution, memory-only secret aliases, exact-origin read-only HTTP(S), offline browser evidence capture, and pre-registered stdio MCP. Unrestricted interactive desktop control, arbitrary/networked MCP processes, runtime image pulls/builds, and optional A2A delegation remain outside the qualified boundary.
 - A5 isolation fails closed when neither the preferred namespace backend nor the host-commissioned Docker fallback is available.
+- model training, benchmark improvement, or external-provider advice does not grant model activation or additional Mission authority.
+- offline Vessel qualification under Native Cognition Independence Program 001 remains future evidence work.
 
 ## Apex Orchestrator readiness
 
 **Current status: APEX QUALIFIED**
 
-The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot through A7 Apex Qualification have qualified, and Post-Apex Operational Evolution Program 001 has completed. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, attributable organizational memory, experienced routing, bounded selective memory, same-Mission crash recovery, checkpointed execution, bounded executive consultation/replanning, cancellation, journaled text-Repair compensation, governed multi-tool execution through Tool Gateway v2, replayable evidence-backed orchestration evaluation whose proposals cannot self-activate, continuous health/reconstitution/drift/provenance mutation proof, truthful single-Mission outcome classification that does not overstate bounded execution, and a canonical provider-neutral controlled Inspect Crew cognition seam using selective deep craft + bounded Crew memory without widening authority.
+The initial self-assessment Mission `MSN-354de0550dd5` established the baseline gaps. Since then A1 Cognitive Pilot through A7 Apex Qualification have qualified, and Post-Apex Operational Evolution Program 001 has completed. GorXu now has project-hosted cognition, durable dependency-aware multi-Crew graphs, attributable organizational memory, experienced routing, bounded selective memory, same-Mission crash recovery, checkpointed execution, bounded executive consultation/replanning, cancellation, journaled text-Repair compensation, governed multi-tool execution through Tool Gateway v2, replayable evidence-backed orchestration evaluation whose proposals cannot self-activate, continuous health/reconstitution/drift/provenance mutation proof, truthful single-Mission outcome classification that does not overstate bounded execution, a canonical provider-neutral controlled Inspect Crew cognition seam using selective deep craft + bounded Crew memory, and one canonically qualified live locally trained neural action-selection provider operating within that seam.
 
-The canonical evolution path is recorded in `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md`.
+The canonical evolution path is recorded in `docs/stewardship/APEX_ORCHESTRATOR_PLAN.md`; the new strategic direction is recorded in `docs/stewardship/ROADMAP.md` under Native Cognition Independence Program 001.
 
-Apex critical path: **COMPLETE**. A1 through A7 are qualified; future changes must preserve the qualification invariants rather than inherit Apex automatically.
+Apex critical path: **COMPLETE**. A1 through A7 are qualified; future changes—including native cognition evolution—must preserve the qualification invariants rather than inherit Apex automatically.
 
 ## Apex critical-path update - A1 Cognitive Pilot
 
@@ -346,7 +417,7 @@ Verified in the qualified Vessel:
 - independent verification passed by `code-reviewer`;
 - 28 automated tests passed at A1 qualification.
 
-**A1 status: SESSION-QUALIFIED.** A capable ChatGPT GPT-5.6 Sol project session may act as GorXu's cognitive provider. No API key, OAuth flow, or vendor CLI is required for this operating mode. If the hosting session is unavailable, GorXu degrades to the deterministic control plane rather than widening authority.
+**A1 status: SESSION-QUALIFIED.** A capable ChatGPT GPT-5.6 Sol project session may act as GorXu's cognitive provider. No API key, OAuth flow, or vendor CLI is required for this historical qualified operating mode. If the hosting session is unavailable, GorXu degrades to the deterministic control plane rather than widening authority. Native Cognition Independence Program 001 now targets an additional local/offline cognition path without rewriting the historical A1 gate.
 
 A1 exit gate is closed; the current Apex stage is tracked below.
 
@@ -354,8 +425,8 @@ A1 exit gate is closed; the current Apex stage is tracked below.
 
 **Status: LOCKED AND IMPLEMENTED**
 
-- cognitive continuity home: ChatGPT project `Space Exploration`;
-- Pilot identity: GorXu; preferred reasoning runtime: GPT-5.6 Sol / high reasoning;
+- cognitive continuity home at the historical A1/A2 baseline: ChatGPT project `Space Exploration`;
+- Pilot identity: GorXu; historically qualified project-hosted reasoning runtime: GPT-5.6 Sol / high reasoning;
 - durable Vessel source home: `vessaxor-spec/GroX`;
 - operational state remains private and outside public Git;
 - `.groxstate` snapshot creation, SHA-256 verification, SQLite integrity checking, and confirmation-gated restore implemented;
@@ -363,7 +434,7 @@ A1 exit gate is closed; the current Apex stage is tracked below.
 - `configs/persistence/project-binding.json` records the active persistence bindings;
 - automated suite: **31 tests passing** after persistence-plane implementation.
 
-The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed. The Apex critical path is complete; future evolution must preserve the qualified Apex invariants.
+The sandbox is explicitly classified as a replaceable flight computer rather than the Vessel's permanent home. The persistence foundation is closed. The Apex critical path is complete; future evolution must preserve the qualified Apex invariants. Native Cognition Independence Program 001 aims to remove vendor/session dependence from the minimum cognitive operating condition without replacing these persistence guarantees.
 
 ## Durable source synchronization
 
@@ -579,7 +650,7 @@ Qualification evidence:
 
 **A6 exit gate: PASSED.**
 
-A6 does not grant proposals authority to mutate the Vessel. Accepted future improvements must still traverse the ordinary GroX authority path with explicit mutation authority and required verification.
+A6 does not grant proposals authority to mutate the Vessel. Accepted future improvements must still traverse the ordinary GroX authority path with explicit mutation authority and required verification. Native model descendants inherit this same non-self-activation rule.
 
 Next Apex stage after A6 was **A7 - Apex Qualification Gauntlet**.
 
