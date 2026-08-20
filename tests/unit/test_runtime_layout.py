@@ -62,7 +62,7 @@ class VesselLayoutTests(unittest.TestCase):
     def test_legacy_layout_rejects_nonidentical_roles(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            with self.assertRaisesRegex(RuntimeLayoutError, "must be identical"):
+            with self.assertRaisesRegex(RuntimeLayoutError, "to be identical"):
                 VesselLayout(
                     root / "assets",
                     root / "state",
