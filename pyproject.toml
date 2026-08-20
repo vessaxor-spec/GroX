@@ -28,6 +28,7 @@ where = ["src"]
 "share/grox/configs/crew" = ["configs/crew/company-manifest.json"]
 "share/grox/configs/crew/dossiers" = ["configs/crew/dossiers/*.json"]
 "share/grox/configs/crew/specialists" = ["configs/crew/specialists/*.md"]
+"share/grox/configs/models" = ["configs/models/*.json"]
 "share/grox/configs/persistence" = ["configs/persistence/*.json"]
 "share/grox/configs/reasoning" = ["configs/reasoning/*.md"]
 
