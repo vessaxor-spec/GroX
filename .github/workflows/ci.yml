@@ -131,6 +131,20 @@ jobs:
           python -m venv /tmp/grox-wheel-env
           /tmp/grox-wheel-env/bin/python -m pip install /tmp/grox-wheel/grox_vessel-*.whl
           /tmp/grox-wheel-env/bin/python -m pip check
+      - name: Packaged runtime assets are complete
+        run: |
+          (cd /tmp && /tmp/grox-wheel-env/bin/python - <<'PY'
+          from pathlib import Path
+          from grox.runtime_assets import packaged_asset_root
+          root = packaged_asset_root()
+          dossiers = list((root / 'configs/crew/dossiers').glob('*.json'))
+          craft = list((root / 'configs/crew/specialists').glob('*.md'))
+          assert len(dossiers) == 82, len(dossiers)
+          assert len(craft) == 82, len(craft)
+          Path('/tmp/grox-asset-root.txt').write_text(str(root))
+          print(root)
+          PY
+          )
       - name: Installed CLI binds to current Vessel checkout
         run: |
           /tmp/grox-wheel-env/bin/python -m grox.cli status | tee /tmp/grox-wheel-status.txt
@@ -160,18 +174,86 @@ jobs:
           assert reported['commissioned'] is True, reported
           assert reported['workspace'] == '/tmp/grox-user-vessel', reported
           PY
-      - name: Unbound operational CLI still fails closed
+      - name: Uncommissioned installed operation fails closed
         run: |
           set +e
-          output=$(cd /tmp && /tmp/grox-wheel-env/bin/python -m grox.cli status 2>&1)
+          output=$(cd /tmp && XDG_CONFIG_HOME=/tmp/grox-uncommissioned-config /tmp/grox-wheel-env/bin/python -m grox.cli status 2>&1)
           rc=$?
           set -e
           printf '%s\n' "$output"
           test "$rc" -ne 0
-          grep -q 'No GroX Vessel root found' <<<"$output"
-          grep -q 'Refusing to start an empty Vessel' <<<"$output"
+          grep -q 'No commissioned GroX workspace found' <<<"$output"
+          grep -q 'grox init' <<<"$output"
       - name: Explicit Vessel binding works outside checkout
         run: |
           (cd /tmp && GROX_VESSEL_ROOT="$GITHUB_WORKSPACE" /tmp/grox-wheel-env/bin/python -m grox.cli status) | tee /tmp/grox-bound-status.txt
           grep -q 'Standing Crew: 82' /tmp/grox-bound-status.txt
           grep -q "Vessel root: $GITHUB_WORKSPACE" /tmp/grox-bound-status.txt
+      - name: Standalone installed GorXu commissions and starts
+        run: |
+          rm -rf /tmp/grox-installed-xdg /tmp/grox-installed-vessel
+          (cd /tmp && XDG_CONFIG_HOME=/tmp/grox-installed-xdg /tmp/grox-wheel-env/bin/python -m grox.cli init \
+            --workspace /tmp/grox-installed-vessel \
+            --non-interactive \
+            --json) | tee /tmp/grox-installed-init.json
+          mkdir -p /tmp/grox-installed-vessel/workspace/tests
+          cat > /tmp/grox-installed-vessel/workspace/tests/test_smoke.py <<'PY'
+          import unittest
+
+          class InstalledWorkspaceSmoke(unittest.TestCase):
+              def test_commander_workspace(self):
+                  self.assertTrue(True)
+          PY
+          echo 'Commander workspace file' > /tmp/grox-installed-vessel/workspace/README.txt
+          (cd /tmp && XDG_CONFIG_HOME=/tmp/grox-installed-xdg /tmp/grox-wheel-env/bin/python -m grox.cli status) | tee /tmp/grox-installed-status.txt
+          grep -q 'Command spine: Commander -> Pilot GorXu -> Divisions -> Standing Crew' /tmp/grox-installed-status.txt
+          grep -q 'Standing Crew: 82' /tmp/grox-installed-status.txt
+          grep -q 'Private state: /tmp/grox-installed-vessel/state' /tmp/grox-installed-status.txt
+          grep -q 'Commander workspace: /tmp/grox-installed-vessel/workspace' /tmp/grox-installed-status.txt
+          test -f /tmp/grox-installed-vessel/state/grox.sqlite3
+          asset_root=$(cat /tmp/grox-asset-root.txt)
+          test ! -e "$asset_root/configs/state/grox.sqlite3"
+      - name: Standalone installed GorXu orchestrates bounded Crew work
+        run: |
+          (cd /tmp && XDG_CONFIG_HOME=/tmp/grox-installed-xdg /tmp/grox-wheel-env/bin/python -m grox.cli mission \
+            'inspect the commissioned Commander workspace' \
+            --mode inspect \
+            --risk medium \
+            --crew code-reviewer \
+            --scope .) | tee /tmp/grox-installed-mission.json
+          /tmp/grox-wheel-env/bin/python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('/tmp/grox-installed-mission.json').read_text())
+          assert result['crew'] == 'code-reviewer', result
+          assert result['mode'] == 'inspect', result
+          assert result['risk'] == 'medium', result
+          assert result['execution_status'] == 'completed', result
+          assert result['verification'] is not None, result
+          assert result['verification']['ok'] is True, result
+          assert result['verification']['verifier'] != result['crew'], result
+          assert result['outcome']['mutation'] is False, result
+          Path('/tmp/grox-installed-mission-id.txt').write_text(result['mission_id'])
+          PY
+      - name: Installed Vessel reconstitutes the same private state
+        run: |
+          mission_id=$(cat /tmp/grox-installed-mission-id.txt)
+          (cd /tmp && XDG_CONFIG_HOME=/tmp/grox-installed-xdg /tmp/grox-wheel-env/bin/python -m grox.cli status) | tee /tmp/grox-installed-reopen.txt
+          grep -q 'Standing Crew: 82' /tmp/grox-installed-reopen.txt
+          grep -q "Last mission: $mission_id" /tmp/grox-installed-reopen.txt
+          test -f /tmp/grox-installed-vessel/state/grox.sqlite3
+      - name: Corrupt packaged runtime fails closed
+        run: |
+          asset_root=$(cat /tmp/grox-asset-root.txt)
+          policy="$asset_root/configs/tool-policy.json"
+          backup="$asset_root/configs/tool-policy.json.nci1c-backup"
+          mv "$policy" "$backup"
+          set +e
+          output=$(cd /tmp && XDG_CONFIG_HOME=/tmp/grox-installed-xdg /tmp/grox-wheel-env/bin/python -m grox.cli status 2>&1)
+          rc=$?
+          set -e
+          mv "$backup" "$policy"
+          printf '%s\n' "$output"
+          test "$rc" -ne 0
+          grep -q 'packaged runtime assets are incomplete' <<<"$output"
+          (cd /tmp && XDG_CONFIG_HOME=/tmp/grox-installed-xdg /tmp/grox-wheel-env/bin/python -m grox.cli status) >/dev/null
