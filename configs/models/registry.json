@@ -41,10 +41,10 @@
     },
     {
       "artifact": {
-        "bytes": 2497280256,
+        "bytes": 1282439264,
         "location": "persistent_model_store",
-        "path": "Qwen3-4B-Q4_K_M.gguf",
-        "sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5"
+        "path": "Qwen3-1.7B-Q4_K_M.gguf",
+        "sha256": "d2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5"
       },
       "backend": "llama.cpp-cli-b10218",
       "claims": {
@@ -59,19 +59,20 @@
         "generation": 1,
         "parent_model_id": null
       },
-      "model_id": "qwen3-4b-q4-k-m-seed-v1",
+      "model_id": "qwen3-1.7b-q4-k-m-seed-v1",
       "model_kind": "language-seed-candidate",
-      "parameter_count": null,
+      "parameter_count": 1700000000,
       "placements": [
         "gorxu"
       ],
       "provenance": {
-        "artifact": "Qwen3-4B-Q4_K_M.gguf",
+        "artifact": "Qwen3-1.7B-Q4_K_M.gguf",
+        "artifact_repository": "ggml-org/Qwen3-1.7B-GGUF",
         "license": "Apache-2.0",
         "quantization": "Q4_K_M",
-        "repository": "Qwen/Qwen3-4B-GGUF",
-        "source_revision": "a9a60d009fa7ff9606305047c2bf77ac25dbec49",
-        "xet_hash": "9375c1fd02b321abc3f51b69ff7fcdd187af17f0d694c5b05000b54664292e17"
+        "source_model": "Qwen/Qwen3-1.7B",
+        "source_revision": "daeb8e2d528a760970442092f6bf1e55c3b659eb",
+        "xet_hash": "0a8e661bad7f1ea5accdd078b6a2aca20ff0201100bbf128aa1cc22c643d7221"
       },
       "resources": {
         "min_ram_bytes": 8589934592,
