@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
-import os
 import tempfile
 import textwrap
 import unittest
@@ -15,6 +13,7 @@ from grox.native_model_runtime import (
     LocalModelRuntime,
     ModelArtifact,
     ModelReadiness,
+    ModelRegistrationError,
     ModelRegistry,
 )
 from grox.reasoning.base import ReasoningError
@@ -42,6 +41,7 @@ def _hardware() -> HardwareRuntimeProfile:
 
 
 def _write_fake_cli(root: Path, *, mode: str = "valid", version: str = "version: 10218 (de699957b)") -> Path:
+    root.mkdir(parents=True, exist_ok=True)
     path = root / f"llama-cli-{mode}"
     script = f'''#!/usr/bin/env python3
 import json
@@ -108,6 +108,7 @@ print(json.dumps(payload, separators=(",", ":")))
 
 
 def _runtime(root: Path, executable: Path) -> tuple[LocalModelRuntime, LlamaCppCLIBackend, str]:
+    root.mkdir(parents=True, exist_ok=True)
     asset_root = root / "assets"
     model_root = root / "models"
     asset_root.mkdir()
@@ -158,6 +159,12 @@ class NCI2ArtifactLocationTests(unittest.TestCase):
             {"path": "configs/models/model.json", "sha256": "0" * 64, "bytes": 1}
         )
         self.assertEqual(artifact.location, "runtime_assets")
+
+    def test_invalid_artifact_location_type_fails_as_registration_error(self) -> None:
+        with self.assertRaisesRegex(ModelRegistrationError, "artifact location"):
+            ModelArtifact.from_mapping(
+                {"location": ["persistent_model_store"], "path": "model.gguf", "sha256": "0" * 64, "bytes": 1}
+            )
 
     def test_existing_nci1_registry_and_tiny_backend_remain_unchanged(self) -> None:
         source_root = Path(__file__).resolve().parents[2]
