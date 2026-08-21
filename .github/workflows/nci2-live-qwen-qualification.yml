@@ -119,7 +119,7 @@ jobs:
           llama_cli=$(find /tmp/nci2-llama -type f -name llama-cli -print -quit)
           test -n "$llama_cli"
           chmod +x "$llama_cli"
-          "$llama_cli" --version | tee /tmp/nci2-llama-version.txt
+          "$llama_cli" --version 2>&1 | tee /tmp/nci2-llama-version.txt
           grep -Eq 'version:[[:space:]]*10218[[:space:]]*\(de69995[0-9a-f]*\)' /tmp/nci2-llama-version.txt
           printf '%s' "$llama_cli" >/tmp/nci2-llama-cli-path.txt
           printf '%s' "$llama_digest" >/tmp/nci2-llama-asset-sha256.txt
