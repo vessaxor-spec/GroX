@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   loader-diagnostic:
-    name: Non-qualifying isolated llama.cpp structured-output matrix
+    name: Non-qualifying isolated llama.cpp Mission-grammar diagnostic
     if: github.event_name == 'workflow_dispatch' || github.head_ref == 'nci-2c-live-qwen-qualification'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -69,29 +69,12 @@ jobs:
           test "$observed" = 'da2572f16c06133561ce56accaa822216f2391ef4d37fba427801cd6736417d4'
           echo "diagnostic model identity PASS: $observed"
 
-      - name: Compare isolated transport and structured-output modes
+      - name: Prove clean constrained output and full Mission grammar
         shell: bash
         run: |
           set -euo pipefail
           llama_cli=$(cat /tmp/nci2-diag-cli.txt)
           model=/tmp/nci2-diag-model.gguf
-          schema='{"type":"object","properties":{"status":{"type":"string","enum":["ok"]}},"required":["status"],"additionalProperties":false}'
-          common=(
-            -m "$model"
-            --single-turn
-            --no-display-prompt
-            --no-warmup
-            --temp 0
-            --seed 1
-            --ctx-size 1024
-            -n 32
-            -t 4
-            --fit off
-            -dev none
-            --no-op-offload
-            -ngl 0
-            --simple-io
-          )
 
           cat >/tmp/nci2-netns-exec.sh <<'SH'
           #!/usr/bin/env bash
@@ -113,93 +96,120 @@ jobs:
           space ::= | " " | "\n"{1,2} [ \t]{0,20}
           GBNF
 
-          probe() {
-            label="$1"
-            shift
-            echo "===== diagnostic: $label ====="
-            started=$(date +%s)
-            set +e
+          cat >/tmp/nci2-mission.gbnf <<'GBNF'
+          root ::= "{" space commander-intent-kv "," space objective-kv "," space ambiguous-kv "," space ambiguities-kv "," space assumptions-kv "," space information-needs-kv "," space candidate-crew-ids-kv "," space options-kv "," space recommended-option-kv "," space confidence-kv "," space proposed-mode-kv "," space proposed-risk-kv "}" space
+          char ::= [^"\\\x7F\x00-\x1F] | [\\] (["\\bfnrt] | "u" [0-9a-fA-F]{4})
+          string ::= "\"" char* "\"" space
+          nonempty-string ::= "\"" char char* "\"" space
+          string-array ::= "[" space ("]" | string ("," space string)* "]" space)
+          nonempty-string-array ::= "[" space nonempty-string ("," space nonempty-string)* "]" space
+          boolean ::= ("true" | "false") space
+          confidence ::= ("0" ("." [0-9]+)? | "1" ("." "0"+)?) space
+          mode ::= ("null" | "\"inspect\"" | "\"repair\"" | "\"execute\"" | "\"verify\"") space
+          risk ::= ("null" | "\"low\"" | "\"medium\"" | "\"high\"" | "\"critical\"") space
+          option ::= "{" space "\"name\"" space ":" space nonempty-string "," space "\"rationale\"" space ":" space nonempty-string "," space "\"advantages\"" space ":" space string-array "," space "\"risks\"" space ":" space string-array "," space "\"crew_ids\"" space ":" space nonempty-string-array "}" space
+          options ::= "[" space option ("," space option)* "]" space
+          commander-intent-kv ::= "\"commander_intent\"" space ":" space nonempty-string
+          objective-kv ::= "\"objective\"" space ":" space nonempty-string
+          ambiguous-kv ::= "\"ambiguous\"" space ":" space boolean
+          ambiguities-kv ::= "\"ambiguities\"" space ":" space string-array
+          assumptions-kv ::= "\"assumptions\"" space ":" space string-array
+          information-needs-kv ::= "\"information_needs\"" space ":" space string-array
+          candidate-crew-ids-kv ::= "\"candidate_crew_ids\"" space ":" space nonempty-string-array
+          options-kv ::= "\"options\"" space ":" space options
+          recommended-option-kv ::= "\"recommended_option\"" space ":" space nonempty-string
+          confidence-kv ::= "\"confidence\"" space ":" space confidence
+          proposed-mode-kv ::= "\"proposed_mode\"" space ":" space mode
+          proposed-risk-kv ::= "\"proposed_risk\"" space ":" space risk
+          space ::= | " " | "\n"{1,2} [ \t]{0,20}
+          GBNF
+
+          common=(
+            -m "$model"
+            --single-turn
+            --no-display-prompt
+            --no-warmup
+            --temp 0
+            --seed 1
+            --ctx-size 2048
+            -t 4
+            --fit off
+            -dev none
+            --no-op-offload
+            -ngl 0
+            --simple-io
+            --reasoning off
+            --reasoning-budget 0
+            --chat-template-kwargs '{"enable_thinking":false}'
+            --skip-chat-parsing
+          )
+
+          run_isolated() {
             sudo env \
               -u OPENAI_API_KEY -u ANTHROPIC_API_KEY -u GOOGLE_API_KEY -u GEMINI_API_KEY \
-              unshare --net /tmp/nci2-netns-exec.sh timeout 30s "$@" \
-              >"/tmp/nci2-${label}.out" 2>"/tmp/nci2-${label}.err"
-            rc=$?
-            set -e
-            elapsed=$(( $(date +%s) - started ))
-            printf '%s\n' "$rc" >"/tmp/nci2-${label}.rc"
-            printf '%s\n' "$elapsed" >"/tmp/nci2-${label}.seconds"
-            echo "diagnostic=$label rc=$rc elapsed_seconds=$elapsed"
-            cat "/tmp/nci2-${label}.out" || true
-            tail -n 120 "/tmp/nci2-${label}.err" || true
+              unshare --net /tmp/nci2-netns-exec.sh timeout 30s "$@"
           }
 
-          probe loopback-plain "$llama_cli" "${common[@]}" \
-            -p 'Reply with the single word OK. /no_think' \
-            --reasoning off --skip-chat-parsing
-
-          probe loopback-schema-default "$llama_cli" "${common[@]}" \
-            -p 'Return only a JSON object whose status is ok. /no_think' \
-            -j "$schema"
-
-          probe loopback-schema-reasoning-off "$llama_cli" "${common[@]}" \
-            -p 'Return only a JSON object whose status is ok.' \
-            -j "$schema" \
-            --reasoning off --reasoning-budget 0 \
-            --chat-template-kwargs '{"enable_thinking":false}'
-
-          probe loopback-schema-skip-parser "$llama_cli" "${common[@]}" \
-            -p 'Return only a JSON object whose status is ok.' \
-            -j "$schema" \
-            --reasoning off --reasoning-budget 0 \
-            --chat-template-kwargs '{"enable_thinking":false}' \
-            --skip-chat-parsing
-
-          probe loopback-gbnf-skip-parser "$llama_cli" "${common[@]}" \
+          rm -f /tmp/nci2-status-response.json
+          run_isolated "$llama_cli" "${common[@]}" \
             -p 'Return only a JSON object whose status is ok.' \
             --grammar-file /tmp/nci2-status.gbnf \
-            --reasoning off --reasoning-budget 0 \
-            --chat-template-kwargs '{"enable_thinking":false}' \
-            --skip-chat-parsing
+            -n 32 \
+            --output-file /tmp/nci2-status-response.json \
+            >/tmp/nci2-status-console.out 2>/tmp/nci2-status-console.err
+          test -s /tmp/nci2-status-response.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          raw = Path('/tmp/nci2-status-response.json').read_text().strip()
+          print({'status_output_file': raw})
+          assert json.loads(raw) == {'status': 'ok'}, raw
+          PY
 
-      - name: Classify isolated structured-output diagnostics
+          rm -f /tmp/nci2-mission-response.json
+          run_isolated "$llama_cli" "${common[@]}" \
+            -p 'Return a compact Mission interpretation. Use commander_intent exactly "Inspect README.md for reliability risk." Use objective "Find reliability risk"; ambiguous false; no ambiguities or assumptions; information_needs ["Inspect README.md"]; candidate_crew_ids ["crew-test"]; one option named "inspect" with rationale "Inspect evidence", empty advantages and risks, crew_ids ["crew-test"]; recommended_option "inspect"; confidence 0.8; proposed_mode "inspect"; proposed_risk "high".' \
+            --grammar-file /tmp/nci2-mission.gbnf \
+            -n 256 \
+            --output-file /tmp/nci2-mission-response.json \
+            >/tmp/nci2-mission-console.out 2>/tmp/nci2-mission-console.err
+          test -s /tmp/nci2-mission-response.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          raw = Path('/tmp/nci2-mission-response.json').read_text().strip()
+          payload = json.loads(raw)
+          print(json.dumps(payload, indent=2, sort_keys=True))
+          required = {
+              'commander_intent', 'objective', 'ambiguous', 'ambiguities', 'assumptions',
+              'information_needs', 'candidate_crew_ids', 'options', 'recommended_option',
+              'confidence', 'proposed_mode', 'proposed_risk',
+          }
+          assert set(payload) == required, payload
+          assert isinstance(payload['candidate_crew_ids'], list) and payload['candidate_crew_ids'], payload
+          assert isinstance(payload['options'], list) and payload['options'], payload
+          assert 0 <= float(payload['confidence']) <= 1, payload
+          assert payload['proposed_mode'] in {'inspect', 'repair', 'execute', 'verify', None}, payload
+          assert payload['proposed_risk'] in {'low', 'medium', 'high', 'critical', None}, payload
+          PY
+
+      - name: Emit diagnostic classification
         if: always()
         shell: bash
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-
-          labels = (
-              'loopback-plain',
-              'loopback-schema-default',
-              'loopback-schema-reasoning-off',
-              'loopback-schema-skip-parser',
-              'loopback-gbnf-skip-parser',
-          )
-          results = {}
-          for label in labels:
-              rc_path = Path(f'/tmp/nci2-{label}.rc')
-              sec_path = Path(f'/tmp/nci2-{label}.seconds')
-              out_path = Path(f'/tmp/nci2-{label}.out')
-              err_path = Path(f'/tmp/nci2-{label}.err')
-              stdout = out_path.read_text(errors='replace').strip() if out_path.exists() else ''
-              stderr = err_path.read_text(errors='replace') if err_path.exists() else ''
-              results[label] = {
-                  'returncode': int(rc_path.read_text().strip()) if rc_path.exists() else None,
-                  'elapsed_seconds': int(sec_path.read_text().strip()) if sec_path.exists() else None,
-                  'stdout_nonempty': bool(stdout),
-                  'contains_status_ok': '"status"' in stdout and '"ok"' in stdout,
-                  'sampler_error': 'Failed to initialize samplers' in stderr,
-                  'template_lstrip_warning': "hint: 'lstrip'" in stderr,
-                  'namespace_wrapper_reached_llama': 'Loading model' in stderr or 'build' in stderr,
-              }
+          status_path = Path('/tmp/nci2-status-response.json')
+          mission_path = Path('/tmp/nci2-mission-response.json')
           payload = {
-              'schema': 'grox-nci2-isolated-structured-output-diagnostic-v1',
+              'schema': 'grox-nci2-mission-grammar-diagnostic-v1',
               'qualification_claim': False,
               'external_network_available': False,
               'loopback_enabled': True,
               'authority_changed': False,
-              'results': results,
+              'response_only_output_file': status_path.exists() and status_path.read_text().strip().startswith('{'),
+              'full_mission_grammar_output': mission_path.exists() and mission_path.read_text().strip().startswith('{'),
           }
           print(json.dumps(payload, indent=2, sort_keys=True))
           PY
