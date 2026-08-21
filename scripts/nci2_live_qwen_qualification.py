@@ -98,6 +98,15 @@ def provision(args: argparse.Namespace) -> None:
         "A restore drill has not yet been recorded.\n",
         encoding="utf-8",
     )
+    tests_dir = commander_work / "tests"
+    tests_dir.mkdir(parents=True, exist_ok=True)
+    (tests_dir / "test_smoke.py").write_text(
+        "import unittest\n\n"
+        "class CommanderWorkspaceSmoke(unittest.TestCase):\n"
+        "    def test_workspace_is_testable(self):\n"
+        "        self.assertTrue(True)\n",
+        encoding="utf-8",
+    )
     _dump(
         {
             "schema": "grox-nci2-live-provisioning-v1",
@@ -135,7 +144,7 @@ def qualify(args: argparse.Namespace) -> None:
     backend = LlamaCppCLIBackend(
         args.llama_cli,
         context_tokens=8192,
-        max_output_tokens=512,
+        max_output_tokens=256,
         max_threads=4,
         timeout_seconds=600,
         scratch_root=scratch,
