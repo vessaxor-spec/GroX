@@ -19,12 +19,12 @@ from grox.reasoning.local_llama_cpp import LocalLlamaCppReasoningProvider
 from grox.tiny_neural_policy import TinyMLPPythonBackend
 
 
-MODEL_ID = "qwen3-1.7b-q4-k-m-seed-v1"
-MODEL_FILENAME = "Qwen3-1.7B-Q4_K_M.gguf"
-MODEL_SHA256 = "d2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5"
-MODEL_BYTES = 1_282_439_264
-MODEL_SOURCE = "https://huggingface.co/ggml-org/Qwen3-1.7B-GGUF"
-MODEL_REVISION = "daeb8e2d528a760970442092f6bf1e55c3b659eb"
+MODEL_ID = "qwen3-0.6b-q4-0-seed-v1"
+MODEL_FILENAME = "Qwen3-0.6B-Q4_0.gguf"
+MODEL_SHA256 = "da2572f16c06133561ce56accaa822216f2391ef4d37fba427801cd6736417d4"
+MODEL_BYTES = 428_970_080
+MODEL_SOURCE = "https://huggingface.co/ggml-org/Qwen3-0.6B-GGUF"
+MODEL_REVISION = "a41486f827d17edd055fe6b3b0ba3f8d427c0519"
 MODEL_LICENSE = "Apache-2.0"
 DIRECTIVE = "Inspect README.md for the most important reliability risk. Do not modify files. /no_think"
 
