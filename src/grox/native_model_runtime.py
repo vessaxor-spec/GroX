@@ -69,6 +69,7 @@ class ModelArtifact:
     path: str
     sha256: str
     byte_size: int
+    location: str = "runtime_assets"
 
     @classmethod
     def from_mapping(cls, raw: Mapping[str, Any]) -> "ModelArtifact":
@@ -77,11 +78,14 @@ class ModelArtifact:
         path = raw.get("path")
         digest = raw.get("sha256")
         byte_size = raw.get("bytes")
+        location = raw.get("location", "runtime_assets")
         if not isinstance(path, str) or not path.strip():
             raise ModelRegistrationError("model artifact path must be a non-empty string")
         normalized = Path(path.strip())
         if normalized.is_absolute() or ".." in normalized.parts:
-            raise ModelRegistrationError("model artifact path must remain relative to the GroX asset root")
+            raise ModelRegistrationError("model artifact path must remain relative to its registered GroX storage root")
+        if location not in {"runtime_assets", "persistent_model_store"}:
+            raise ModelRegistrationError(f"unsupported model artifact location: {location}")
         if not isinstance(digest, str) or len(digest) != 64:
             raise ModelRegistrationError("model artifact sha256 must be a 64-character hexadecimal digest")
         try:
@@ -90,15 +94,32 @@ class ModelArtifact:
             raise ModelRegistrationError("model artifact sha256 must be hexadecimal") from exc
         if not isinstance(byte_size, int) or isinstance(byte_size, bool) or byte_size <= 0:
             raise ModelRegistrationError("model artifact bytes must be a positive integer")
-        return cls(path=normalized.as_posix(), sha256=digest.lower(), byte_size=byte_size)
+        return cls(
+            path=normalized.as_posix(),
+            sha256=digest.lower(),
+            byte_size=byte_size,
+            location=location,
+        )
 
-    def resolve(self, asset_root: Path | str) -> Path:
-        root = Path(asset_root).expanduser().resolve()
+    def resolve(
+        self,
+        asset_root: Path | str,
+        *,
+        model_store_root: Path | str | None = None,
+    ) -> Path:
+        if self.location == "runtime_assets":
+            root = Path(asset_root).expanduser().resolve()
+            root_label = "GroX asset root"
+        else:
+            if model_store_root is None:
+                raise ModelRegistrationError("persistent model artifact requires an explicit GroX model-store root")
+            root = Path(model_store_root).expanduser().resolve()
+            root_label = "GroX model-store root"
         target = (root / self.path).resolve()
         try:
             target.relative_to(root)
         except ValueError as exc:
-            raise ModelRegistrationError("model artifact path escapes the GroX asset root") from exc
+            raise ModelRegistrationError(f"model artifact path escapes the {root_label}") from exc
         return target
 
 
@@ -139,7 +160,7 @@ class ModelManifest:
     def from_mapping(cls, raw: Mapping[str, Any]) -> "ModelManifest":
         if not isinstance(raw, Mapping):
             raise ModelRegistrationError("model manifest must be a mapping")
-        required_strings = {}
+        required_strings: dict[str, str] = {}
         for key in ("model_id", "model_kind", "format", "backend"):
             value = raw.get(key)
             if not isinstance(value, str) or not value.strip():
@@ -248,8 +269,17 @@ class ModelRegistry:
 
     schema = "grox-model-registry-v1"
 
-    def __init__(self, *, asset_root: Path | str, manifests: list[ModelManifest]):
+    def __init__(
+        self,
+        *,
+        asset_root: Path | str,
+        manifests: list[ModelManifest],
+        model_store_root: Path | str | None = None,
+    ):
         self.asset_root = Path(asset_root).expanduser().resolve()
+        self.model_store_root = (
+            Path(model_store_root).expanduser().resolve() if model_store_root is not None else None
+        )
         by_id: dict[str, ModelManifest] = {}
         for manifest in manifests:
             if manifest.model_id in by_id:
@@ -260,7 +290,11 @@ class ModelRegistry:
 
     @classmethod
     def from_mapping(
-        cls, *, asset_root: Path | str, raw: Mapping[str, Any]
+        cls,
+        *,
+        asset_root: Path | str,
+        raw: Mapping[str, Any],
+        model_store_root: Path | str | None = None,
     ) -> "ModelRegistry":
         if not isinstance(raw, Mapping) or raw.get("schema") != cls.schema:
             raise ModelRegistrationError(f"model registry schema must be {cls.schema}")
@@ -269,11 +303,17 @@ class ModelRegistry:
             raise ModelRegistrationError("model registry models must be a list")
         return cls(
             asset_root=asset_root,
+            model_store_root=model_store_root,
             manifests=[ModelManifest.from_mapping(item) for item in models],
         )
 
     @classmethod
-    def from_asset_root(cls, asset_root: Path | str) -> "ModelRegistry":
+    def from_asset_root(
+        cls,
+        asset_root: Path | str,
+        *,
+        model_store_root: Path | str | None = None,
+    ) -> "ModelRegistry":
         root = Path(asset_root).expanduser().resolve()
         path = root / "configs" / "models" / "registry.json"
         try:
@@ -282,7 +322,7 @@ class ModelRegistry:
             raise ModelRegistrationError(f"model registry is unavailable: {path}") from exc
         except (OSError, json.JSONDecodeError) as exc:
             raise ModelRegistrationError(f"model registry is malformed: {path}: {exc}") from exc
-        return cls.from_mapping(asset_root=root, raw=raw)
+        return cls.from_mapping(asset_root=root, model_store_root=model_store_root, raw=raw)
 
     def ids(self) -> tuple[str, ...]:
         return tuple(sorted(self._manifests))
@@ -292,6 +332,12 @@ class ModelRegistry:
             return self._manifests[model_id]
         except KeyError as exc:
             raise ModelRegistrationError(f"model is not registered: {model_id}") from exc
+
+    def artifact_path(self, manifest: ModelManifest) -> Path:
+        return manifest.artifact.resolve(
+            self.asset_root,
+            model_store_root=self.model_store_root,
+        )
 
     def _validate_lineage(self) -> None:
         for manifest in self._manifests.values():
@@ -368,23 +414,41 @@ class LocalModelRuntime:
     def active_models(self) -> tuple[str, ...]:
         return tuple(sorted(self._loaded))
 
+    @staticmethod
+    def _digest_artifact(path: Path) -> tuple[str, int]:
+        digest = hashlib.sha256()
+        size = 0
+        with path.open("rb") as handle:
+            while True:
+                chunk = handle.read(1024 * 1024)
+                if not chunk:
+                    break
+                digest.update(chunk)
+                size += len(chunk)
+        return digest.hexdigest(), size
+
     def readiness(self, model_id: str) -> ModelReadinessReport:
         try:
             manifest = self.registry.get(model_id)
+            artifact_path = self.registry.artifact_path(manifest)
         except ModelRegistrationError as exc:
+            manifest = None
+            try:
+                manifest = self.registry.get(model_id)
+            except ModelRegistrationError:
+                pass
             return ModelReadinessReport(
                 model_id=model_id,
                 status=ModelReadiness.UNAVAILABLE,
                 reason=str(exc),
-                backend=None,
-                placement_options=(),
+                backend=manifest.backend if manifest is not None else None,
+                placement_options=manifest.placements if manifest is not None else (),
                 artifact_path=None,
                 artifact_sha256=None,
                 hardware=self.hardware,
                 active=False,
             )
 
-        artifact_path = manifest.artifact.resolve(self.registry.asset_root)
         active = model_id in self._loaded
         if not artifact_path.is_file():
             return self._report(
@@ -395,7 +459,7 @@ class LocalModelRuntime:
                 active,
             )
         try:
-            data = artifact_path.read_bytes()
+            digest, size = self._digest_artifact(artifact_path)
         except OSError as exc:
             return self._report(
                 manifest,
@@ -404,12 +468,11 @@ class LocalModelRuntime:
                 artifact_path,
                 active,
             )
-        digest = hashlib.sha256(data).hexdigest()
-        if len(data) != manifest.artifact.byte_size:
+        if size != manifest.artifact.byte_size:
             return self._report(
                 manifest,
                 ModelReadiness.CORRUPT,
-                f"model artifact byte-size mismatch: expected {manifest.artifact.byte_size}, got {len(data)}",
+                f"model artifact byte-size mismatch: expected {manifest.artifact.byte_size}, got {size}",
                 artifact_path,
                 active,
                 digest=digest,
@@ -505,7 +568,7 @@ class LocalModelRuntime:
                 f"model {model_id} is not ready: {report.status.value}: {report.reason}"
             )
         backend = self.backends[manifest.backend]
-        artifact_path = manifest.artifact.resolve(self.registry.asset_root)
+        artifact_path = self.registry.artifact_path(manifest)
         try:
             handle = backend.load(manifest, artifact_path)
         except Exception as exc:
