@@ -80,7 +80,8 @@ class NativeModelRuntimeIntegrationTests(unittest.TestCase):
             self.assertEqual(reconstituted["active_after"], [])
             self.assertFalse(reconstituted["auto_activation"])
             self.assertFalse(reconstituted["authority_changed"])
-            self.assertEqual(reconstituted["models"][0]["status"], ModelReadiness.AVAILABLE.value)
+            models_by_id = {item["model_id"]: item for item in reconstituted["models"]}
+            self.assertEqual(models_by_id[TINY_MODEL_ID]["status"], ModelReadiness.AVAILABLE.value)
         finally:
             td.cleanup()
 
