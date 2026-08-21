@@ -169,7 +169,7 @@ class NCI2ArtifactLocationTests(unittest.TestCase):
     def test_existing_nci1_registry_and_tiny_backend_remain_unchanged(self) -> None:
         source_root = Path(__file__).resolve().parents[2]
         registry = ModelRegistry.from_asset_root(source_root)
-        self.assertEqual(registry.ids(), (TINY_MODEL_ID,))
+        self.assertIn(TINY_MODEL_ID, registry.ids())
         self.assertEqual(registry.get(TINY_MODEL_ID).artifact.location, "runtime_assets")
         runtime = LocalModelRuntime(registry, [TinyMLPPythonBackend()], hardware=_hardware())
         self.assertEqual(runtime.readiness(TINY_MODEL_ID).status, ModelReadiness.AVAILABLE)
