@@ -1,0 +1,194 @@
+name: NCI-2 Live Qwen Qualification
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'configs/models/registry.json'
+      - 'scripts/nci2_live_qwen_qualification.py'
+      - '.github/workflows/nci2-live-qwen-qualification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nci2-live-qwen-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  live-qwen-seed:
+    name: Installed offline Qwen3-4B seed Mission
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'nci-2c-live-qwen-qualification'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Verify qualification host floor
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -s)" = Linux
+          test "$(uname -m)" = x86_64
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+
+          mem_kib = 0
+          for line in Path('/proc/meminfo').read_text().splitlines():
+              if line.startswith('MemTotal:'):
+                  mem_kib = int(line.split()[1])
+                  break
+          mem_bytes = mem_kib * 1024
+          free_bytes = shutil.disk_usage('/tmp').free
+          print({'memory_bytes': mem_bytes, 'free_disk_bytes': free_bytes})
+          assert mem_bytes >= 8 * 1024**3, f'host RAM below NCI-2 CPU floor: {mem_bytes}'
+          assert free_bytes >= 8 * 1024**3, f'host disk below NCI-2 working floor: {free_bytes}'
+          PY
+
+      - name: Build and install non-editable GroX wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/nci2-wheel /tmp/nci2-env /tmp/nci2-harness
+          mkdir -p /tmp/nci2-wheel /tmp/nci2-harness
+          python -m pip wheel --no-deps --wheel-dir /tmp/nci2-wheel .
+          python -m venv /tmp/nci2-env
+          /tmp/nci2-env/bin/python -m pip install /tmp/nci2-wheel/grox_vessel-*.whl
+          /tmp/nci2-env/bin/python -m pip check
+          cp scripts/nci2_live_qwen_qualification.py /tmp/nci2-harness/
+          (cd /tmp && /tmp/nci2-env/bin/python - <<'PY'
+          from pathlib import Path
+          import grox
+          path = Path(grox.__file__).resolve()
+          print(path)
+          assert 'site-packages' in path.parts, path
+          assert not str(path).startswith(str(Path('${{ github.workspace }}').resolve())), path
+          PY
+          )
+
+      - name: Commission fresh installed Vessel
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/nci2-user
+          mkdir -p /tmp/nci2-user/config
+          (cd /tmp && /tmp/nci2-env/bin/python -m grox.cli init \
+            --workspace /tmp/nci2-user/GroX \
+            --config-dir /tmp/nci2-user/config \
+            --non-interactive \
+            --json) | tee /tmp/nci2-init.json
+          test -f /tmp/nci2-user/GroX/.grox/workspace.json
+          test -d /tmp/nci2-user/GroX/models
+
+      - name: Acquire and verify pinned llama.cpp runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/nci2-llama /tmp/nci2-llama.tar.gz /tmp/nci2-release.json
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/b10218 \
+            -o /tmp/nci2-release.json
+          python - <<'PY' >/tmp/nci2-llama-asset.json
+          import json
+          from pathlib import Path
+          release = json.loads(Path('/tmp/nci2-release.json').read_text())
+          exact = 'llama-b10218-bin-ubuntu-x64.tar.gz'
+          matches = [a for a in release.get('assets', []) if a.get('name') == exact]
+          assert len(matches) == 1, (exact, [a.get('name') for a in release.get('assets', [])])
+          asset = matches[0]
+          digest = asset.get('digest')
+          assert isinstance(digest, str) and digest.startswith('sha256:'), asset
+          print(json.dumps({'name': exact, 'url': asset['browser_download_url'], 'digest': digest}))
+          PY
+          llama_url=$(python -c "import json; print(json.load(open('/tmp/nci2-llama-asset.json'))['url'])")
+          llama_digest=$(python -c "import json; print(json.load(open('/tmp/nci2-llama-asset.json'))['digest'].split(':',1)[1])")
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            "$llama_url" -o /tmp/nci2-llama.tar.gz
+          observed=$(sha256sum /tmp/nci2-llama.tar.gz | awk '{print $1}')
+          test "$observed" = "$llama_digest"
+          mkdir -p /tmp/nci2-llama
+          tar -xzf /tmp/nci2-llama.tar.gz -C /tmp/nci2-llama
+          llama_cli=$(find /tmp/nci2-llama -type f -name llama-cli -print -quit)
+          test -n "$llama_cli"
+          chmod +x "$llama_cli"
+          "$llama_cli" --version | tee /tmp/nci2-llama-version.txt
+          grep -Eq 'version:[[:space:]]*10218[[:space:]]*\(de69995[0-9a-f]*\)' /tmp/nci2-llama-version.txt
+          printf '%s' "$llama_cli" >/tmp/nci2-llama-cli-path.txt
+          printf '%s' "$llama_digest" >/tmp/nci2-llama-asset-sha256.txt
+
+      - name: Acquire exact Qwen3-4B Q4_K_M artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/nci2-download
+          model=/tmp/nci2-download/Qwen3-4B-Q4_K_M.gguf
+          rm -f "$model"
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/a9a60d009fa7ff9606305047c2bf77ac25dbec49/Qwen3-4B-Q4_K_M.gguf?download=true' \
+            -o "$model"
+          test "$(stat -c '%s' "$model")" = '2497280256'
+          observed=$(sha256sum "$model" | awk '{print $1}')
+          test "$observed" = '7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5'
+          echo "Qwen model identity PASS: bytes=$(stat -c '%s' "$model") sha256=$observed"
+
+      - name: Admit exact model into persistent store
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd /tmp && /tmp/nci2-env/bin/python /tmp/nci2-harness/nci2_live_qwen_qualification.py provision \
+            --config-dir /tmp/nci2-user/config \
+            --model-source /tmp/nci2-download/Qwen3-4B-Q4_K_M.gguf \
+            --forbidden-source-root '${{ github.workspace }}') | tee /tmp/nci2-provisioning.json
+          rm -f /tmp/nci2-download/Qwen3-4B-Q4_K_M.gguf
+          test -f /tmp/nci2-user/GroX/models/Qwen3-4B-Q4_K_M.gguf
+          test "$(stat -c '%s' /tmp/nci2-user/GroX/models/Qwen3-4B-Q4_K_M.gguf)" = '2497280256'
+
+      - name: Prove host supports isolated network namespace
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo unshare --net /bin/sh -c 'test -r /proc/net/route; ! grep -Eq "^[^[:space:]]+[[:space:]]+00000000[[:space:]]" /proc/net/route'
+
+      - name: Run installed local GorXu Mission with network isolated
+        shell: bash
+        run: |
+          set -euo pipefail
+          llama_cli=$(cat /tmp/nci2-llama-cli-path.txt)
+          sudo env \
+            -u OPENAI_API_KEY \
+            -u ANTHROPIC_API_KEY \
+            -u GOOGLE_API_KEY \
+            -u GEMINI_API_KEY \
+            unshare --net \
+            /tmp/nci2-env/bin/python /tmp/nci2-harness/nci2_live_qwen_qualification.py qualify \
+              --config-dir /tmp/nci2-user/config \
+              --llama-cli "$llama_cli" \
+              --forbidden-source-root '${{ github.workspace }}' \
+            | tee /tmp/nci2-live-qualification.json
+          grep -q '"status": "PASS"' /tmp/nci2-live-qualification.json
+          grep -q '"network_isolated": true' /tmp/nci2-live-qualification.json
+          grep -q '"authority_changed": false' /tmp/nci2-live-qualification.json
+          grep -q '"auto_activation": false' /tmp/nci2-live-qualification.json
+
+      - name: Emit qualification identities
+        if: always()
+        shell: bash
+        run: |
+          echo "candidate=${GITHUB_SHA}"
+          if test -f /tmp/nci2-llama-asset-sha256.txt; then
+            echo "llama_release_asset_sha256=$(cat /tmp/nci2-llama-asset-sha256.txt)"
+          fi
+          if test -f /tmp/nci2-llama-version.txt; then
+            cat /tmp/nci2-llama-version.txt
+          fi
+          if test -f /tmp/nci2-live-qualification.json; then
+            cat /tmp/nci2-live-qualification.json
+          fi
