@@ -97,10 +97,13 @@ jobs:
           #!/usr/bin/env bash
           set -euo pipefail
           ip link set lo up
-          test "$(cat /sys/class/net/lo/operstate)" = unknown -o "$(cat /sys/class/net/lo/operstate)" = up
-          test "$(find /sys/class/net -mindepth 1 -maxdepth 1 -printf '%f\n' | wc -l)" -eq 1
-          test -d /sys/class/net/lo
-          ! grep -Eq '^[^[:space:]]+[[:space:]]+00000000[[:space:]]' /proc/net/route
+          echo '--- isolated links ---' >&2
+          ip -brief link >&2
+          echo '--- isolated routes ---' >&2
+          ip route >&2
+          non_loopback=$(ip -o link show | grep -vE '^[0-9]+: lo:' || true)
+          test -z "$non_loopback"
+          ! ip route | grep -Eq '^default([[:space:]]|$)'
           exec "$@"
           SH
           chmod +x /tmp/nci2-netns-exec.sh
@@ -127,7 +130,7 @@ jobs:
             printf '%s\n' "$elapsed" >"/tmp/nci2-${label}.seconds"
             echo "diagnostic=$label rc=$rc elapsed_seconds=$elapsed"
             cat "/tmp/nci2-${label}.out" || true
-            tail -n 100 "/tmp/nci2-${label}.err" || true
+            tail -n 120 "/tmp/nci2-${label}.err" || true
           }
 
           probe loopback-plain "$llama_cli" "${common[@]}" \
@@ -188,6 +191,7 @@ jobs:
                   'contains_status_ok': '"status"' in stdout and '"ok"' in stdout,
                   'sampler_error': 'Failed to initialize samplers' in stderr,
                   'template_lstrip_warning': "hint: 'lstrip'" in stderr,
+                  'namespace_wrapper_reached_llama': 'Loading model' in stderr or 'build' in stderr,
               }
           payload = {
               'schema': 'grox-nci2-isolated-structured-output-diagnostic-v1',
