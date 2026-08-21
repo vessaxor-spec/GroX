@@ -282,9 +282,17 @@ class PersistentModelStore:
                 raise ModelStoreError(
                     f"model artifact digest mismatch: expected {spec.sha256}, got {observed}"
                 )
-            if target.exists():
-                raise ModelStoreError(f"model artifact target appeared during provisioning: {target}")
-            os.replace(temp_path, target)
+            try:
+                os.link(temp_path, target)
+            except FileExistsError as exc:
+                raise ModelStoreError(
+                    f"model artifact target appeared during provisioning: {target}"
+                ) from exc
+            except OSError as exc:
+                raise ModelStoreError(
+                    f"model artifact could not be atomically published: {target}: {exc}"
+                ) from exc
+            temp_path.unlink()
             return ProvisioningResult(
                 model_id=spec.model_id,
                 status="provisioned",
