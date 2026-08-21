@@ -4,6 +4,7 @@ import hashlib
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from grox.installation import commission_workspace
 from grox.model_store import (
@@ -139,6 +140,23 @@ class PersistentModelStoreTests(unittest.TestCase):
             with self.assertRaisesRegex(ModelStoreError, "refusing to overwrite"):
                 store.provision_from_file(spec, source)
             self.assertEqual(target.read_bytes(), b"conflicting bytes")
+
+    def test_publish_race_fails_closed_without_overwrite_or_partial(self) -> None:
+        payload = b"expected bytes"
+        spec = _spec(payload)
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            model_root = root / "models"
+            model_root.mkdir()
+            source = root / "source.gguf"
+            source.write_bytes(payload)
+            store = PersistentModelStore(model_root)
+
+            with patch("grox.model_store.os.link", side_effect=FileExistsError("raced")):
+                with self.assertRaisesRegex(ModelStoreError, "appeared during provisioning"):
+                    store.provision_from_file(spec, source)
+            self.assertFalse((model_root / spec.target_filename).exists())
+            self.assertEqual(list(model_root.glob("*.partial")), [])
 
     def test_exact_existing_target_is_idempotent_without_activation(self) -> None:
         payload = b"expected bytes"
