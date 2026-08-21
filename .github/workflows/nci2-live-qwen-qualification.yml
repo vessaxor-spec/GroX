@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'configs/models/registry.json'
+      - 'src/grox/reasoning/local_llama_cpp.py'
       - 'scripts/nci2_live_qwen_qualification.py'
       - '.github/workflows/nci2-live-qwen-qualification.yml'
   workflow_dispatch:
@@ -157,6 +158,45 @@ jobs:
           set -euo pipefail
           sudo unshare --net /bin/sh -c 'test -r /proc/net/route; ! grep -Eq "^[^[:space:]]+[[:space:]]+00000000[[:space:]]" /proc/net/route'
 
+      - name: Probe local Qwen CPU inference with network isolated
+        shell: bash
+        run: |
+          set -euo pipefail
+          llama_cli=$(cat /tmp/nci2-llama-cli-path.txt)
+          model=/tmp/nci2-user/GroX/models/Qwen3-4B-Q4_K_M.gguf
+          schema='{"type":"object","properties":{"status":{"type":"string","enum":["ok"]}},"required":["status"],"additionalProperties":false}'
+          started=$(date +%s)
+          set +e
+          sudo env \
+            -u OPENAI_API_KEY \
+            -u ANTHROPIC_API_KEY \
+            -u GOOGLE_API_KEY \
+            -u GEMINI_API_KEY \
+            unshare --net \
+            timeout 180s "$llama_cli" \
+              -m "$model" \
+              -p 'Return only a JSON object whose status is ok.' \
+              -j "$schema" \
+              --single-turn \
+              --no-display-prompt \
+              --no-warmup \
+              --temp 0 \
+              --seed 1 \
+              --ctx-size 1024 \
+              -n 32 \
+              -t 4 \
+              -ngl 0 \
+            > /tmp/nci2-qwen-probe.json 2> /tmp/nci2-qwen-probe.stderr
+          rc=$?
+          set -e
+          elapsed=$(( $(date +%s) - started ))
+          cat /tmp/nci2-qwen-probe.json
+          tail -n 80 /tmp/nci2-qwen-probe.stderr
+          echo "Qwen raw CPU probe: rc=$rc elapsed_seconds=$elapsed"
+          test "$rc" -eq 0
+          grep -Eq '"status"[[:space:]]*:[[:space:]]*"ok"' /tmp/nci2-qwen-probe.json
+          printf '%s' "$elapsed" >/tmp/nci2-qwen-probe-seconds.txt
+
       - name: Run installed local GorXu Mission with network isolated
         shell: bash
         run: |
@@ -188,6 +228,9 @@ jobs:
           fi
           if test -f /tmp/nci2-llama-version.txt; then
             cat /tmp/nci2-llama-version.txt
+          fi
+          if test -f /tmp/nci2-qwen-probe-seconds.txt; then
+            echo "qwen_raw_probe_seconds=$(cat /tmp/nci2-qwen-probe-seconds.txt)"
           fi
           if test -f /tmp/nci2-live-qualification.json; then
             cat /tmp/nci2-live-qualification.json
