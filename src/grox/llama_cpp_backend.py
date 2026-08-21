@@ -196,6 +196,7 @@ class LlamaCppCLIBackend:
                 "--ctx-size", str(self.context_tokens),
                 "-n", str(self.max_output_tokens),
                 "-t", str(threads),
+                "--fit", "off",
                 "-ngl", "0",
             ]
             self.last_command = tuple(command)
