@@ -2,9 +2,9 @@
 
 ## Current position
 
-GroX `v0.8.0` is the current published Post-Apex Operational Evolution baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, controlled context heat, A6 longitudinal operational drift analysis, privacy-safe Mission-to-source provenance, Mission Outcome Truthfulness, bounded Selective Deep-Craft Crew Cognition, one canonically qualified **live locally trained neural Crew cognition provider**, and the first canonical Native Cognition Independence installation/runtime foundations.
+GroX `v0.8.0` is the current published Post-Apex Operational Evolution baseline while canonical source continues through protected `main`. The Vessel has 82 Standing Crew, three-plane persistence, qualified A1-A7 Apex behavior, protected CI across Python 3.11-3.14 plus wheel bootstrap, continuous critical-detector mutation proof, a native read-only Vessel health surface, tiered reconstitution planning, controlled context heat, A6 longitudinal operational drift analysis, privacy-safe Mission-to-source provenance, Mission Outcome Truthfulness, bounded Selective Deep-Craft Crew Cognition, one canonically qualified **live locally trained neural Crew cognition provider**, and a **qualified NCI-1 native cognition runtime + local Vessel foundation**.
 
-The Commander has set a strategic direction: **GroX should own its cognition lifecycle and become capable of operating locally/offline without requiring a paid model subscription or vendor-hosted reasoning session.** GroX will evolve its own native cognition runtime and local model family while treating external models such as OpenAI, Anthropic, Google, and future providers as optional governed capabilities rather than required pilots. This direction is an active implementation program, not a claim that a general local language model or complete native cognition runtime is already qualified.
+The Commander has set a strategic direction: **GroX should own its cognition lifecycle and become capable of operating locally/offline without requiring a paid model subscription or vendor-hosted reasoning session.** GroX will evolve its own native cognition runtime and local model family while treating external models such as OpenAI, Anthropic, Google, and future providers as optional governed capabilities rather than required pilots. NCI-1 now qualifies the local runtime/install/model-control foundation required for that direction; it is **not** a claim that a general-purpose local language model, built-in assistant seed cognition, or offline GorXu cognition is already qualified.
 
 The Commander has also made the purpose ordering explicit: **GroX's prime function is to remain the Commander's persistent AI personal assistant.** Native cognition, training, installation, and evolution are core survival and improvement functions whose purpose is to strengthen that personal assistance, orchestration quality, resilience, privacy, continuity, and independence. GroX must not optimize itself into a primarily self-directed model-training or research system, and no evolved objective may supersede Commander intent.
 
@@ -50,6 +50,8 @@ Native cognition gives the Pilot an engine the Vessel can own. It does not repla
 - **NCI-1A is canonical:** `grox init` / `grox workspace`, platform-aware per-user binding, collision/refusal behavior, idempotent/partial commissioning recovery, and non-editable-wheel commissioning outside checkout are implemented.
 - **NCI-1B is canonical:** `VesselLayout` separates runtime/assets, private state, and Commander work; separated Pilot operation loads all 82 Crew from runtime assets, keeps SQLite/evidence scratch in private state, confines Tool Gateway to Commander work, and rejects path escape into state/assets.
 - **NCI-1C is canonical:** the non-editable wheel packages and validates the canonical runtime assets, starts the same Pilot GorXu from a commissioned workspace without a checkout/manual `GROX_VESSEL_ROOT`, loads all 82 Standing Crew, performs bounded independently verified Crew work, reconstitutes the same private state, and fails closed on missing/corrupt packaged assets.
+- **NCI-1D is canonical:** GroX owns an integrity-bound local model registry, lineage/readiness/resource contract, provider-neutral local inference interface, explicit load/invoke/unload semantics, and fail-closed reconstitution using the existing qualified `tiny-mlp-policy-5x8x3-v1` as the first registered model.
+- **NCI-1 is QUALIFIED:** PR #102 permanently proves the non-editable installed wheel can resolve packaged assets, discover the registered model, explicitly load/invoke it outside a checkout, and reconstitute with no auto-activation or authority widening. Canonical `main@41fa4944d1b3e3011561a346b066df54be176a78` has tree `734e5b1762271045f0e4ac91c3f66334bdc13361`, identical to the CI-tested synthetic merge tree.
 
 ## Apex critical path
 
@@ -293,7 +295,7 @@ This purpose ordering is a design constraint for NCI-1 onward and a qualificatio
 
 ## Native Cognition Independence Program 001
 
-**Status: IMPLEMENTATION IN PROGRESS — NCI-1A / NCI-1B / NCI-1C CANONICAL; NCI-1 EXIT NOT YET QUALIFIED.** This program follows the first live local neural qualification and the canonical Prime Function/vendor-independence decisions. It is not A8, does not change the current release, and grants no additional authority. Every stage remains subordinate to Commander intent and the Prime Function doctrine.
+**Status: IMPLEMENTATION IN PROGRESS — NCI-1 QUALIFIED; NCI-2 NEXT.** This program follows the first live local neural qualification and the canonical Prime Function/vendor-independence decisions. It is not A8, does not change the current release, and grants no additional authority. Every stage remains subordinate to Commander intent and the Prime Function doctrine.
 
 North star:
 
@@ -322,9 +324,9 @@ Strategic objective:
 11. **Evolution cannot self-authorize.** A candidate model cannot promote itself. Parent/child comparison, regression gates, adversarial tests, independent verification, and the ordinary Commander/GorXu authority path remain required for activation.
 12. **Offline/local accessibility is a first-class target.** Network availability and paid intelligence should expand capabilities, not determine whether a supported host can eventually operate the minimum useful GroX Vessel.
 
-### NCI-1 — Native cognition runtime + local Vessel foundation
+### NCI-1 — Native cognition runtime + local Vessel foundation — QUALIFIED
 
-NCI-1 establishes the GroX-owned runtime/install boundary required before local seed cognition can become a real product capability.
+NCI-1 establishes and now qualifies the GroX-owned runtime/install boundary required before local seed cognition can become a real product capability.
 
 #### NCI-1A — Installed workspace commissioning foundation — COMPLETE / CANONICAL
 
@@ -378,24 +380,46 @@ Qualification evidence:
 - PR #97 merged as canonical `main@0eddbc204b1e7b52158c355e9587731a7cbec08c`;
 - canonical tree `b4a4bf8f389309e79341ad8df9b6e1f5f6801e35` exactly matches CI-tested synthetic merge `73fb8c58d2bd02271e2122b04a12c8f76bacef2d`.
 
-#### NCI-1D — Native Model Registry + Local Inference Runtime Contract — NEXT
+#### NCI-1D — Native Model Registry + Local Inference Runtime Contract — COMPLETE / CANONICAL
 
-The next bounded NCI-1 slice requires:
+Implemented through issue #99 / PR #100:
 
 - integrity-bound model manifest/artifact contracts;
-- deterministic model registry and model lineage;
-- local inference-provider/backend interface;
-- hardware/runtime discovery;
-- deterministic resource and context ceilings;
-- explicit GorXu-versus-Crew cognition placement without changing hierarchy;
-- local model health/readiness evidence;
-- fail-closed fallback and reconstitution;
-- registration/readiness that cannot self-activate a model or widen authority;
-- the already qualified `tiny-mlp-policy-5x8x3-v1` as the first model integrated through the registry/runtime without relabeling it as language-capable.
+- deterministic model registry and model lineage validation;
+- provider-neutral local inference backend contract;
+- host hardware/runtime discovery and deterministic resource readiness;
+- explicit Crew cognition placement without changing hierarchy;
+- local model readiness evidence for available/unavailable/corrupt/unsupported states;
+- explicit load/invoke/unload behavior;
+- fail-closed backend/runtime failure handling;
+- reconstitution that clears active model state and never auto-activates a registered model;
+- the already-qualified `tiny-mlp-policy-5x8x3-v1` registered as the first model without relabeling it as language-capable.
 
-**NCI-1 exit evidence:** GroX can commission and locate its local Vessel, resolve packaged runtime assets independently of a source checkout, validate/load/invoke a registered local model through a GroX-owned runtime contract, emit readiness evidence, fail closed on corruption/unavailability, and reconstitute safely without changing Commander authority, GorXu's personal-assistant/sole-orchestrator role, or the Prime Function.
+Preserved red evidence: candidate `1833310769d443ef18f0fb8fce6262e92b5ab712` / run **280 / `32392662853`** exposed Python 3.11 trained-weight reproduction drift. The digest gate contained the mismatch. The final design packages the exact already-qualified trained weights rather than weakening identity checks.
 
-#### NCI-2 — Built-in local seed cognition
+Final implementation head `2d68b63222cc69883d7c4252cbeeaaa9b6e5fb46` passed run **281 / `32393064902`** across all five canonical CI jobs, and PR #100 merged as `8dde1a1714c38850c681623f1aba9238d6ec8b20`. Issue #99 closed completed.
+
+#### NCI-1 installed-wheel exit proof — COMPLETE / QUALIFIED
+
+Post-NCI-1D inspection found one legitimate remaining overall exit gap: packaged runtime installation and source-qualified model runtime had not yet met in one permanent non-editable-wheel proof outside the checkout.
+
+Issue #101 / PR #102 closed that evidence gap without runtime redesign. Exact head `689f1e1f77f49d9ea6eb5fb5fda49c54da3e6d6a` passed run **283 / `32406301653`** across all five jobs and permanently proved the installed wheel can:
+
+- resolve packaged runtime assets;
+- construct the packaged model registry;
+- find `tiny-mlp-policy-5x8x3-v1` `AVAILABLE` but inactive;
+- explicitly load it with Crew placement;
+- invoke it through the GroX-owned runtime contract;
+- report no authority change;
+- unload/reconstitute with no active model and no auto-activation.
+
+Python 3.12 recorded **294 passed, 2 skipped, 440 subtests** in pytest and **296 OK, 2 skipped** in unittest. Mutation gates remained **12/12, 7/7, 9/9, 4/4, 6/6** killed and integrated Post-Apex qualification remained PASS with GorXu sole-orchestrator proof intact.
+
+PR #102 merged as `main@41fa4944d1b3e3011561a346b066df54be176a78`. Canonical tree `734e5b1762271045f0e4ac91c3f66334bdc13361` exactly matches CI-tested synthetic merge `34dbcb11831a4c5eccbfc5fb3211720ba94f4510` tree `734e5b1762271045f0e4ac91c3f66334bdc13361`.
+
+**NCI-1 exit evidence: PASSED.** GroX can commission and locate its local Vessel, resolve packaged runtime assets independently of a source checkout, validate/load/invoke a registered local model through a GroX-owned runtime contract, emit readiness evidence, fail closed on corruption/unavailability, and reconstitute safely without changing Commander authority, GorXu's personal-assistant/sole-orchestrator role, or the Prime Function.
+
+#### NCI-2 — Built-in local seed cognition — NEXT
 
 Package a practical local cognitive baseline with the installed Vessel. The initial language-capable seed may use permissively licensed open weights while the existing GroX-trained neural policy remains the first native learned component.
 
@@ -511,7 +535,7 @@ This roadmap does not claim:
 
 - that GroX already has a complete native language model;
 - that the 75-parameter policy is a general-purpose model;
-- that NCI-1A/NCI-1B/NCI-1C mean NCI-1 as a whole is qualified;
+- that NCI-1 qualification implies NCI-2 seed cognition, offline GorXu cognition, or later-stage qualification;
 - that standalone installed GorXu qualification implies a public one-command installer, desktop launcher, or native general-purpose cognition;
 - that a public one-command installer or desktop launcher is already qualified;
 - that GroX will pretrain a frontier foundation model from random weights as the first step;
@@ -527,9 +551,9 @@ This roadmap does not claim:
 
 ## Post-Apex operating posture
 
-There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** `v0.8.0` is published from the verified Program 001 baseline. Later protected-main hardening and evolution—including Mission Outcome Truthfulness, Selective Deep-Craft Crew Cognition, the live local neural Crew qualification, NCI-1A workspace commissioning, NCI-1B filesystem-role separation, and NCI-1C packaged runtime/standalone installed GorXu qualification—remain source evolution beyond the immutable release and do not themselves create a new Apex stage or release.
+There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** `v0.8.0` is published from the verified Program 001 baseline. Later protected-main hardening and evolution—including Mission Outcome Truthfulness, Selective Deep-Craft Crew Cognition, the live local neural Crew qualification, and qualified NCI-1 local runtime/install/model foundations—remain source evolution beyond the immutable release and do not themselves create a new Apex stage or release.
 
-The current strategic program is **Native Cognition Independence Program 001 — implementation in progress**. NCI-1A, NCI-1B, and NCI-1C are canonical bounded foundations, while the broader NCI-1 exit remains unqualified and NCI-1D is the next bounded runtime slice. No roadmap item inherits qualification merely because it is listed here. The Prime Function and orchestration doctrine constrain every stage: evolution must improve or preserve GroX as the Commander's AI personal assistant, keep GorXu at the helm above Divisions/Crew, and cannot create independent purpose.
+The current strategic program is **Native Cognition Independence Program 001 — implementation in progress**. **NCI-1 is qualified and NCI-2 is next.** No roadmap item inherits qualification merely because it is listed here. The Prime Function and orchestration doctrine constrain every stage: evolution must improve or preserve GroX as the Commander's AI personal assistant, keep GorXu at the helm above Divisions/Crew, and cannot create independent purpose.
 
 Other known deliberate limits remain candidates, not automatic commitments: autonomous memory consolidation, generic external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP, and optional external-agent interoperability.
 
@@ -569,8 +593,8 @@ Do not:
 - treat Commander interactions primarily as training-data acquisition rather than assistance to satisfy Commander objectives;
 - admit vendor/model output into training truth without provenance, applicable rights/terms, and required verification;
 - make network access or a paid model subscription a prerequisite for the target minimum offline personal-assistant + Crew-orchestration operating condition;
-- advertise the public one-command installer, desktop launcher, or general native language model before implementation and qualification evidence exist; NCI-1C standalone installed GorXu may be described only within its exact qualified boundary.
+- advertise the public one-command installer, desktop launcher, or general native language model before implementation and qualification evidence exist; NCI-1 standalone installed/local-model qualification may be described only within its exact bounded claim.
 
 ## Release posture
 
-Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. `v0.8.0` is published from `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` after exact-head candidate CI `32014558365` and canonical post-merge CI `32015076306` passed. Issue #55 is complete. Canonical source has since advanced through protected-main hardening, bounded post-Apex evolution, and NCI-1A/NCI-1B/NCI-1C installation/runtime foundations without moving the immutable release tag. Native Cognition Independence Program 001 is an active strategic implementation program subordinate to the Prime Function and GorXu command doctrine; it does not itself make a release decision. Future release or evolution decisions remain Commander-controlled. No new Apex stage or A8 is implied.
+Post-Apex Evolution Program 001 qualification is complete, canonical, and post-merge verified. `v0.8.0` is published from `27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` after exact-head candidate CI `32014558365` and canonical post-merge CI `32015076306` passed. Issue #55 is complete. Canonical source has since advanced through protected-main hardening, bounded post-Apex evolution, and **qualified NCI-1 native cognition runtime/local Vessel foundations** without moving the immutable release tag. Native Cognition Independence Program 001 remains active with **NCI-2 next**; it is subordinate to the Prime Function and GorXu command doctrine and does not itself make a release decision. Future release or evolution decisions remain Commander-controlled. No new Apex stage or A8 is implied.
