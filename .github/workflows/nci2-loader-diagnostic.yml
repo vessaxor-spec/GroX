@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   loader-diagnostic:
-    name: Non-qualifying isolated llama.cpp Mission-grammar diagnostic
+    name: Non-qualifying transcript and Mission grammar diagnostic
     if: github.event_name == 'workflow_dispatch' || github.head_ref == 'nci-2c-live-qwen-qualification'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -26,12 +26,10 @@ jobs:
       - name: Checkout exact candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Acquire pinned llama.cpp and diagnostic seed
+      - name: Acquire pinned runtime and diagnostic seed
         shell: bash
         run: |
           set -euo pipefail
-          test "$(uname -s)" = Linux
-          test "$(uname -m)" = x86_64
           rm -rf /tmp/nci2-diag-llama /tmp/nci2-diag-llama.tar.gz /tmp/nci2-diag-release.json /tmp/nci2-diag-model.gguf
           curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
             https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/b10218 \
@@ -42,10 +40,10 @@ jobs:
           release = json.loads(Path('/tmp/nci2-diag-release.json').read_text())
           exact = 'llama-b10218-bin-ubuntu-x64.tar.gz'
           matches = [a for a in release.get('assets', []) if a.get('name') == exact]
-          assert len(matches) == 1, (exact, [a.get('name') for a in release.get('assets', [])])
+          assert len(matches) == 1
           asset = matches[0]
           digest = asset.get('digest')
-          assert isinstance(digest, str) and digest.startswith('sha256:'), asset
+          assert isinstance(digest, str) and digest.startswith('sha256:')
           print(json.dumps({'url': asset['browser_download_url'], 'digest': digest}))
           PY
           llama_url=$(python -c "import json; print(json.load(open('/tmp/nci2-diag-asset.json'))['url'])")
@@ -65,11 +63,9 @@ jobs:
             'https://huggingface.co/ggml-org/Qwen3-0.6B-GGUF/resolve/a41486f827d17edd055fe6b3b0ba3f8d427c0519/Qwen3-0.6B-Q4_0.gguf?download=true' \
             -o /tmp/nci2-diag-model.gguf
           test "$(stat -c '%s' /tmp/nci2-diag-model.gguf)" = '428970080'
-          observed=$(sha256sum /tmp/nci2-diag-model.gguf | awk '{print $1}')
-          test "$observed" = 'da2572f16c06133561ce56accaa822216f2391ef4d37fba427801cd6736417d4'
-          echo "diagnostic model identity PASS: $observed"
+          test "$(sha256sum /tmp/nci2-diag-model.gguf | awk '{print $1}')" = 'da2572f16c06133561ce56accaa822216f2391ef4d37fba427801cd6736417d4'
 
-      - name: Prove exact transcript extraction and full Mission grammar
+      - name: Prove transcript extraction and full Mission grammar
         shell: bash
         run: |
           set -euo pipefail
@@ -80,9 +76,7 @@ jobs:
           #!/usr/bin/env bash
           set -euo pipefail
           ip link set lo up
-          echo '--- isolated links ---' >&2
           ip -brief link >&2
-          echo '--- isolated routes ---' >&2
           ip route >&2
           non_loopback=$(ip -o link show | grep -vE '^[0-9]+: lo:' || true)
           test -z "$non_loopback"
@@ -142,65 +136,65 @@ jobs:
             --reasoning-budget 0
             --chat-template-kwargs '{"enable_thinking":false}'
             --skip-chat-parsing
-            --no-show-timings
           )
 
-          run_isolated() {
+          run_probe() {
+            label="$1"
+            prompt="$2"
+            grammar="$3"
+            tokens="$4"
+            transcript="/tmp/nci2-${label}-transcript.txt"
+            stdout="/tmp/nci2-${label}.out"
+            stderr="/tmp/nci2-${label}.err"
+            rm -f "$transcript"
+            set +e
             sudo env \
               -u OPENAI_API_KEY -u ANTHROPIC_API_KEY -u GOOGLE_API_KEY -u GEMINI_API_KEY \
-              unshare --net /tmp/nci2-netns-exec.sh timeout 30s "$@"
+              unshare --net /tmp/nci2-netns-exec.sh timeout 30s \
+              "$llama_cli" "${common[@]}" \
+              -p "$prompt" \
+              --grammar-file "$grammar" \
+              -n "$tokens" \
+              --output-file "$transcript" \
+              >"$stdout" 2>"$stderr"
+            rc=$?
+            set -e
+            if test "$rc" -ne 0; then
+              echo "probe=$label rc=$rc"
+              cat "$stdout" || true
+              cat "$stderr" || true
+              exit "$rc"
+            fi
+            chmod 0600 "$transcript"
           }
 
           status_prompt='Return only a JSON object whose status is ok.'
-          rm -f /tmp/nci2-status-transcript.txt
-          : >/tmp/nci2-status-transcript.txt
-          chmod 0600 /tmp/nci2-status-transcript.txt
-          run_isolated "$llama_cli" "${common[@]}" \
-            -p "$status_prompt" \
-            --grammar-file /tmp/nci2-status.gbnf \
-            -n 32 \
-            --output-file /tmp/nci2-status-transcript.txt \
-            >/tmp/nci2-status-console.out 2>/tmp/nci2-status-console.err
-
+          run_probe status "$status_prompt" /tmp/nci2-status.gbnf 32
           STATUS_PROMPT="$status_prompt" python - <<'PY'
-          import json
-          import os
+          import json, os
           from pathlib import Path
           prompt = os.environ['STATUS_PROMPT']
           transcript = Path('/tmp/nci2-status-transcript.txt').read_text()
           prefix = f'User:\n{prompt}\n\nAssistant:\n'
-          assert transcript.startswith(prefix), repr(transcript[:len(prefix) + 80])
+          assert transcript.startswith(prefix), repr(transcript)
           response = transcript[len(prefix):].strip()
           assert response and 'Assistant:\n' not in response, repr(response)
-          payload = json.loads(response)
-          assert payload == {'status': 'ok'}, payload
+          assert json.loads(response) == {'status': 'ok'}, response
           Path('/tmp/nci2-status-extracted.json').write_text(response)
-          print({'exact_prefix': True, 'status': payload})
           PY
 
           mission_prompt='Return a compact Mission interpretation. Use commander_intent exactly "Inspect README.md for reliability risk." Use objective "Find reliability risk"; ambiguous false; no ambiguities or assumptions; information_needs ["Inspect README.md"]; candidate_crew_ids ["crew-test"]; one option named "inspect" with rationale "Inspect evidence", empty advantages and risks, crew_ids ["crew-test"]; recommended_option "inspect"; confidence 0.8; proposed_mode "inspect"; proposed_risk "high".'
-          rm -f /tmp/nci2-mission-transcript.txt
-          : >/tmp/nci2-mission-transcript.txt
-          chmod 0600 /tmp/nci2-mission-transcript.txt
-          run_isolated "$llama_cli" "${common[@]}" \
-            -p "$mission_prompt" \
-            --grammar-file /tmp/nci2-mission.gbnf \
-            -n 256 \
-            --output-file /tmp/nci2-mission-transcript.txt \
-            >/tmp/nci2-mission-console.out 2>/tmp/nci2-mission-console.err
-
+          run_probe mission "$mission_prompt" /tmp/nci2-mission.gbnf 256
           MISSION_PROMPT="$mission_prompt" python - <<'PY'
-          import json
-          import os
+          import json, os
           from pathlib import Path
           prompt = os.environ['MISSION_PROMPT']
           transcript = Path('/tmp/nci2-mission-transcript.txt').read_text()
           prefix = f'User:\n{prompt}\n\nAssistant:\n'
-          assert transcript.startswith(prefix), repr(transcript[:len(prefix) + 80])
+          assert transcript.startswith(prefix), repr(transcript)
           response = transcript[len(prefix):].strip()
           assert response and 'Assistant:\n' not in response, repr(response)
           payload = json.loads(response)
-          print(json.dumps(payload, indent=2, sort_keys=True))
           required = {
               'commander_intent', 'objective', 'ambiguous', 'ambiguities', 'assumptions',
               'information_needs', 'candidate_crew_ids', 'options', 'recommended_option',
@@ -226,6 +220,7 @@ jobs:
           assert payload['proposed_mode'] in {'inspect', 'repair', 'execute', 'verify', None}, payload
           assert payload['proposed_risk'] in {'low', 'medium', 'high', 'critical', None}, payload
           Path('/tmp/nci2-mission-extracted.json').write_text(response)
+          print(json.dumps(payload, indent=2, sort_keys=True))
           PY
 
       - name: Emit diagnostic classification
@@ -235,7 +230,7 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          payload = {
+          print(json.dumps({
               'schema': 'grox-nci2-mission-grammar-diagnostic-v1',
               'qualification_claim': False,
               'external_network_available': False,
@@ -243,6 +238,5 @@ jobs:
               'authority_changed': False,
               'exact_transcript_extraction': Path('/tmp/nci2-status-extracted.json').exists(),
               'full_mission_grammar_output': Path('/tmp/nci2-mission-extracted.json').exists(),
-          }
-          print(json.dumps(payload, indent=2, sort_keys=True))
+          }, indent=2, sort_keys=True))
           PY
