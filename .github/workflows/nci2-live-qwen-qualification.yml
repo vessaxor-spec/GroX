@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   live-qwen-seed:
-    name: Installed offline Qwen3-1.7B seed Mission
+    name: Installed offline Qwen3-0.6B seed Mission
     if: github.event_name == 'workflow_dispatch' || github.head_ref == 'nci-2c-live-qwen-qualification'
     runs-on: ubuntu-24.04
     timeout-minutes: 50
@@ -125,19 +125,19 @@ jobs:
           printf '%s' "$llama_cli" >/tmp/nci2-llama-cli-path.txt
           printf '%s' "$llama_digest" >/tmp/nci2-llama-asset-sha256.txt
 
-      - name: Acquire exact Qwen3-1.7B Q4_K_M artifact
+      - name: Acquire exact Qwen3-0.6B Q4_0 artifact
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p /tmp/nci2-download
-          model=/tmp/nci2-download/Qwen3-1.7B-Q4_K_M.gguf
+          model=/tmp/nci2-download/Qwen3-0.6B-Q4_0.gguf
           rm -f "$model"
           curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
-            'https://huggingface.co/ggml-org/Qwen3-1.7B-GGUF/resolve/daeb8e2d528a760970442092f6bf1e55c3b659eb/Qwen3-1.7B-Q4_K_M.gguf?download=true' \
+            'https://huggingface.co/ggml-org/Qwen3-0.6B-GGUF/resolve/a41486f827d17edd055fe6b3b0ba3f8d427c0519/Qwen3-0.6B-Q4_0.gguf?download=true' \
             -o "$model"
-          test "$(stat -c '%s' "$model")" = '1282439264'
+          test "$(stat -c '%s' "$model")" = '428970080'
           observed=$(sha256sum "$model" | awk '{print $1}')
-          test "$observed" = 'd2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5'
+          test "$observed" = 'da2572f16c06133561ce56accaa822216f2391ef4d37fba427801cd6736417d4'
           echo "Qwen model identity PASS: bytes=$(stat -c '%s' "$model") sha256=$observed"
 
       - name: Admit exact model into persistent store
@@ -146,11 +146,11 @@ jobs:
           set -euo pipefail
           (cd /tmp && /tmp/nci2-env/bin/python /tmp/nci2-harness/nci2_live_qwen_qualification.py provision \
             --config-dir /tmp/nci2-user/config \
-            --model-source /tmp/nci2-download/Qwen3-1.7B-Q4_K_M.gguf \
+            --model-source /tmp/nci2-download/Qwen3-0.6B-Q4_0.gguf \
             --forbidden-source-root '${{ github.workspace }}') | tee /tmp/nci2-provisioning.json
-          rm -f /tmp/nci2-download/Qwen3-1.7B-Q4_K_M.gguf
-          test -f /tmp/nci2-user/GroX/models/Qwen3-1.7B-Q4_K_M.gguf
-          test "$(stat -c '%s' /tmp/nci2-user/GroX/models/Qwen3-1.7B-Q4_K_M.gguf)" = '1282439264'
+          rm -f /tmp/nci2-download/Qwen3-0.6B-Q4_0.gguf
+          test -f /tmp/nci2-user/GroX/models/Qwen3-0.6B-Q4_0.gguf
+          test "$(stat -c '%s' /tmp/nci2-user/GroX/models/Qwen3-0.6B-Q4_0.gguf)" = '428970080'
 
       - name: Prove host supports isolated network namespace
         shell: bash
@@ -163,7 +163,7 @@ jobs:
         run: |
           set -euo pipefail
           llama_cli=$(cat /tmp/nci2-llama-cli-path.txt)
-          model=/tmp/nci2-user/GroX/models/Qwen3-1.7B-Q4_K_M.gguf
+          model=/tmp/nci2-user/GroX/models/Qwen3-0.6B-Q4_0.gguf
           schema='{"type":"object","properties":{"status":{"type":"string","enum":["ok"]}},"required":["status"],"additionalProperties":false}'
           started=$(date +%s)
           set +e
