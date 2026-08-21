@@ -6,6 +6,7 @@ on:
     paths:
       - 'configs/models/registry.json'
       - 'src/grox/reasoning/local_llama_cpp.py'
+      - 'src/grox/llama_cpp_backend.py'
       - 'scripts/nci2_live_qwen_qualification.py'
       - '.github/workflows/nci2-live-qwen-qualification.yml'
   workflow_dispatch:
@@ -185,6 +186,7 @@ jobs:
               --ctx-size 1024 \
               -n 32 \
               -t 4 \
+              --fit off \
               -ngl 0 \
             > /tmp/nci2-qwen-probe.json 2> /tmp/nci2-qwen-probe.stderr
           rc=$?
