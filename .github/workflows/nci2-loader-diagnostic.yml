@@ -1,0 +1,176 @@
+name: NCI-2 Loader Diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/nci2-loader-diagnostic.yml'
+      - '.github/workflows/nci2-live-qwen-qualification.yml'
+      - 'src/grox/llama_cpp_backend.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nci2-loader-diagnostic-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  loader-diagnostic:
+    name: Non-qualifying llama.cpp loader matrix
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'nci-2c-live-qwen-qualification'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Verify diagnostic host
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -s)" = Linux
+          test "$(uname -m)" = x86_64
+          id
+          command -v timeout
+          command -v setpriv
+          python - <<'PY'
+          from pathlib import Path
+          print(Path('/proc/meminfo').read_text().splitlines()[0])
+          PY
+
+      - name: Acquire pinned llama.cpp and diagnostic seed
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/nci2-diag-llama /tmp/nci2-diag-llama.tar.gz /tmp/nci2-diag-release.json /tmp/nci2-diag-model.gguf
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/b10218 \
+            -o /tmp/nci2-diag-release.json
+          python - <<'PY' >/tmp/nci2-diag-asset.json
+          import json
+          from pathlib import Path
+          release = json.loads(Path('/tmp/nci2-diag-release.json').read_text())
+          exact = 'llama-b10218-bin-ubuntu-x64.tar.gz'
+          matches = [a for a in release.get('assets', []) if a.get('name') == exact]
+          assert len(matches) == 1, (exact, [a.get('name') for a in release.get('assets', [])])
+          asset = matches[0]
+          digest = asset.get('digest')
+          assert isinstance(digest, str) and digest.startswith('sha256:'), asset
+          print(json.dumps({'url': asset['browser_download_url'], 'digest': digest}))
+          PY
+          llama_url=$(python -c "import json; print(json.load(open('/tmp/nci2-diag-asset.json'))['url'])")
+          llama_digest=$(python -c "import json; print(json.load(open('/tmp/nci2-diag-asset.json'))['digest'].split(':',1)[1])")
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors "$llama_url" -o /tmp/nci2-diag-llama.tar.gz
+          test "$(sha256sum /tmp/nci2-diag-llama.tar.gz | awk '{print $1}')" = "$llama_digest"
+          mkdir -p /tmp/nci2-diag-llama
+          tar -xzf /tmp/nci2-diag-llama.tar.gz -C /tmp/nci2-diag-llama
+          llama_cli=$(find /tmp/nci2-diag-llama -type f -name llama-cli -print -quit)
+          test -n "$llama_cli"
+          chmod +x "$llama_cli"
+          "$llama_cli" --version 2>&1 | tee /tmp/nci2-diag-version.txt
+          grep -Eq 'version:[[:space:]]*10218[[:space:]]*\(de69995[0-9a-f]*\)' /tmp/nci2-diag-version.txt
+          "$llama_cli" --list-devices 2>&1 | tee /tmp/nci2-diag-devices.txt || true
+          printf '%s' "$llama_cli" >/tmp/nci2-diag-cli.txt
+
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://huggingface.co/ggml-org/Qwen3-0.6B-GGUF/resolve/a41486f827d17edd055fe6b3b0ba3f8d427c0519/Qwen3-0.6B-Q4_0.gguf?download=true' \
+            -o /tmp/nci2-diag-model.gguf
+          test "$(stat -c '%s' /tmp/nci2-diag-model.gguf)" = '428970080'
+          observed=$(sha256sum /tmp/nci2-diag-model.gguf | awk '{print $1}')
+          test "$observed" = 'da2572f16c06133561ce56accaa822216f2391ef4d37fba427801cd6736417d4'
+          echo "diagnostic model identity PASS: $observed"
+
+      - name: Compare loader execution contexts
+        shell: bash
+        run: |
+          set -euo pipefail
+          llama_cli=$(cat /tmp/nci2-diag-cli.txt)
+          model=/tmp/nci2-diag-model.gguf
+          schema='{"type":"object","properties":{"status":{"type":"string","enum":["ok"]}},"required":["status"],"additionalProperties":false}'
+          base=(
+            -m "$model"
+            -p 'Return only a JSON object whose status is ok. /no_think'
+            -j "$schema"
+            --single-turn
+            --no-display-prompt
+            --no-warmup
+            --temp 0
+            --seed 1
+            --ctx-size 1024
+            -n 8
+            -t 4
+            --fit off
+            -ngl 0
+            -v
+          )
+
+          probe() {
+            label="$1"
+            shift
+            echo "===== diagnostic: $label ====="
+            started=$(date +%s)
+            set +e
+            "$@" >"/tmp/nci2-${label}.out" 2>"/tmp/nci2-${label}.err"
+            rc=$?
+            set -e
+            elapsed=$(( $(date +%s) - started ))
+            printf '%s\n' "$rc" >"/tmp/nci2-${label}.rc"
+            printf '%s\n' "$elapsed" >"/tmp/nci2-${label}.seconds"
+            echo "diagnostic=$label rc=$rc elapsed_seconds=$elapsed"
+            cat "/tmp/nci2-${label}.out" || true
+            tail -n 120 "/tmp/nci2-${label}.err" || true
+          }
+
+          probe runner-default timeout 30s "$llama_cli" "${base[@]}"
+          probe runner-strict-cpu timeout 30s "$llama_cli" "${base[@]}" -dev none --no-op-offload
+          probe runner-load-none timeout 30s "$llama_cli" "${base[@]}" --load-mode none
+
+          probe root-default sudo env \
+            -u OPENAI_API_KEY -u ANTHROPIC_API_KEY -u GOOGLE_API_KEY -u GEMINI_API_KEY \
+            timeout 30s "$llama_cli" "${base[@]}"
+
+          probe root-netns sudo env \
+            -u OPENAI_API_KEY -u ANTHROPIC_API_KEY -u GOOGLE_API_KEY -u GEMINI_API_KEY \
+            unshare --net timeout 30s "$llama_cli" "${base[@]}"
+
+          runner_uid=$(id -u)
+          runner_gid=$(id -g)
+          probe runner-netns sudo env \
+            -u OPENAI_API_KEY -u ANTHROPIC_API_KEY -u GOOGLE_API_KEY -u GEMINI_API_KEY \
+            unshare --net setpriv --reuid "$runner_uid" --regid "$runner_gid" --clear-groups \
+            timeout 30s "$llama_cli" "${base[@]}"
+
+      - name: Classify loader diagnostics
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          labels = (
+              'runner-default',
+              'runner-strict-cpu',
+              'runner-load-none',
+              'root-default',
+              'root-netns',
+              'runner-netns',
+          )
+          results = {}
+          for label in labels:
+              rc_path = Path(f'/tmp/nci2-{label}.rc')
+              seconds_path = Path(f'/tmp/nci2-{label}.seconds')
+              results[label] = {
+                  'returncode': int(rc_path.read_text().strip()) if rc_path.exists() else None,
+                  'elapsed_seconds': int(seconds_path.read_text().strip()) if seconds_path.exists() else None,
+              }
+          payload = {
+              'schema': 'grox-nci2-llama-loader-diagnostic-v1',
+              'qualification_claim': False,
+              'authority_changed': False,
+              'results': results,
+          }
+          print(json.dumps(payload, indent=2, sort_keys=True))
+          PY
