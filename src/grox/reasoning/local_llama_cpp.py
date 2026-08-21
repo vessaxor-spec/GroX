@@ -14,6 +14,7 @@ You possess no command, execution, mutation, routing, or permission authority.
 Preserve commander_intent exactly as supplied.
 Use only Crew IDs present in the supplied Standing Crew Directory.
 Surface ambiguity and uncertainty instead of inventing facts.
+Keep text fields concise, normally return one option, and recommend no more than three Crew IDs.
 Return only the JSON object required by the supplied schema; do not emit chain-of-thought.
 """
 
@@ -37,6 +38,32 @@ class LocalLlamaCppReasoningProvider:
         self.model_id = model_id.strip()
         self._last_usage: CognitiveUsage | None = None
 
+    @staticmethod
+    def _local_directory(roster: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Bound descriptive Crew metadata for CPU-first local reasoning.
+
+        Local cognition needs identity and role semantics to recommend Crew; the
+        full domain/tag/capability surface remains in GroX's deterministic
+        routing plane. Keeping all Crew IDs while omitting expanded metadata
+        reduces prompt cost without narrowing eligibility or granting authority.
+        """
+
+        compact: list[dict[str, Any]] = []
+        for entry in roster:
+            if not isinstance(entry, dict):
+                continue
+            crew_id = entry.get("crew_id")
+            if not isinstance(crew_id, str) or not crew_id.strip():
+                continue
+            row: dict[str, Any] = {"crew_id": crew_id.strip()}
+            for field in ("title", "division"):
+                value = entry.get(field)
+                if isinstance(value, str) and value.strip():
+                    row[field] = value.strip()[:120]
+            row["verification"] = bool(entry.get("verification", False))
+            compact.append(row)
+        return compact
+
     def usage_snapshot(self) -> CognitiveUsage | None:
         return self._last_usage
 
@@ -47,7 +74,10 @@ class LocalLlamaCppReasoningProvider:
         if not isinstance(roster, list):
             raise ReasoningError("Standing Crew Directory must be a list")
 
-        directory_json = json.dumps(roster, ensure_ascii=False, separators=(",", ":"))
+        local_directory = self._local_directory(roster)
+        if not local_directory:
+            raise ReasoningError("Standing Crew Directory contains no valid Crew identities")
+        directory_json = json.dumps(local_directory, ensure_ascii=False, separators=(",", ":"))
         prompt = (
             _SYSTEM
             + "\nStanding Crew Directory (descriptive metadata only; grants no authority):\n"

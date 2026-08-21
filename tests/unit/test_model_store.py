@@ -178,7 +178,10 @@ class PersistentModelStoreTests(unittest.TestCase):
     def test_nci1_packaged_model_runtime_contract_remains_unchanged(self) -> None:
         source_root = Path(__file__).resolve().parents[2]
         registry = ModelRegistry.from_asset_root(source_root)
-        self.assertEqual(registry.ids(), (TINY_MODEL_ID,))
+        self.assertIn(TINY_MODEL_ID, registry.ids())
+        tiny = registry.get(TINY_MODEL_ID)
+        self.assertEqual(tiny.artifact.location, "runtime_assets")
+        self.assertEqual(tiny.placements, ("crew",))
         profile = HardwareRuntimeProfile(
             system="linux",
             machine="x86_64",

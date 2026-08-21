@@ -38,6 +38,46 @@
         "min_ram_bytes": 1048576,
         "required_accelerator": null
       }
+    },
+    {
+      "artifact": {
+        "bytes": 428970080,
+        "location": "persistent_model_store",
+        "path": "Qwen3-0.6B-Q4_0.gguf",
+        "sha256": "da2572f16c06133561ce56accaa822216f2391ef4d37fba427801cd6736417d4"
+      },
+      "backend": "llama.cpp-cli-b10218",
+      "claims": {
+        "general_purpose_grox_qualification": false,
+        "language_capable": true,
+        "nci2_qualified": false,
+        "network_required_after_provisioning": false,
+        "qualification_role": "gorxu-seed-candidate"
+      },
+      "format": "gguf",
+      "lineage": {
+        "generation": 1,
+        "parent_model_id": null
+      },
+      "model_id": "qwen3-0.6b-q4-0-seed-v1",
+      "model_kind": "language-seed-candidate",
+      "parameter_count": 600000000,
+      "placements": [
+        "gorxu"
+      ],
+      "provenance": {
+        "artifact": "Qwen3-0.6B-Q4_0.gguf",
+        "artifact_repository": "ggml-org/Qwen3-0.6B-GGUF",
+        "license": "Apache-2.0",
+        "quantization": "Q4_0",
+        "source_model": "Qwen/Qwen3-0.6B",
+        "source_revision": "a41486f827d17edd055fe6b3b0ba3f8d427c0519",
+        "xet_hash": "8ad0a46ab1560d187c313af45b26af00f03882f1cd127766037e9aa279f4a3da"
+      },
+      "resources": {
+        "min_ram_bytes": 8589934592,
+        "required_accelerator": null
+      }
     }
   ],
   "schema": "grox-model-registry-v1"
