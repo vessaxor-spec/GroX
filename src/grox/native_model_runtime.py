@@ -84,8 +84,8 @@ class ModelArtifact:
         normalized = Path(path.strip())
         if normalized.is_absolute() or ".." in normalized.parts:
             raise ModelRegistrationError("model artifact path must remain relative to its registered GroX storage root")
-        if location not in {"runtime_assets", "persistent_model_store"}:
-            raise ModelRegistrationError(f"unsupported model artifact location: {location}")
+        if not isinstance(location, str) or location not in {"runtime_assets", "persistent_model_store"}:
+            raise ModelRegistrationError(f"unsupported model artifact location: {location!r}")
         if not isinstance(digest, str) or len(digest) != 64:
             raise ModelRegistrationError("model artifact sha256 must be a 64-character hexadecimal digest")
         try:
