@@ -19,14 +19,14 @@ from grox.reasoning.local_llama_cpp import LocalLlamaCppReasoningProvider
 from grox.tiny_neural_policy import TinyMLPPythonBackend
 
 
-MODEL_ID = "qwen3-4b-q4-k-m-seed-v1"
-MODEL_FILENAME = "Qwen3-4B-Q4_K_M.gguf"
-MODEL_SHA256 = "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5"
-MODEL_BYTES = 2_497_280_256
-MODEL_SOURCE = "https://huggingface.co/Qwen/Qwen3-4B-GGUF"
-MODEL_REVISION = "a9a60d009fa7ff9606305047c2bf77ac25dbec49"
+MODEL_ID = "qwen3-1.7b-q4-k-m-seed-v1"
+MODEL_FILENAME = "Qwen3-1.7B-Q4_K_M.gguf"
+MODEL_SHA256 = "d2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5"
+MODEL_BYTES = 1_282_439_264
+MODEL_SOURCE = "https://huggingface.co/ggml-org/Qwen3-1.7B-GGUF"
+MODEL_REVISION = "daeb8e2d528a760970442092f6bf1e55c3b659eb"
 MODEL_LICENSE = "Apache-2.0"
-DIRECTIVE = "Inspect README.md for the most important reliability risk. Do not modify files."
+DIRECTIVE = "Inspect README.md for the most important reliability risk. Do not modify files. /no_think"
 
 
 def _dump(payload: dict[str, Any]) -> None:
@@ -143,7 +143,7 @@ def qualify(args: argparse.Namespace) -> None:
 
     backend = LlamaCppCLIBackend(
         args.llama_cli,
-        context_tokens=8192,
+        context_tokens=4096,
         max_output_tokens=256,
         max_threads=4,
         timeout_seconds=600,
