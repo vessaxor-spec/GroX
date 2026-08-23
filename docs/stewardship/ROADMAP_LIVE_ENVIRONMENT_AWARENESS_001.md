@@ -1,6 +1,6 @@
 # GroX Roadmap Doctrine 001 — Live Environment Awareness
 
-**Status:** ROADMAP-BOUND / CURRENT BOUNDED PRIORITY / IMPLEMENTATION NOT YET STARTED
+**Status:** ROADMAP-BOUND / IMPLEMENTATION IN PROGRESS / FIRST LOCAL-RUNTIME EXIT QUALIFIED
 
 **Placement:** NCI-3 is qualified. Live Environment Awareness is the Commander-designated immediate bounded workstream before the next numbered Native Cognition Independence stage, unless later repository evidence supports replanning.
 
@@ -74,9 +74,9 @@ GroX should preserve durable evidence about prior execution and qualification wh
 
 Historical evidence may inform selection. It must not substitute for current readiness where current readiness is required.
 
-## Post-NCI-3 starting primitives
+## Canonical local-runtime foundation and first-exit state
 
-NCI-3 did not implement this doctrine, but it established reusable bounded primitives that the first implementation slice should extend rather than duplicate:
+NCI-3 established reusable bounded primitives. Canonical PRs #119 and #120 extended those primitives into the qualified first bounded Live Environment Awareness exit for defined local cognition/runtime resources:
 
 - `ModelRegistry` as an integrity-bound catalogue of represented local models;
 - local model readiness reporting against artifact integrity, backend support, placement, and current host hardware/runtime profile;
@@ -85,13 +85,15 @@ NCI-3 did not implement this doctrine, but it established reusable bounded primi
 - observed provider/model/backend/artifact identity on qualified local execution;
 - reconstitution that clears active model state and reports current readiness without silently preserving prior activation.
 
-These primitives prove that GroX can observe some local runtime facts. They do **not** yet establish a unified live-resource inventory, authorization state, qualification/fitness state, resource selection policy, fallback policy, remote-provider discovery, tool/application discovery, or general volatile-observation lifecycle.
+For defined local cognition/runtime resources, canonical PRs #119 and #120 now establish a fresh live-resource inventory; explicit Discovered / Authorized / Ready / Qualified-Fit / Selected / Observed separation; policy-constrained candidate fallback; fail-closed selection; actual execution identity/configuration observation; durable identity-only observation history; and volatile selected/observed invalidation with fresh readiness discovery on reconstitution. Historical observations are explicitly non-authoritative for current readiness.
+
+This qualified local-runtime exit does **not** establish remote/cloud provider discovery, governed tool/application discovery, authorized connection awareness, broader operational capability-surface awareness, or adaptive startup/resource routing.
 
 ## Sequencing
 
 NCI-3 is **QUALIFIED** through issue #113 / PR #114 and its exact-tree canonical merge. Live Environment Awareness is now the current bounded architectural workstream tracked by issue #115.
 
-The first implementation slice should establish the smallest useful live-resource inventory and authority separation before introducing adaptive selection complexity. Reuse the qualified NCI-3 local runtime seams where they fit; do not broaden the first slice merely to enumerate every possible resource type.
+The first bounded local-runtime implementation exit is **QUALIFIED** through canonical PRs #119 and #120. Broader issue #115 remains open. Subsequent slices should expand awareness only through the smallest evidence-backed resource surface that preserves the same state and authority separation; adaptive selection complexity should not outrun fresh discovery, authorization, readiness, qualification, observation, and reconstitution evidence.
 
 Recommended first exit boundary:
 
@@ -103,6 +105,8 @@ Recommended first exit boundary:
 - execution evidence records what actually ran;
 - reconstitution invalidates volatile observations and re-discovers them;
 - no command, risk, Repair, verification, or self-activation authority is widened.
+
+**First-exit qualification evidence:** PR #119 merged as `631f7d2086ae6a5d51308f052025c75032ca047b`, establishing the local runtime inventory/state-selection seam and permanent authorization mutation proof. PR #120 merged as `c2e6de3b7a061abfa25a6fbe37b9621cb9370773`, canonical tree `2bd8dc19d71d27a805d500177cf4952843fb09d4`, exactly matching CI-tested synthetic merge tree `2bd8dc19d71d27a805d500177cf4952843fb09d4`. Exact-head CI #381 / `32651553449` passed Wheel plus Python 3.11–3.14; Python 3.12 recorded Vessel Health 10 PASS, pytest 347 passed / 2 skipped / 449 subtests, unittest 349 / 2 skipped, mutations 13/13 + 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex integrated qualification PASS.
 
 NCI-4 remains the next numbered Native Cognition Independence stage after this Commander-designated bounded priority unless later repository evidence supports replanning. This doctrine does not renumber or pre-qualify NCI-4 through NCI-9.
 
