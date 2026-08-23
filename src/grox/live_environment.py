@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from .native_model_runtime import LocalModelRuntime, ModelReadiness
 
@@ -13,6 +13,10 @@ class ResourcePolicyError(ValueError):
 
 class ResourceSelectionError(RuntimeError):
     """No currently observable resource satisfies the bounded policy gates."""
+
+
+class ResourceObservationError(RuntimeError):
+    """An executed resource could not be durably recorded as observed."""
 
 
 def _normalized_ids(values: frozenset[str], *, label: str) -> frozenset[str]:
@@ -139,10 +143,18 @@ class LiveEnvironmentAwareness:
 
     resource_kind = "local_cognition_model"
 
-    def __init__(self, runtime: LocalModelRuntime):
+    def __init__(
+        self,
+        runtime: LocalModelRuntime,
+        *,
+        observation_recorder: Callable[..., Any] | None = None,
+    ):
         if not isinstance(runtime, LocalModelRuntime):
             raise TypeError("runtime must be a LocalModelRuntime")
+        if observation_recorder is not None and not callable(observation_recorder):
+            raise TypeError("observation_recorder must be callable or null")
         self.runtime = runtime
+        self._observation_recorder = observation_recorder
         self._selected: dict[str, str] = {}
         self._observed: dict[tuple[str, str], dict[str, Any]] = {}
 
@@ -280,7 +292,22 @@ class LiveEnvironmentAwareness:
         ):
             if field in invocation:
                 identity[field] = invocation[field]
-        identity["hardware"] = self.runtime.hardware.to_dict()
+        hardware = self.runtime.hardware.to_dict()
+        hardware["accelerators"] = list(hardware.get("accelerators") or ())
+        identity["hardware"] = hardware
+        if self._observation_recorder is not None:
+            try:
+                self._observation_recorder(
+                    resource_id=selection.resource_id,
+                    resource_kind=self.resource_kind,
+                    placement=selection.placement,
+                    identity=dict(identity),
+                )
+            except Exception as exc:
+                raise ResourceObservationError(
+                    f"observation persistence failed for {selection.resource_id}: "
+                    f"{type(exc).__name__}: {exc}"
+                ) from exc
         self._observed[(selection.placement, selection.resource_id)] = dict(identity)
         return {
             "schema": "grox-live-resource-execution-v1",
