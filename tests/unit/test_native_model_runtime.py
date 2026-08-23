@@ -101,7 +101,7 @@ class NativeModelRuntimeTests(unittest.TestCase):
     def test_canonical_registry_is_available_but_not_auto_activated(self):
         root = Path(__file__).resolve().parents[2]
         registry = ModelRegistry.from_asset_root(root)
-        self.assertEqual(registry.ids(), (TINY_MODEL_ID,))
+        self.assertIn(TINY_MODEL_ID, registry.ids())
         runtime = LocalModelRuntime(registry, [TinyMLPPythonBackend()], hardware=_profile(memory=32 * 1024 * 1024))
         readiness = runtime.readiness(TINY_MODEL_ID)
         self.assertEqual(readiness.status, ModelReadiness.AVAILABLE)

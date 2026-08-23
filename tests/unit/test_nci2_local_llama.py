@@ -64,13 +64,15 @@ if mode == "nonzero":
 args = sys.argv[1:]
 prompt_path = pathlib.Path(args[args.index("-f") + 1])
 prompt = prompt_path.read_text(encoding="utf-8")
+if "--grammar-file" in args:
+    grammar_path = pathlib.Path(args[args.index("--grammar-file") + 1])
+    if not grammar_path.is_file() or not grammar_path.read_text(encoding="utf-8").strip():
+        print("missing grammar", file=sys.stderr)
+        raise SystemExit(8)
 start = prompt.index("<commander-directive>\\n") + len("<commander-directive>\\n")
 end = prompt.index("\\n</commander-directive>")
 directive = prompt[start:end]
 
-if mode == "malformed":
-    print("not-json")
-    raise SystemExit(0)
 if mode == "drift":
     directive = "changed intent"
 if mode == "unknown-crew":
@@ -100,7 +102,17 @@ payload = {{
     "proposed_mode": "inspect",
     "proposed_risk": "medium",
 }}
-print(json.dumps(payload, separators=(",", ":")))
+response = "not-json" if mode == "malformed" else json.dumps(payload, separators=(",", ":"))
+
+if "--output-file" in args:
+    output_path = pathlib.Path(args[args.index("--output-file") + 1])
+    transcript_prompt = "tampered prompt" if mode == "transcript-tamper" else prompt
+    output_path.write_text(
+        "User:\\n" + transcript_prompt + "\\n\\nAssistant:\\n" + response + "\\n",
+        encoding="utf-8",
+    )
+else:
+    print(response)
 '''
     path.write_text(textwrap.dedent(script), encoding="utf-8")
     path.chmod(0o755)
@@ -169,7 +181,7 @@ class NCI2ArtifactLocationTests(unittest.TestCase):
     def test_existing_nci1_registry_and_tiny_backend_remain_unchanged(self) -> None:
         source_root = Path(__file__).resolve().parents[2]
         registry = ModelRegistry.from_asset_root(source_root)
-        self.assertEqual(registry.ids(), (TINY_MODEL_ID,))
+        self.assertIn(TINY_MODEL_ID, registry.ids())
         self.assertEqual(registry.get(TINY_MODEL_ID).artifact.location, "runtime_assets")
         runtime = LocalModelRuntime(registry, [TinyMLPPythonBackend()], hardware=_hardware())
         self.assertEqual(runtime.readiness(TINY_MODEL_ID).status, ModelReadiness.AVAILABLE)
@@ -209,7 +221,7 @@ class NCI2ArtifactLocationTests(unittest.TestCase):
 
 
 class LlamaCppBackendTests(unittest.TestCase):
-    def test_pinned_cli_load_and_invoke_is_local_bounded_and_non_activating_until_load(self) -> None:
+    def test_pinned_cli_load_and_invoke_uses_private_gbnf_transcript_path(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             cli = _write_fake_cli(root)
@@ -227,22 +239,48 @@ class LlamaCppBackendTests(unittest.TestCase):
             self.assertIsNotNone(provider.usage_snapshot())
             self.assertEqual(provider.usage_snapshot().model, model_id)
 
-            command = backend.last_command
-            self.assertIsNotNone(command)
-            joined = " ".join(command or ())
-            self.assertNotIn("-hf", command or ())
+            command = list(backend.last_command or ())
+            joined = " ".join(command)
+            self.assertNotIn("-hf", command)
             self.assertNotIn("http://", joined)
             self.assertNotIn("https://", joined)
             self.assertNotIn(_DIRECTIVE, joined)
-            self.assertIn("-ngl", command or ())
-            self.assertEqual((command or ())[list(command or ()).index("-ngl") + 1], "0")
-            prompt_path = Path((command or ())[list(command or ()).index("-f") + 1])
-            self.assertFalse(prompt_path.exists())
+            self.assertIn("--grammar-file", command)
+            self.assertNotIn("-j", command)
+            self.assertIn("--output-file", command)
+            self.assertIn("--fit", command)
+            self.assertEqual(command[command.index("--fit") + 1], "off")
+            self.assertIn("-dev", command)
+            self.assertEqual(command[command.index("-dev") + 1], "none")
+            self.assertIn("--no-op-offload", command)
+            self.assertIn("-ngl", command)
+            self.assertEqual(command[command.index("-ngl") + 1], "0")
+            self.assertIn("--simple-io", command)
+            self.assertIn("--reasoning", command)
+            self.assertEqual(command[command.index("--reasoning") + 1], "off")
+            self.assertIn("--skip-chat-parsing", command)
+
+            for flag in ("-f", "--grammar-file", "--output-file"):
+                temporary_path = Path(command[command.index(flag) + 1])
+                self.assertFalse(temporary_path.exists(), flag)
 
             reconstituted = runtime.reconstitute()
             self.assertEqual(reconstituted["active_after"], [])
             self.assertFalse(reconstituted["auto_activation"])
             self.assertFalse(reconstituted["authority_changed"])
+
+    def test_transcript_prompt_tampering_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            runtime, backend, model_id = _runtime(root, _write_fake_cli(root, mode="transcript-tamper"))
+            runtime.load(model_id, placement="gorxu")
+            provider = LocalLlamaCppReasoningProvider(runtime, model_id=model_id)
+            with self.assertRaisesRegex(ReasoningError, "exact prompt boundary"):
+                provider.interpret(_DIRECTIVE, roster=_ROSTER)
+            self.assertIsNone(provider.usage_snapshot())
+            command = list(backend.last_command or ())
+            for flag in ("-f", "--grammar-file", "--output-file"):
+                self.assertFalse(Path(command[command.index(flag) + 1]).exists())
 
     def test_wrong_pinned_version_is_unsupported(self) -> None:
         with tempfile.TemporaryDirectory() as td:

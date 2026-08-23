@@ -188,7 +188,8 @@ jobs:
           assert reconstituted['active_after'] == [], reconstituted
           assert reconstituted['auto_activation'] is False, reconstituted
           assert reconstituted['authority_changed'] is False, reconstituted
-          assert reconstituted['models'][0]['status'] == ModelReadiness.AVAILABLE.value, reconstituted
+          models = {item['model_id']: item for item in reconstituted['models']}
+          assert models[TINY_MODEL_ID]['status'] == ModelReadiness.AVAILABLE.value, reconstituted
           PY
           )
       - name: Installed CLI binds to current Vessel checkout
