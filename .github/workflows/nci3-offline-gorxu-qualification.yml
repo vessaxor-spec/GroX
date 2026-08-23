@@ -217,16 +217,16 @@ jobs:
           set -euo pipefail
           llama_cli=$(cat /tmp/nci3-llama-cli-path.txt)
           sudo env \
+            -u OPENAI_API_KEY \
+            -u ANTHROPIC_API_KEY \
+            -u GOOGLE_API_KEY \
+            -u GEMINI_API_KEY \
             HOME=/tmp/nci3-user/home \
             XDG_CONFIG_HOME=/tmp/nci3-user/config \
             GROX_REASONER_PROVIDER=local-llama-cpp \
             GROX_REASONER_MODEL=qwen3-4b-q4-k-m-seed-v1 \
             GROX_LLAMA_CPP_EXECUTABLE="$llama_cli" \
             GROX_LOCAL_MODEL_LOAD=explicit \
-            -u OPENAI_API_KEY \
-            -u ANTHROPIC_API_KEY \
-            -u GOOGLE_API_KEY \
-            -u GEMINI_API_KEY \
             unshare --net /tmp/nci3-netns-exec.sh \
             /tmp/nci3-env/bin/python -m grox.cli ask \
               'Why does restore verification matter even when backups exist?' \
@@ -250,12 +250,12 @@ jobs:
           set -euo pipefail
           llama_cli=$(cat /tmp/nci3-llama-cli-path.txt)
           sudo env \
-            HOME=/tmp/nci3-user/home \
-            XDG_CONFIG_HOME=/tmp/nci3-user/config \
             -u OPENAI_API_KEY \
             -u ANTHROPIC_API_KEY \
             -u GOOGLE_API_KEY \
             -u GEMINI_API_KEY \
+            HOME=/tmp/nci3-user/home \
+            XDG_CONFIG_HOME=/tmp/nci3-user/config \
             unshare --net /tmp/nci3-netns-exec.sh \
             /tmp/nci3-env/bin/python /tmp/nci3-harness/nci3_offline_gorxu_qualification.py \
               --config-dir /tmp/nci3-user/config/grox \
