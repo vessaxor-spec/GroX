@@ -4,8 +4,8 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after Live Environment Awareness first local-runtime exit qualification:** `main@c2e6de3b7a061abfa25a6fbe37b9621cb9370773`
-**Current canonical runtime-qualified tree:** `2bd8dc19d71d27a805d500177cf4952843fb09d4`
+**Current verified canonical source after governed Tool Gateway awareness qualification:** `main@bdbd08a11bb93594dbf84c2fc0e81266ca6dc243`
+**Current canonical runtime-qualified tree:** `a4a537983d242988b747d04668055cbd0c2e047b`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,9 +15,9 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **347 passed, 2 skipped, 449 subtests**; unittest **349 OK, 2 skipped**; mutations **13/13**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
-**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; FIRST LOCAL-RUNTIME EXIT QUALIFIED**
-**Next bounded implementation:** **Continue issue #115 beyond the qualified local-runtime exit using the smallest evidence-backed resource-awareness surface; remote/cloud provider, governed tool/application, authorized-connection awareness, and adaptive routing remain unqualified pending recalibration.**
+**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **354 passed, 2 skipped, 449 subtests**; unittest **356 OK, 2 skipped**; mutations **14/14**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
+**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; FIRST LOCAL-RUNTIME EXIT + GOVERNED TOOL GATEWAY AWARENESS EXIT QUALIFIED**
+**Next bounded implementation:** **Continue issue #115 beyond the qualified local-runtime and governed Tool Gateway awareness exits using the smallest repository-native evidence-backed surface; remote/cloud cognition/provider discovery-readiness-qualification-selection and authorized external-connection awareness remain unqualified, and adaptive routing must not outrun those gates.**
 
 ## GorXu command/infrastructure invariant — current synchronization
 
