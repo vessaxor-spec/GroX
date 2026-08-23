@@ -9,7 +9,7 @@ from grox.llama_cpp_backend import LlamaCppCLIBackend, LlamaCppHandle
 
 
 class LlamaCppCpuPolicyTests(unittest.TestCase):
-    def test_cpu_only_invocation_disables_automatic_device_memory_fit(self) -> None:
+    def test_cpu_only_invocation_disables_adaptive_fit_and_device_offload(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             cli = root / "llama-cli"
@@ -48,8 +48,12 @@ class LlamaCppCpuPolicyTests(unittest.TestCase):
 
             self.assertEqual(result["text"], '{"status":"ok"}')
             command = list(backend.last_command or ())
+            self.assertIn("-j", command)
             self.assertIn("--fit", command)
             self.assertEqual(command[command.index("--fit") + 1], "off")
+            self.assertIn("-dev", command)
+            self.assertEqual(command[command.index("-dev") + 1], "none")
+            self.assertIn("--no-op-offload", command)
             self.assertIn("-ngl", command)
             self.assertEqual(command[command.index("-ngl") + 1], "0")
 
