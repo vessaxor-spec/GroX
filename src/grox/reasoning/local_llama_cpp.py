@@ -131,16 +131,10 @@ class LocalLlamaCppReasoningProvider:
             raise ReasoningError("Commander input exceeds the bounded direct-assistance ceiling")
         prompt = (
             _ASSISTANT_SYSTEM
-            + "
-Commander input follows verbatim between markers.
-"
-            + "<commander-input>
-"
+            + "\nCommander input follows verbatim between markers.\n"
+            + "<commander-input>\n"
             + message
-            + "
-</commander-input>
-
-"
+            + "\n</commander-input>\n\n"
             + "Produce the direct Commander-facing response now."
         )
         try:
