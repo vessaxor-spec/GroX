@@ -1,0 +1,28 @@
+name: Temporary NCI-3 bootstrap v2
+
+on:
+  push:
+    branches: [nci-3-offline-gorxu-cognition]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Apply branch patch
+        run: python scripts/nci3_bootstrap_patch.py
+      - name: Commit bounded implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'VESSAXOR Stewardship'
+          git config user.email 'vessaxor@gmail.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'Implement NCI-3 offline GorXu cognition'
+          git push origin HEAD:nci-3-offline-gorxu-cognition
