@@ -165,7 +165,6 @@ jobs:
               cat "$stderr" || true
               exit "$rc"
             fi
-            chmod 0600 "$transcript"
           }
 
           status_prompt='Return only a JSON object whose status is ok.'
