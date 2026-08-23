@@ -1,0 +1,70 @@
+name: Temporary Live Environment Mutation Binding
+
+on:
+  push:
+    branches: [live-environment-awareness-local-runtime]
+
+permissions:
+  contents: write
+
+jobs:
+  bind:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: live-environment-awareness-local-runtime
+          fetch-depth: 0
+
+      - name: Add authority-gate mutation proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('tests/mutation/run_critical_invariants.py')
+          text = path.read_text(encoding='utf-8')
+          anchor = '''    MutationSpec(
+        name="ci-action-immutable-pin",
+'''
+          insertion = '''    MutationSpec(
+        name="live-resource-authorization-gate",
+        invariant="A discovered, ready, and qualified resource must never be selected unless explicit policy also authorizes it.",
+        path="src/grox/live_environment.py",
+        old='            if not resource.authorized:\n                missing.append("not_authorized")\n',
+        new='            if False and not resource.authorized:\n                missing.append("not_authorized")\n',
+        nodeid="tests/unit/test_live_environment_awareness.py::LiveEnvironmentAwarenessTests::test_selection_uses_only_policy_order_and_requires_every_gate",
+    ),
+'''
+          if text.count(anchor) != 1:
+              raise SystemExit('critical mutation insertion anchor drifted')
+          if 'name="live-resource-authorization-gate"' in text:
+              raise SystemExit('live-resource authorization mutation already exists')
+          text = text.replace(anchor, insertion + anchor, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+          python tests/mutation/run_critical_invariants.py | tee /tmp/live-env-mutations.txt
+          grep -q 'MUTATION live-resource-authorization-gate: KILLED' /tmp/live-env-mutations.txt
+          grep -q '"killed": 13' /tmp/live-env-mutations.txt
+          grep -q '"total": 13' /tmp/live-env-mutations.txt
+          git diff --check
+
+      - name: Commit mutation proof and self-delete
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/live-environment-mutation-bind-temp.yml
+          git config user.name 'VESSAXOR'
+          git config user.email 'vessaxor@gmail.com'
+          git add tests/mutation/run_critical_invariants.py .github/workflows/live-environment-mutation-bind-temp.yml
+          git diff --cached --check
+          mapfile -t paths < <(git diff --cached --name-only)
+          printf 'staged=%s\n' "${paths[*]}"
+          test "${#paths[@]}" -eq 2
+          test "${paths[0]}" = '.github/workflows/live-environment-mutation-bind-temp.yml'
+          test "${paths[1]}" = 'tests/mutation/run_critical_invariants.py'
+          git commit -m 'Prove live resource authorization gate by mutation'
+          git push origin HEAD:live-environment-awareness-local-runtime
