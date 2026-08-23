@@ -1,0 +1,60 @@
+name: Hosted Cognition Mutation Bind Temp
+
+on:
+  push:
+    branches:
+      - live-environment-hosted-cognition-awareness
+    paths:
+      - .github/.hosted-cognition-mutation-trigger
+
+permissions:
+  contents: write
+
+jobs:
+  bind:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: live-environment-hosted-cognition-awareness
+          fetch-depth: 0
+      - name: Bind permanent authorization mutation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tests/mutation/run_critical_invariants.py')
+          text=p.read_text(encoding='utf-8')
+          marker='''    MutationSpec(\n        name="ci-action-immutable-pin",\n'''
+          if text.count(marker) != 1:
+              raise SystemExit(f'mutation insertion seam drift: {text.count(marker)}')
+          spec='''    MutationSpec(\n        name="hosted-cognition-authorization-gate",\n        invariant="A bound or structurally ready hosted cognition provider must never become authorized without explicit exact-resource policy.",\n        path="src/grox/cognition_awareness.py",\n        old='        authorized = resource_id in policy.authorized_ids if policy is not None else False\\n',\n        new='        authorized = True if policy is None else resource_id in policy.authorized_ids\\n',\n        nodeid="tests/unit/test_cognition_provider_awareness.py::CognitionProviderAwarenessTests::test_bound_session_provider_is_discovered_selected_but_not_authorized_or_observed",\n    ),\n'''
+          p.write_text(text.replace(marker,spec+marker,1),encoding='utf-8')
+          PY
+          python tests/mutation/run_critical_invariants.py | tee /tmp/mutations.log
+          grep -F 'MUTATION hosted-cognition-authorization-gate: KILLED' /tmp/mutations.log
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          line=next(x for x in Path('/tmp/mutations.log').read_text().splitlines() if x.startswith('MUTATION_MATRIX_JSON='))
+          report=json.loads(line.split('=',1)[1])
+          assert report['summary']['total'] == 15, report['summary']
+          assert report['summary']['killed'] == 15, report['summary']
+          assert report['summary']['survived'] == 0, report['summary']
+          assert report['summary']['other_failures'] == 0, report['summary']
+          assert report['summary']['source_restored_clean'] is True, report['summary']
+          PY
+      - name: Remove temporary workflow and trigger
+        shell: bash
+        run: |
+          rm -f .github/workflows/hosted-cognition-mutation-bind-temp.yml
+          rm -f .github/.hosted-cognition-mutation-trigger
+      - name: Commit permanent mutation only
+        shell: bash
+        run: |
+          git config user.name 'VESSAXOR'
+          git config user.email 'vessaxor@gmail.com'
+          git add tests/mutation/run_critical_invariants.py .github/workflows/hosted-cognition-mutation-bind-temp.yml .github/.hosted-cognition-mutation-trigger
+          git diff --cached --check
+          git commit -m 'Bind hosted cognition authorization mutation proof'
+          git push origin HEAD:live-environment-hosted-cognition-awareness
