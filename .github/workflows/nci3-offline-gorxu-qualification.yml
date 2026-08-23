@@ -228,8 +228,7 @@ jobs:
             GROX_LLAMA_CPP_EXECUTABLE="$llama_cli" \
             GROX_LOCAL_MODEL_LOAD=explicit \
             unshare --net /tmp/nci3-netns-exec.sh \
-            /tmp/nci3-env/bin/python -m grox.cli ask \
-              'Why does restore verification matter even when backups exist?' \
+            /bin/bash -c "cd /tmp && exec /tmp/nci3-env/bin/python -m grox.cli ask 'Why does restore verification matter even when backups exist?'" \
             | tee /tmp/nci3-installed-ask.json
           python - <<'PY'
           import json
