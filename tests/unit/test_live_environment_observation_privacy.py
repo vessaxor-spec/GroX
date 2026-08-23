@@ -45,6 +45,25 @@ class LiveEnvironmentObservationPrivacyTests(unittest.TestCase):
                         },
                     )
                 self.assertEqual(store.resource_observations(), [])
+            finally:
+                store.close()
+
+    def test_nested_hardware_observation_requires_complete_identity_shape(self):
+        with tempfile.TemporaryDirectory() as td:
+            store = StateStore(Path(td) / "grox.sqlite3")
+            try:
+                hardware = dict(self._identity()["hardware"])
+                hardware.pop("python_version")
+                with self.assertRaisesRegex(ValueError, "missing hardware identity field"):
+                    store.record_resource_observation(
+                        resource_id="observed-model",
+                        resource_kind="local_cognition_model",
+                        placement="gorxu",
+                        identity={**self._identity(), "hardware": hardware},
+                    )
+                self.assertEqual(store.resource_observations(), [])
+            finally:
+                store.close()
 
     def test_expected_hardware_identity_shape_is_accepted(self):
         with tempfile.TemporaryDirectory() as td:
