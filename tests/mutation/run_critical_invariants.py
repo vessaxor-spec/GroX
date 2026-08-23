@@ -144,6 +144,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_live_environment_awareness.py::LiveEnvironmentAwarenessTests::test_selection_uses_only_policy_order_and_requires_every_gate",
     ),
     MutationSpec(
+        name="tool-capability-mission-authorization",
+        invariant="Host-enabled or ready Tool Gateway capability state must never imply Mission authorization without sealed Order context.",
+        path="src/grox/tool_awareness.py",
+        old='            if order is None:\n                return requested, False, "no_mission_context"\n',
+        new='            if order is None:\n                return requested, True, "no_mission_context"\n',
+        nodeid="tests/unit/test_tool_capability_awareness.py::ToolCapabilityAwarenessTests::test_host_ready_never_implies_mission_authorization",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
