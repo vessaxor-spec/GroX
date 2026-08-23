@@ -15,8 +15,39 @@ Preserve commander_intent exactly as supplied.
 Use only Crew IDs present in the supplied Standing Crew Directory.
 Surface ambiguity and uncertainty instead of inventing facts.
 Keep text fields concise, normally return one option, and recommend no more than three Crew IDs.
-Return only the JSON object required by the supplied schema; do not emit chain-of-thought.
+Emit fields in this exact order: commander_intent, objective, ambiguous, ambiguities, assumptions, information_needs, candidate_crew_ids, options, recommended_option, confidence, proposed_mode, proposed_risk.
+Return only the required JSON object; do not emit chain-of-thought.
 """
+
+# llama.cpp b10218's JSON-schema sampler path is incompatible with the Qwen3
+# chat-template prefix used by the NCI-2 seed. This equivalent structural GBNF
+# is used only to constrain generation. MissionInterpretation.from_mapping and
+# the Commander-intent/Crew checks below remain the semantic authority.
+_MISSION_INTERPRETATION_GBNF = r'''root ::= "{" space commander-intent-kv "," space objective-kv "," space ambiguous-kv "," space ambiguities-kv "," space assumptions-kv "," space information-needs-kv "," space candidate-crew-ids-kv "," space options-kv "," space recommended-option-kv "," space confidence-kv "," space proposed-mode-kv "," space proposed-risk-kv "}" space
+char ::= [^"\\\x7F\x00-\x1F] | [\\] (["\\bfnrt] | "u" [0-9a-fA-F]{4})
+string ::= "\"" char* "\"" space
+nonempty-string ::= "\"" char char* "\"" space
+string-array ::= "[" space ("]" space | string ("," space string)* "]" space)
+boolean ::= ("true" | "false") space
+confidence ::= ("0" ("." [0-9]+)? | "1" ("." "0"+)?) space
+mode ::= ("null" | "\"inspect\"" | "\"repair\"" | "\"execute\"" | "\"verify\"") space
+risk ::= ("null" | "\"low\"" | "\"medium\"" | "\"high\"" | "\"critical\"") space
+option ::= "{" space "\"name\"" space ":" space nonempty-string "," space "\"rationale\"" space ":" space nonempty-string "," space "\"advantages\"" space ":" space string-array "," space "\"risks\"" space ":" space string-array "," space "\"crew_ids\"" space ":" space string-array "}" space
+options ::= "[" space ("]" space | option ("," space option)* "]" space)
+commander-intent-kv ::= "\"commander_intent\"" space ":" space string
+objective-kv ::= "\"objective\"" space ":" space nonempty-string
+ambiguous-kv ::= "\"ambiguous\"" space ":" space boolean
+ambiguities-kv ::= "\"ambiguities\"" space ":" space string-array
+assumptions-kv ::= "\"assumptions\"" space ":" space string-array
+information-needs-kv ::= "\"information_needs\"" space ":" space string-array
+candidate-crew-ids-kv ::= "\"candidate_crew_ids\"" space ":" space string-array
+options-kv ::= "\"options\"" space ":" space options
+recommended-option-kv ::= "\"recommended_option\"" space ":" space string
+confidence-kv ::= "\"confidence\"" space ":" space confidence
+proposed-mode-kv ::= "\"proposed_mode\"" space ":" space mode
+proposed-risk-kv ::= "\"proposed_risk\"" space ":" space risk
+space ::= | " " | "\n"{1,2} [ \t]{0,20}
+'''
 
 
 class LocalLlamaCppReasoningProvider:
@@ -95,6 +126,7 @@ class LocalLlamaCppReasoningProvider:
                 payload={
                     "prompt": prompt,
                     "json_schema": MissionInterpretation.json_schema(),
+                    "gbnf_grammar": _MISSION_INTERPRETATION_GBNF,
                 },
             )
         except (ModelInvocationError, ModelRuntimeError) as exc:
