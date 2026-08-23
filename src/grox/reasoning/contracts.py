@@ -42,6 +42,59 @@ class StrategyOption:
 
 
 @dataclass(slots=True)
+class AssistantResponse:
+    """One bounded direct Commander-facing response from GorXu cognition.
+
+    This is conversational content only. It carries no Mission, tool, routing,
+    mutation, or permission authority.
+    """
+
+    commander_input: str
+    response: str
+
+    @classmethod
+    def from_mapping(cls, raw: dict[str, Any], *, expected_input: str) -> "AssistantResponse":
+        if not isinstance(raw, dict):
+            raise ValueError("assistant response must be an object")
+        expected_fields = {"commander_input", "response"}
+        if set(raw) != expected_fields:
+            raise ValueError("assistant response must contain only commander_input and response")
+        commander_input = raw.get("commander_input")
+        if commander_input != expected_input:
+            raise ValueError("assistant response must preserve Commander input verbatim")
+        response = raw.get("response")
+        if not isinstance(response, str) or not response.strip():
+            raise ValueError("assistant response text is required")
+        response = response.strip()
+        if len(response) > 1200:
+            raise ValueError("assistant response exceeds the bounded 1200-character ceiling")
+        return cls(commander_input=commander_input, response=response)
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @staticmethod
+    def json_schema() -> dict[str, Any]:
+        return {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "commander_input": {
+                    "type": "string",
+                    "description": "Repeat the Commander input exactly, byte for byte.",
+                },
+                "response": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1200,
+                    "description": "Concise direct answer for the Commander; no private chain-of-thought.",
+                },
+            },
+            "required": ["commander_input", "response"],
+        }
+
+
+@dataclass(slots=True)
 class MissionInterpretation:
     commander_intent: str
     objective: str

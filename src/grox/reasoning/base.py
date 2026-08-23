@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Protocol, Any
-from .contracts import MissionInterpretation
+from .contracts import AssistantResponse, MissionInterpretation
 
 
 class ReasoningError(RuntimeError):
@@ -28,4 +28,16 @@ class CognitiveUsage:
 class ReasoningProvider(Protocol):
     name: str
     def interpret(self, directive: str, *, roster: list[dict[str, Any]]) -> MissionInterpretation: ...
+    def usage_snapshot(self) -> CognitiveUsage | None: ...
+
+
+class ConversationalReasoningProvider(Protocol):
+    """Optional provider-neutral direct-assistance capability.
+
+    Implementing this protocol does not grant Mission or command authority.
+    Existing interpretation-only providers remain valid for Mission cognition.
+    """
+
+    name: str
+    def respond(self, message: str) -> AssistantResponse: ...
     def usage_snapshot(self) -> CognitiveUsage | None: ...
