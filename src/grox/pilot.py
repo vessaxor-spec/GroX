@@ -54,7 +54,10 @@ class PilotGorXu:
         self.reasoner=build_reasoner_from_env(layout=layout) if reasoner is _AUTO else reasoner
         local_runtime=getattr(self.reasoner,'runtime',None) if self.reasoner else None
         self._live_environment=(
-            LiveEnvironmentAwareness(local_runtime) if isinstance(local_runtime,LocalModelRuntime) else None
+            LiveEnvironmentAwareness(
+                local_runtime, observation_recorder=self.store.record_resource_observation
+            )
+            if isinstance(local_runtime,LocalModelRuntime) else None
         )
 
     @property
@@ -84,6 +87,10 @@ class PilotGorXu:
         if self._live_environment is None:
             raise ResourceSelectionError('Pilot has no bound local model runtime for live-resource selection')
         return self._live_environment.select(policy,placement=placement)
+
+    def live_resource_history(self, resource_id:str|None=None, *, limit:int=20)->list[dict[str,Any]]:
+        """Return durable historical execution identity; never current readiness."""
+        return self.store.resource_observations(resource_id=resource_id,limit=limit)
 
     def _required_caps(self, mode:MissionMode)->list[str]:
         return {'inspect':['repo_read'],'repair':['repo_read','repo_write'],'verify':['repo_read','verify'],'execute':['repo_read']}[mode.value]

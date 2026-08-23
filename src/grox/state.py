@@ -9,6 +9,12 @@ from typing import Any
 from .contracts import Evidence, MissionOrder
 
 
+_RESOURCE_OBSERVATION_IDENTITY_FIELDS = frozenset({
+    "model_id", "model_kind", "backend", "placement", "artifact_sha256",
+    "authority_changed", "hardware",
+})
+
+
 def now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -57,6 +63,11 @@ class StateStore:
           evidence_quality REAL NOT NULL, verified INTEGER, latency_ms REAL NOT NULL,
           cost_units REAL NOT NULL, risk TEXT NOT NULL, created_at TEXT NOT NULL);
         CREATE INDEX IF NOT EXISTS idx_crew_performance_task ON crew_performance(crew_id,task_class,created_at);
+        CREATE TABLE IF NOT EXISTS resource_observations(
+          id INTEGER PRIMARY KEY AUTOINCREMENT, resource_id TEXT NOT NULL,
+          resource_kind TEXT NOT NULL, placement TEXT NOT NULL, identity TEXT NOT NULL,
+          created_at TEXT NOT NULL);
+        CREATE INDEX IF NOT EXISTS idx_resource_observations_resource ON resource_observations(resource_id,created_at);
         ''')
         # Crash recovery: no Crew remains notionally on duty after process death.
         self.db.execute("UPDATE crew_state SET status='asleep' WHERE status='on_duty'")
@@ -125,6 +136,88 @@ class StateStore:
             (mission_id, order_id, ev.kind, json.dumps(ev.content, sort_keys=True), now()),
         )
         self.db.commit()
+
+    def record_resource_observation(
+        self,
+        *,
+        resource_id: str,
+        resource_kind: str,
+        placement: str,
+        identity: dict[str, Any],
+    ) -> int:
+        """Persist bounded historical execution identity, never current readiness.
+
+        Runtime observations are not Mission/Order evidence and therefore use a
+        dedicated private-state ledger rather than fabricated Mission IDs. Only
+        the identity/configuration fields emitted by the GroX runtime contract
+        are accepted; prompts, model output, tool results, and Commander content
+        have no admissible field here.
+        """
+        for label, value in (("resource_id", resource_id), ("resource_kind", resource_kind), ("placement", placement)):
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{label} must be a non-empty string")
+        if not isinstance(identity, dict) or not identity:
+            raise ValueError("execution identity must be a non-empty mapping")
+        unsupported = sorted(set(identity) - _RESOURCE_OBSERVATION_IDENTITY_FIELDS)
+        if unsupported:
+            raise ValueError(f"unsupported execution identity field(s): {unsupported}")
+        resource_id = resource_id.strip()
+        resource_kind = resource_kind.strip()
+        placement = placement.strip()
+        if identity.get("model_id") != resource_id:
+            raise ValueError("model identity mismatch for resource observation")
+        if identity.get("placement") != placement:
+            raise ValueError("placement identity mismatch for resource observation")
+        if identity.get("authority_changed") is not False:
+            raise ValueError("resource observation cannot record an authority change")
+        for field in ("model_id", "model_kind", "backend", "placement", "artifact_sha256"):
+            value = identity.get(field)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"execution identity {field} must be a non-empty string")
+        digest = identity["artifact_sha256"]
+        if len(digest) != 64:
+            raise ValueError("execution identity artifact_sha256 must be a 64-character hexadecimal digest")
+        try:
+            int(digest, 16)
+        except ValueError as exc:
+            raise ValueError("execution identity artifact_sha256 must be hexadecimal") from exc
+        hardware = identity.get("hardware")
+        if not isinstance(hardware, dict):
+            raise ValueError("execution identity hardware must be a mapping")
+        encoded = json.dumps(identity, sort_keys=True)
+        cur = self.db.execute(
+            "INSERT INTO resource_observations(resource_id,resource_kind,placement,identity,created_at) VALUES(?,?,?,?,?)",
+            (resource_id, resource_kind, placement, encoded, now()),
+        )
+        self.db.commit()
+        return int(cur.lastrowid)
+
+    def resource_observations(
+        self, resource_id: str | None = None, *, limit: int = 20
+    ) -> list[dict[str, Any]]:
+        """Return historical observations without asserting current readiness."""
+        limit = max(0, min(1000, int(limit)))
+        if limit == 0:
+            return []
+        if resource_id is None:
+            rows = self.db.execute(
+                "SELECT * FROM resource_observations ORDER BY id DESC LIMIT ?", (limit,)
+            ).fetchall()
+        else:
+            if not isinstance(resource_id, str) or not resource_id.strip():
+                raise ValueError("resource_id must be null or a non-empty string")
+            rows = self.db.execute(
+                "SELECT * FROM resource_observations WHERE resource_id=? ORDER BY id DESC LIMIT ?",
+                (resource_id.strip(), limit),
+            ).fetchall()
+        out: list[dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["identity"] = json.loads(item["identity"])
+            item["historical"] = True
+            item["current_readiness_claim"] = False
+            out.append(item)
+        return out
 
     def save_graph_node(
         self,
