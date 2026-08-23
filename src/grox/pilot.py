@@ -18,6 +18,7 @@ from .live_environment import (
     LiveEnvironmentAwareness, LiveResourceSnapshot, ResourcePolicy, ResourceSelectionError,
 )
 from .native_model_runtime import LocalModelRuntime
+from .tool_awareness import ToolCapabilityAwareness
 from .graph import MissionGraphPlan
 from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
@@ -46,6 +47,7 @@ class PilotGorXu:
             layout, policy=gateway_policy, extra_allowed_origins=extra_allowed_origins,
             secret_broker=secret_broker, mcp_registry=mcp_registry,
         )
+        self._tool_awareness=ToolCapabilityAwareness(self.gateway)
         self.executor=CrewExecutor(self.gateway,self.durable)
         self.verifier=IndependentVerifier()
         self.intelligence=LivingCompanyIntelligence(self.store,self.roster)
@@ -91,6 +93,10 @@ class PilotGorXu:
     def live_resource_history(self, resource_id:str|None=None, *, limit:int=20)->list[dict[str,Any]]:
         """Return durable historical execution identity; never current readiness."""
         return self.store.resource_observations(resource_id=resource_id,limit=limit)
+
+    def live_tool_capability_inventory(self, *, order:MissionOrder|None=None)->dict[str,Any]:
+        """Return fresh governed A5 capability state without invoking tools."""
+        return self._tool_awareness.inventory(order=order)
 
     def _required_caps(self, mode:MissionMode)->list[str]:
         return {'inspect':['repo_read'],'repair':['repo_read','repo_write'],'verify':['repo_read','verify'],'execute':['repo_read']}[mode.value]
