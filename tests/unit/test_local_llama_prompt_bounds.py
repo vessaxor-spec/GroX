@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import unittest
 
-from grox.reasoning.local_llama_cpp import LocalLlamaCppReasoningProvider
+from grox.reasoning.local_llama_cpp import (
+    LocalLlamaCppReasoningProvider,
+    _MISSION_INTERPRETATION_GBNF,
+    _SYSTEM,
+)
 
 
 class LocalLlamaPromptBoundsTests(unittest.TestCase):
@@ -44,6 +48,17 @@ class LocalLlamaPromptBoundsTests(unittest.TestCase):
         self.assertEqual(compact[0]["crew_id"], "architect")
         self.assertEqual(len(compact[0]["title"]), 120)
         self.assertTrue(compact[0]["verification"])
+
+    def test_local_generation_contract_is_bounded_without_bounding_commander_intent(self) -> None:
+        self.assertIn('commander-string ::= "\\\"" char* "\\\"" space', _MISSION_INTERPRETATION_GBNF)
+        self.assertIn('short-string ::= "\\\"" char{0,120} "\\\"" space', _MISSION_INTERPRETATION_GBNF)
+        self.assertIn('nonempty-short-string ::= "\\\"" char{1,160} "\\\"" space', _MISSION_INTERPRETATION_GBNF)
+        self.assertIn('crew-id ::= "\\\"" char{1,120} "\\\"" space', _MISSION_INTERPRETATION_GBNF)
+        self.assertIn('bounded-list ::= "[" space (\"]\" space | short-string (\",\" space short-string)? \"]\" space)', _MISSION_INTERPRETATION_GBNF)
+        self.assertIn('crew-list ::= "[" space crew-id ("," space crew-id){0,2} "]" space', _MISSION_INTERPRETATION_GBNF)
+        self.assertIn('options ::= "[" space option "]" space', _MISSION_INTERPRETATION_GBNF)
+        self.assertIn("Return exactly one concise strategy option", _SYSTEM)
+        self.assertIn("one to three Crew IDs", _SYSTEM)
 
 
 if __name__ == "__main__":
