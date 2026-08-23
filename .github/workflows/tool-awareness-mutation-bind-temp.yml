@@ -1,0 +1,42 @@
+name: Tool Awareness Mutation Bind Temp
+
+on:
+  push:
+    branches:
+      - live-environment-tool-capability-awareness
+
+permissions:
+  contents: write
+
+jobs:
+  bind:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: live-environment-tool-capability-awareness
+          fetch-depth: 0
+      - name: Bind permanent tool capability authorization mutation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('tests/mutation/run_critical_invariants.py')
+          text = path.read_text(encoding='utf-8')
+          anchor = '''    MutationSpec(\n        name="ci-action-immutable-pin",\n'''
+          insertion = '''    MutationSpec(\n        name="tool-capability-mission-authorization",\n        invariant="Host-enabled or ready Tool Gateway capability state must never imply Mission authorization without sealed Order context.",\n        path="src/grox/tool_awareness.py",\n        old='            if order is None:\\n                return requested, False, "no_mission_context"\\n',\n        new='            if order is None:\\n                return requested, True, "no_mission_context"\\n',\n        nodeid="tests/unit/test_tool_capability_awareness.py::ToolCapabilityAwarenessTests::test_host_ready_never_implies_mission_authorization",\n    ),\n'''
+          if text.count(anchor) != 1:
+              raise SystemExit(f'mutation anchor drift: {text.count(anchor)}')
+          if 'name="tool-capability-mission-authorization"' in text:
+              raise SystemExit('mutation already present')
+          path.write_text(text.replace(anchor, insertion + anchor, 1), encoding='utf-8')
+          PY
+          git diff --check
+          test "$(git diff --name-only)" = "tests/mutation/run_critical_invariants.py"
+          rm .github/workflows/tool-awareness-mutation-bind-temp.yml
+          rm -f .tool-awareness-mutation-bind-trigger
+          git config user.name 'VESSAXOR'
+          git config user.email 'vessaxor@gmail.com'
+          git add tests/mutation/run_critical_invariants.py .github/workflows/tool-awareness-mutation-bind-temp.yml .tool-awareness-mutation-bind-trigger
+          git commit -m 'Bind Tool Gateway authorization mutation proof'
+          git push origin HEAD:live-environment-tool-capability-awareness
