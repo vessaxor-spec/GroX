@@ -14,6 +14,10 @@ from .runtime.executor import CrewExecutor
 from .mission_control.core import MissionControl
 from .verification.core import IndependentVerifier
 from .reasoning import AssistantResponse, ReasoningError, build_reasoner_from_env
+from .live_environment import (
+    LiveEnvironmentAwareness, LiveResourceSnapshot, ResourcePolicy, ResourceSelectionError,
+)
+from .native_model_runtime import LocalModelRuntime
 from .graph import MissionGraphPlan
 from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
@@ -48,10 +52,38 @@ class PilotGorXu:
         self.exception_loop=ExecutiveExceptionLoop(self.durable)
         self.evaluation=OrchestrationEvaluator(self.store,self.durable,self.roster)
         self.reasoner=build_reasoner_from_env(layout=layout) if reasoner is _AUTO else reasoner
+        local_runtime=getattr(self.reasoner,'runtime',None) if self.reasoner else None
+        self._live_environment=(
+            LiveEnvironmentAwareness(local_runtime) if isinstance(local_runtime,LocalModelRuntime) else None
+        )
 
     @property
     def cognitive_status(self)->str:
         return getattr(self.reasoner,'name','deterministic-only') if self.reasoner else 'deterministic-only'
+
+    def live_resource_inventory(self, policy:ResourcePolicy, *, placement:str='gorxu')->dict[str,Any]:
+        """Return fresh bounded local-resource state without activating anything.
+
+        A Pilot without a bound LocalModelRuntime reports the local live-resource
+        surface unavailable rather than fabricating discovery or availability.
+        """
+        if self._live_environment is None:
+            return {
+                'schema':'grox-live-environment-inventory-v1',
+                'status':'unavailable',
+                'placement':placement,
+                'resources':[],
+                'authority_changed':False,
+                'auto_activation':False,
+            }
+        inventory=self._live_environment.inventory(policy,placement=placement).to_dict()
+        return {'status':'ok',**inventory}
+
+    def select_live_resource(self, policy:ResourcePolicy, *, placement:str='gorxu')->LiveResourceSnapshot:
+        """Select within explicit policy; selection never loads or activates."""
+        if self._live_environment is None:
+            raise ResourceSelectionError('Pilot has no bound local model runtime for live-resource selection')
+        return self._live_environment.select(policy,placement=placement)
 
     def _required_caps(self, mode:MissionMode)->list[str]:
         return {'inspect':['repo_read'],'repair':['repo_read','repo_write'],'verify':['repo_read','verify'],'execute':['repo_read']}[mode.value]

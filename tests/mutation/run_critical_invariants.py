@@ -136,6 +136,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_vessel_root.py::VesselRootTests::test_unbound_installed_runtime_refuses_empty_vessel",
     ),
     MutationSpec(
+        name="live-resource-authorization-gate",
+        invariant="A discovered, ready, and qualified resource must never be selected unless explicit policy also authorizes it.",
+        path="src/grox/live_environment.py",
+        old='            if not resource.authorized:\n                missing.append("not_authorized")\n',
+        new='            if False and not resource.authorized:\n                missing.append("not_authorized")\n',
+        nodeid="tests/unit/test_live_environment_awareness.py::LiveEnvironmentAwarenessTests::test_selection_uses_only_policy_order_and_requires_every_gate",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
