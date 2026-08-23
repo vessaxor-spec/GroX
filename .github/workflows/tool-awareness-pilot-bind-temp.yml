@@ -1,0 +1,50 @@
+name: Tool Awareness Pilot Bind Temp
+
+on:
+  push:
+    branches:
+      - live-environment-tool-capability-awareness
+
+permissions:
+  contents: write
+
+jobs:
+  bind:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: live-environment-tool-capability-awareness
+          fetch-depth: 0
+      - name: Bind Tool Capability Awareness to Pilot GorXu
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('src/grox/pilot.py')
+          text = path.read_text(encoding='utf-8')
+          old = 'from .native_model_runtime import LocalModelRuntime\n'
+          new = 'from .native_model_runtime import LocalModelRuntime\nfrom .tool_awareness import ToolCapabilityAwareness\n'
+          if text.count(old) != 1:
+              raise SystemExit(f'import seam drift: {text.count(old)}')
+          text = text.replace(old, new, 1)
+          old = '''        self.gateway=LayoutToolGateway(\n            layout, policy=gateway_policy, extra_allowed_origins=extra_allowed_origins,\n            secret_broker=secret_broker, mcp_registry=mcp_registry,\n        )\n        self.executor=CrewExecutor(self.gateway,self.durable)\n'''
+          new = '''        self.gateway=LayoutToolGateway(\n            layout, policy=gateway_policy, extra_allowed_origins=extra_allowed_origins,\n            secret_broker=secret_broker, mcp_registry=mcp_registry,\n        )\n        self._tool_awareness=ToolCapabilityAwareness(self.gateway)\n        self.executor=CrewExecutor(self.gateway,self.durable)\n'''
+          if text.count(old) != 1:
+              raise SystemExit(f'gateway seam drift: {text.count(old)}')
+          text = text.replace(old, new, 1)
+          old = '''    def live_resource_history(self, resource_id:str|None=None, *, limit:int=20)->list[dict[str,Any]]:\n        \"\"\"Return durable historical execution identity; never current readiness.\"\"\"\n        return self.store.resource_observations(resource_id=resource_id,limit=limit)\n\n    def _required_caps(self, mode:MissionMode)->list[str]:\n'''
+          new = '''    def live_resource_history(self, resource_id:str|None=None, *, limit:int=20)->list[dict[str,Any]]:\n        \"\"\"Return durable historical execution identity; never current readiness.\"\"\"\n        return self.store.resource_observations(resource_id=resource_id,limit=limit)\n\n    def live_tool_capability_inventory(self, *, order:MissionOrder|None=None)->dict[str,Any]:\n        \"\"\"Return fresh governed A5 capability state without invoking tools.\"\"\"\n        return self._tool_awareness.inventory(order=order)\n\n    def _required_caps(self, mode:MissionMode)->list[str]:\n'''
+          if text.count(old) != 1:
+              raise SystemExit(f'method seam drift: {text.count(old)}')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+          git diff --check
+          test "$(git diff --name-only)" = "src/grox/pilot.py"
+          rm .github/workflows/tool-awareness-pilot-bind-temp.yml
+          rm -f .tool-awareness-pilot-bind-trigger
+          git config user.name 'VESSAXOR'
+          git config user.email 'vessaxor@gmail.com'
+          git add src/grox/pilot.py .github/workflows/tool-awareness-pilot-bind-temp.yml .tool-awareness-pilot-bind-trigger
+          git commit -m 'Bind governed tool awareness to Pilot GorXu'
+          git push origin HEAD:live-environment-tool-capability-awareness
