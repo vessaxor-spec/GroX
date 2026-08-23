@@ -9,6 +9,7 @@ from typing import Any
 from grox.live_environment import (
     LiveEnvironmentAwareness,
     ResourcePolicy,
+    ResourcePolicyError,
     ResourceSelectionError,
 )
 from grox.native_model_runtime import (
@@ -80,6 +81,20 @@ def _runtime(root: Path, model_ids: tuple[str, ...]) -> LocalModelRuntime:
 
 
 class LiveEnvironmentAwarenessTests(unittest.TestCase):
+    def test_policy_requires_an_explicit_unique_fallback_envelope(self):
+        with self.assertRaisesRegex(ResourcePolicyError, "at least one resource"):
+            ResourcePolicy(
+                authorized_ids=frozenset(),
+                qualified_ids=frozenset(),
+                candidate_order=(),
+            )
+        with self.assertRaisesRegex(ResourcePolicyError, "duplicate resource"):
+            ResourcePolicy(
+                authorized_ids=frozenset({"first"}),
+                qualified_ids=frozenset({"first"}),
+                candidate_order=("first", "first"),
+            )
+
     def test_inventory_separates_representation_discovery_authority_readiness_and_fitness(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
