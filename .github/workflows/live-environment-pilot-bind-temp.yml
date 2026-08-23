@@ -1,0 +1,84 @@
+name: Temporary Live Environment Pilot Binding
+
+on:
+  push:
+    branches: [live-environment-awareness-local-runtime]
+
+permissions:
+  contents: write
+
+jobs:
+  bind:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: live-environment-awareness-local-runtime
+          fetch-depth: 0
+
+      - name: Patch Pilot with bounded live-resource exposure
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/grox/pilot.py')
+          text = path.read_text(encoding='utf-8')
+
+          old_import = "from .reasoning import AssistantResponse, ReasoningError, build_reasoner_from_env\n"
+          new_import = (
+              "from .reasoning import AssistantResponse, ReasoningError, build_reasoner_from_env\n"
+              "from .live_environment import (\n"
+              "    LiveEnvironmentAwareness, LiveResourceSnapshot, ResourcePolicy, ResourceSelectionError,\n"
+              ")\n"
+              "from .native_model_runtime import LocalModelRuntime\n"
+          )
+          if text.count(old_import) != 1:
+              raise SystemExit('Pilot import seam drifted')
+          text = text.replace(old_import, new_import, 1)
+
+          old_reasoner = "        self.reasoner=build_reasoner_from_env(layout=layout) if reasoner is _AUTO else reasoner\n"
+          new_reasoner = (
+              old_reasoner
+              + "        local_runtime=getattr(self.reasoner,'runtime',None) if self.reasoner else None\n"
+              + "        self._live_environment=(\n"
+              + "            LiveEnvironmentAwareness(local_runtime) if isinstance(local_runtime,LocalModelRuntime) else None\n"
+              + "        )\n"
+          )
+          if text.count(old_reasoner) != 1:
+              raise SystemExit('Pilot reasoner construction seam drifted')
+          text = text.replace(old_reasoner, new_reasoner, 1)
+
+          old_status = (
+              "    @property\n"
+              "    def cognitive_status(self)->str:\n"
+              "        return getattr(self.reasoner,'name','deterministic-only') if self.reasoner else 'deterministic-only'\n"
+          )
+          new_status = old_status + '''\n    def live_resource_inventory(self, policy:ResourcePolicy, *, placement:str='gorxu')->dict[str,Any]:\n        \"\"\"Return fresh bounded local-resource state without activating anything.\n\n        A Pilot without a bound LocalModelRuntime reports the local live-resource\n        surface unavailable rather than fabricating discovery or availability.\n        \"\"\"\n        if self._live_environment is None:\n            return {\n                'schema':'grox-live-environment-inventory-v1',\n                'status':'unavailable',\n                'placement':placement,\n                'resources':[],\n                'authority_changed':False,\n                'auto_activation':False,\n            }\n        inventory=self._live_environment.inventory(policy,placement=placement).to_dict()\n        return {'status':'ok',**inventory}\n\n    def select_live_resource(self, policy:ResourcePolicy, *, placement:str='gorxu')->LiveResourceSnapshot:\n        \"\"\"Select within explicit policy; selection never loads or activates.\"\"\"\n        if self._live_environment is None:\n            raise ResourceSelectionError('Pilot has no bound local model runtime for live-resource selection')\n        return self._live_environment.select(policy,placement=placement)\n'''
+          if text.count(old_status) != 1:
+              raise SystemExit('Pilot cognitive-status seam drifted')
+          text = text.replace(old_status, new_status, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+          python -m compileall -q src tests
+          git diff --check
+
+      - name: Commit Pilot binding and self-delete
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/live-environment-pilot-bind-temp.yml
+          git config user.name 'VESSAXOR'
+          git config user.email 'vessaxor@gmail.com'
+          git add src/grox/pilot.py .github/workflows/live-environment-pilot-bind-temp.yml
+          git diff --cached --check
+          mapfile -t paths < <(git diff --cached --name-only)
+          printf 'staged=%s\n' "${paths[*]}"
+          test "${#paths[@]}" -eq 2
+          test "${paths[0]}" = '.github/workflows/live-environment-pilot-bind-temp.yml'
+          test "${paths[1]}" = 'src/grox/pilot.py'
+          git commit -m 'Expose bounded live resources through Pilot GorXu'
+          git push origin HEAD:live-environment-awareness-local-runtime
