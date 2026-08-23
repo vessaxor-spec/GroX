@@ -1,0 +1,156 @@
+name: Hosted Cognition Stewardship Sync Temp
+
+on:
+  push:
+    branches:
+      - stewardship-hosted-cognition-awareness-qualified
+    paths:
+      - .github/.stewardship-hosted-cognition-trigger
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: stewardship-hosted-cognition-awareness-qualified
+          fetch-depth: 0
+      - name: Reconcile canonical stewardship records
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_exact(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one replacement seam, found {count}: {old[:100]!r}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          doctrine = 'docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md'
+          replace_exact(
+              doctrine,
+              '**Status:** ROADMAP-BOUND / IMPLEMENTATION IN PROGRESS / FIRST LOCAL-RUNTIME + GOVERNED TOOL GATEWAY AWARENESS EXITS QUALIFIED',
+              '**Status:** ROADMAP-BOUND / IMPLEMENTATION IN PROGRESS / LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION AWARENESS EXITS QUALIFIED',
+          )
+          replace_exact(
+              doctrine,
+              'The qualified local-runtime exit alone did **not** establish remote/cloud provider discovery, governed tool/application awareness, authorized connection awareness, broader operational capability-surface awareness, or adaptive startup/resource routing. Canonical issue #122 / PR #123 now separately qualify read-only awareness for the existing governed A5 Tool Gateway workspace/network/browser/MCP surface, while preserving sealed-Mission authorization and no-auto-invocation boundaries. This still does **not** establish ambient application/process scanning, arbitrary tool discovery, remote/cloud cognition-provider discovery, authorized external-connection discovery, broader operational capability awareness, or adaptive startup/resource routing.',
+              'The qualified local-runtime exit alone did **not** establish remote/cloud provider discovery, governed tool/application awareness, authorized connection awareness, broader operational capability-surface awareness, or adaptive startup/resource routing. Canonical issue #122 / PR #123 separately qualify read-only awareness for the existing governed A5 Tool Gateway workspace/network/browser/MCP surface, while preserving sealed-Mission authorization and no-auto-invocation boundaries. Canonical issue #125 / PR #126 now additionally qualify fresh privacy-safe awareness for hosted/session cognition providers already bound to the current GorXu/Crew cognition seats. Binding, authorization, current readiness, qualification/fit, existing binding selection, and prior observation remain separate; prior remote execution never becomes current remote readiness. These exits still do **not** establish ambient application/process scanning, arbitrary tool discovery, unbound remote/cloud provider discovery, current remote reachability qualification, authorized external-connection discovery, broader operational capability awareness, or adaptive startup/resource routing.',
+          )
+          replace_exact(
+              doctrine,
+              'The first bounded local-runtime implementation exit is **QUALIFIED** through canonical PRs #119 and #120. The governed Tool Gateway capability-awareness exit is also **QUALIFIED** through issue #122 / PR #123 for the existing A5 workspace/network/browser/MCP surface. Broader issue #115 remains open. Subsequent slices should expand awareness only through the smallest evidence-backed resource surface that preserves the same state and authority separation; adaptive selection complexity should not outrun fresh discovery, authorization, readiness, qualification, observation, and reconstitution evidence.',
+              'The first bounded local-runtime implementation exit is **QUALIFIED** through canonical PRs #119 and #120. The governed Tool Gateway capability-awareness exit is **QUALIFIED** through issue #122 / PR #123 for the existing A5 workspace/network/browser/MCP surface. The bound hosted/session cognition-awareness exit is **QUALIFIED** through issue #125 / PR #126 for providers already bound to GorXu or Crew cognition seats, without network probing or routing changes. Broader issue #115 remains open. Subsequent slices should expand awareness only through the smallest evidence-backed resource surface that preserves the same state and authority separation; adaptive selection complexity should not outrun fresh discovery, authorization, readiness, qualification, observation, and reconstitution evidence.',
+          )
+          tool_evidence = '**Governed Tool Gateway awareness qualification evidence:** issue #122 / PR #123 merged as `main@bdbd08a11bb93594dbf84c2fc0e81266ca6dc243`; canonical tree `a4a537983d242988b747d04668055cbd0c2e047b` exactly matches CI-tested synthetic merge tree `a4a537983d242988b747d04668055cbd0c2e047b`. Exact-head CI #394 / `32653017307` passed Wheel plus Python 3.11–3.14; Python 3.12 recorded Vessel Health 10 PASS, pytest 354 passed / 2 skipped / 449 subtests, unittest 356 / 2 skipped, mutations 14/14 + 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex integrated qualification PASS. The permanent `tool-capability-mission-authorization` mutation was killed, proving host-enabled/readiness state cannot imply Mission authorization without sealed Order context.'
+          replace_exact(
+              doctrine,
+              tool_evidence,
+              tool_evidence + '\n\n**Bound hosted/session cognition awareness qualification evidence:** issue #125 / PR #126 merged as `main@6be03b46ac02d121c8ef7e90c25341504fd1d020`; canonical tree `50bf3333eabb066a74b0e62538ea741d7038a106` exactly matches CI-tested synthetic merge tree `50bf3333eabb066a74b0e62538ea741d7038a106`. Exact-head CI #410 / `32661093847` passed Wheel plus Python 3.11–3.14; Python 3.12 recorded Vessel Health 10 PASS, pytest 364 passed / 2 skipped / 449 subtests, unittest 366 / 2 skipped, critical mutations 15/15 plus 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex integrated qualification PASS. The permanent `hosted-cognition-authorization-gate` mutation was killed. The qualified boundary is inventory of already-bound hosted/session cognition resources only: qualification remains independent of authorization, prior remote observation does not imply current readiness, and no provider invocation, catalog discovery, credential validation, switching, fallback, startup, or adaptive routing was added.',
+          )
+
+          roadmap = 'docs/stewardship/ROADMAP.md'
+          replace_exact(
+              roadmap,
+              'and qualified governed Tool Gateway capability-awareness exit**.',
+              'qualified governed Tool Gateway capability-awareness exit, and qualified bound hosted/session cognition-awareness exit**.',
+          )
+          replace_exact(
+              roadmap,
+              '- 12 high-consequence production invariants continuously mutation-proven.',
+              '- 15 high-consequence production invariants continuously mutation-proven.',
+          )
+          gateway_bullet = '- **Live Environment Awareness governed Tool Gateway capability-awareness exit is QUALIFIED:** issue #122 / PR #123 add fresh read-only Pilot-owned awareness for the existing A5 isolated-workspace, network-fetch, browser-capture, and MCP capability surface. Host policy/readiness remains distinct from exact sealed-Mission authorization; inventory invokes no governed capability, creates no Mission, persists no new operational state, and widens no authority. Exact-head CI #394 / `32653017307` passed Wheel plus Python 3.11–3.14; Python 3.12 recorded pytest 354 passed / 2 skipped / 449 subtests, unittest 356 / 2 skipped, mutations 14/14 + 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex PASS. PR #123 merged as `main@bdbd08a11bb93594dbf84c2fc0e81266ca6dc243`; canonical tree `a4a537983d242988b747d04668055cbd0c2e047b` exactly matches the CI-tested synthetic merge tree. Parent issue #115 remains broader and open.'
+          replace_exact(
+              roadmap,
+              gateway_bullet,
+              gateway_bullet + '\n- **Live Environment Awareness bound hosted/session cognition-awareness exit is QUALIFIED:** issue #125 / PR #126 add fresh privacy-safe Pilot-owned awareness for hosted/session cognition providers already bound to GorXu or Crew cognition seats. Binding/discovery, authorization, current readiness, qualification/fit, existing binding selection, and prior observation remain distinct; qualification does not imply authorization, prior remote execution does not imply current remote readiness, and inventory performs no callback/network invocation or provider switching. Exact-head CI #410 / `32661093847` passed Wheel plus Python 3.11–3.14; Python 3.12 recorded pytest 364 passed / 2 skipped / 449 subtests, unittest 366 / 2 skipped, mutations 15/15 + 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex PASS. PR #126 merged as `main@6be03b46ac02d121c8ef7e90c25341504fd1d020`; canonical tree `50bf3333eabb066a74b0e62538ea741d7038a106` exactly matches the CI-tested synthetic merge tree. Parent issue #115 remains broader and open; remote reachability/freshness and adaptive provider routing remain unqualified.',
+          )
+          replace_exact(
+              roadmap,
+              '**Status: IMPLEMENTATION IN PROGRESS — NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS NEXT.**',
+              '**Status: IMPLEMENTATION IN PROGRESS — NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS — LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION AWARENESS EXITS QUALIFIED.**',
+          )
+          replace_exact(
+              roadmap,
+              '**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** The first bounded local cognition/runtime exit is QUALIFIED through PRs #119 and #120; broader awareness remains IN PROGRESS. Continue only from canonical runtime evidence and preserve discovery/authorization/readiness/qualification/selection/observation separation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified.',
+              '**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** The bounded local cognition/runtime exit is QUALIFIED through PRs #119 and #120, governed Tool Gateway awareness is QUALIFIED through issue #122 / PR #123, and bound hosted/session cognition awareness is QUALIFIED through issue #125 / PR #126. Broader awareness remains IN PROGRESS: unbound provider discovery, current remote reachability/freshness, authorized external-connection awareness, and adaptive provider/resource routing remain unqualified. Continue only from canonical runtime evidence and preserve discovery/authorization/readiness/qualification/selection/observation separation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified.',
+          )
+          replace_exact(
+              roadmap,
+              'The current strategic program is **Native Cognition Independence Program 001 — implementation in progress**. **NCI-1, NCI-2, and NCI-3 are qualified. Live Environment Awareness (issue #115) is implementation in progress, with its first bounded local cognition/runtime exit qualified through canonical PRs #119 and #120. Broader provider/tool/application/connection awareness and adaptive resource routing remain unqualified. NCI-4 remains the next numbered Native Cognition Independence stage after this Commander-designated priority unless later replanned.**',
+              'The current strategic program is **Native Cognition Independence Program 001 — implementation in progress**. **NCI-1, NCI-2, and NCI-3 are qualified. Live Environment Awareness (issue #115) is implementation in progress, with the bounded local cognition/runtime exit qualified through PRs #119/#120, governed Tool Gateway awareness qualified through #122/#123, and bound hosted/session cognition awareness qualified through #125/#126. Unbound provider discovery, current remote reachability/freshness, authorized external-connection awareness, broader application/process awareness, and adaptive resource routing remain unqualified. NCI-4 remains the next numbered Native Cognition Independence stage after this Commander-designated priority unless later replanned.**',
+          )
+          replace_exact(
+              roadmap,
+              'Native Cognition Independence Program 001 remains active with **NCI-1 through NCI-3 qualified; Live Environment Awareness in progress and its first bounded local-runtime exit qualified before the next numbered NCI stage**;',
+              'Native Cognition Independence Program 001 remains active with **NCI-1 through NCI-3 qualified; Live Environment Awareness in progress with local-runtime, governed Tool Gateway, and bound hosted/session cognition awareness exits qualified before the next numbered NCI stage**;',
+          )
+
+          tracker = 'docs/stewardship/progress-tracker.md'
+          replace_exact(
+              tracker,
+              '**Current verified canonical source after governed Tool Gateway awareness qualification:** `main@bdbd08a11bb93594dbf84c2fc0e81266ca6dc243`',
+              '**Current verified canonical source after bound hosted/session cognition awareness qualification:** `main@6be03b46ac02d121c8ef7e90c25341504fd1d020`',
+          )
+          replace_exact(
+              tracker,
+              '**Current canonical runtime-qualified tree:** `a4a537983d242988b747d04668055cbd0c2e047b`',
+              '**Current canonical runtime-qualified tree:** `50bf3333eabb066a74b0e62538ea741d7038a106`',
+          )
+          replace_exact(
+              tracker,
+              '**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **354 passed, 2 skipped, 449 subtests**; unittest **356 OK, 2 skipped**; mutations **14/14**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS',
+              '**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **364 passed, 2 skipped, 449 subtests**; unittest **366 OK, 2 skipped**; mutations **15/15**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS',
+          )
+          replace_exact(
+              tracker,
+              '**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; FIRST LOCAL-RUNTIME EXIT + GOVERNED TOOL GATEWAY AWARENESS EXIT QUALIFIED**',
+              '**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION AWARENESS EXITS QUALIFIED**',
+          )
+          replace_exact(
+              tracker,
+              '**Next bounded implementation:** **Continue issue #115 beyond the qualified local-runtime and governed Tool Gateway awareness exits using the smallest repository-native evidence-backed surface; remote/cloud cognition/provider discovery-readiness-qualification-selection and authorized external-connection awareness remain unqualified, and adaptive routing must not outrun those gates.**',
+              '**Next bounded implementation:** **Continue issue #115 beyond the qualified local-runtime, governed Tool Gateway, and bound hosted/session cognition awareness exits using the smallest repository-native evidence-backed surface. Current remote reachability/freshness, unbound provider discovery, authorized external-connection awareness, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**',
+          )
+          replace_exact(
+              tracker,
+              '**Status: IMPLEMENTATION IN PROGRESS — NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; FIRST LOCAL-RUNTIME EXIT QUALIFIED**',
+              '**Status: IMPLEMENTATION IN PROGRESS — NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION AWARENESS EXITS QUALIFIED**',
+          )
+          replace_exact(
+              tracker,
+              '**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** The first bounded local cognition/runtime exit is QUALIFIED through PRs #119 and #120; broader awareness remains IN PROGRESS. Continue only from canonical runtime evidence and preserve discovery/authorization/readiness/qualification/selection/observation separation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified.',
+              '**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** The local cognition/runtime exit is QUALIFIED through PRs #119/#120, governed Tool Gateway awareness through #122/#123, and bound hosted/session cognition awareness through #125/#126. Broader awareness remains IN PROGRESS; current remote reachability/freshness, unbound provider discovery, authorized external-connection awareness, and adaptive provider/resource routing remain unqualified. Continue only from canonical runtime evidence and preserve discovery/authorization/readiness/qualification/selection/observation separation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified.',
+          )
+          replace_exact(
+              tracker,
+              '- current protected source includes Inspect-only selective deep craft, a CI-qualified provider-neutral controlled Crew cognition seam, one qualified live locally trained neural action-selection provider, the complete qualified NCI-1 local runtime/install/model foundation, and qualified NCI-2 Qwen3-4B built-in local seed cognition; broader NCI-3 offline conversational GorXu cognition, a public one-command installer, and desktop launcher remain future qualification targets.',
+              '- current protected source includes Inspect-only selective deep craft, a CI-qualified provider-neutral controlled Crew cognition seam, one qualified live locally trained neural action-selection provider, the complete qualified NCI-1 local runtime/install/model foundation, qualified NCI-2 Qwen3-4B built-in local seed cognition, qualified NCI-3 offline GorXu conversational cognition, and qualified Live Environment Awareness exits for local runtime, governed Tool Gateway, and currently bound hosted/session cognition resources; a public one-command installer, desktop launcher, current remote reachability qualification, unbound provider discovery, and adaptive resource routing remain future qualification targets.',
+          )
+          nci3_exit = '**NCI-3 EXIT: QUALIFIED.** Offline, the Commander can converse with GorXu, state a natural-language objective, receive bounded interpretation/planning, route governed Crew work, complete a high-risk Inspect Mission, receive synthesis, and obtain independent verification in the defined qualification profile. This does not qualify every assistant/tool surface offline, a public installer/desktop launcher, NCI-4 neural Crew evolution, model self-activation, a new release/tag, or A8.'
+          hosted_section = '''## Live Environment Awareness — issue #115\n\n**Status: IMPLEMENTATION IN PROGRESS — THREE BOUNDED AWARENESS SURFACES QUALIFIED**\n\n- local cognition/runtime inventory, policy-constrained selection, execution observation, durable identity-only history, and reconstitution semantics are qualified through PRs #119/#120;\n- governed Tool Gateway capability awareness for the existing A5 workspace/network/browser/MCP surface is qualified through issue #122 / PR #123;\n- bound hosted/session cognition awareness is qualified through issue #125 / PR #126;\n- PR #126 canonical merge is `main@6be03b46ac02d121c8ef7e90c25341504fd1d020`; canonical tree `50bf3333eabb066a74b0e62538ea741d7038a106` exactly matches the CI-tested synthetic tree;\n- exact-head CI #410 / `32661093847` passed Wheel and Python 3.11–3.14; Python 3.12 recorded Vessel Health 10 PASS, pytest 364 passed / 2 skipped / 449 subtests, unittest 366 / 2 skipped, mutations 15/15 + 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex PASS;\n- bound hosted/session providers are inventoried without callback/network invocation; authorization and qualification are exact independent policy inputs; prior remote observation cannot become current readiness;\n- remote provider reachability/freshness, unbound provider/catalog discovery, authorized external-connection awareness, broader process/application awareness, and adaptive resource routing remain unqualified.\n\nParent issue #115 remains open. No release, NCI, Apex, A8, command, Crew, Repair, Tool Gateway, verifier, or Commander-authority change is implied.'''
+          replace_exact(tracker, nci3_exit, nci3_exit + '\n\n' + hosted_section)
+          PY
+          git diff --check
+          git diff -- docs/stewardship/ROADMAP.md docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md docs/stewardship/progress-tracker.md
+      - name: Remove temporary workflow and trigger
+        shell: bash
+        run: |
+          rm -f .github/workflows/stewardship-hosted-cognition-sync-temp.yml
+          rm -f .github/.stewardship-hosted-cognition-trigger
+      - name: Commit stewardship reconciliation only
+        shell: bash
+        run: |
+          git config user.name 'VESSAXOR'
+          git config user.email 'vessaxor@gmail.com'
+          git add docs/stewardship/ROADMAP.md docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md docs/stewardship/progress-tracker.md .github/workflows/stewardship-hosted-cognition-sync-temp.yml .github/.stewardship-hosted-cognition-trigger
+          git diff --cached --check
+          git commit -m 'Stewardship: record hosted cognition awareness qualification'
+          git push origin HEAD:stewardship-hosted-cognition-awareness-qualified
