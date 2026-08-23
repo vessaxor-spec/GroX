@@ -219,10 +219,10 @@ class CognitionProviderAwareness:
             )
             transport = "host_session"
         elif is_remote:
-            ready = observed
-            readiness_status = "remote_execution_observed" if observed else "remote_reachability_unproven"
+            ready = False
+            readiness_status = "remote_reachability_unproven"
             readiness_reason = (
-                "existing provider observability records a completed invocation in this bound provider instance"
+                "prior provider execution was observed, but current reachability and credential validity were not revalidated"
                 if observed
                 else "remote provider is configured but reachability and credential validity were not probed"
             )
@@ -254,7 +254,7 @@ class CognitionProviderAwareness:
             "readiness_status": readiness_status,
             "readiness_reason": readiness_reason,
             "qualification_recorded": qualification_recorded,
-            "qualified_fit": bool(authorized and ready and qualification_recorded),
+            "qualified_fit": bool(ready and qualification_recorded),
             "selected": True,
             "selection_source": "existing_pilot_binding",
             "observed": observed,
