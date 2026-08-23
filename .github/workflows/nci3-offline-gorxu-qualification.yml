@@ -1,0 +1,282 @@
+name: NCI-3 Offline GorXu Qualification
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/grox/cli.py'
+      - 'src/grox/pilot.py'
+      - 'src/grox/reasoning/**'
+      - 'src/grox/llama_cpp_backend.py'
+      - 'src/grox/native_model_runtime.py'
+      - 'src/grox/model_store.py'
+      - 'configs/models/registry.json'
+      - 'scripts/nci3_offline_gorxu_qualification.py'
+      - '.github/workflows/nci3-offline-gorxu-qualification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nci3-offline-gorxu-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  installed-offline-gorxu:
+    name: Installed offline GorXu conversation + governed Mission
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'nci-3-offline-gorxu-cognition'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Verify qualification host floor
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -s)" = Linux
+          test "$(uname -m)" = x86_64
+          command -v ip
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+          mem_kib = 0
+          for line in Path('/proc/meminfo').read_text().splitlines():
+              if line.startswith('MemTotal:'):
+                  mem_kib = int(line.split()[1])
+                  break
+          mem_bytes = mem_kib * 1024
+          free_bytes = shutil.disk_usage('/tmp').free
+          print({'memory_bytes': mem_bytes, 'free_disk_bytes': free_bytes})
+          assert mem_bytes >= 8 * 1024**3, f'host RAM below NCI-3 CPU floor: {mem_bytes}'
+          assert free_bytes >= 8 * 1024**3, f'host disk below NCI-3 working floor: {free_bytes}'
+          PY
+
+      - name: Build and install non-editable GroX wheel
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/nci3-wheel /tmp/nci3-env /tmp/nci3-harness /tmp/nci3-user
+          mkdir -p /tmp/nci3-wheel /tmp/nci3-harness /tmp/nci3-user
+          python -m pip wheel --no-deps --wheel-dir /tmp/nci3-wheel .
+          python -m venv /tmp/nci3-env
+          /tmp/nci3-env/bin/python -m pip install /tmp/nci3-wheel/grox_vessel-*.whl
+          /tmp/nci3-env/bin/python -m pip check
+          cp scripts/nci3_offline_gorxu_qualification.py /tmp/nci3-harness/
+          (cd /tmp && /tmp/nci3-env/bin/python - <<'PY'
+          from pathlib import Path
+          import grox
+          path = Path(grox.__file__).resolve()
+          print(path)
+          assert 'site-packages' in path.parts, path
+          assert not str(path).startswith(str(Path('${{ github.workspace }}').resolve())), path
+          PY
+          )
+
+      - name: Commission fresh installed Vessel
+        shell: bash
+        run: |
+          set -euo pipefail
+          export HOME=/tmp/nci3-user/home
+          export XDG_CONFIG_HOME=/tmp/nci3-user/config
+          mkdir -p "$HOME" "$XDG_CONFIG_HOME"
+          (cd /tmp && /tmp/nci3-env/bin/python -m grox.cli init \
+            --workspace /tmp/nci3-user/GroX \
+            --non-interactive \
+            --json) | tee /tmp/nci3-init.json
+          test -f /tmp/nci3-user/GroX/.grox/workspace.json
+          test -d /tmp/nci3-user/GroX/models
+          test -f /tmp/nci3-user/config/grox/workspace.json
+
+      - name: Acquire and verify pinned llama.cpp runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/nci3-llama /tmp/nci3-llama.tar.gz /tmp/nci3-release.json
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            https://api.github.com/repos/ggml-org/llama.cpp/releases/tags/b10218 \
+            -o /tmp/nci3-release.json
+          python - <<'PY' >/tmp/nci3-llama-asset.json
+          import json
+          from pathlib import Path
+          release = json.loads(Path('/tmp/nci3-release.json').read_text())
+          exact = 'llama-b10218-bin-ubuntu-x64.tar.gz'
+          matches = [a for a in release.get('assets', []) if a.get('name') == exact]
+          assert len(matches) == 1, (exact, [a.get('name') for a in release.get('assets', [])])
+          asset = matches[0]
+          digest = asset.get('digest')
+          assert isinstance(digest, str) and digest.startswith('sha256:'), asset
+          print(json.dumps({'name': exact, 'url': asset['browser_download_url'], 'digest': digest}))
+          PY
+          llama_url=$(python -c "import json; print(json.load(open('/tmp/nci3-llama-asset.json'))['url'])")
+          llama_digest=$(python -c "import json; print(json.load(open('/tmp/nci3-llama-asset.json'))['digest'].split(':',1)[1])")
+          test "$llama_digest" = '78ec7a1964710918030e85c132a0995b10b07e4f43001bdf54fe0fd48d1eb85b'
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            "$llama_url" -o /tmp/nci3-llama.tar.gz
+          observed=$(sha256sum /tmp/nci3-llama.tar.gz | awk '{print $1}')
+          test "$observed" = "$llama_digest"
+          mkdir -p /tmp/nci3-llama
+          tar -xzf /tmp/nci3-llama.tar.gz -C /tmp/nci3-llama
+          llama_cli=$(find /tmp/nci3-llama -type f -name llama-cli -print -quit)
+          test -n "$llama_cli"
+          chmod +x "$llama_cli"
+          "$llama_cli" --version 2>&1 | tee /tmp/nci3-llama-version.txt
+          grep -Eq 'version:[[:space:]]*10218[[:space:]]*\(de69995[0-9a-f]*\)' /tmp/nci3-llama-version.txt
+          printf '%s' "$llama_cli" >/tmp/nci3-llama-cli-path.txt
+          printf '%s' "$llama_digest" >/tmp/nci3-llama-asset-sha256.txt
+
+      - name: Acquire exact Qwen3-4B Q4_K_M artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/nci3-download
+          model=/tmp/nci3-download/Qwen3-4B-Q4_K_M.gguf
+          rm -f "$model"
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/a9a60d009fa7ff9606305047c2bf77ac25dbec49/Qwen3-4B-Q4_K_M.gguf?download=true' \
+            -o "$model"
+          test "$(stat -c '%s' "$model")" = '2497280256'
+          observed=$(sha256sum "$model" | awk '{print $1}')
+          test "$observed" = '7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5'
+          echo "Qwen model identity PASS: bytes=$(stat -c '%s' "$model") sha256=$observed"
+
+      - name: Admit exact model into persistent store and seed Commander workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          export HOME=/tmp/nci3-user/home
+          export XDG_CONFIG_HOME=/tmp/nci3-user/config
+          (cd /tmp && MODEL_SOURCE_FILE=/tmp/nci3-download/Qwen3-4B-Q4_K_M.gguf /tmp/nci3-env/bin/python - <<'PY'
+          import os
+          from pathlib import Path
+          from grox.model_store import PersistentModelStore, ProvisioningSpec, ModelArtifactState
+          spec = ProvisioningSpec(
+              model_id='qwen3-4b-q4-k-m-seed-v1',
+              target_filename='Qwen3-4B-Q4_K_M.gguf',
+              source='https://huggingface.co/Qwen/Qwen3-4B-GGUF',
+              source_revision='a9a60d009fa7ff9606305047c2bf77ac25dbec49',
+              license_id='Apache-2.0',
+              sha256='7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5',
+              byte_size=2497280256,
+          )
+          store = PersistentModelStore.from_workspace()
+          result = store.provision_from_file(spec, Path(os.environ['MODEL_SOURCE_FILE']))
+          report = store.inspect(spec)
+          assert report.state is ModelArtifactState.AVAILABLE, report.to_dict()
+          workspace = store.root.parent / 'workspace'
+          (workspace / 'README.md').write_text(
+              '# Commander Workspace Reliability Note\n\n'
+              'The local backup job has no configured restore verification.\n'
+              'A restore drill has not yet been recorded.\n',
+              encoding='utf-8',
+          )
+          tests = workspace / 'tests'
+          tests.mkdir(parents=True, exist_ok=True)
+          (tests / 'test_smoke.py').write_text(
+              'import unittest\n\nclass CommanderWorkspaceSmoke(unittest.TestCase):\n'
+              '    def test_workspace_is_testable(self):\n        self.assertTrue(True)\n',
+              encoding='utf-8',
+          )
+          print({'provisioning': result.to_dict(), 'model': report.to_dict()})
+          PY
+          )
+          rm -f /tmp/nci3-download/Qwen3-4B-Q4_K_M.gguf
+          test -f /tmp/nci3-user/GroX/models/Qwen3-4B-Q4_K_M.gguf
+
+      - name: Prove loopback-only isolated network namespace
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat >/tmp/nci3-netns-exec.sh <<'SH'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          ip link set lo up
+          echo '--- isolated links ---' >&2
+          ip -brief link >&2
+          echo '--- isolated routes ---' >&2
+          ip route >&2
+          non_loopback=$(ip -o link show | grep -vE '^[0-9]+: lo:' || true)
+          test -z "$non_loopback"
+          ! ip route | grep -Eq '^default([[:space:]]|$)'
+          exec "$@"
+          SH
+          chmod +x /tmp/nci3-netns-exec.sh
+          sudo unshare --net /tmp/nci3-netns-exec.sh /bin/sh -c \
+            'test -d /sys/class/net/lo; ! ip route | grep -Eq "^default([[:space:]]|$)"'
+
+      - name: Exercise installed GorXu ask startup through explicit local binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          llama_cli=$(cat /tmp/nci3-llama-cli-path.txt)
+          sudo env \
+            HOME=/tmp/nci3-user/home \
+            XDG_CONFIG_HOME=/tmp/nci3-user/config \
+            GROX_REASONER_PROVIDER=local-llama-cpp \
+            GROX_REASONER_MODEL=qwen3-4b-q4-k-m-seed-v1 \
+            GROX_LLAMA_CPP_EXECUTABLE="$llama_cli" \
+            GROX_LOCAL_MODEL_LOAD=explicit \
+            -u OPENAI_API_KEY \
+            -u ANTHROPIC_API_KEY \
+            -u GOOGLE_API_KEY \
+            -u GEMINI_API_KEY \
+            unshare --net /tmp/nci3-netns-exec.sh \
+            /tmp/nci3-env/bin/python -m grox.cli ask \
+              'Why does restore verification matter even when backups exist?' \
+            | tee /tmp/nci3-installed-ask.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('/tmp/nci3-installed-ask.json').read_text())
+          assert result['status'] == 'answered', result
+          assert result['mission_created'] is False, result
+          assert result['crew_delegated'] is False, result
+          assert result['authority_changed'] is False, result
+          text = result['response'].lower()
+          assert 'backup' in text and 'restore' in text and len(text.strip()) >= 40, result
+          print({'installed_ask': 'PASS', 'provider': result['provider']})
+          PY
+
+      - name: Run installed offline NCI-3 qualification
+        shell: bash
+        run: |
+          set -euo pipefail
+          llama_cli=$(cat /tmp/nci3-llama-cli-path.txt)
+          sudo env \
+            HOME=/tmp/nci3-user/home \
+            XDG_CONFIG_HOME=/tmp/nci3-user/config \
+            -u OPENAI_API_KEY \
+            -u ANTHROPIC_API_KEY \
+            -u GOOGLE_API_KEY \
+            -u GEMINI_API_KEY \
+            unshare --net /tmp/nci3-netns-exec.sh \
+            /tmp/nci3-env/bin/python /tmp/nci3-harness/nci3_offline_gorxu_qualification.py \
+              --config-dir /tmp/nci3-user/config/grox \
+              --llama-cli "$llama_cli" \
+              --forbidden-source-root '${{ github.workspace }}' \
+            | tee /tmp/nci3-live-qualification.json
+          grep -q '"status": "PASS"' /tmp/nci3-live-qualification.json
+          grep -q '"network_isolated": true' /tmp/nci3-live-qualification.json
+          grep -q '"authority_changed": false' /tmp/nci3-live-qualification.json
+          grep -q '"auto_activation": false' /tmp/nci3-live-qualification.json
+          grep -q '"mission_created": false' /tmp/nci3-live-qualification.json
+
+      - name: Emit qualification identities
+        if: always()
+        shell: bash
+        run: |
+          echo "candidate=${GITHUB_SHA}"
+          echo "pr_head=${{ github.event.pull_request.head.sha }}"
+          if test -f /tmp/nci3-llama-asset-sha256.txt; then
+            echo "llama_release_asset_sha256=$(cat /tmp/nci3-llama-asset-sha256.txt)"
+          fi
+          if test -f /tmp/nci3-llama-version.txt; then cat /tmp/nci3-llama-version.txt; fi
+          if test -f /tmp/nci3-installed-ask.json; then cat /tmp/nci3-installed-ask.json; fi
+          if test -f /tmp/nci3-live-qualification.json; then cat /tmp/nci3-live-qualification.json; fi
