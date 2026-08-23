@@ -1,6 +1,6 @@
 # GroX Roadmap Doctrine 001 — Live Environment Awareness
 
-**Status:** ROADMAP-BOUND / IMPLEMENTATION IN PROGRESS / FIRST LOCAL-RUNTIME + GOVERNED TOOL GATEWAY AWARENESS EXITS QUALIFIED
+**Status:** ROADMAP-BOUND / IMPLEMENTATION IN PROGRESS / LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION AWARENESS EXITS QUALIFIED
 
 **Placement:** NCI-3 is qualified. Live Environment Awareness is the Commander-designated immediate bounded workstream before the next numbered Native Cognition Independence stage, unless later repository evidence supports replanning.
 
@@ -74,7 +74,7 @@ GroX should preserve durable evidence about prior execution and qualification wh
 
 Historical evidence may inform selection. It must not substitute for current readiness where current readiness is required.
 
-## Canonical local-runtime foundation and first-exit state
+## Canonical local-runtime foundation and qualified awareness state
 
 NCI-3 established reusable bounded primitives. Canonical PRs #119 and #120 extended those primitives into the qualified first bounded Live Environment Awareness exit for defined local cognition/runtime resources:
 
@@ -85,15 +85,15 @@ NCI-3 established reusable bounded primitives. Canonical PRs #119 and #120 exten
 - observed provider/model/backend/artifact identity on qualified local execution;
 - reconstitution that clears active model state and reports current readiness without silently preserving prior activation.
 
-For defined local cognition/runtime resources, canonical PRs #119 and #120 now establish a fresh live-resource inventory; explicit Discovered / Authorized / Ready / Qualified-Fit / Selected / Observed separation; policy-constrained candidate fallback; fail-closed selection; actual execution identity/configuration observation; durable identity-only observation history; and volatile selected/observed invalidation with fresh readiness discovery on reconstitution. Historical observations are explicitly non-authoritative for current readiness.
+For defined local cognition/runtime resources, canonical PRs #119 and #120 establish a fresh live-resource inventory; explicit Discovered / Authorized / Ready / Qualified-Fit / Selected / Observed separation; policy-constrained candidate fallback; fail-closed selection; actual execution identity/configuration observation; durable identity-only observation history; and volatile selected/observed invalidation with fresh readiness discovery on reconstitution. Historical observations are explicitly non-authoritative for current readiness.
 
-The qualified local-runtime exit alone did **not** establish remote/cloud provider discovery, governed tool/application awareness, authorized connection awareness, broader operational capability-surface awareness, or adaptive startup/resource routing. Canonical issue #122 / PR #123 now separately qualify read-only awareness for the existing governed A5 Tool Gateway workspace/network/browser/MCP surface, while preserving sealed-Mission authorization and no-auto-invocation boundaries. This still does **not** establish ambient application/process scanning, arbitrary tool discovery, remote/cloud cognition-provider discovery, authorized external-connection discovery, broader operational capability awareness, or adaptive startup/resource routing.
+The qualified local-runtime exit alone did **not** establish remote/cloud provider discovery, governed tool/application awareness, authorized connection awareness, broader operational capability-surface awareness, or adaptive startup/resource routing. Canonical issue #122 / PR #123 separately qualify read-only awareness for the existing governed A5 Tool Gateway workspace/network/browser/MCP surface, while preserving sealed-Mission authorization and no-auto-invocation boundaries. Canonical issue #125 / PR #126 now additionally qualify fresh privacy-safe awareness for hosted/session cognition providers already bound to the current GorXu/Crew cognition seats. Binding, authorization, current readiness, qualification/fit, existing binding selection, and prior observation remain separate; prior remote execution never becomes current remote readiness. These exits still do **not** establish ambient application/process scanning, arbitrary tool discovery, unbound remote/cloud provider discovery, current remote reachability qualification, authorized external-connection discovery, broader operational capability awareness, or adaptive startup/resource routing.
 
 ## Sequencing
 
-NCI-3 is **QUALIFIED** through issue #113 / PR #114 and its exact-tree canonical merge. Live Environment Awareness is now the current bounded architectural workstream tracked by issue #115.
+NCI-3 is **QUALIFIED** through issue #113 / PR #114 and its exact-tree canonical merge. Live Environment Awareness is the current bounded architectural workstream tracked by issue #115.
 
-The first bounded local-runtime implementation exit is **QUALIFIED** through canonical PRs #119 and #120. The governed Tool Gateway capability-awareness exit is also **QUALIFIED** through issue #122 / PR #123 for the existing A5 workspace/network/browser/MCP surface. Broader issue #115 remains open. Subsequent slices should expand awareness only through the smallest evidence-backed resource surface that preserves the same state and authority separation; adaptive selection complexity should not outrun fresh discovery, authorization, readiness, qualification, observation, and reconstitution evidence.
+The bounded local-runtime implementation exit is **QUALIFIED** through canonical PRs #119 and #120. The governed Tool Gateway capability-awareness exit is **QUALIFIED** through issue #122 / PR #123 for the existing A5 workspace/network/browser/MCP surface. The bound hosted/session cognition-awareness exit is **QUALIFIED** through issue #125 / PR #126 for providers already bound to GorXu or Crew cognition seats, without network probing or routing changes. Broader issue #115 remains open. Subsequent slices should expand awareness only through the smallest evidence-backed resource surface that preserves the same state and authority separation; adaptive selection complexity should not outrun fresh discovery, authorization, readiness, qualification, observation, and reconstitution evidence.
 
 Recommended first exit boundary:
 
@@ -109,6 +109,8 @@ Recommended first exit boundary:
 **First-exit qualification evidence:** PR #119 merged as `631f7d2086ae6a5d51308f052025c75032ca047b`, establishing the local runtime inventory/state-selection seam and permanent authorization mutation proof. PR #120 merged as `c2e6de3b7a061abfa25a6fbe37b9621cb9370773`, canonical tree `2bd8dc19d71d27a805d500177cf4952843fb09d4`, exactly matching CI-tested synthetic merge tree `2bd8dc19d71d27a805d500177cf4952843fb09d4`. Exact-head CI #381 / `32651553449` passed Wheel plus Python 3.11–3.14; Python 3.12 recorded Vessel Health 10 PASS, pytest 347 passed / 2 skipped / 449 subtests, unittest 349 / 2 skipped, mutations 13/13 + 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex integrated qualification PASS.
 
 **Governed Tool Gateway awareness qualification evidence:** issue #122 / PR #123 merged as `main@bdbd08a11bb93594dbf84c2fc0e81266ca6dc243`; canonical tree `a4a537983d242988b747d04668055cbd0c2e047b` exactly matches CI-tested synthetic merge tree `a4a537983d242988b747d04668055cbd0c2e047b`. Exact-head CI #394 / `32653017307` passed Wheel plus Python 3.11–3.14; Python 3.12 recorded Vessel Health 10 PASS, pytest 354 passed / 2 skipped / 449 subtests, unittest 356 / 2 skipped, mutations 14/14 + 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex integrated qualification PASS. The permanent `tool-capability-mission-authorization` mutation was killed, proving host-enabled/readiness state cannot imply Mission authorization without sealed Order context.
+
+**Bound hosted/session cognition awareness qualification evidence:** issue #125 / PR #126 merged as `main@6be03b46ac02d121c8ef7e90c25341504fd1d020`; canonical tree `50bf3333eabb066a74b0e62538ea741d7038a106` exactly matches CI-tested synthetic merge tree `50bf3333eabb066a74b0e62538ea741d7038a106`. Exact-head CI #410 / `32661093847` passed Wheel plus Python 3.11–3.14; Python 3.12 recorded Vessel Health 10 PASS, pytest 364 passed / 2 skipped / 449 subtests, unittest 366 / 2 skipped, critical mutations 15/15 plus 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex integrated qualification PASS. The permanent `hosted-cognition-authorization-gate` mutation was killed. The qualified boundary is inventory of already-bound hosted/session cognition resources only: qualification remains independent of authorization, prior remote observation does not imply current readiness, and no provider invocation, catalog discovery, credential validation, switching, fallback, startup, or adaptive routing was added.
 
 NCI-4 remains the next numbered Native Cognition Independence stage after this Commander-designated bounded priority unless later repository evidence supports replanning. This doctrine does not renumber or pre-qualify NCI-4 through NCI-9.
 
