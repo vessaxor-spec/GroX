@@ -50,7 +50,7 @@ class CognitionProviderAwarenessTests(unittest.TestCase):
         )["resources"][0]
         self.assertFalse(qualified_only["authorized"])
         self.assertTrue(qualified_only["qualification_recorded"])
-        self.assertFalse(qualified_only["qualified_fit"])
+        self.assertTrue(qualified_only["qualified_fit"])
 
         authorized_only = awareness.inventory(
             policy=CognitionProviderPolicy(authorized_ids=frozenset({resource_id}))
@@ -89,16 +89,29 @@ class CognitionProviderAwarenessTests(unittest.TestCase):
         self.assertEqual(item["details"]["model"], "gpt-test-model")
         self.assertEqual(item["details"]["endpoint"], "https://example.test/v1/responses")
 
-    def test_existing_remote_observability_marks_observed_without_authorizing(self):
+    def test_existing_remote_observability_does_not_become_current_readiness_or_authorization(self):
         provider = OpenAIResponsesProvider(api_key="k", model="gpt-configured")
         provider._last_usage = CognitiveUsage(provider=provider.name, model="gpt-observed")
         inventory = CognitionProviderAwareness(reasoner=provider).inventory()
         item = inventory["resources"][0]
         self.assertTrue(item["observed"])
-        self.assertTrue(item["ready"])
-        self.assertEqual(item["readiness_status"], "remote_execution_observed")
+        self.assertFalse(item["ready"])
+        self.assertEqual(item["readiness_status"], "remote_reachability_unproven")
+        self.assertIn("not revalidated", item["readiness_reason"])
         self.assertEqual(item["observed_identity"], {"provider": provider.name, "model": "gpt-observed"})
         self.assertFalse(item["authorized"])
+        self.assertFalse(item["qualified_fit"])
+
+    def test_remote_qualification_record_does_not_override_unproven_readiness(self):
+        provider = OpenAIResponsesProvider(api_key="k", model="gpt-qualified-history")
+        awareness = CognitionProviderAwareness(reasoner=provider)
+        resource_id = awareness.inventory()["resources"][0]["resource_id"]
+        item = awareness.inventory(
+            policy=CognitionProviderPolicy(qualified_ids=frozenset({resource_id}))
+        )["resources"][0]
+        self.assertTrue(item["qualification_recorded"])
+        self.assertFalse(item["authorized"])
+        self.assertFalse(item["ready"])
         self.assertFalse(item["qualified_fit"])
 
     def test_crew_disclosure_observability_is_privacy_minimized_and_inventory_never_invokes(self):
