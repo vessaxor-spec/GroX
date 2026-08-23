@@ -13,7 +13,7 @@ from .tools.layout_gateway import LayoutToolGateway
 from .runtime.executor import CrewExecutor
 from .mission_control.core import MissionControl
 from .verification.core import IndependentVerifier
-from .reasoning import ReasoningError, build_reasoner_from_env
+from .reasoning import AssistantResponse, ReasoningError, build_reasoner_from_env
 from .graph import MissionGraphPlan
 from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
@@ -47,7 +47,7 @@ class PilotGorXu:
         self.intelligence=LivingCompanyIntelligence(self.store,self.roster)
         self.exception_loop=ExecutiveExceptionLoop(self.durable)
         self.evaluation=OrchestrationEvaluator(self.store,self.durable,self.roster)
-        self.reasoner=build_reasoner_from_env() if reasoner is _AUTO else reasoner
+        self.reasoner=build_reasoner_from_env(layout=layout) if reasoner is _AUTO else reasoner
 
     @property
     def cognitive_status(self)->str:
@@ -84,6 +84,46 @@ class PilotGorXu:
             return brief,None,self._reasoner_usage()
         except (ReasoningError,ValueError,TypeError) as e:
             return None,str(e),self._reasoner_usage()
+
+    def ask(self, message: str) -> dict[str, Any]:
+        """Return one direct GorXu assistant response without creating a Mission.
+
+        Direct cognition is advisory text only. It cannot route Crew, issue a
+        Mission Order, mutate the Vessel, or widen authority.
+        """
+        if not isinstance(message, str) or not message.strip():
+            raise ValueError("Commander input must be a non-empty string")
+        if len(message) > 32768:
+            raise ValueError("Commander input exceeds the bounded direct-assistance ceiling")
+        provider = self.cognitive_status
+        if not self.reasoner:
+            return {
+                "status": "cognition_unavailable", "commander_input": message, "response": None,
+                "provider": provider, "error": "no cognitive provider is configured",
+                "mission_created": False, "crew_delegated": False, "authority_changed": False,
+            }
+        responder = getattr(self.reasoner, "respond", None)
+        if not callable(responder):
+            return {
+                "status": "cognition_unavailable", "commander_input": message, "response": None,
+                "provider": provider, "error": "configured cognitive provider has no direct-assistance capability",
+                "mission_created": False, "crew_delegated": False, "authority_changed": False,
+            }
+        try:
+            turn = responder(message)
+            if not isinstance(turn, AssistantResponse):
+                raise ReasoningError("direct-assistance provider returned the wrong contract type")
+        except (ReasoningError, ValueError, TypeError) as exc:
+            return {
+                "status": "cognition_unavailable", "commander_input": message, "response": None,
+                "provider": provider, "error": str(exc),
+                "mission_created": False, "crew_delegated": False, "authority_changed": False,
+            }
+        return {
+            "status": "answered", "commander_input": turn.commander_input, "response": turn.response,
+            "provider": provider, "usage": self._reasoner_usage(),
+            "mission_created": False, "crew_delegated": False, "authority_changed": False,
+        }
 
     def _reconcile_mode(self,directive:str,explicit:MissionMode|None,brief)->MissionMode:
         policy=self.mission_control.infer_mode(directive,explicit)

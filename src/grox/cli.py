@@ -12,6 +12,7 @@ from .installation import (
     workspace_status,
 )
 from .persistence import PersistenceManager
+from .reasoning import ReasoningError
 from .reconstitution import ReconstitutionPlanner
 from .runtime_layout import VesselLayout
 from .vessel import VesselRootError, resolve_vessel_root
@@ -131,7 +132,7 @@ def bridge(p):
         except (EOFError,KeyboardInterrupt): print(); break
         if not line: continue
         if line in {'/exit','/quit'}: break
-        if line=='/help': print("/status /roster /missions /show <id> /exit | plain text = Mission directive"); continue
+        if line=='/help': print("/status /roster /missions /show <id> /ask <question> /exit | plain text = Mission directive"); continue
         if line=='/status': status(p); continue
         if line=='/roster':
             for d,s in zip(p.roster.all(),[]): pass
@@ -142,11 +143,17 @@ def bridge(p):
             for m in p.store.recent_missions(): print(f"{m['mission_id']} {m['status']:20} {m['directive']}")
             continue
         if line.startswith('/show '): dump(p.store.mission(line.split(maxsplit=1)[1])); continue
+        if line.startswith('/ask '):
+            result=p.ask(line.split(maxsplit=1)[1])
+            if result.get('status')=='answered': print(f"GorXu> {result['response']}")
+            else: dump(result)
+            continue
         dump(p.command(line))
 
 def main(argv=None):
     ap=argparse.ArgumentParser(prog='grox'); sp=ap.add_subparsers(dest='cmd')
     sp.add_parser('status'); sp.add_parser('roster'); sp.add_parser('missions'); sp.add_parser('bridge')
+    ask=sp.add_parser('ask'); ask.add_argument('message')
     init=sp.add_parser('init'); init.add_argument('--workspace'); init.add_argument('--config-dir'); init.add_argument('--non-interactive',action='store_true'); init.add_argument('--json',action='store_true',dest='json_output')
     ws=sp.add_parser('workspace'); ws.add_argument('--config-dir'); ws.add_argument('--json',action='store_true',dest='json_output')
     he=sp.add_parser('health'); he.add_argument('--json',action='store_true',dest='json_output')
@@ -173,6 +180,7 @@ def main(argv=None):
         p=pilot()
         if ns.cmd in (None,'bridge'): bridge(p); return
         if ns.cmd=='status': status(p); return
+        if ns.cmd=='ask': dump(p.ask(ns.message)); return
         if ns.cmd=='roster':
             states={x['crew_id']:x for x in p.store.crew_states()}
             for d in p.roster.all(): print(f"{d.crew_id:30} {d.division:14} {states[d.crew_id]['status']:8} tours={states[d.crew_id]['tours']} caps={','.join(sorted(d.capabilities))}")
@@ -183,7 +191,7 @@ def main(argv=None):
         elif ns.cmd=='graph-mission':
             plan=json.loads(Path(ns.plan).read_text())
             dump(p.command_graph(ns.directive,plan=plan,risk=RiskClass(ns.risk) if ns.risk else None,allow_repair=ns.allow_repair,plan_source=ns.plan_source))
-    except InstallationError as exc:
+    except (InstallationError, ReasoningError) as exc:
         ap.error(str(exc))
 
 if __name__=='__main__': main()

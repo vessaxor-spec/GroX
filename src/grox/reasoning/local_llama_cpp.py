@@ -4,7 +4,7 @@ import json
 from typing import Any
 
 from .base import CognitiveUsage, ReasoningError
-from .contracts import MissionInterpretation
+from .contracts import AssistantResponse, MissionInterpretation
 from ..native_model_runtime import LocalModelRuntime, ModelInvocationError, ModelRuntimeError
 
 
@@ -56,6 +56,25 @@ space ::= | " " | "\n"{1,2} [ \t]{0,20}
 '''
 
 
+_ASSISTANT_SYSTEM = """You are bounded local cognition serving Pilot GorXu, the Commander's personal AI assistant inside GroX.
+Answer the Commander's question directly, concisely, and usefully.
+You possess no command, routing, execution, mutation, tool, permission, or model-activation authority.
+Do not claim that you used tools, inspected files, accessed the network, or observed external state unless that information is supplied in the Commander input.
+Preserve commander_input exactly as supplied.
+Return at most three concise sentences in response.
+Return only the required JSON object; do not emit private chain-of-thought.
+"""
+
+_ASSISTANT_RESPONSE_GBNF = r"""root ::= "{" space commander-input-kv "," space response-kv "}" space
+char ::= [^"\\\x7F\x00-\x1F] | [\\] (["\\bfnrt] | "u" [0-9a-fA-F]{4})
+commander-string ::= "\"" char* "\"" space
+response-string ::= "\"" char{1,1200} "\"" space
+commander-input-kv ::= "\"commander_input\"" space ":" space commander-string
+response-kv ::= "\"response\"" space ":" space response-string
+space ::= | " " | "\n"{1,2} [ \t]{0,20}
+"""
+
+
 class LocalLlamaCppReasoningProvider:
     """Use an explicitly loaded local model through GroX's native runtime.
 
@@ -103,6 +122,54 @@ class LocalLlamaCppReasoningProvider:
 
     def usage_snapshot(self) -> CognitiveUsage | None:
         return self._last_usage
+
+    def respond(self, message: str) -> AssistantResponse:
+        self._last_usage = None
+        if not isinstance(message, str) or not message.strip():
+            raise ReasoningError("Commander input must be a non-empty string")
+        if len(message) > 32768:
+            raise ReasoningError("Commander input exceeds the bounded direct-assistance ceiling")
+        prompt = (
+            _ASSISTANT_SYSTEM
+            + "\nCommander input follows verbatim between markers.\n"
+            + "<commander-input>\n"
+            + message
+            + "\n</commander-input>\n\n"
+            + "Produce the direct Commander-facing response now."
+        )
+        try:
+            invocation = self.runtime.invoke(
+                self.model_id,
+                placement="gorxu",
+                payload={
+                    "prompt": prompt,
+                    "json_schema": AssistantResponse.json_schema(),
+                    "gbnf_grammar": _ASSISTANT_RESPONSE_GBNF,
+                },
+            )
+        except (ModelInvocationError, ModelRuntimeError) as exc:
+            raise ReasoningError(f"local direct-assistance provider failure: {exc}") from exc
+
+        if invocation.get("model_id") != self.model_id:
+            raise ReasoningError("local direct-assistance invocation returned the wrong model identity")
+        if invocation.get("placement") != "gorxu":
+            raise ReasoningError("local direct-assistance invocation returned the wrong cognition placement")
+        if invocation.get("authority_changed") is not False:
+            raise ReasoningError("local direct-assistance invocation reported an authority change")
+        output = invocation.get("output")
+        if not isinstance(output, dict):
+            raise ReasoningError("local direct-assistance invocation returned no structured backend output")
+        text = output.get("text")
+        if not isinstance(text, str) or not text.strip():
+            raise ReasoningError("local direct-assistance backend returned no output text")
+        try:
+            raw = json.loads(text)
+            response = AssistantResponse.from_mapping(raw, expected_input=message)
+        except (json.JSONDecodeError, TypeError, ValueError) as exc:
+            raise ReasoningError(f"invalid local direct-assistance output: {exc}") from exc
+
+        self._last_usage = CognitiveUsage(provider=self.name, model=self.model_id)
+        return response
 
     def interpret(self, directive: str, *, roster: list[dict[str, Any]]) -> MissionInterpretation:
         self._last_usage = None
