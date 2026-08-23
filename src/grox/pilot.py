@@ -19,6 +19,7 @@ from .live_environment import (
 )
 from .native_model_runtime import LocalModelRuntime
 from .tool_awareness import ToolCapabilityAwareness
+from .cognition_awareness import CognitionProviderAwareness, CognitionProviderPolicy
 from .graph import MissionGraphPlan
 from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
@@ -97,6 +98,13 @@ class PilotGorXu:
     def live_tool_capability_inventory(self, *, order:MissionOrder|None=None)->dict[str,Any]:
         """Return fresh governed A5 capability state without invoking tools."""
         return self._tool_awareness.inventory(order=order)
+
+    def live_cognition_provider_inventory(self, *, policy:CognitionProviderPolicy|None=None)->dict[str,Any]:
+        """Return fresh hosted cognition binding state without invoking providers."""
+        crew_provider=getattr(self.executor,'cognition_provider',None)
+        return CognitionProviderAwareness(
+            reasoner=self.reasoner, crew_provider=crew_provider
+        ).inventory(policy=policy)
 
     def _required_caps(self, mode:MissionMode)->list[str]:
         return {'inspect':['repo_read'],'repair':['repo_read','repo_write'],'verify':['repo_read','verify'],'execute':['repo_read']}[mode.value]
