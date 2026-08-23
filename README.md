@@ -196,8 +196,8 @@ GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational E
 | Post-release source hardening | Mission Outcome Truthfulness: scan-only execution is no longer represented as Commander-objective delivery; mutation/rollback state is reported conservatively |
 | Post-release Crew evolution | Selective deep craft + bounded Crew memory + provider-neutral Inspect cognition seam + **one qualified live locally trained neural action-selection provider** |
 | Strategic program | **Native Cognition Independence Program 001 — implementation in progress** |
-| NCI installation foundation | **NCI-1A + NCI-1B + NCI-1C canonical**: workspace commissioning, separated runtime/state/work roles, packaged runtime assets, and standalone installed GorXu |
-| NCI next bounded runtime slice | **NCI-1D**: native model registry + local inference runtime contract |
+| NCI installed/offline baseline | **NCI-1 and NCI-2 QUALIFIED**: commissioned installed Vessel, separated runtime/state/work roles, packaged runtime assets, persistent local-model storage, native model runtime, and bounded installed/offline GorXu cognition |
+| NCI active bounded runtime slice | **NCI-3 qualification candidate**: direct local GorXu conversation plus the existing governed Mission/Crew path; canonical qualification remains pending exact-head CI/live proof, review, and merge-tree equivalence |
 | Native cognition target | Minimum useful offline personal-assistant + Crew-orchestration cognition owned by GroX; vendor models optional capability multipliers rather than required pilots |
 | Apex posture | **No A8 is defined or implied.** Native cognition work must preserve the existing Apex regression boundary. |
 | Canonical current status | [`docs/stewardship/progress-tracker.md`](docs/stewardship/progress-tracker.md) |
