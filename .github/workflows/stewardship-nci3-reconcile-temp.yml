@@ -1,0 +1,186 @@
+name: Temporary NCI-3 Stewardship Reconciliation
+
+on:
+  push:
+    branches: [stewardship-nci3-qualified]
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: stewardship-nci3-qualified
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Reconcile NCI-3 stewardship truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly one match, found {count}')
+              return text.replace(old, new, 1)
+
+          roadmap_path = Path('docs/stewardship/ROADMAP.md')
+          roadmap = roadmap_path.read_text(encoding='utf-8')
+
+          roadmap = replace_once(
+              roadmap,
+              'and a **qualified NCI-1 native cognition runtime + local Vessel foundation plus qualified NCI-2 built-in local seed cognition**.',
+              'and a **qualified NCI-1 native cognition runtime + local Vessel foundation, qualified NCI-2 built-in local seed cognition, and qualified NCI-3 offline GorXu conversational cognition**.',
+              'roadmap current-position qualification summary',
+          )
+          roadmap = replace_once(
+              roadmap,
+              "NCI-1 qualifies the local runtime/install/model-control foundation required for that direction, and NCI-2 now qualifies a bounded built-in local language seed for an installed personal-assistant + orchestration cognitive Mission without a vendor credential or external network. This does **not** qualify the broader NCI-3 offline GorXu conversational operating profile, a public installer/desktop launcher, or a GroX-pretrained foundation model.",
+              "NCI-1 qualifies the local runtime/install/model-control foundation required for that direction, NCI-2 qualifies a bounded built-in local language seed for an installed personal-assistant + orchestration cognitive Mission without a vendor credential or external network, and NCI-3 now qualifies one bounded offline GorXu conversational operating profile: direct Commander↔GorXu assistance without Mission creation, natural-language interpretation/planning, governed Crew delegation, high-risk Inspect execution, synthesis, independent verification, and fail-closed reconstitution without vendor credentials or an external route. This does **not** qualify NCI-4 neural Crew evolution, every personal-assistant/tool surface as offline, a public installer/desktop launcher, or a GroX-pretrained foundation model.",
+              'roadmap current-position strategic paragraph',
+          )
+          roadmap = replace_once(
+              roadmap,
+              '\n## Apex critical path',
+              "\n- **NCI-3 is QUALIFIED:** issue #113 / PR #114 qualify the bounded offline GorXu conversational profile on the same exact Qwen3-4B Q4_K_M seed and pinned llama.cpp b10218 path. Exact-head GroX CI #353 / `32642076863` and NCI-3 Offline GorXu Qualification #7 / `32642076857` passed on PR head `900d6bbb7f2683844a2182095cce67f374ae4592`; installed `grox ask` answered locally without creating a Mission, delegating Crew, or changing authority; the same offline profile then completed a governed high-risk Inspect Mission with `application-security-engineer`, synthesis, independent PASS by `code-reviewer`, no mutation or cognition degradation, and reconstitution to zero active models. PR #114 merged as `main@a21c9999d220952bff2397754e66c9480de3a750`; canonical tree `e1d89e1c2e64b3422abb4db72f5263eb757bca03` exactly matches the CI-tested synthetic merge tree.\n\n## Apex critical path",
+              'roadmap completed-foundation NCI-3 insertion',
+          )
+          roadmap = replace_once(
+              roadmap,
+              '**Status: IMPLEMENTATION IN PROGRESS — NCI-1 + NCI-2 QUALIFIED; NCI-3 NEXT.**',
+              '**Status: IMPLEMENTATION IN PROGRESS — NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS NEXT.**',
+              'roadmap NCI program status',
+          )
+          roadmap = replace_once(
+              roadmap,
+              "NCI-2 does not qualify the broader NCI-3 conversational/offline GorXu profile, a public installer or desktop launcher, model self-activation, a release/tag change, or A8.",
+              "NCI-2 alone did not qualify the broader NCI-3 conversational/offline GorXu profile; NCI-3 is now separately qualified through issue #113 / PR #114. Neither qualification implies a public installer or desktop launcher, model self-activation, a release/tag change, NCI-4, or A8.",
+              'roadmap NCI-2 non-claim transition',
+          )
+          roadmap = replace_once(
+              roadmap,
+              "#### NCI-3 — Offline GorXu cognition\n\nMove GorXu from vendor/session-required cognition toward a native local reasoning path while keeping the deterministic authority plane unchanged and preserving GorXu as the Commander's principal assistant interface and Crew orchestrator.\n\nExit evidence: offline, the Commander can converse with GorXu, state an objective in natural language, receive useful interpretation/planning, route bounded work to Crew when useful, execute a high-risk Inspect Mission, receive synthesis, and obtain independent verification under a defined minimum hardware profile.",
+              "#### NCI-3 — Offline GorXu cognition — COMPLETE / QUALIFIED\n\nMove GorXu from vendor/session-required cognition toward a native local reasoning path while keeping the deterministic authority plane unchanged and preserving GorXu as the Commander's principal assistant interface and Crew orchestrator.\n\nExit evidence: offline, the Commander can converse with GorXu, state an objective in natural language, receive useful interpretation/planning, route bounded work to Crew when useful, execute a high-risk Inspect Mission, receive synthesis, and obtain independent verification under a defined minimum hardware profile.\n\n**NCI-3 exit evidence: PASSED.** Issue #113 / PR #114 established the full bounded exit on Linux x86_64 with >=8 GiB RAM/free working disk, CPU-only operation and at most four inference threads. The non-editable installed wheel used the exact Qwen seed `qwen3-4b-q4-k-m-seed-v1` / SHA-256 `7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5` and pinned llama.cpp b10218 / `de699957b`; network execution was loopback-only with vendor credentials absent. Direct `grox ask` returned a useful local response with `mission_created=false`, `crew_delegated=false`, and `authority_changed=false`. A natural-language high-risk Inspect objective then produced local interpretation/planning, routed through the existing deterministic authority path to `application-security-engineer`, completed without mutation, returned Pilot synthesis, and received independent verification PASS from `code-reviewer`. Reconstitution cleared the active Qwen model without auto-activation or authority change. Exact-head CI #353 / `32642076863` and live qualification #7 / `32642076857` passed on `900d6bbb7f2683844a2182095cce67f374ae4592`; canonical merge `a21c9999d220952bff2397754e66c9480de3a750` has tree `e1d89e1c2e64b3422abb4db72f5263eb757bca03`, exactly equal to the CI-tested synthetic merge tree.\n\nNCI-3 does not qualify every personal-assistant/tool surface for offline use, a public one-command installer or desktop launcher, NCI-4 neural Crew evolution, model self-activation, a new release/tag, or A8.",
+              'roadmap NCI-3 qualification section',
+          )
+          roadmap = replace_once(
+              roadmap,
+              '- that NCI-2 qualification means GroX has a GroX-pretrained foundation model or the broader NCI-3 offline GorXu cognition profile;',
+              '- that NCI-3 qualification means GroX has a GroX-pretrained foundation model, every assistant/tool surface offline, a public installer/desktop launcher, or NCI-4 neural Crew evolution;',
+              'roadmap deliberately-not-implied NCI-3',
+          )
+          roadmap = replace_once(
+              roadmap,
+              'including Mission Outcome Truthfulness, Selective Deep-Craft Crew Cognition, the live local neural Crew qualification, qualified NCI-1 local runtime/install/model foundations, and qualified NCI-2 built-in local seed cognition—remain source evolution beyond the immutable release',
+              'including Mission Outcome Truthfulness, Selective Deep-Craft Crew Cognition, the live local neural Crew qualification, qualified NCI-1 local runtime/install/model foundations, qualified NCI-2 built-in local seed cognition, and qualified NCI-3 offline GorXu conversational cognition—remain source evolution beyond the immutable release',
+              'roadmap post-apex qualification list',
+          )
+          roadmap = replace_once(
+              roadmap,
+              '**NCI-1 and NCI-2 are qualified; NCI-3 is next.**',
+              '**NCI-1, NCI-2, and NCI-3 are qualified. The Commander-designated immediate next bounded priority is Live Environment Awareness (issue #115; doctrine PR #116 to be reconciled against post-NCI-3 truth). NCI-4 remains the next numbered Native Cognition Independence stage after that priority unless later replanned.**',
+              'roadmap post-apex frontier',
+          )
+          roadmap = replace_once(
+              roadmap,
+              'NCI-1 standalone installed/local-model qualification and NCI-2 built-in local seed qualification may be described only within their exact bounded claims.',
+              'NCI-1 standalone installed/local-model qualification, NCI-2 built-in local seed qualification, and NCI-3 offline GorXu conversational qualification may be described only within their exact bounded claims.',
+              'roadmap standing exclusion claim boundary',
+          )
+          roadmap = replace_once(
+              roadmap,
+              'Canonical source has since advanced through protected-main hardening, bounded post-Apex evolution, and **qualified NCI-1 native cognition runtime/local Vessel foundations** without moving the immutable release tag. Native Cognition Independence Program 001 remains active with **NCI-3 next**;',
+              'Canonical source has since advanced through protected-main hardening, bounded post-Apex evolution, **qualified NCI-1 native cognition runtime/local Vessel foundations, qualified NCI-2 built-in local seed cognition, and qualified NCI-3 offline GorXu conversational cognition** without moving the immutable release tag. Native Cognition Independence Program 001 remains active with **NCI-1 through NCI-3 qualified; Live Environment Awareness is the immediate Commander-designated priority before the next numbered NCI stage**;',
+              'roadmap release posture frontier',
+          )
+          if 'NCI-3 NEXT' in roadmap or '**NCI-3 next**' in roadmap or 'NCI-3 is next.' in roadmap:
+              raise SystemExit('roadmap still contains stale NCI-3-next wording')
+          roadmap_path.write_text(roadmap, encoding='utf-8')
+
+          tracker_path = Path('docs/stewardship/progress-tracker.md')
+          tracker = tracker_path.read_text(encoding='utf-8')
+          tracker = replace_once(
+              tracker,
+              '**Current verified canonical source after NCI-2 seed qualification:** `main@720a916b1500b3b5629724e3763d812ff16da948`',
+              '**Current verified canonical source after NCI-3 qualification:** `main@a21c9999d220952bff2397754e66c9480de3a750`',
+              'tracker canonical source',
+          )
+          tracker = replace_once(
+              tracker,
+              '**Current canonical runtime-qualified tree:** `2c8e85bc5c0c89a619b2fd61bcdaec600b268d46`',
+              '**Current canonical runtime-qualified tree:** `e1d89e1c2e64b3422abb4db72f5263eb757bca03`',
+              'tracker canonical tree',
+          )
+          tracker = replace_once(
+              tracker,
+              '**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **320 passed, 2 skipped, 449 subtests**; unittest **322 OK, 2 skipped**; mutations **12/12**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS',
+              '**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **333 passed, 2 skipped, 449 subtests**; unittest **335 OK, 2 skipped**; mutations **12/12**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS',
+              'tracker regression counts',
+          )
+          tracker = replace_once(
+              tracker,
+              '**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 QUALIFIED; NCI-3 NEXT**',
+              '**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS NEXT**',
+              'tracker strategic program',
+          )
+          tracker = replace_once(
+              tracker,
+              '**Next bounded implementation:** **NCI-3 — offline GorXu cognition**',
+              '**Next bounded implementation:** **Live Environment Awareness — issue #115; reconcile doctrine PR #116 against post-NCI-3 truth before runtime implementation**',
+              'tracker next bounded implementation',
+          )
+          tracker = replace_once(
+              tracker,
+              "**NCI-2 EXIT: QUALIFIED.** The Roadmap exit is satisfied: a fresh installed GroX can perform a bounded personal-assistant + orchestration cognitive Mission locally without a vendor credential or external network call. This does not qualify NCI-3's broader offline conversational GorXu profile, a public installer/desktop launcher, a new release, model self-activation, or A8.",
+              "**NCI-2 EXIT: QUALIFIED.** The Roadmap exit is satisfied: a fresh installed GroX can perform a bounded personal-assistant + orchestration cognitive Mission locally without a vendor credential or external network call. NCI-2 alone did not qualify NCI-3's broader offline conversational GorXu profile; NCI-3 is now separately qualified through issue #113 / PR #114. NCI-2 still does not imply a public installer/desktop launcher, a new release, model self-activation, NCI-4, or A8.\n\n## NCI-3 offline GorXu conversational cognition — issue #113 / PR #114\n\n**Status: COMPLETE — QUALIFIED — CANONICAL MERGED AND EXACT-TREE VERIFIED**\n\nNCI-3 closes the bounded offline conversational GorXu exit while preserving the existing deterministic authority plane:\n\n- final PR head `900d6bbb7f2683844a2182095cce67f374ae4592`;\n- GroX CI #353 / `32642076863`: PASS all five canonical jobs; Python 3.12 pytest **333 passed, 2 skipped, 449 subtests**, unittest **335 OK, 2 skipped**, Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**, mutations **12/12, 7/7, 9/9, 4/4, 6/6** killed, integrated Post-Apex PASS;\n- NCI-3 Offline GorXu Qualification #7 / `32642076857`: PASS;\n- non-editable installed `grox_vessel-0.8.0` outside checkout in a fresh commissioned Vessel;\n- exact Qwen seed `qwen3-4b-q4-k-m-seed-v1` / `Qwen3-4B-Q4_K_M.gguf`, 2,497,280,256 bytes, SHA-256 `7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5`;\n- exact llama.cpp b10218 / `10218 (de699957b)`, release-asset SHA-256 `78ec7a1964710918030e85c132a0995b10b07e4f43001bdf54fe0fd48d1eb85b`;\n- CPU-first qualification: Linux x86_64, >=8 GiB RAM and >=8 GiB free working disk, no accelerator required, max four inference threads;\n- loopback-only execution namespace, no non-loopback interface/default route, vendor credential variables absent;\n- installed `grox ask` returned useful local direct assistance through `grox-local-llama-cpp` with `mission_created=false`, `crew_delegated=false`, `authority_changed=false`;\n- natural-language high-risk Inspect produced local interpretation/planning and proceeded through the existing governed Mission path;\n- deterministic selected executor `application-security-engineer`; Mission/execution completed with mutation false and bounded Pilot synthesis;\n- independent verifier `code-reviewer`, PASS, different from executor;\n- no `cognition_degraded`;\n- reconstitution returned `active_after=[]`, `auto_activation=false`, `authority_changed=false`, unload errors empty;\n- independent final review found no material blocker and no Mission Control, Tool Gateway, Repair, verifier-core, Crew-eligibility, or reconstitution-policy widening;\n- PR #114 merged as `main@a21c9999d220952bff2397754e66c9480de3a750`;\n- canonical merge tree `e1d89e1c2e64b3422abb4db72f5263eb757bca03` exactly matches CI-tested synthetic merge `f9e400610e8639ec3b70484555f760cb11cdbc73` tree `e1d89e1c2e64b3422abb4db72f5263eb757bca03`;\n- issue #113 closed completed.\n\n**NCI-3 EXIT: QUALIFIED.** Offline, the Commander can converse with GorXu, state a natural-language objective, receive bounded interpretation/planning, route governed Crew work, complete a high-risk Inspect Mission, receive synthesis, and obtain independent verification in the defined qualification profile. This does not qualify every assistant/tool surface offline, a public installer/desktop launcher, NCI-4 neural Crew evolution, model self-activation, a new release/tag, or A8.",
+              'tracker NCI-3 qualification block',
+          )
+          tracker = replace_once(
+              tracker,
+              '**Status: IMPLEMENTATION IN PROGRESS — NCI-1 + NCI-2 QUALIFIED; NCI-3 NEXT**',
+              '**Status: IMPLEMENTATION IN PROGRESS — NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS NEXT**',
+              'tracker NCI strategic status',
+          )
+          tracker = replace_once(
+              tracker,
+              '3. **NCI-3 — Offline GorXu cognition — NEXT:** qualify local conversational interaction, natural-language objective interpretation, planning/synthesis, and governed Crew delegation while deterministic authority remains authoritative.',
+              '3. **NCI-3 — Offline GorXu cognition: QUALIFIED.** Issue #113 / PR #114 qualify local conversational interaction, natural-language objective interpretation, planning/synthesis, governed Crew delegation, high-risk Inspect execution, and independent verification while deterministic authority remains authoritative.\n\n**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** Reconcile doctrine PR #116 against the canonical post-NCI-3 Vessel before implementation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified.',
+              'tracker staged roadmap NCI-3/frontier',
+          )
+          if 'NCI-3 NEXT' in tracker or 'NCI-3 — offline GorXu cognition**' in tracker:
+              raise SystemExit('tracker still contains stale NCI-3-next wording')
+          tracker_path.write_text(tracker, encoding='utf-8')
+          PY
+
+          git diff --check
+          git diff -- docs/stewardship/ROADMAP.md docs/stewardship/progress-tracker.md
+
+      - name: Commit only canonical stewardship records and self-delete
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/stewardship-nci3-reconcile-temp.yml
+          git config user.name 'VESSAXOR'
+          git config user.email 'vessaxor@gmail.com'
+          git add docs/stewardship/ROADMAP.md docs/stewardship/progress-tracker.md .github/workflows/stewardship-nci3-reconcile-temp.yml
+          git diff --cached --check
+          mapfile -t paths < <(git diff --cached --name-only)
+          printf 'staged=%s\n' "${paths[*]}"
+          test "${#paths[@]}" -eq 3
+          test "${paths[0]}" = '.github/workflows/stewardship-nci3-reconcile-temp.yml'
+          test "${paths[1]}" = 'docs/stewardship/ROADMAP.md'
+          test "${paths[2]}" = 'docs/stewardship/progress-tracker.md'
+          git commit -m 'Stewardship: record NCI-3 qualification'
+          git push origin HEAD:stewardship-nci3-qualified
