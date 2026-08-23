@@ -4,8 +4,8 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after NCI-3 qualification:** `main@a21c9999d220952bff2397754e66c9480de3a750`
-**Current canonical runtime-qualified tree:** `e1d89e1c2e64b3422abb4db72f5263eb757bca03`
+**Current verified canonical source after Live Environment Awareness first local-runtime exit qualification:** `main@c2e6de3b7a061abfa25a6fbe37b9621cb9370773`
+**Current canonical runtime-qualified tree:** `2bd8dc19d71d27a805d500177cf4952843fb09d4`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,9 +15,9 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **333 passed, 2 skipped, 449 subtests**; unittest **335 OK, 2 skipped**; mutations **12/12**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
-**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS NEXT**
-**Next bounded implementation:** **Live Environment Awareness — issue #115; reconcile doctrine PR #116 against post-NCI-3 truth before runtime implementation**
+**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **347 passed, 2 skipped, 449 subtests**; unittest **349 OK, 2 skipped**; mutations **13/13**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
+**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; FIRST LOCAL-RUNTIME EXIT QUALIFIED**
+**Next bounded implementation:** **Continue issue #115 beyond the qualified local-runtime exit using the smallest evidence-backed resource-awareness surface; remote/cloud provider, governed tool/application, authorized-connection awareness, and adaptive routing remain unqualified pending recalibration.**
 
 ## GorXu command/infrastructure invariant — current synchronization
 
@@ -337,7 +337,7 @@ This doctrine constrains NCI-1 onward. It adds no runtime authority, does not cl
 
 ## Native Cognition Independence Program 001 — strategic direction
 
-**Status: IMPLEMENTATION IN PROGRESS — NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS NEXT**
+**Status: IMPLEMENTATION IN PROGRESS — NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; FIRST LOCAL-RUNTIME EXIT QUALIFIED**
 
 Commander intent establishes a long-term native-cognition direction under the Prime Function:
 
@@ -371,7 +371,7 @@ Canonical staged roadmap in `docs/stewardship/ROADMAP.md`:
 2. **NCI-2 — Built-in local seed cognition: QUALIFIED.** The exact Qwen3-4B Q4_K_M seed is qualified on the installed CPU-first path with integrity/provenance, pinned llama.cpp runtime, external-network isolation, no vendor credential, bounded GorXu cognition, Crew routing, and independent verification.
 3. **NCI-3 — Offline GorXu cognition: QUALIFIED.** Issue #113 / PR #114 qualify local conversational interaction, natural-language objective interpretation, planning/synthesis, governed Crew delegation, high-risk Inspect execution, and independent verification while deterministic authority remains authoritative.
 
-**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** Reconcile doctrine PR #116 against the canonical post-NCI-3 Vessel before implementation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified.
+**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** The first bounded local cognition/runtime exit is QUALIFIED through PRs #119 and #120; broader awareness remains IN PROGRESS. Continue only from canonical runtime evidence and preserve discovery/authorization/readiness/qualification/selection/observation separation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified.
 4. **NCI-4 — Neural Crew evolution:** evolve the qualified policy toward richer action/path/evidence/test/confidence/failure decisions with generation-by-generation comparison.
 5. **NCI-5 — Mission learning corpus and evolution registry:** structure verified operational experience into provenance-bound learning material and model ancestry without turning assistance into a data-acquisition objective.
 6. **NCI-6 — Optional external teacher/tool adapters:** allow governed external intelligence for difficult work and, where permitted, candidate teaching material without dependency or inherited authority.
