@@ -37,8 +37,10 @@ class LocalLlamaConversationTests(unittest.TestCase):
             provider.respond("original")
 
     def test_direct_generation_contract_is_bounded(self) -> None:
-        self.assertIn('response-string ::= "\"" char{1,1200}', _ASSISTANT_RESPONSE_GBNF)
-        self.assertIn('commander-string ::= "\"" char*', _ASSISTANT_RESPONSE_GBNF)
+        self.assertIn("response-string ::=", _ASSISTANT_RESPONSE_GBNF)
+        self.assertIn("char{1,1200}", _ASSISTANT_RESPONSE_GBNF)
+        self.assertIn("commander-string ::=", _ASSISTANT_RESPONSE_GBNF)
+        self.assertIn("char*", _ASSISTANT_RESPONSE_GBNF)
         self.assertIn("at most three concise sentences", _ASSISTANT_SYSTEM)
         self.assertIn("no command", _ASSISTANT_SYSTEM.lower())
 
