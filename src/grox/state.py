@@ -13,6 +13,10 @@ _RESOURCE_OBSERVATION_IDENTITY_FIELDS = frozenset({
     "model_id", "model_kind", "backend", "placement", "artifact_sha256",
     "authority_changed", "hardware",
 })
+_RESOURCE_OBSERVATION_HARDWARE_FIELDS = frozenset({
+    "system", "machine", "cpu_count", "total_memory_bytes", "accelerators",
+    "python_implementation", "python_version",
+})
 
 
 def now() -> str:
@@ -184,6 +188,30 @@ class StateStore:
         hardware = identity.get("hardware")
         if not isinstance(hardware, dict):
             raise ValueError("execution identity hardware must be a mapping")
+        hardware_keys = set(hardware)
+        unsupported_hardware = sorted(hardware_keys - _RESOURCE_OBSERVATION_HARDWARE_FIELDS)
+        if unsupported_hardware:
+            raise ValueError(f"unsupported hardware identity field(s): {unsupported_hardware}")
+        missing_hardware = sorted(_RESOURCE_OBSERVATION_HARDWARE_FIELDS - hardware_keys)
+        if missing_hardware:
+            raise ValueError(f"missing hardware identity field(s): {missing_hardware}")
+        for field in ("system", "machine", "python_implementation", "python_version"):
+            value = hardware.get(field)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"hardware identity {field} must be a non-empty string")
+        cpu_count = hardware.get("cpu_count")
+        if not isinstance(cpu_count, int) or isinstance(cpu_count, bool) or cpu_count < 1:
+            raise ValueError("hardware identity cpu_count must be a positive integer")
+        total_memory = hardware.get("total_memory_bytes")
+        if total_memory is not None and (
+            not isinstance(total_memory, int) or isinstance(total_memory, bool) or total_memory < 0
+        ):
+            raise ValueError("hardware identity total_memory_bytes must be null or a non-negative integer")
+        accelerators = hardware.get("accelerators")
+        if not isinstance(accelerators, list) or any(
+            not isinstance(item, str) or not item.strip() for item in accelerators
+        ):
+            raise ValueError("hardware identity accelerators must be a list of non-empty strings")
         encoded = json.dumps(identity, sort_keys=True)
         cur = self.db.execute(
             "INSERT INTO resource_observations(resource_id,resource_kind,placement,identity,created_at) VALUES(?,?,?,?,?)",
