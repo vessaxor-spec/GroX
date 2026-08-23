@@ -292,7 +292,9 @@ class LiveEnvironmentAwareness:
         ):
             if field in invocation:
                 identity[field] = invocation[field]
-        identity["hardware"] = self.runtime.hardware.to_dict()
+        hardware = self.runtime.hardware.to_dict()
+        hardware["accelerators"] = list(hardware.get("accelerators") or ())
+        identity["hardware"] = hardware
         if self._observation_recorder is not None:
             try:
                 self._observation_recorder(
