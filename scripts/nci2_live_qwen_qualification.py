@@ -144,7 +144,7 @@ def qualify(args: argparse.Namespace) -> None:
     backend = LlamaCppCLIBackend(
         args.llama_cli,
         context_tokens=8192,
-        max_output_tokens=256,
+        max_output_tokens=512,
         max_threads=4,
         timeout_seconds=600,
         scratch_root=scratch,
