@@ -1,0 +1,30 @@
+name: Temporary NCI-3 prompt repair
+
+on:
+  push:
+    branches: [nci-3-offline-gorxu-cognition]
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Repair generated prompt source
+        run: python scripts/nci3_repair_prompt.py
+      - name: Compile changed Python
+        run: python -m compileall -q src/grox tests
+      - name: Commit repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'VESSAXOR Stewardship'
+          git config user.email 'vessaxor@gmail.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'Repair NCI-3 direct-assistance prompt source'
+          git push origin HEAD:nci-3-offline-gorxu-cognition
