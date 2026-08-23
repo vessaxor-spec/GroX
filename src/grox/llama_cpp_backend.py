@@ -25,8 +25,8 @@ class LlamaCppCLIBackend:
     """Pinned local llama.cpp process backend.
 
     The backend never downloads models or executables, never searches PATH, and
-    never starts a network server. An explicit local executable and an already
-    verified local GGUF artifact are required before invocation.
+    never starts a network server itself. An explicit local executable and an
+    already verified local GGUF artifact are required before invocation.
     """
 
     name = "llama.cpp-cli-b10218"
@@ -152,22 +152,43 @@ class LlamaCppCLIBackend:
             raise ModelRuntimeError(f"GGUF artifact is unavailable: {path}")
         return LlamaCppHandle(model_id=manifest.model_id, artifact_path=path)
 
+    def _extract_transcript(self, transcript: str, *, prompt: str) -> str:
+        prefix = f"User:\n{prompt}\n\nAssistant:\n"
+        if not transcript.startswith(prefix):
+            raise ModelRuntimeError("llama.cpp transcript did not preserve the exact prompt boundary")
+        text = transcript[len(prefix):].strip()
+        if not text:
+            raise ModelRuntimeError("llama.cpp transcript contained no assistant response")
+        if "\nUser:\n" in text or "\nAssistant:\n" in text:
+            raise ModelRuntimeError("llama.cpp transcript contained an unexpected additional turn")
+        if len(text) > self.max_output_chars:
+            raise ModelRuntimeError("llama.cpp inference output exceeded the bounded character ceiling")
+        return text
+
     def invoke(self, handle: LlamaCppHandle, payload: Mapping[str, Any]) -> Mapping[str, Any]:
         if not isinstance(handle, LlamaCppHandle):
             raise ModelRuntimeError("llama.cpp handle is invalid")
         prompt = payload.get("prompt")
         json_schema = payload.get("json_schema")
+        grammar = payload.get("gbnf_grammar")
         if not isinstance(prompt, str) or not prompt.strip():
             raise ModelRuntimeError("llama.cpp invocation requires a non-empty prompt")
         if not isinstance(json_schema, Mapping):
             raise ModelRuntimeError("llama.cpp invocation requires a JSON-schema mapping")
         if len(prompt) > 131072:
             raise ModelRuntimeError("llama.cpp prompt exceeds the bounded character ceiling")
+        if grammar is not None:
+            if not isinstance(grammar, str) or not grammar.strip():
+                raise ModelRuntimeError("llama.cpp GBNF grammar must be a non-empty string")
+            if len(grammar) > 65536:
+                raise ModelRuntimeError("llama.cpp GBNF grammar exceeds the bounded character ceiling")
 
         schema_text = json.dumps(dict(json_schema), ensure_ascii=False, separators=(",", ":"), sort_keys=True)
         threads = min(self.max_threads, max(1, int(os.cpu_count() or 1)))
         temp_dir = str(self.scratch_root) if self.scratch_root is not None else None
         prompt_path: Path | None = None
+        grammar_path: Path | None = None
+        transcript_path: Path | None = None
         try:
             with tempfile.NamedTemporaryFile(
                 mode="w",
@@ -187,7 +208,6 @@ class LlamaCppCLIBackend:
                 str(self.executable),
                 "-m", str(handle.artifact_path),
                 "-f", str(prompt_path),
-                "-j", schema_text,
                 "--single-turn",
                 "--no-display-prompt",
                 "--no-warmup",
@@ -197,8 +217,49 @@ class LlamaCppCLIBackend:
                 "-n", str(self.max_output_tokens),
                 "-t", str(threads),
                 "--fit", "off",
+                "-dev", "none",
+                "--no-op-offload",
                 "-ngl", "0",
             ]
+
+            if grammar is None:
+                command[5:5] = ["-j", schema_text]
+            else:
+                with tempfile.NamedTemporaryFile(
+                    mode="w",
+                    encoding="utf-8",
+                    prefix="grox-llama-grammar-",
+                    suffix=".gbnf",
+                    dir=temp_dir,
+                    delete=False,
+                ) as grammar_file:
+                    grammar_file.write(grammar)
+                    grammar_file.flush()
+                    os.fsync(grammar_file.fileno())
+                    grammar_path = Path(grammar_file.name)
+                os.chmod(grammar_path, 0o600)
+                with tempfile.NamedTemporaryFile(
+                    mode="w",
+                    encoding="utf-8",
+                    prefix="grox-llama-transcript-",
+                    suffix=".txt",
+                    dir=temp_dir,
+                    delete=False,
+                ) as transcript_file:
+                    transcript_path = Path(transcript_file.name)
+                os.chmod(transcript_path, 0o600)
+                command[5:5] = ["--grammar-file", str(grammar_path)]
+                command.extend(
+                    [
+                        "--simple-io",
+                        "--reasoning", "off",
+                        "--reasoning-budget", "0",
+                        "--chat-template-kwargs", '{"enable_thinking":false}',
+                        "--skip-chat-parsing",
+                        "--output-file", str(transcript_path),
+                    ]
+                )
+
             self.last_command = tuple(command)
             try:
                 completed = subprocess.run(
@@ -218,11 +279,19 @@ class LlamaCppCLIBackend:
                 raise ModelRuntimeError(
                     f"llama.cpp inference returned {completed.returncode}: {detail}"
                 )
-            text = completed.stdout.strip()
-            if not text:
-                raise ModelRuntimeError("llama.cpp inference returned no stdout")
-            if len(text) > self.max_output_chars:
-                raise ModelRuntimeError("llama.cpp inference output exceeded the bounded character ceiling")
+
+            if grammar is None:
+                text = completed.stdout.strip()
+                if not text:
+                    raise ModelRuntimeError("llama.cpp inference returned no stdout")
+                if len(text) > self.max_output_chars:
+                    raise ModelRuntimeError("llama.cpp inference output exceeded the bounded character ceiling")
+            else:
+                if transcript_path is None or not transcript_path.is_file():
+                    raise ModelRuntimeError("llama.cpp inference did not produce the expected transcript")
+                transcript = transcript_path.read_text(encoding="utf-8")
+                text = self._extract_transcript(transcript, prompt=prompt)
+
             return {
                 "text": text,
                 "backend_version": self.expected_version,
@@ -232,8 +301,9 @@ class LlamaCppCLIBackend:
                 "cpu_only": True,
             }
         finally:
-            if prompt_path is not None:
-                prompt_path.unlink(missing_ok=True)
+            for path in (prompt_path, grammar_path, transcript_path):
+                if path is not None:
+                    path.unlink(missing_ok=True)
 
     def unload(self, handle: LlamaCppHandle) -> None:
         if not isinstance(handle, LlamaCppHandle):
