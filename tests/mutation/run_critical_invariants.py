@@ -152,6 +152,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_tool_capability_awareness.py::ToolCapabilityAwarenessTests::test_host_ready_never_implies_mission_authorization",
     ),
     MutationSpec(
+        name="hosted-cognition-authorization-gate",
+        invariant="A bound or structurally ready hosted cognition provider must never become authorized without explicit exact-resource policy.",
+        path="src/grox/cognition_awareness.py",
+        old='        authorized = resource_id in policy.authorized_ids if policy is not None else False\n',
+        new='        authorized = True if policy is None else resource_id in policy.authorized_ids\n',
+        nodeid="tests/unit/test_cognition_provider_awareness.py::CognitionProviderAwarenessTests::test_bound_session_provider_is_discovered_selected_but_not_authorized_or_observed",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
