@@ -1,6 +1,6 @@
 # GroX Architecture
 
-**Qualified release baseline:** GroX `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`. Canonical source continues on protected `main` and may advance beyond that immutable release through governed PR/CI. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. Protected source additionally has **NCI-1, NCI-2, and NCI-3 QUALIFIED** and four bounded Live Environment Awareness exits qualified: local runtime, governed Tool Gateway capability awareness, already-bound hosted/session cognition awareness, and already-bound remote origin transport freshness. These source advances do not create a new command layer, Apex stage, release, NCI-4, or A8.
+**Qualified release baseline:** GroX `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`. Canonical source continues on protected `main` and may advance beyond that immutable release through governed PR/CI. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. Protected source additionally has **NCI-1, NCI-2, and NCI-3 QUALIFIED** and five bounded Live Environment Awareness exits qualified: local runtime, governed Tool Gateway capability awareness, already-bound hosted/session cognition awareness, already-bound remote origin transport freshness, and already-bound exact endpoint-surface freshness. These source advances do not create a new command layer, Apex stage, release, NCI-4, or A8.
 
 ## Purpose
 

@@ -4,8 +4,8 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after transport exact-origin evidence-binding repair:** `main@d7024261f9c49a8b2bb95a26e5ad0a08a6d5a34a`
-**Current verified canonical tree:** `d8959016ce59dbd61cb148d974ba0c9e1d351c21`
+**Current verified canonical source after exact bound remote endpoint-surface freshness qualification:** `main@2b516b8b5e4757c216e5fe561db5325a1471f6de`
+**Current verified canonical tree:** `581b492e285f85a43680cb6315ae299b1ea85f33`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,9 +15,40 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **376 passed, 2 skipped, 455 subtests**; unittest **378 OK, 2 skipped**; mutations **17/17**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
-**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS EXITS QUALIFIED**
-**Next bounded implementation:** **Continue issue #115 beyond the four qualified bounded exits using the smallest repository-native evidence-backed surface. Provider/service readiness beyond origin transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **386 passed, 2 skipped, 463 subtests**; unittest **388 OK, 2 skipped**; mutations **18/18**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
+**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS EXITS QUALIFIED**
+**Next bounded implementation:** **Continue issue #115 beyond the five qualified bounded exits using the smallest repository-native evidence-backed surface. Credential validity, authenticated provider/service readiness, model existence/availability/fitness, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+
+## Live Environment Awareness — exact bound remote endpoint-surface freshness — issue #136 / PR #137
+
+**Status: COMPLETE — QUALIFIED — CANONICAL MERGED AND EXACT-TREE VERIFIED.**
+
+Qualified boundary:
+
+- passive cognition inventory remains zero-network and non-invoking;
+- active refresh applies only to one already-bound remote cognition resource with an exact safe current HTTP(S) endpoint;
+- the Mission Order must already be sealed and carry exact `net_fetch`, `operation=cognition_endpoint_probe`, exact current `resource_id`, exact current endpoint URL, and exact normalized origin authority;
+- host Tool Gateway policy must independently permit that origin;
+- network I/O reuses `ToolGateway.fetch_url` only and sends no provider credential, Authorization header, prompt/model request, Commander content, Crew context, secret, or cognition payload;
+- awareness discards response body/preview and retains only volatile bounded endpoint observation metadata; malformed Gateway responses fail closed as `unproven`;
+- observations bind to the exact current endpoint and origin, expire, and are replaced by failure; endpoint rebind invalidates prior evidence even when provider/model resource identity is unchanged;
+- HTTP response classification preserves evidence (`responding`, `not_found`, `server_degraded`, `unreachable`, `stale`, `unproven`) without interpreting any response as authenticated readiness;
+- remote provider `ready=False`; authorization, qualification/fit, provider selection/fallback, cognition invocation, routing, Repair, verifier, and Tool Gateway authority remain unchanged.
+
+Qualification evidence:
+
+- red-before-green test-only head `7e1b3294…`: Wheel remained green while Python 3.11–3.14 failed on the intended missing endpoint-refresh seam;
+- final PR #137 head `f86b6dff1cc73b8487ed09ce58720dc4c09f3677`;
+- exact-head GroX CI #463 / `32742888955`: PASS Wheel + Python 3.11–3.14;
+- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **386 passed, 2 skipped, 463 subtests**; unittest **388 OK, 2 skipped**; critical mutations **18/18**; health **7/7**; reconstitution **9/9**; operational drift **4/4**; source provenance **6/6**; Post-Apex PASS;
+- permanent mutation `cognition-endpoint-exact-binding`: KILLED;
+- final bounded review `5009439807`: PASS with no review threads;
+- CI-tested synthetic merge `0daa8fe53f1c3d13b7a1a61b7d5d9a18a8348488`, tree `581b492e285f85a43680cb6315ae299b1ea85f33`;
+- canonical merge `main@2b516b8b5e4757c216e5fe561db5325a1471f6de`, tree `581b492e285f85a43680cb6315ae299b1ea85f33`;
+- synthetic-to-canonical tree equality: **PASS**;
+- issue #136 closed completed; parent #115 remains **OPEN**.
+
+Still unqualified: credential validity, authenticated provider/service readiness, model existence/availability/fitness, successful cognition semantics, provider qualification, provider switching/fallback, unbound provider/catalog discovery, broader authorized external-connection/application/process awareness, and adaptive provider/resource routing. No release/package/NCI/Apex/A8 advancement occurred.
 
 ## Live Environment Awareness — bound remote cognition transport freshness — issue #128 / PR #129
 

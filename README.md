@@ -197,7 +197,7 @@ GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational E
 | Post-release Crew evolution | Selective deep craft + bounded Crew memory + provider-neutral Inspect cognition seam + **one qualified live locally trained neural action-selection provider** |
 | Strategic program | **Native Cognition Independence Program 001 — implementation in progress** |
 | NCI installed/offline baseline | **NCI-1, NCI-2, and NCI-3 QUALIFIED**: commissioned installed Vessel, separated runtime/state/work roles, packaged runtime/model assets, qualified local seed cognition, direct offline GorXu conversation, governed Crew delegation, and fail-closed reconstitution under the bounded NCI-3 profile |
-| Live Environment Awareness | **IN PROGRESS — four bounded exits QUALIFIED**: local runtime (#119/#120), governed Tool Gateway (#122/#123), bound hosted/session cognition awareness (#125/#126), and governed bound-remote origin transport freshness (#128/#129). Parent #115 remains open; provider/service readiness, credential validity, unbound discovery, broader external-connection/application awareness, and adaptive routing remain unqualified. |
+| Live Environment Awareness | **IN PROGRESS — five bounded exits QUALIFIED**: local runtime (#119/#120), governed Tool Gateway (#122/#123), bound hosted/session cognition awareness (#125/#126), governed bound-remote origin transport freshness (#128/#129), and exact bound-remote endpoint-surface freshness (#136/#137). Parent #115 remains open; credential validity, authenticated provider/service readiness, model availability/fitness, unbound discovery, broader external-connection/application awareness, and adaptive routing remain unqualified. |
 | Native cognition target | Minimum useful offline personal-assistant + Crew-orchestration cognition owned by GroX; vendor models optional capability multipliers rather than required pilots |
 | Apex posture | **No A8 is defined or implied.** Native cognition work must preserve the existing Apex regression boundary. |
 | Canonical current status | [`docs/stewardship/progress-tracker.md`](docs/stewardship/progress-tracker.md) |
@@ -226,7 +226,7 @@ Apex is an evidence-backed regression boundary, not additional authority and not
 
 Current protected evolution has added continuous proof around high-consequence controls:
 
-- **16/16** current critical-invariant mutations killed; the original Stage 1 qualification remains historically **12/12**, with four later Live Environment Awareness authority mutations extending the current matrix;
+- **18/18** current critical-invariant mutations killed; the original Stage 1 qualification remains historically **12/12**, with six later Live Environment Awareness authority/evidence mutations extending the current matrix;
 - **7/7** Stage 2 Vessel-health mutations killed;
 - **9/9** Stage 3 reconstitution mutations killed;
 - **4/4** A6 operational-drift detector mutations killed;
