@@ -24,10 +24,7 @@ jobs:
           from pathlib import Path
           targets = {
               'README.md': [('passive supported configured cognition-resource discovery (#140/#141), and configured remote cognition connection-policy awareness (#144/#145), and configured local llama.cpp readiness awareness (#148/#149)', 'passive supported configured cognition-resource discovery (#140/#141), configured remote cognition connection-policy awareness (#144/#145), and configured local llama.cpp readiness awareness (#148/#149)')],
-              'docs/architecture/ARCHITECTURE.md': [
-                  ('passive supported configured cognition-resource discovery, and configured remote cognition connection-policy awareness, and configured local llama.cpp readiness awareness.', 'passive supported configured cognition-resource discovery, configured remote cognition connection-policy awareness, and configured local llama.cpp readiness awareness.'),
-                  ('passive supported configured cognition-resource discovery (#140/#141), and configured remote cognition connection-policy awareness (#144/#145), and configured local llama.cpp readiness awareness (#148/#149).', 'passive supported configured cognition-resource discovery (#140/#141), configured remote cognition connection-policy awareness (#144/#145), and configured local llama.cpp readiness awareness (#148/#149).'),
-              ],
+              'docs/architecture/ARCHITECTURE.md': [('passive supported configured cognition-resource discovery (#140/#141), and configured remote cognition connection-policy awareness (#144/#145), and configured local llama.cpp readiness awareness (#148/#149).', 'passive supported configured cognition-resource discovery (#140/#141), configured remote cognition connection-policy awareness (#144/#145), and configured local llama.cpp readiness awareness (#148/#149).')],
           }
           for path, replacements in targets.items():
               p = Path(path)
