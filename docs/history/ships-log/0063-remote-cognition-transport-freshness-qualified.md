@@ -22,4 +22,4 @@ Qualification evidence:
 
 Issue #128 is closed completed. Parent #115 remains OPEN. Provider/service readiness beyond transport freshness, credential validity, unbound provider/catalog discovery, broader external-connection/application awareness, and adaptive routing remain future bounded work. Release/package remain `v0.8.0` / `0.8.0`; NCI-4 is not implied; no A8 exists.
 
-Repository-wide current-documentation reconciliation is tracked separately by issue #130. This entry records the already-canonical #128/#129 implementation evidence and does not pre-claim #130 completion.
+Repository-wide current-documentation reconciliation is tracked separately by issue #130 / PR #131. This entry records the already-canonical #128/#129 implementation evidence and does not pre-claim #130 completion.
