@@ -57,6 +57,19 @@ jobs:
               raise SystemExit(f"expected one replace_all helper, found {script.count(old_all)}")
           script = script.replace(old_all, "def replace_all(path, old, new, minimum=0):", 1)
 
+          old_priority = "**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** The local cognition/runtime exit is QUALIFIED through PRs #119/#120, governed Tool Gateway awareness through #122/#123, and bound hosted/session cognition awareness through #125/#126. Broader awareness remains IN PROGRESS; current remote reachability/freshness, unbound provider discovery, authorized external-connection awareness, and adaptive provider/resource routing remain unqualified. Continue only from canonical runtime evidence and preserve discovery/authorization/readiness/qualification/selection/observation separation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified."
+          new_priority = "**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** The local cognition/runtime exit is QUALIFIED through PRs #119/#120, governed Tool Gateway awareness through #122/#123, bound hosted/session cognition awareness through #125/#126, and bound remote origin transport freshness through #128/#129. Broader awareness remains IN PROGRESS; provider/service readiness beyond transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, and adaptive provider/resource routing remain unqualified. Continue only from canonical runtime evidence and preserve discovery/authorization/readiness/qualification/selection/observation separation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified."
+          old_limit = "- Live Environment Awareness currently qualifies local-runtime awareness, governed Tool Gateway awareness, and already-bound hosted/session cognition awareness. It does not yet qualify current remote reachability/freshness, unbound provider/catalog discovery, authorized external-connection awareness, broader ambient application/process discovery, or adaptive provider/resource routing."
+          new_limit = "- Live Environment Awareness currently qualifies local-runtime awareness, governed Tool Gateway awareness, already-bound hosted/session cognition awareness, and already-bound remote exact-origin transport freshness. It does not yet qualify provider/service readiness beyond transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, broader ambient application/process discovery, or adaptive provider/resource routing."
+          audit_marker = "# Fail if known stale current-state claims survive outside append-only history."
+          if script.count(audit_marker) != 1:
+              raise SystemExit(f"expected one stale-audit marker, found {script.count(audit_marker)}")
+          injection = "\n".join([
+              f"replace_once('docs/stewardship/progress-tracker.md', {old_priority!r}, {new_priority!r})",
+              f"replace_once('docs/stewardship/progress-tracker.md', {old_limit!r}, {new_limit!r})",
+          ])
+          script = script.replace(audit_marker, injection + "\n\n" + audit_marker, 1)
+
           compile(script, "staged-doc-sync", "exec")
           exec(script, {"__name__": "__main__"})
           PY
