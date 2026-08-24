@@ -21,6 +21,7 @@ from .native_model_runtime import LocalModelRuntime
 from .tool_awareness import ToolCapabilityAwareness
 from .cognition_awareness import CognitionProviderAwareness, CognitionProviderPolicy
 from .cognition_discovery import ConfiguredCognitionDiscovery, nonsecret_reasoner_config_from_env
+from .configured_connection_awareness import ConfiguredConnectionPolicyAwareness
 from .graph import MissionGraphPlan
 from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
@@ -119,6 +120,13 @@ class PilotGorXu:
     def live_configured_cognition_inventory(self)->dict[str,Any]:
         """Discover supported non-secret cognition configuration without binding or invocation."""
         return ConfiguredCognitionDiscovery(nonsecret_reasoner_config_from_env()).inventory()
+
+    def live_configured_connection_policy_inventory(self, *, order:MissionOrder|None=None)->dict[str,Any]:
+        """Report configured remote connection policy state without network or provider activity."""
+        inventory=self.live_configured_cognition_inventory()
+        resources=inventory.get('resources') or []
+        resource=resources[0] if len(resources)==1 else {}
+        return ConfiguredConnectionPolicyAwareness(self.gateway).inventory(resource=resource,order=order)
 
     def refresh_cognition_transport(self, *, resource_id:str, order:MissionOrder)->dict[str,Any]:
         """Refresh bounded remote-origin transport evidence through the governed Tool Gateway."""
