@@ -4,7 +4,7 @@
 
 Issue #144 / PR #145 qualified the seventh bounded Live Environment Awareness exit.
 
-GroX can now report host-policy permission separately from exact already-sealed Mission authorization for one valid configured remote `openai` cognition connection. The surface derives the normalized origin from the exact configured endpoint and requires exact `net_fetch`, operation, resource ID, endpoint, origin grant, and host-policy permission before reporting authorization.
+GroX can now report host-policy permission separately from exact already-sealed Mission authorization for one valid configured remote `openai` cognition connection. The surface derives the normalized origin from the exact configured endpoint and requires exact `net_fetch`, operation, resource ID, endpoint, origin grant, and host-policy permission before reporting authorization. In this surface, `authorized=True` means only that the exact configured connection is permitted by those policy gates for the bounded Order; it is not provider readiness, provider qualification, provider selection, or permission to invoke cognition.
 
 It performs no network request, credential inspection or validation, provider construction/binding, model or executable activation, cognition invocation, Mission creation, readiness/fitness promotion, selection, fallback, or routing. `ready`, `qualified_fit`, `selected`, and `observed` remain false.
 
