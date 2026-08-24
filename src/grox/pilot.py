@@ -50,6 +50,7 @@ class PilotGorXu:
         )
         self._tool_awareness=ToolCapabilityAwareness(self.gateway)
         self._cognition_transport_observations:dict[str,Any]={}
+        self._cognition_endpoint_observations:dict[str,Any]={}
         self.executor=CrewExecutor(self.gateway,self.durable)
         self.verifier=IndependentVerifier()
         self.intelligence=LivingCompanyIntelligence(self.store,self.roster)
@@ -107,6 +108,7 @@ class PilotGorXu:
             crew_provider=crew_provider,
             gateway=self.gateway,
             transport_observations=self._cognition_transport_observations,
+            endpoint_observations=self._cognition_endpoint_observations,
         )
 
     def live_cognition_provider_inventory(self, *, policy:CognitionProviderPolicy|None=None)->dict[str,Any]:
@@ -116,6 +118,10 @@ class PilotGorXu:
     def refresh_cognition_transport(self, *, resource_id:str, order:MissionOrder)->dict[str,Any]:
         """Refresh bounded remote-origin transport evidence through the governed Tool Gateway."""
         return self._cognition_provider_awareness().refresh_transport(resource_id=resource_id,order=order)
+
+    def refresh_cognition_endpoint_surface(self, *, resource_id:str, order:MissionOrder)->dict[str,Any]:
+        """Refresh exact bound remote endpoint-surface evidence through the governed Tool Gateway."""
+        return self._cognition_provider_awareness().refresh_endpoint_surface(resource_id=resource_id,order=order)
 
     def _required_caps(self, mode:MissionMode)->list[str]:
         return {'inspect':['repo_read'],'repair':['repo_read','repo_write'],'verify':['repo_read','verify'],'execute':['repo_read']}[mode.value]
