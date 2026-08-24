@@ -4,8 +4,8 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after exact bound remote endpoint-surface freshness qualification:** `main@2b516b8b5e4757c216e5fe561db5325a1471f6de`
-**Current verified canonical tree:** `581b492e285f85a43680cb6315ae299b1ea85f33`
+**Current verified canonical source after supported configured cognition-resource discovery qualification:** `main@bf3d0f622ed4088330324f865611e40a4466ae59`
+**Current verified canonical tree:** `baf7841fabbdc02b91fcc750fedc02b0a4e8f929`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,9 +15,38 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **386 passed, 2 skipped, 463 subtests**; unittest **388 OK, 2 skipped**; mutations **18/18**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
-**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS EXITS QUALIFIED**
-**Next bounded implementation:** **Continue issue #115 beyond the five qualified bounded exits using the smallest repository-native evidence-backed surface. Credential validity, authenticated provider/service readiness, model existence/availability/fitness, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **392 passed, 2 skipped, 467 subtests**; unittest **394 OK, 2 skipped**; mutations **19/19**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
+**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS + SUPPORTED CONFIGURED COGNITION DISCOVERY EXITS QUALIFIED**
+**Next bounded implementation:** **Continue issue #115 beyond the six qualified bounded exits using the smallest repository-native evidence-backed surface. Credential validity, authenticated provider/service readiness, model existence/availability/fitness, arbitrary/unconfigured provider catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, provider switching/fallback, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+
+## Live Environment Awareness — supported configured cognition-resource discovery — issue #140 / PR #141
+
+**Status: COMPLETE — QUALIFIED — CANONICAL MERGED AND EXACT-TREE VERIFIED.**
+
+Qualified boundary:
+
+- reads only the non-secret reasoning identity keys `GROX_REASONER_PROVIDER`, `GROX_REASONER_MODEL`, and `GROX_REASONER_ENDPOINT`;
+- `OPENAI_API_KEY` and unrelated configuration are outside the discovery allowlist and are neither emitted nor used to infer credential state;
+- supported discovery kinds are exactly the currently implemented repository configuration kinds `openai` and `local-llama-cpp`;
+- no provider construction or binding, network I/O, local executable/model-store probe, model load, cognition invocation, Mission creation, durable readiness state, fallback, or routing occurs;
+- valid supported configuration yields deterministic privacy-minimized resource identity and `discovered=True`; `authorized`, `ready`, `qualified_fit`, `selected`, and `observed` remain false;
+- missing, incomplete, malformed, or unsupported configuration fails closed;
+- Pilot exposure preserves the existing bound reasoner and creates no Mission.
+
+Qualification evidence:
+
+- red-before-green test-only head `b6ababf3d7395076bc083bd12f0a7d03e3bac1fc`: Wheel PASS; Python 3.11–3.14 red on the intended missing discovery module;
+- final PR #141 head `37a0fabe5efbe8d378f3abe11f825316fd468401`;
+- exact-head GroX CI #476 / `32771922889`: PASS Wheel + Python 3.11–3.14;
+- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **392 passed, 2 skipped, 467 subtests**; unittest **394 OK, 2 skipped**; critical mutations **19/19**; health **7/7**; reconstitution **9/9**; operational drift **4/4**; source provenance **6/6**; Post-Apex PASS;
+- permanent mutation `configured-cognition-discovery-state-separation`: KILLED;
+- bounded review `5012089051`: PASS with no review threads;
+- CI-tested synthetic merge `5f83c2773c1890b127fd2abbcf178f3e85ef4b03`, tree `baf7841fabbdc02b91fcc750fedc02b0a4e8f929`;
+- guarded canonical merge `main@bf3d0f622ed4088330324f865611e40a4466ae59`, same tree;
+- synthetic-to-canonical tree equality: **PASS**;
+- issue #140 closed completed; parent #115 remains **OPEN**.
+
+Still unqualified: credential validity, authenticated provider/service readiness, model existence/availability/fitness, successful cognition semantics, arbitrary/unconfigured provider catalog discovery, broader authorized external-connection/application/process awareness, provider switching/fallback, and adaptive provider/resource routing. No release/package/NCI/Apex/A8 advancement occurred.
 
 ## Live Environment Awareness — exact bound remote endpoint-surface freshness — issue #136 / PR #137
 
