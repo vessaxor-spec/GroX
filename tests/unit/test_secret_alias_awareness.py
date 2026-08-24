@@ -6,6 +6,11 @@ from grox.secret_awareness import SecretAliasAwareness
 from grox.tools.secrets import SecretBroker
 
 
+class MaterializationTrapBroker(SecretBroker):
+    def materialize_env(self, *args, **kwargs):
+        raise AssertionError("secret materialization must not occur during awareness")
+
+
 class SecretAliasAwarenessTests(unittest.TestCase):
     def test_exact_alias_availability_never_exposes_secret_value(self):
         secret = "GROX-SECRET-SENTINEL-DO-NOT-EXPOSE"
@@ -23,6 +28,16 @@ class SecretAliasAwarenessTests(unittest.TestCase):
         self.assertFalse(result["secret_materialized"])
         self.assertFalse(result["credential_validated"])
         self.assertNotIn(secret, repr(result))
+
+    def test_awareness_never_materializes_secret(self):
+        awareness = SecretAliasAwareness(
+            MaterializationTrapBroker({"openai-api-key": "GROX-MATERIALIZATION-TRAP"})
+        )
+
+        result = awareness.inspect("openai-api-key")
+
+        self.assertTrue(result["available"])
+        self.assertFalse(result["secret_materialized"])
 
     def test_absent_alias_fails_closed_without_enumerating_other_aliases(self):
         awareness = SecretAliasAwareness(SecretBroker({"other-alias": "value"}))
