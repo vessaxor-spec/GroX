@@ -1,0 +1,66 @@
+name: Stage 144 configured connection awareness
+
+on:
+  push:
+    branches:
+      - live-awareness-configured-connection-policy
+
+permissions:
+  contents: write
+
+jobs:
+  stage:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Wire Pilot and mutation proof
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          pilot = Path('src/grox/pilot.py')
+          text = pilot.read_text()
+          anchor = 'from .cognition_discovery import ConfiguredCognitionDiscovery, nonsecret_reasoner_config_from_env\n'
+          addition = anchor + 'from .configured_connection_awareness import ConfiguredConnectionPolicyAwareness\n'
+          if 'from .configured_connection_awareness import ConfiguredConnectionPolicyAwareness' not in text:
+              if anchor not in text:
+                  raise SystemExit('pilot import anchor missing')
+              text = text.replace(anchor, addition, 1)
+          method_anchor = '''    def live_configured_cognition_inventory(self)->dict[str,Any]:\n        \"\"\"Discover supported non-secret cognition configuration without binding or invocation.\"\"\"\n        return ConfiguredCognitionDiscovery(nonsecret_reasoner_config_from_env()).inventory()\n\n'''
+          method_addition = method_anchor + '''    def live_configured_connection_policy_inventory(self, *, order:MissionOrder|None=None)->dict[str,Any]:\n        \"\"\"Report configured remote connection policy state without network or provider activity.\"\"\"\n        inventory=self.live_configured_cognition_inventory()\n        resources=inventory.get('resources') or []\n        resource=resources[0] if len(resources)==1 else {}\n        return ConfiguredConnectionPolicyAwareness(self.gateway).inventory(resource=resource,order=order)\n\n'''
+          if 'def live_configured_connection_policy_inventory' not in text:
+              if method_anchor not in text:
+                  raise SystemExit('pilot method anchor missing')
+              text = text.replace(method_anchor, method_addition, 1)
+          pilot.write_text(text)
+
+          mutation = Path('tests/mutation/run_critical_invariants.py')
+          text = mutation.read_text()
+          anchor = '''    MutationSpec(\n        name=\"ci-action-immutable-pin\",\n'''
+          block = '''    MutationSpec(\n        name=\"configured-connection-exact-resource-binding\",\n        invariant=\"Configured remote connection authorization must remain bound to the exact discovered resource identity.\",\n        path=\"src/grox/configured_connection_awareness.py\",\n        old='        elif parameters.get(\"resource_id\") != resource_id:\\n',\n        new='        elif False and parameters.get(\"resource_id\") != resource_id:\\n',\n        nodeid=\"tests/unit/test_configured_connection_policy_awareness.py::ConfiguredConnectionPolicyAwarenessTests::test_resource_endpoint_operation_and_origin_binding_fail_closed\",\n    ),\n'''
+          if 'configured-connection-exact-resource-binding' not in text:
+              if anchor not in text:
+                  raise SystemExit('mutation anchor missing')
+              text = text.replace(anchor, block + anchor, 1)
+          mutation.write_text(text)
+          PY
+          rm .github/workflows/stage-144-configured-connection.yml
+          python -m pip install -e '.[test]'
+          python -m pytest -q tests/unit/test_configured_connection_policy_awareness.py tests/integration/test_configured_connection_policy_awareness.py
+          python tests/mutation/run_critical_invariants.py
+          git diff --check
+      - name: Commit workflow-free candidate
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/grox/pilot.py tests/mutation/run_critical_invariants.py .github/workflows/stage-144-configured-connection.yml
+          git commit -m 'feat: wire configured connection policy awareness'
+          git push origin HEAD:live-awareness-configured-connection-policy
