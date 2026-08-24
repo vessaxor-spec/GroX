@@ -107,3 +107,10 @@ GroX's native cognition program exists to give GorXu and authorized Crew a cogni
 ## 25. Local accessibility is part of independence
 
 The target local Vessel should be installable and useful on supported macOS and Linux hosts without requiring a paid AI subscription for its minimum qualified operating profile. Connectivity and paid intelligence may increase capability; their absence must not transfer command or prevent the eventual minimum local operating condition once that profile is qualified.
+
+
+## 26. Awareness is not authority
+
+Execution-environment awareness must preserve **Discovered ≠ Authorized ≠ Ready ≠ Qualified/Fit ≠ Selected ≠ Observed**. Discovery, configuration, connectivity, provider binding, model power, historical success, or a successful transport observation cannot create permission, readiness, qualification, lower Mission risk, bypass the Tool Gateway, weaken verification, or authorize adaptive routing. Volatile facts must be rediscovered after reconstitution when current evidence is required.
+
+NCI-2/NCI-3 now prove one bounded installed/offline Linux x86_64 CPU-first cognition profile. That qualification does not imply the public cross-platform installer, desktop launcher, NCI-4, or broader NCI-8 offline Vessel qualification.

@@ -1,6 +1,6 @@
 # GroX Architecture
 
-**Qualified release baseline:** GroX `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`. Canonical source continues on protected `main` and may advance beyond that immutable release through governed PR/CI. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. A1–A7 are qualified for the current project-hosted operating model. Protected source additionally contains NCI-1A installed-workspace commissioning and NCI-1B runtime/state/work filesystem-role separation; those post-release foundations do not create a new command layer, Apex stage, or release.
+**Qualified release baseline:** GroX `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`. Canonical source continues on protected `main` and may advance beyond that immutable release through governed PR/CI. GorXu is **APEX QUALIFIED** with **82 Standing Crew**. Protected source additionally has **NCI-1, NCI-2, and NCI-3 QUALIFIED** and four bounded Live Environment Awareness exits qualified: local runtime, governed Tool Gateway capability awareness, already-bound hosted/session cognition awareness, and already-bound remote origin transport freshness. These source advances do not create a new command layer, Apex stage, release, NCI-4, or A8.
 
 ## Purpose
 
@@ -108,7 +108,7 @@ Selective Crew cognition is not another runtime command layer. It is an optional
 
 ## NCI filesystem-role architecture
 
-NCI-1A and NCI-1B establish the local-installation/runtime foundation beneath the existing command model.
+NCI-1A through NCI-1D establish the qualified local installation/runtime/model foundation beneath the existing command model. NCI-2 and NCI-3 then qualify the exact local seed-cognition and bounded offline GorXu profile on that foundation.
 
 ### NCI-1A — commissioned workspace
 
@@ -150,7 +150,26 @@ In separated mode:
 
 This is a filesystem/security architecture **below Pilot GorXu**. Crew definitions residing in `asset_root` remain subordinate to GorXu. Model artifacts later placed in runtime/model resources will likewise remain governed capabilities rather than authority layers.
 
-NCI-1C is the next installation blocker: package the canonical runtime assets required by Pilot GorXu and bind them to the commissioned workspace so an installed non-editable GroX can start the real Vessel without a source checkout or `GROX_VESSEL_ROOT`. That future slice must preserve the same command hierarchy.
+NCI-1C now packages and validates the canonical runtime assets so a commissioned non-editable installation can start the same Pilot GorXu with all 82 Standing Crew outside a source checkout. NCI-1D adds the integrity-bound model registry and explicit local inference runtime. NCI-2 qualifies the exact Qwen3-4B Q4_K_M seed through pinned `llama.cpp`, and NCI-3 qualifies the bounded offline GorXu conversational + governed Crew-orchestration profile. Public one-command installation, desktop launchers, NCI-4, and broader NCI-8 offline Vessel qualification remain separate future gates.
+
+## Live Environment Awareness architecture
+
+Live Environment Awareness is a Pilot-owned capability layer beneath GorXu. It does not create a discovery daemon, command layer, alternate router, or new authority source.
+
+Every represented resource preserves six distinct states:
+
+1. **Discovered** — current evidence says the resource exists or is represented;
+2. **Authorized** — Commander/GroX policy permits consideration for the bounded Mission;
+3. **Ready** — current host/resource evidence satisfies the relevant readiness requirements;
+4. **Qualified / fit** — evidence supports the bounded work class;
+5. **Selected** — GorXu selects it under existing policy;
+6. **Observed** — GroX records what actually executed or was observed.
+
+No state automatically implies the next. Current protected source qualifies four bounded surfaces: defined local runtime awareness (#119/#120), passive governed Tool Gateway capability awareness (#122/#123), awareness of hosted/session cognition already bound to GorXu/Crew seats (#125/#126), and explicit current-session **origin transport freshness** for an already-bound remote cognition resource (#128/#129).
+
+The remote transport refresh is deliberately narrow. Passive inventory remains zero-network. Active refresh requires an already sealed Mission Order granting exact `net_fetch`, `operation=cognition_transport_probe`, the exact current resource ID, and the exact normalized bound origin; the host Tool Gateway policy must independently allow the same origin. Runtime I/O goes only through `ToolGateway.fetch_url`. The observation retains only volatile timestamp/reachable-state/bounded HTTP status and discards response content. It never validates provider credentials, invokes cognition, changes provider binding, sets remote `ready`, creates qualification, or authorizes adaptive routing.
+
+Reconstitution may retain attributable historical execution evidence where separately designed, but volatile current readiness/transport observations must be rediscovered rather than treated as durable fact. Parent issue #115 remains open for broader awareness.
 
 ## Standing Crew model
 
@@ -227,7 +246,7 @@ Provider-facing Order, craft, memory, and observation values are copies. Provide
 
 A mutating action request or scope escape is denied and does not gain a broader fallback. Known recoverable provider/contract failures may degrade to the existing deterministic Inspect executor. Verify, Repair, and Execute remain on their existing deterministic paths in this first seam.
 
-Controlled fake-provider CI qualifies only the provider-neutral seam and its safety properties. It is **not** evidence that a live project/session or external model provider is operational for Crew cognition. Live provider activation requires separate operational evidence.
+Controlled fake-provider CI historically qualified only the provider-neutral Crew-cognition seam and its safety properties. Issue #76 / PR #79 later supplied separate operational evidence for one live locally trained neural action-selection provider. That later qualification remains bounded to the Inspect Crew cognition seat and does not turn arbitrary project/session or external providers into qualified Crew cognition.
 
 ## Verification
 
@@ -301,6 +320,8 @@ The A5-qualified Tool Gateway v2 exposes bounded filesystem/list/test operations
 A5 browser capture deliberately keeps network authority in the Gateway: approved HTML is fetched through `net_fetch`, then rendered offline while browser-originated HTTP(S) is blocked. MCP process definitions are host/Pilot registered rather than Crew supplied, and mutating MCP tools require a separate mutation action grant. Secret values remain memory-only and are not durable Mission data.
 
 The Crew cognition seam reuses this same Gateway. It does not add direct provider tool ownership, an alternate filesystem API, broader network access, or an MCP/desktop path.
+
+Live Environment Awareness also reuses this same Gateway for the #128/#129 remote cognition transport-freshness probe. Awareness cannot open a parallel network client or acquire authority by asking the Gateway to seal an unsealed Order; the pre-sealed exact authority requirement is permanently mutation-proven.
 
 NCI-1B further binds ordinary filesystem access to the Commander work root in separated mode. Private state and runtime assets are outside that root and may not be reached through path escape.
 

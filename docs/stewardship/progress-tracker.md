@@ -1,11 +1,11 @@
 # GroX Progress Tracker
 
-**Status date:** 2026-08-23
+**Status date:** 2026-08-24
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after bound hosted/session cognition awareness qualification:** `main@6be03b46ac02d121c8ef7e90c25341504fd1d020`
-**Current canonical runtime-qualified tree:** `50bf3333eabb066a74b0e62538ea741d7038a106`
+**Current verified canonical source after bound remote cognition transport-freshness qualification:** `main@922a35add9c92e7e0d7eed31dc1ff80895e28e61`
+**Current verified canonical tree:** `9cc6ed2765cfc226e279ae498ebabd6ade675bd5`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,9 +15,38 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **364 passed, 2 skipped, 449 subtests**; unittest **366 OK, 2 skipped**; mutations **15/15**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
-**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION AWARENESS EXITS QUALIFIED**
-**Next bounded implementation:** **Continue issue #115 beyond the qualified local-runtime, governed Tool Gateway, and bound hosted/session cognition awareness exits using the smallest repository-native evidence-backed surface. Current remote reachability/freshness, unbound provider discovery, authorized external-connection awareness, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **373 passed, 2 skipped, 453 subtests**; unittest **375 OK, 2 skipped**; mutations **16/16**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
+**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS EXITS QUALIFIED**
+**Next bounded implementation:** **Continue issue #115 beyond the four qualified bounded exits using the smallest repository-native evidence-backed surface. Provider/service readiness beyond origin transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+
+## Live Environment Awareness — bound remote cognition transport freshness — issue #128 / PR #129
+
+**Status: COMPLETE — QUALIFIED — CANONICAL MERGED AND EXACT-TREE VERIFIED.**
+
+Qualified boundary:
+
+- passive hosted cognition inventory remains zero-network and non-invoking;
+- active refresh applies only to one remote cognition resource already bound to a current GorXu/Crew cognition seat;
+- awareness requires an **already sealed** Mission Order with exact `net_fetch`, `operation=cognition_transport_probe`, exact current `resource_id`, and exact allowed origin;
+- host Tool Gateway policy must independently allow the same normalized origin;
+- network I/O reuses `ToolGateway.fetch_url` only; no parallel HTTP/socket authority path exists;
+- no provider credential, prompt/model request, Commander content, Crew context, or secret is sent by awareness;
+- only volatile observation timestamp, reachable/unreachable state, and bounded HTTP status are retained; response content is discarded;
+- transport evidence expires and failure replaces prior positive current transport state; provider rebinding changes resource identity;
+- fresh transport reachability never sets remote `ready`, `authorized`, or `qualified_fit`, never invokes cognition, and never changes provider binding or routing.
+
+Qualification evidence:
+
+- final PR #129 head `ba69209e1a92b48561903d372947bcf2db7c824d`;
+- exact-head GroX CI #426 / `32710787713`: PASS Wheel + Python 3.11–3.14;
+- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **373 passed, 2 skipped, 453 subtests**; unittest **375 OK, 2 skipped**; critical mutations **16/16**; health **7/7**; reconstitution **9/9**; operational drift **4/4**; source provenance **6/6**; Post-Apex PASS;
+- permanent mutation `cognition-transport-presealed-authority`: KILLED;
+- CI-tested synthetic merge `807d4cb70d78ace26349a4fa6412605e89b8dfb8`, tree `9cc6ed2765cfc226e279ae498ebabd6ade675bd5`;
+- canonical merge `main@922a35add9c92e7e0d7eed31dc1ff80895e28e61`, tree `9cc6ed2765cfc226e279ae498ebabd6ade675bd5`;
+- synthetic-to-canonical tree equality: **PASS**;
+- issue #128 closed completed; parent #115 remains **OPEN**.
+
+Still unqualified: provider/service readiness beyond exact-origin transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, provider switching/fallback, and adaptive provider/resource routing. No release/package/NCI/Apex/A8 advancement occurred.
 
 ## GorXu command/infrastructure invariant — current synchronization
 
@@ -385,7 +414,7 @@ Canonical staged roadmap in `docs/stewardship/ROADMAP.md`:
 2. **NCI-2 — Built-in local seed cognition: QUALIFIED.** The exact Qwen3-4B Q4_K_M seed is qualified on the installed CPU-first path with integrity/provenance, pinned llama.cpp runtime, external-network isolation, no vendor credential, bounded GorXu cognition, Crew routing, and independent verification.
 3. **NCI-3 — Offline GorXu cognition: QUALIFIED.** Issue #113 / PR #114 qualify local conversational interaction, natural-language objective interpretation, planning/synthesis, governed Crew delegation, high-risk Inspect execution, and independent verification while deterministic authority remains authoritative.
 
-**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** The local cognition/runtime exit is QUALIFIED through PRs #119/#120, governed Tool Gateway awareness through #122/#123, and bound hosted/session cognition awareness through #125/#126. Broader awareness remains IN PROGRESS; current remote reachability/freshness, unbound provider discovery, authorized external-connection awareness, and adaptive provider/resource routing remain unqualified. Continue only from canonical runtime evidence and preserve discovery/authorization/readiness/qualification/selection/observation separation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified.
+**Immediate Commander-designated bounded priority before NCI-4:** **Live Environment Awareness — issue #115.** The local cognition/runtime exit is QUALIFIED through PRs #119/#120, governed Tool Gateway awareness through #122/#123, bound hosted/session cognition awareness through #125/#126, and bound remote origin transport freshness through #128/#129. Broader awareness remains IN PROGRESS; provider/service readiness beyond transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, and adaptive provider/resource routing remain unqualified. Continue only from canonical runtime evidence and preserve discovery/authorization/readiness/qualification/selection/observation separation. This priority does not renumber NCI-4 through NCI-9 and does not imply any later NCI stage is qualified.
 4. **NCI-4 — Neural Crew evolution:** evolve the qualified policy toward richer action/path/evidence/test/confidence/failure decisions with generation-by-generation comparison.
 5. **NCI-5 — Mission learning corpus and evolution registry:** structure verified operational experience into provenance-bound learning material and model ancestry without turning assistance into a data-acquisition objective.
 6. **NCI-6 — Optional external teacher/tool adapters:** allow governed external intelligence for difficult work and, where permitted, candidate teaching material without dependency or inherited authority.
@@ -696,7 +725,7 @@ Evidence: `docs/verification/POST_APEX_EVOLUTION_001_INTEGRATION_EVIDENCE.md`.
 - Standing Crew have a provider-neutral Inspect cognition seam with selective craft + bounded memory, and one live locally trained neural action-selection provider is operationally qualified through that seam. The qualified provider is narrow; no GroX-pretrained general-purpose foundation model is claimed.
 - **NCI-1, NCI-2, and NCI-3 are qualified.** The installed Vessel has commissioned workspace/runtime separation, validated packaged runtime assets, a GroX-owned native model registry/inference/readiness/reconstitution contract, the exact Qwen3-4B built-in local seed, and the bounded offline conversational GorXu profile. This does not provide a public installer/desktop launcher, a GroX-pretrained foundation model, NCI-4, or A8.
 - the public one-command macOS/Linux installer and desktop launchers are not yet qualified.
-- Live Environment Awareness currently qualifies local-runtime awareness, governed Tool Gateway awareness, and already-bound hosted/session cognition awareness. It does not yet qualify current remote reachability/freshness, unbound provider/catalog discovery, authorized external-connection awareness, broader ambient application/process discovery, or adaptive provider/resource routing.
+- Live Environment Awareness currently qualifies local-runtime awareness, governed Tool Gateway awareness, already-bound hosted/session cognition awareness, and already-bound remote exact-origin transport freshness. It does not yet qualify provider/service readiness beyond transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, broader ambient application/process discovery, or adaptive provider/resource routing.
 - A3 episodic retrieval plus attributable semantic, procedural, and Vessel-wide memory are live with bounded selective retrieval; autonomous consolidation remains future evolution.
 - A4 durable Mission Graph resume, checkpointing, bounded cancellation/retry, and text-Repair compensation are live; generic compensation for arbitrary external systems remains intentionally unclaimed.
 - A5 qualifies bounded workspace shell/code execution, memory-only secret aliases, exact-origin read-only HTTP(S), offline browser evidence capture, and pre-registered stdio MCP. Unrestricted interactive desktop control, arbitrary/networked MCP processes, runtime image pulls/builds, and optional A2A delegation remain outside the qualified boundary.

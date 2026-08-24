@@ -2,6 +2,8 @@
 
 **Current qualified release baseline:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb` / **APEX QUALIFIED** / **82 Standing Crew**. Canonical source continues on protected `main` and may advance beyond the immutable release through the governed PR/CI path.
 
+Current protected source additionally has **NCI-1, NCI-2, and NCI-3 QUALIFIED** plus four bounded Live Environment Awareness exits: local runtime, governed Tool Gateway capabilities, already-bound hosted/session cognition awareness, and already-bound remote origin transport freshness. These are source qualifications beyond the immutable release; they do not move `v0.8.0`, create NCI-4, or create A8.
+
 Apex qualification is a regression boundary, not inherited permission. Any consequential future change that touches Commander sovereignty, GorXu's sole-orchestrator role, Mission Order authority, verifier independence, evidence integrity, recovery, source/state compatibility, routing, governed tool execution, native cognition, or local installation must preserve those invariants through appropriate tests and independent verification.
 
 This repository defines the Vessel. Any AI builder, coding agent, reviewer, or maintainer working here must preserve the command architecture unless the Commander explicitly changes it.
@@ -61,9 +63,17 @@ When diagrams show command relationships, use the canonical spine explicitly. Wh
 - Native cognition and model evolution may improve capability but cannot self-activate, self-promote, redefine GroX's purpose, or displace GorXu's orchestration role.
 - CLI and desktop launchers are Commander Seat entry paths into the same GorXu-led Vessel. They must not create alternate orchestration paths or duplicate state authorities.
 
+### Live Environment Awareness constraints
+
+- Preserve the six distinct states: **Discovered, Authorized, Ready, Qualified/Fit, Selected, Observed**. Never infer a later state merely from an earlier one.
+- Passive awareness must not invoke providers, tools, network resources, or create Missions merely to inventory them.
+- The qualified remote cognition transport refresh applies only to an already-bound remote cognition resource and requires an **already sealed** Mission Order with exact `net_fetch`, exact `operation=cognition_transport_probe`, exact current `resource_id`, and exact origin authority under both the Order and host Tool Gateway policy. Awareness must never seal the Order itself.
+- Current origin transport reachability is volatile evidence only. It does not prove credential validity, provider/service readiness, provider/model availability or fitness, authorization, qualification, switching/fallback eligibility, or adaptive routing authority.
+- Historical observation may inform continuity but cannot assert current volatile readiness. Reconstitution must invalidate volatile current observations and rediscover them where required.
+
 ## Persistence and filesystem doctrine
 
-- Treat the `Space Exploration` ChatGPT project as GorXu's current cognitive reconstitution home while native local cognition remains under development.
+- Treat the `Space Exploration` ChatGPT project as GorXu's current project/session coordination and cognitive reconstitution home. NCI-1/2/3 now qualify bounded local cognition paths, but project/session continuity remains a separate recovery plane and never becomes executable authority.
 - Treat `vessaxor-spec/GroX` as the durable source body of the Vessel.
 - Treat operational state and `.groxstate` archives as private; never commit them to the public repository.
 - Legacy source-checkout operation stores live SQLite state at `configs/state/grox.sqlite3`.
@@ -78,8 +88,8 @@ When diagrams show command relationships, use the canonical spine explicitly. Wh
 
 - Normal-user direction is an installed GroX CLI for macOS and Linux; repository cloning is the developer path, not the intended long-term consumer path.
 - First-run commissioning defaults the dedicated workspace to `~/GroX` while allowing the user to choose another location.
-- NCI-1A has established safe workspace commissioning primitives and host-to-workspace binding. NCI-1B has established runtime/assets, private-state, and Commander-work separation. These foundations do not yet prove a standalone installed GorXu because canonical runtime assets are not yet packaged for that path.
-- Do not advertise a public one-command installer, desktop launcher, bundled native language model, or offline GorXu as available until the corresponding implementation and qualification evidence exists.
+- NCI-1A through NCI-1D are qualified: workspace commissioning, runtime/state/work separation, packaged canonical runtime assets with standalone installed GorXu, and the native model registry/local inference runtime. NCI-2 and NCI-3 separately qualify the exact local seed and bounded offline GorXu profile.
+- Do not advertise a public one-command installer, desktop launcher, GroX-pretrained general-purpose foundation model, unsupported host profile, or broader offline capability beyond the exact NCI evidence. Bounded local seed cognition and offline GorXu are qualified only under their recorded NCI-2/NCI-3 constraints.
 - Installation, upgrade, launcher, model provisioning, and uninstall behavior must preserve the same command spine and must not silently destroy the Commander's Vessel state.
 
 ## Working rules

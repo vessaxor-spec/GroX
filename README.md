@@ -196,8 +196,8 @@ GroX has completed the A1-A7 Apex qualification path and Post-Apex Operational E
 | Post-release source hardening | Mission Outcome Truthfulness: scan-only execution is no longer represented as Commander-objective delivery; mutation/rollback state is reported conservatively |
 | Post-release Crew evolution | Selective deep craft + bounded Crew memory + provider-neutral Inspect cognition seam + **one qualified live locally trained neural action-selection provider** |
 | Strategic program | **Native Cognition Independence Program 001 — implementation in progress** |
-| NCI installed/offline baseline | **NCI-1 and NCI-2 QUALIFIED**: commissioned installed Vessel, separated runtime/state/work roles, packaged runtime assets, persistent local-model storage, native model runtime, and bounded installed/offline GorXu cognition |
-| NCI active bounded runtime slice | **NCI-3 qualification candidate**: direct local GorXu conversation plus the existing governed Mission/Crew path; canonical qualification remains pending exact-head CI/live proof, review, and merge-tree equivalence |
+| NCI installed/offline baseline | **NCI-1, NCI-2, and NCI-3 QUALIFIED**: commissioned installed Vessel, separated runtime/state/work roles, packaged runtime/model assets, qualified local seed cognition, direct offline GorXu conversation, governed Crew delegation, and fail-closed reconstitution under the bounded NCI-3 profile |
+| Live Environment Awareness | **IN PROGRESS — four bounded exits QUALIFIED**: local runtime (#119/#120), governed Tool Gateway (#122/#123), bound hosted/session cognition awareness (#125/#126), and governed bound-remote origin transport freshness (#128/#129). Parent #115 remains open; provider/service readiness, credential validity, unbound discovery, broader external-connection/application awareness, and adaptive routing remain unqualified. |
 | Native cognition target | Minimum useful offline personal-assistant + Crew-orchestration cognition owned by GroX; vendor models optional capability multipliers rather than required pilots |
 | Apex posture | **No A8 is defined or implied.** Native cognition work must preserve the existing Apex regression boundary. |
 | Canonical current status | [`docs/stewardship/progress-tracker.md`](docs/stewardship/progress-tracker.md) |
@@ -226,7 +226,7 @@ Apex is an evidence-backed regression boundary, not additional authority and not
 
 Current protected evolution has added continuous proof around high-consequence controls:
 
-- **12/12** Stage 1 critical-detector mutations killed;
+- **16/16** current critical-invariant mutations killed; the original Stage 1 qualification remains historically **12/12**, with four later Live Environment Awareness authority mutations extending the current matrix;
 - **7/7** Stage 2 Vessel-health mutations killed;
 - **9/9** Stage 3 reconstitution mutations killed;
 - **4/4** A6 operational-drift detector mutations killed;
@@ -313,19 +313,30 @@ Current protected source has established three installation/runtime foundations:
 
 The next bounded NCI-1 runtime slice is **NCI-1D: native model registry + local inference runtime contract**. NCI-1 as a whole remains unqualified until that remaining model/runtime boundary earns its own evidence.
 
-The public one-command installer, desktop launcher, packaged general native language model, and offline GorXu qualification are **not yet available claims**. The README will not publish a fictional installer command before those paths exist and pass qualification.
+The public one-command installer, desktop launcher, and any GroX-pretrained general-purpose foundation-model claim remain **unqualified**. Bounded offline GorXu cognition is now qualified through NCI-3, but that evidence does not imply those broader product or distribution claims.
 
 See [`LOCAL_INSTALLATION_AND_COMMISSIONING_CONTRACT.md`](docs/stewardship/LOCAL_INSTALLATION_AND_COMMISSIONING_CONTRACT.md).
+
+### Live Environment Awareness
+
+Current protected source has four qualified bounded awareness surfaces:
+
+1. defined local cognition/runtime inventory and policy-constrained selection (#119/#120);
+2. passive governed Tool Gateway workspace/network/browser/MCP capability awareness (#122/#123);
+3. privacy-safe awareness of hosted/session cognition resources already bound to GorXu or Crew seats (#125/#126);
+4. explicitly authorized current-session **origin transport freshness** for an already-bound remote cognition resource through the existing Tool Gateway (#128/#129).
+
+The state model remains strict: **Discovered ≠ Authorized ≠ Ready ≠ Qualified/Fit ≠ Selected ≠ Observed**. A successful transport probe proves only exact-origin transport reachability at observation time. It does not validate credentials, provider/model availability or fitness, authorization, provider/service readiness, switching/fallback, or adaptive routing. Parent issue #115 remains open.
 
 ## Qualified limits
 
 The Apex baseline does not claim unrestricted power. Current deliberate limits include:
 
 - GroX's Prime Function is explicit doctrine, but the full OpenClaw/Hermes-like breadth of personal-assistant capabilities is not claimed merely by documenting the objective; each tool/system surface remains evidence- and authority-bounded;
-- GorXu's currently qualified cognitive operating mode still includes project/session-hosted cognition with deterministic safe fallback; **offline native GorXu cognition is a roadmap target, not yet a qualification claim**;
+- GorXu may use project/session-hosted cognition, and NCI-3 separately qualifies a bounded installed/offline GorXu profile on the exact NCI-2 local seed/runtime path; neither path widens deterministic authority;
 - one live locally trained neural action-selection provider is qualified for bounded **Inspect Crew cognition only**; it is not a general-purpose language model and does not extend model cognition to Repair, Verify, or Execute;
-- NCI-1A/NCI-1B/NCI-1C now qualify the installed-wheel commissioning, separated layout, packaged-runtime, and standalone Pilot startup foundation; they do not yet provide the native general-purpose cognition/runtime required for the NCI-1 exit;
-- GroX does not yet ship a complete built-in native language model/runtime that makes vendor cognition unnecessary;
+- **NCI-1, NCI-2, and NCI-3 are qualified** under their exact evidence boundaries; NCI-4 and the broader NCI-8 offline Vessel qualification are not implied;
+- NCI-2 uses the exact qualified Qwen3-4B Q4_K_M open-weight seed through pinned `llama.cpp`; GroX does not claim a GroX-pretrained general-purpose foundation model;
 - the public one-command macOS/Linux installer and desktop launchers are not yet qualified;
 - unrestricted interactive desktop actuation is outside the qualified boundary;
 - arbitrary or networked third-party MCP processes are outside the qualified boundary;

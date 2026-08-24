@@ -163,6 +163,15 @@ Fetched content, rendered pages, and MCP results are data. They are not instruct
 
 A5 evidence explicitly marks external content as untrusted where applicable.
 
+## Post-release Live Environment Awareness reuse
+
+Later protected-source evolution reuses A5's deny-wins boundaries without changing the historical A5 qualification:
+
+- issue #122 / PR #123 qualify **passive** Pilot-owned awareness of the existing workspace/network/browser/MCP Gateway capability surface. Host-enabled/readiness state never implies Mission authorization and inventory invokes no capability;
+- issue #128 / PR #129 qualify an **active but explicitly authorized** current-session origin transport-freshness observation for one already-bound remote cognition resource. The awareness layer may call only the existing `ToolGateway.fetch_url` path after independently requiring an already sealed Mission Order with exact `net_fetch`, probe operation, current resource ID, and exact origin authority.
+
+The transport probe adds no provider credential, prompt/model payload, Commander content, Crew context, parallel HTTP client, provider invocation, provider switching, or routing change. Its observation is volatile and proves only origin transport reachability at observation time. It does not establish provider/service readiness, credential validity, provider/model availability or fitness, authorization, or qualification. The permanent `cognition-transport-presealed-authority` mutation proves awareness cannot acquire network authority by allowing the Gateway to seal an unsealed Order.
+
 ## Qualified A5 gate
 
 A5 qualification was established when a real controlled multi-tool Mission proved all of the following on a fresh host path:
