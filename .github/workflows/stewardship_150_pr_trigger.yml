@@ -1,0 +1,44 @@
+name: Stewardship 150 PR staging trigger
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  stage:
+    if: github.head_ref == 'stewardship-configured-local-readiness-qualified' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: stewardship-configured-local-readiness-qualified
+          fetch-depth: 0
+      - name: Execute staged transform and remove temporary artifacts
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path('.github/workflows/stewardship_150_stage.yml').read_text().splitlines()
+          marker = '        run: |'
+          try:
+              i = src.index(marker)
+          except ValueError:
+              raise SystemExit('staging run block missing')
+          block = []
+          for line in src[i+1:]:
+              if line.startswith('          '):
+                  block.append(line[10:])
+              elif not line.strip():
+                  block.append('')
+              else:
+                  raise SystemExit(f'unexpected staging indentation: {line!r}')
+          Path('/tmp/stewardship-150-stage.sh').write_text('\n'.join(block) + '\n')
+          PY
+          bash /tmp/stewardship-150-stage.sh
+          git rm .github/workflows/stewardship_150_pr_trigger.yml .stewardship-150-trigger
+          git commit -m 'Remove stewardship staging artifacts'
+          git push origin HEAD:stewardship-configured-local-readiness-qualified
