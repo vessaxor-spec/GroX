@@ -4,7 +4,7 @@
 
 Issue #152 / PR #153 qualified the ninth bounded Live Environment Awareness exit: secret-blind availability awareness for one exact alias already represented in the host-injected memory-only `SecretBroker`.
 
-The broker now exposes only exact membership through `has_alias(alias)`. The awareness surface reports whether that requested alias is represented and keeps `authorized`, `ready`, `qualified_fit`, `selected`, and `observed` false. It never enumerates aliases or returns, hashes, compares, persists, logs, transforms, materializes, or validates a secret value. A default empty broker fails closed. A dedicated materialization-trap regression proves awareness never calls `materialize_env`.
+The broker now exposes only exact membership through `has_alias(alias)`. The awareness surface reports whether that requested alias is represented and keeps `authorized`, `ready`, `qualified_fit`, `selected`, and `observed` false. It never enumerates aliases or returns, hashes, compares, persists, logs, transforms, materializes, or validates a secret value. A default empty broker fails closed. A dedicated materialization-trap regression proves awareness never calls `materialize_env`. Alias representation does not prove that an underlying value is non-empty, current, valid, or usable.
 
 This qualification does not scan environment variables, filesystems, keychains, or credential stores; it performs no network request, provider construction or binding, cognition invocation, Mission creation, fallback, or routing. Alias availability is not credential validity and does not establish authenticated provider/service readiness, model availability or Mission fitness, cognition success, qualification, selection, or observation.
 
