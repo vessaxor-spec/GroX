@@ -49,6 +49,7 @@ class PilotGorXu:
             secret_broker=secret_broker, mcp_registry=mcp_registry,
         )
         self._tool_awareness=ToolCapabilityAwareness(self.gateway)
+        self._cognition_transport_observations:dict[str,Any]={}
         self.executor=CrewExecutor(self.gateway,self.durable)
         self.verifier=IndependentVerifier()
         self.intelligence=LivingCompanyIntelligence(self.store,self.roster)
@@ -99,12 +100,22 @@ class PilotGorXu:
         """Return fresh governed A5 capability state without invoking tools."""
         return self._tool_awareness.inventory(order=order)
 
-    def live_cognition_provider_inventory(self, *, policy:CognitionProviderPolicy|None=None)->dict[str,Any]:
-        """Return fresh hosted cognition binding state without invoking providers."""
+    def _cognition_provider_awareness(self)->CognitionProviderAwareness:
         crew_provider=getattr(self.executor,'cognition_provider',None)
         return CognitionProviderAwareness(
-            reasoner=self.reasoner, crew_provider=crew_provider
-        ).inventory(policy=policy)
+            reasoner=self.reasoner,
+            crew_provider=crew_provider,
+            gateway=self.gateway,
+            transport_observations=self._cognition_transport_observations,
+        )
+
+    def live_cognition_provider_inventory(self, *, policy:CognitionProviderPolicy|None=None)->dict[str,Any]:
+        """Return fresh hosted cognition binding state without invoking providers."""
+        return self._cognition_provider_awareness().inventory(policy=policy)
+
+    def refresh_cognition_transport(self, *, resource_id:str, order:MissionOrder)->dict[str,Any]:
+        """Refresh bounded remote-origin transport evidence through the governed Tool Gateway."""
+        return self._cognition_provider_awareness().refresh_transport(resource_id=resource_id,order=order)
 
     def _required_caps(self, mode:MissionMode)->list[str]:
         return {'inspect':['repo_read'],'repair':['repo_read','repo_write'],'verify':['repo_read','verify'],'execute':['repo_read']}[mode.value]
