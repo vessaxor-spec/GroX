@@ -240,7 +240,13 @@ class CognitionProviderAwareness:
             ("crew_cognition", self.crew_provider),
         )
 
-    def _transport_snapshot(self, *, resource_id: str, is_remote: bool) -> dict[str, Any]:
+    def _transport_snapshot(
+        self,
+        *,
+        resource_id: str,
+        is_remote: bool,
+        current_origin: str | None,
+    ) -> dict[str, Any]:
         if not is_remote:
             return {
                 "transport_reachable": False,
@@ -251,6 +257,29 @@ class CognitionProviderAwareness:
             }
         raw = self.transport_observations.get(resource_id)
         if not isinstance(raw, dict):
+            return {
+                "transport_reachable": False,
+                "transport_fresh": False,
+                "transport_status": "unproven",
+                "transport_http_status": None,
+                "transport_age_seconds": None,
+            }
+        observed_origin_raw = raw.get("origin")
+        observed_origin = None
+        if isinstance(observed_origin_raw, str) and observed_origin_raw.strip():
+            try:
+                observed_origin = normalize_origin(observed_origin_raw)
+            except (PolicyError, ValueError):
+                observed_origin = None
+        if observed_origin is None or current_origin is None:
+            return {
+                "transport_reachable": False,
+                "transport_fresh": False,
+                "transport_status": "unproven",
+                "transport_http_status": None,
+                "transport_age_seconds": None,
+            }
+        if observed_origin != current_origin:
             return {
                 "transport_reachable": False,
                 "transport_fresh": False,
@@ -308,7 +337,12 @@ class CognitionProviderAwareness:
         observed = observed_identity is not None or _response_observed(provider)
         is_session = isinstance(provider, _SESSION_TYPES)
         is_remote = isinstance(provider, _REMOTE_TYPES)
-        transport_evidence = self._transport_snapshot(resource_id=resource_id, is_remote=is_remote)
+        current_origin = _provider_origin(provider) if is_remote else None
+        transport_evidence = self._transport_snapshot(
+            resource_id=resource_id,
+            is_remote=is_remote,
+            current_origin=current_origin,
+        )
 
         if is_session:
             ready = _session_ready(provider)
@@ -439,6 +473,7 @@ class CognitionProviderAwareness:
         except (ToolDenied, TimeoutError, OSError):
             self.transport_observations[resource_id] = {
                 "observed_at": observed_at,
+                "origin": origin,
                 "reachable": False,
                 "http_status": None,
             }
@@ -446,6 +481,7 @@ class CognitionProviderAwareness:
             status = response.get("status") if isinstance(response, dict) else None
             self.transport_observations[resource_id] = {
                 "observed_at": observed_at,
+                "origin": origin,
                 "reachable": True,
                 "http_status": status if isinstance(status, int) and not isinstance(status, bool) else None,
             }

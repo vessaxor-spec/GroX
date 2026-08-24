@@ -168,6 +168,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_cognition_transport_freshness.py::CognitionTransportFreshnessTests::test_unsealed_order_is_rejected_without_becoming_sealed",
     ),
     MutationSpec(
+        name="cognition-transport-origin-binding",
+        invariant="Remote cognition transport evidence must remain bound to the exact currently configured origin.",
+        path="src/grox/cognition_awareness.py",
+        old="        if observed_origin != current_origin:\n",
+        new="        if False and observed_origin != current_origin:\n",
+        nodeid="tests/unit/test_cognition_transport_freshness.py::CognitionTransportFreshnessTests::test_same_resource_identity_endpoint_rebind_invalidates_prior_origin_evidence",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
