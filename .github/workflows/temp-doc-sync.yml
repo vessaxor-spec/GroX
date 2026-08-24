@@ -14,6 +14,7 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
+          from pathlib import Path
           import subprocess
           import textwrap
 
@@ -72,4 +73,10 @@ jobs:
 
           compile(script, "staged-doc-sync", "exec")
           exec(script, {"__name__": "__main__"})
+
+          installation = Path("docs/stewardship/LOCAL_INSTALLATION_AND_COMMISSIONING_CONTRACT.md")
+          text = installation.read_text(encoding="utf-8")
+          status = "**Status:** AUTHORIZED NCI REQUIREMENT — NCI-1A / NCI-1B / NCI-1C / NCI-1D + NCI-2 / NCI-3 BOUNDED LOCAL COGNITION QUALIFIED; PUBLIC ONE-COMMAND INSTALLER / DESKTOP LAUNCHER NOT YET QUALIFIED"
+          text = text.replace(status + "  \n", status + "\n", 1)
+          installation.write_text(text, encoding="utf-8")
           PY
