@@ -1,0 +1,131 @@
+name: Stage 146 seventh awareness stewardship sync
+
+on:
+  push:
+    branches:
+      - stewardship-seventh-live-awareness-sync
+
+permissions:
+  contents: write
+
+jobs:
+  stage:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Synchronize seventh awareness qualification
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace(path, old, new, count=1):
+              p=Path(path); text=p.read_text()
+              if old not in text:
+                  raise SystemExit(f'missing anchor in {path}: {old[:100]!r}')
+              p.write_text(text.replace(old,new,count))
+
+          # README current-state summary and mutation count.
+          replace('README.md',
+              '**IN PROGRESS — six bounded exits QUALIFIED**: local runtime (#119/#120), governed Tool Gateway (#122/#123), bound hosted/session cognition awareness (#125/#126), governed bound-remote origin transport freshness (#128/#129), exact bound-remote endpoint-surface freshness (#136/#137), and passive supported configured cognition-resource discovery (#140/#141). Parent #115 remains open; credential validity, authenticated provider/service readiness, model availability/fitness, arbitrary/unconfigured provider catalog discovery, broader external-connection/application awareness, and adaptive routing remain unqualified.',
+              '**IN PROGRESS — seven bounded exits QUALIFIED**: local runtime (#119/#120), governed Tool Gateway (#122/#123), bound hosted/session cognition awareness (#125/#126), governed bound-remote origin transport freshness (#128/#129), exact bound-remote endpoint-surface freshness (#136/#137), passive supported configured cognition-resource discovery (#140/#141), and configured remote cognition connection-policy awareness (#144/#145). Parent #115 remains open; credential validity, authenticated provider/service readiness, model availability/fitness, arbitrary/unconfigured provider catalog discovery, broader external-connection/application/process awareness, and adaptive routing remain unqualified.')
+          replace('README.md',
+              '**19/19** current critical-invariant mutations killed; the original Stage 1 qualification remains historically **12/12**, with seven later Live Environment Awareness authority/evidence mutations extending the current matrix;',
+              '**20/20** current critical-invariant mutations killed; the original Stage 1 qualification remains historically **12/12**, with eight later Live Environment Awareness authority/evidence mutations extending the current matrix;')
+
+          # Architecture header and detailed surface enumeration.
+          replace('docs/architecture/ARCHITECTURE.md',
+              'and six bounded Live Environment Awareness exits qualified: local runtime, governed Tool Gateway capability awareness, already-bound hosted/session cognition awareness, already-bound remote origin transport freshness, already-bound exact endpoint-surface freshness, and passive supported configured cognition-resource discovery.',
+              'and seven bounded Live Environment Awareness exits qualified: local runtime, governed Tool Gateway capability awareness, already-bound hosted/session cognition awareness, already-bound remote origin transport freshness, already-bound exact endpoint-surface freshness, passive supported configured cognition-resource discovery, and configured remote cognition connection-policy awareness.')
+          old_arch='No state automatically implies the next. Current protected source qualifies four bounded surfaces: defined local runtime awareness (#119/#120), passive governed Tool Gateway capability awareness (#122/#123), awareness of hosted/session cognition already bound to GorXu/Crew seats (#125/#126), and explicit current-session **origin transport freshness** for an already-bound remote cognition resource (#128/#129).'
+          new_arch='No state automatically implies the next. Current protected source qualifies seven bounded surfaces: defined local runtime awareness (#119/#120), passive governed Tool Gateway capability awareness (#122/#123), awareness of hosted/session cognition already bound to GorXu/Crew seats (#125/#126), explicit current-session **origin transport freshness** for an already-bound remote cognition resource (#128/#129), exact endpoint-surface freshness for that already-bound remote class (#136/#137), passive supported configured cognition-resource discovery (#140/#141), and configured remote cognition connection-policy awareness (#144/#145).'
+          replace('docs/architecture/ARCHITECTURE.md', old_arch, new_arch)
+          arch_path=Path('docs/architecture/ARCHITECTURE.md'); arch=arch_path.read_text()
+          transport='The remote transport refresh is deliberately narrow.'
+          insertion='The configured-connection policy-awareness surface is also deliberately non-operational. For one valid configured `openai` cognition resource it derives the exact normalized origin from the configured endpoint, reports host-policy permission separately from an already-sealed Mission Order, and requires exact operation/resource/endpoint/origin authority before reporting `authorized=True`. It performs no network request, credential inspection, provider construction, model activation, cognition invocation, selection, or routing; `ready`, `qualified_fit`, `selected`, and `observed` remain false.\n\n'
+          if insertion.strip() not in arch:
+              arch=arch.replace(transport, insertion+transport,1); arch_path.write_text(arch)
+
+          # Roadmap current position/count + append seventh qualification bullet before Apex path.
+          replace('docs/stewardship/ROADMAP.md',
+              'qualified exact bound remote endpoint-surface freshness exit, and qualified supported configured cognition-resource discovery exit**.',
+              'qualified exact bound remote endpoint-surface freshness exit, qualified supported configured cognition-resource discovery exit, and qualified configured remote cognition connection-policy awareness exit**.')
+          replace('docs/stewardship/ROADMAP.md',
+              '19 high-consequence production invariants continuously mutation-proven; the original Stage 1 12/12 record remains historical and seven later Live Environment Awareness authority/evidence mutations extend the current matrix.',
+              '20 high-consequence production invariants continuously mutation-proven; the original Stage 1 12/12 record remains historical and eight later Live Environment Awareness authority/evidence mutations extend the current matrix.')
+          roadmap=Path('docs/stewardship/ROADMAP.md'); text=roadmap.read_text()
+          marker='\n## Apex critical path\n'
+          block='''\n- **Live Environment Awareness configured remote cognition connection-policy awareness exit is QUALIFIED:** issue #144 / PR #145 add read-only policy awareness for one valid configured remote `openai` cognition endpoint. Host Tool Gateway permission is reported separately from Mission authorization; `authorized=True` requires an already sealed Order with exact `net_fetch`, `operation=configured_cognition_connection_authorization`, exact configured resource ID, exact endpoint, and exact normalized origin permitted by host policy. The surface performs no network request, credential inspection, provider/model activation, cognition invocation, readiness/fitness promotion, selection, fallback, or routing. Exact-head CI #491 / `32775200609` passed Wheel plus Python 3.11–3.14 on head `c6257872847746b0ef913f2291a6634ac206cc2b`; Python 3.12 recorded Vessel Health 10/0/0/0, pytest 399 passed / 2 skipped / 470 subtests, unittest 401 / 2 skipped, critical mutations 20/20 plus 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex PASS. The permanent `configured-connection-exact-resource-binding` mutation was killed. CI-tested synthetic merge `14ac96d070c4c5f22005de3b1a170128dc9b7b88` and guarded canonical merge `main@ef88cf34ea6732b65cf2ca461d06076d6af1221b` share exact tree `1480d54f15a4713a083e53cb7174ed8c6c244adf`. Credential validity, authenticated provider/service readiness, model existence/availability/fitness, cognition success, broader external-connection/application/process awareness, switching/fallback, and adaptive routing remain unqualified. Parent #115 remains open.\n'''
+          if block.strip() not in text:
+              if marker not in text: raise SystemExit('roadmap apex marker missing')
+              roadmap.write_text(text.replace(marker,block+marker,1))
+
+          # Live-awareness doctrine status, canonical narrative, sequencing, and evidence.
+          replace('docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md',
+              'SUPPORTED CONFIGURED COGNITION DISCOVERY EXITS QUALIFIED',
+              'SUPPORTED CONFIGURED COGNITION DISCOVERY + CONFIGURED REMOTE CONNECTION POLICY AWARENESS EXITS QUALIFIED')
+          doctrine=Path('docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md'); text=doctrine.read_text()
+          anchor='These exits still do **not** establish ambient application/process scanning'
+          lead='Issue #144 / PR #145 additionally qualify **configured remote cognition connection-policy awareness** for one valid configured `openai` resource. That surface derives the exact origin from the configured endpoint, separates host-policy permission from already-sealed Mission authorization, and requires exact operation/resource/endpoint/origin authority before reporting authorization. It performs no network request or credential/provider/model/cognition activity, and `ready`, `qualified_fit`, `selected`, and `observed` remain false. '
+          if lead.strip() not in text:
+              if anchor not in text: raise SystemExit('doctrine narrative anchor missing')
+              text=text.replace(anchor,lead+anchor,1)
+          seq='The supported configured cognition-resource discovery exit is **QUALIFIED** through issue #140 / PR #141 and establishes `Discovered` only from the repository-supported non-secret configuration surface. The configured remote cognition connection-policy awareness exit is **QUALIFIED** through issue #144 / PR #145 and establishes only the separation between host-policy permission and exact already-sealed Mission authorization for one configured remote connection, with zero network/provider/credential/model activity. '
+          broad='Broader issue #115 remains open.'
+          if seq.strip() not in text:
+              if broad not in text: raise SystemExit('doctrine sequencing anchor missing')
+              text=text.replace(broad,seq+broad,1)
+          evidence='''\n**Configured remote cognition connection-policy awareness qualification evidence:** issue #144 / PR #145 qualified the seventh bounded awareness exit. Final head `c6257872847746b0ef913f2291a6634ac206cc2b` passed exact-head GroX CI #491 / `32775200609` across Wheel + Python 3.11–3.14. Python 3.12 recorded Vessel Health 10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN, pytest 399 passed / 2 skipped / 470 subtests, unittest 401 / 2 skipped, critical mutations 20/20 plus 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex PASS. The permanent `configured-connection-exact-resource-binding` mutation was killed. Bounded review `5012382826` passed with no review threads. CI-tested synthetic merge `14ac96d070c4c5f22005de3b1a170128dc9b7b88` and guarded canonical merge `main@ef88cf34ea6732b65cf2ca461d06076d6af1221b` share exact tree `1480d54f15a4713a083e53cb7174ed8c6c244adf`. The qualified claim is policy awareness only; credentials, authenticated readiness, model availability/fitness, cognition success, broader connection discovery, switching/fallback, adaptive routing, and all later states remain unqualified.\n'''
+          if evidence.strip() not in text:
+              text += evidence
+          doctrine.write_text(text)
+
+          # Progress tracker top + prepend seventh qualification section.
+          progress=Path('docs/stewardship/progress-tracker.md'); text=progress.read_text()
+          text=text.replace('**Current verified canonical source after supported configured cognition-resource discovery qualification:** `main@bf3d0f622ed4088330324f865611e40a4466ae59`','**Current verified canonical source after configured remote cognition connection-policy awareness qualification:** `main@ef88cf34ea6732b65cf2ca461d06076d6af1221b`',1)
+          text=text.replace('**Current verified canonical tree:** `baf7841fabbdc02b91fcc750fedc02b0a4e8f929`','**Current verified canonical tree:** `1480d54f15a4713a083e53cb7174ed8c6c244adf`',1)
+          text=text.replace('pytest **392 passed, 2 skipped, 467 subtests**; unittest **394 OK, 2 skipped**; mutations **19/19**','pytest **399 passed, 2 skipped, 470 subtests**; unittest **401 OK, 2 skipped**; mutations **20/20**',1)
+          text=text.replace('SUPPORTED CONFIGURED COGNITION DISCOVERY EXITS QUALIFIED','SUPPORTED CONFIGURED COGNITION DISCOVERY + CONFIGURED REMOTE CONNECTION POLICY AWARENESS EXITS QUALIFIED',1)
+          text=text.replace('Continue issue #115 beyond the six qualified bounded exits','Continue issue #115 beyond the seven qualified bounded exits',1)
+          newsection='''## Live Environment Awareness — configured remote cognition connection-policy awareness — issue #144 / PR #145\n\n**Status: COMPLETE — QUALIFIED — CANONICAL MERGED AND EXACT-TREE VERIFIED.**\n\nQualified boundary:\n\n- applies only to one valid passive configured remote `openai` cognition resource; local `local-llama-cpp` configuration is not promoted into this remote-connection surface;\n- derives the exact normalized origin from the configured endpoint and reports host Tool Gateway permission separately from Mission authorization;\n- host policy alone never implies authorization;\n- an Order must already be sealed before awareness examines it; unsealed Orders fail closed without being changed;\n- `authorized=True` requires exact `net_fetch`, `operation=configured_cognition_connection_authorization`, exact configured resource ID, exact endpoint, exact origin grant, and independent host-policy permission;\n- no network request, credential inspection/validation, provider construction/binding, model/executable activation, cognition invocation, Mission creation, fallback, or routing occurs;\n- `ready`, `qualified_fit`, `selected`, and `observed` remain false.\n\nQualification evidence:\n\n- red-before-green tests-only head `1ff2903752dd0fd273f760502f4ab05713555260`: Wheel PASS; Python 3.11–3.14 red only because `grox.configured_connection_awareness` was absent while Python 3.12 source Health/reconstitution stayed green;\n- final PR #145 head `c6257872847746b0ef913f2291a6634ac206cc2b`;\n- exact-head GroX CI #491 / `32775200609`: PASS Wheel + Python 3.11–3.14;\n- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **399 passed, 2 skipped, 470 subtests**; unittest **401 OK, 2 skipped**; critical mutations **20/20**; health **7/7**; reconstitution **9/9**; operational drift **4/4**; source provenance **6/6**; Post-Apex PASS;\n- permanent mutation `configured-connection-exact-resource-binding`: KILLED;\n- bounded review `5012382826`: PASS with no review threads;\n- CI-tested synthetic merge `14ac96d070c4c5f22005de3b1a170128dc9b7b88`, tree `1480d54f15a4713a083e53cb7174ed8c6c244adf`;\n- guarded canonical merge `main@ef88cf34ea6732b65cf2ca461d06076d6af1221b`, same tree;\n- synthetic-to-canonical tree equality: **PASS**;\n- issue #144 closed completed; parent #115 remains **OPEN**.\n\nStill unqualified: credential validity, authenticated provider/service readiness, model existence/availability/fitness, successful cognition semantics, arbitrary/unconfigured provider catalogs, broader external-connection/application/process awareness, provider switching/fallback, and adaptive routing. No release/package/NCI/Apex/A8 advancement occurred.\n\n'''
+          marker='## Live Environment Awareness — supported configured cognition-resource discovery — issue #140 / PR #141\n'
+          if newsection.strip() not in text:
+              if marker not in text: raise SystemExit('progress section marker missing')
+              text=text.replace(marker,newsection+marker,1)
+          progress.write_text(text)
+
+          # Mutation matrix extension.
+          matrix=Path('docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md'); text=matrix.read_text()
+          text=text.replace('seven additional high-consequence Live Environment Awareness authority/evidence mutations. The current matrix is therefore **19/19 KILLED**','eight additional high-consequence Live Environment Awareness authority/evidence mutations. The current matrix is therefore **20/20 KILLED**',1)
+          row='| 20 | Configured remote connection authorization must remain bound to the exact discovered resource identity | disable the exact configured resource-ID mismatch rejection in `src/grox/configured_connection_awareness.py` | `ConfiguredConnectionPolicyAwarenessTests.test_wrong_resource_id_never_authorizes_connection` | KILLED |\n'
+          if row not in text:
+              anchor='| 19 | Configured cognition discovery must never imply readiness before an independently qualified readiness check | change configured-resource `ready` from false to true in `src/grox/cognition_discovery.py` | `ConfiguredCognitionDiscoveryTests.test_supported_openai_configuration_is_discovered_only` | KILLED |\n'
+              if anchor not in text: raise SystemExit('matrix row 19 anchor missing')
+              text=text.replace(anchor,anchor+row,1)
+          oldlatest='Latest exact-head evidence is PR #141 CI #476 / `32771922889`: Python 3.12 killed **19/19** critical mutations with zero survivors while all health, reconstitution, operational-drift, source-provenance, and Post-Apex gates remained green. The #16 mutation remains `cognition-transport-presealed-authority`; #17 is `cognition-transport-origin-binding`; #18 is `cognition-endpoint-exact-binding`; #19 is `configured-cognition-discovery-state-separation`. The original Stage 1 **12/12** qualification remains preserved above as historical evidence.'
+          newlatest='Latest exact-head evidence is PR #145 CI #491 / `32775200609`: Python 3.12 killed **20/20** critical mutations with zero survivors while all health, reconstitution, operational-drift, source-provenance, and Post-Apex gates remained green. The #16 mutation remains `cognition-transport-presealed-authority`; #17 is `cognition-transport-origin-binding`; #18 is `cognition-endpoint-exact-binding`; #19 is `configured-cognition-discovery-state-separation`; #20 is `configured-connection-exact-resource-binding`. The original Stage 1 **12/12** qualification remains preserved above as historical evidence.'
+          if oldlatest not in text: raise SystemExit('matrix latest evidence anchor missing')
+          matrix.write_text(text.replace(oldlatest,newlatest,1))
+
+          # Append-only Ship's Log.
+          ship=Path('docs/history/ships-log/0066-configured-connection-policy-awareness-qualified.md')
+          if ship.exists(): raise SystemExit('ship log 0066 already exists')
+          ship.write_text('''# Ship's Log 0066 — Configured Connection Policy Awareness Qualified\n\n**Date:** 2026-08-24\n\nIssue #144 / PR #145 qualified the seventh bounded Live Environment Awareness exit.\n\nGroX can now report host-policy permission separately from exact already-sealed Mission authorization for one valid configured remote `openai` cognition connection. The surface derives the normalized origin from the exact configured endpoint and requires exact `net_fetch`, operation, resource ID, endpoint, origin grant, and host-policy permission before reporting authorization.\n\nIt performs no network request, credential inspection or validation, provider construction/binding, model or executable activation, cognition invocation, Mission creation, readiness/fitness promotion, selection, fallback, or routing. `ready`, `qualified_fit`, `selected`, and `observed` remain false.\n\nQualification evidence:\n\n- red-before-green tests-only head `1ff2903752dd0fd273f760502f4ab05713555260`; Wheel PASS and Python 3.11–3.14 red only on the absent awareness module;\n- final PR #145 head `c6257872847746b0ef913f2291a6634ac206cc2b`;\n- exact-head GroX CI #491 / `32775200609`: PASS Wheel + Python 3.11–3.14;\n- Python 3.12: Health 10/0/0/0; pytest 399 passed, 2 skipped, 470 subtests; unittest 401 OK, 2 skipped; critical mutations 20/20; health 7/7; reconstitution 9/9; drift 4/4; provenance 6/6; Post-Apex PASS;\n- permanent `configured-connection-exact-resource-binding` mutation: KILLED;\n- bounded review `5012382826`: PASS;\n- CI-tested synthetic merge `14ac96d070c4c5f22005de3b1a170128dc9b7b88`, tree `1480d54f15a4713a083e53cb7174ed8c6c244adf`;\n- guarded canonical merge `main@ef88cf34ea6732b65cf2ca461d06076d6af1221b`, same tree;\n- exact synthetic/canonical tree equality: PASS.\n\nThe qualification does not establish credential validity, authenticated provider/service readiness, model existence/availability/fitness, cognition success, arbitrary provider discovery, broader connection/application/process awareness, switching/fallback, or adaptive routing. Issue #144 is closed completed; parent #115 remains open. No release/package/NCI/Apex/A8 change occurred.\n''')
+
+          # Remove staging artifacts before candidate commit.
+          Path('.github/workflows/stage-146-doc-sync.yml').unlink()
+          trigger=Path('.stage-146-trigger')
+          if trigger.exists(): trigger.unlink()
+          PY
+          git diff --check
+      - name: Commit workflow-free docs candidate
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md docs/architecture/ARCHITECTURE.md docs/stewardship/ROADMAP.md docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md docs/stewardship/progress-tracker.md docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md docs/history/ships-log/0066-configured-connection-policy-awareness-qualified.md .github/workflows/stage-146-doc-sync.yml .stage-146-trigger
+          git commit -m 'docs: record configured connection policy awareness qualification'
+          git push origin HEAD:stewardship-seventh-live-awareness-sync
