@@ -14,7 +14,6 @@ jobs:
         shell: bash
         run: |
           python3 - <<'PY'
-          from pathlib import Path
           import subprocess
           import textwrap
 
@@ -28,10 +27,30 @@ jobs:
           start = workflow.index(start_marker) + len(start_marker)
           end = workflow.index(end_marker, start)
           script = textwrap.dedent(workflow[start:end])
-          old_helper = "def replace_all(path, old, new, minimum=1):"
-          if script.count(old_helper) != 1:
-              raise SystemExit(f"expected one replace_all helper, found {script.count(old_helper)}")
-          script = script.replace(old_helper, "def replace_all(path, old, new, minimum=0):", 1)
+
+          old_once = '''def replace_once(path, old, new):
+    text = load(path)
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f"{path}: expected one match, found {count}: {old[:120]!r}")
+    save(path, text.replace(old, new, 1))'''
+          new_once = '''def replace_once(path, old, new):
+    text = load(path)
+    count = text.count(old)
+    if count == 0 and new in text:
+        return
+    if count != 1:
+        raise SystemExit(f"{path}: expected one match, found {count}: {old[:120]!r}")
+    save(path, text.replace(old, new, 1))'''
+          if script.count(old_once) != 1:
+              raise SystemExit(f"expected one replace_once helper body, found {script.count(old_once)}")
+          script = script.replace(old_once, new_once, 1)
+
+          old_all = "def replace_all(path, old, new, minimum=1):"
+          if script.count(old_all) != 1:
+              raise SystemExit(f"expected one replace_all helper, found {script.count(old_all)}")
+          script = script.replace(old_all, "def replace_all(path, old, new, minimum=0):", 1)
+
           compile(script, "staged-doc-sync", "exec")
           exec(script, {"__name__": "__main__"})
           PY
