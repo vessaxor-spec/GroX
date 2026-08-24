@@ -32,6 +32,10 @@ class CognitionTransportAuthorizationError(PermissionError):
     """The bounded cognition transport probe lacks exact sealed authority."""
 
 
+class CognitionEndpointAuthorizationError(PermissionError):
+    """The bounded cognition endpoint probe lacks exact sealed authority."""
+
+
 def _validate_ids(values: frozenset[str], *, field: str) -> frozenset[str]:
     normalized: set[str] = set()
     for value in values:
@@ -95,6 +99,16 @@ def _provider_origin(provider: Any) -> str | None:
         return normalize_origin(endpoint.strip())
     except (PolicyError, ValueError):
         return None
+
+
+def _provider_endpoint(provider: Any) -> str | None:
+    raw = getattr(provider, "endpoint", None)
+    if not isinstance(raw, str) or not raw.strip():
+        return None
+    safe = _safe_endpoint(raw)
+    if safe is None or raw.strip() != safe:
+        return None
+    return safe
 
 
 def _provider_name(provider: Any) -> str:
@@ -199,9 +213,10 @@ class CognitionProviderAwareness:
 
     Passive inventory never scans for providers, reads credential values, invokes
     callbacks/network endpoints, changes bindings, or performs provider selection.
-    A separate explicitly authorized refresh may observe only current transport
-    reachability for an already-bound remote origin through the existing A5 Tool
-    Gateway. Transport evidence never establishes provider readiness or fitness.
+    Separate explicitly authorized refreshes may observe current origin transport
+    reachability or exact configured endpoint-surface response evidence for an
+    already-bound remote resource through the existing A5 Tool Gateway. Neither
+    observation establishes provider readiness, credential validity, or fitness.
     """
 
     schema = "grox-live-hosted-cognition-inventory-v1"
@@ -214,6 +229,7 @@ class CognitionProviderAwareness:
         crew_provider: Any = None,
         gateway: ToolGateway | None = None,
         transport_observations: MutableMapping[str, Any] | None = None,
+        endpoint_observations: MutableMapping[str, Any] | None = None,
         clock: Callable[[], float] = monotonic,
         transport_freshness_seconds: float = 60.0,
     ):
@@ -231,6 +247,7 @@ class CognitionProviderAwareness:
         self.crew_provider = crew_provider
         self.gateway = gateway
         self.transport_observations = transport_observations if transport_observations is not None else {}
+        self.endpoint_observations = endpoint_observations if endpoint_observations is not None else {}
         self.clock = clock
         self.transport_freshness_seconds = float(transport_freshness_seconds)
 
@@ -317,6 +334,67 @@ class CognitionProviderAwareness:
             "transport_age_seconds": age,
         }
 
+    def _endpoint_snapshot(
+        self,
+        *,
+        resource_id: str,
+        is_remote: bool,
+        current_endpoint: str | None,
+        current_origin: str | None,
+    ) -> dict[str, Any]:
+        base = {
+            "endpoint_surface_fresh": False,
+            "endpoint_surface_status": "not_applicable" if not is_remote else "unproven",
+            "endpoint_http_status": None,
+            "endpoint_age_seconds": None,
+        }
+        if not is_remote:
+            return base
+        raw = self.endpoint_observations.get(resource_id)
+        if not isinstance(raw, dict) or current_endpoint is None or current_origin is None:
+            return base
+        observed_endpoint_raw = raw.get("endpoint")
+        observed_endpoint = _safe_endpoint(observed_endpoint_raw)
+        if (
+            observed_endpoint is None
+            or not isinstance(observed_endpoint_raw, str)
+            or observed_endpoint_raw.strip() != observed_endpoint
+            or observed_endpoint != current_endpoint
+        ):
+            return base
+        observed_origin_raw = raw.get("origin")
+        try:
+            observed_origin = normalize_origin(observed_origin_raw) if isinstance(observed_origin_raw, str) else None
+        except (PolicyError, ValueError):
+            observed_origin = None
+        if observed_origin is None or observed_origin != current_origin:
+            return base
+        observed_at = raw.get("observed_at")
+        if isinstance(observed_at, bool) or not isinstance(observed_at, (int, float)):
+            return base
+        age = max(0.0, float(self.clock()) - float(observed_at))
+        if age > self.transport_freshness_seconds:
+            return {**base, "endpoint_surface_status": "stale", "endpoint_age_seconds": age}
+        if raw.get("responded") is False:
+            return {
+                "endpoint_surface_fresh": True,
+                "endpoint_surface_status": "unreachable",
+                "endpoint_http_status": None,
+                "endpoint_age_seconds": age,
+            }
+        if raw.get("responded") is not True:
+            return base
+        status = raw.get("http_status")
+        if isinstance(status, bool) or not isinstance(status, int) or not 100 <= status <= 599:
+            return base
+        classification = "not_found" if status == 404 else ("server_degraded" if status >= 500 else "responding")
+        return {
+            "endpoint_surface_fresh": True,
+            "endpoint_surface_status": classification,
+            "endpoint_http_status": status,
+            "endpoint_age_seconds": age,
+        }
+
     def _snapshot(
         self,
         *,
@@ -338,9 +416,16 @@ class CognitionProviderAwareness:
         is_session = isinstance(provider, _SESSION_TYPES)
         is_remote = isinstance(provider, _REMOTE_TYPES)
         current_origin = _provider_origin(provider) if is_remote else None
+        current_endpoint = _provider_endpoint(provider) if is_remote else None
         transport_evidence = self._transport_snapshot(
             resource_id=resource_id,
             is_remote=is_remote,
+            current_origin=current_origin,
+        )
+        endpoint_evidence = self._endpoint_snapshot(
+            resource_id=resource_id,
+            is_remote=is_remote,
+            current_endpoint=current_endpoint,
             current_origin=current_origin,
         )
 
@@ -356,7 +441,11 @@ class CognitionProviderAwareness:
         elif is_remote:
             ready = False
             readiness_status = "remote_reachability_unproven"
-            if transport_evidence["transport_fresh"]:
+            if endpoint_evidence["endpoint_surface_fresh"]:
+                readiness_reason = (
+                    "current endpoint surface was observed separately, but credential, provider, model, and cognition readiness remain unproven"
+                )
+            elif transport_evidence["transport_fresh"]:
                 readiness_reason = (
                     "current origin transport was observed separately, but credential, provider, and model readiness remain unproven"
                 )
@@ -400,6 +489,7 @@ class CognitionProviderAwareness:
             "observed": observed,
             "observed_identity": dict(observed_identity) if observed_identity is not None else None,
             **transport_evidence,
+            **endpoint_evidence,
             "details": details,
             "authority_changed": False,
             "auto_selection": False,
@@ -491,6 +581,72 @@ class CognitionProviderAwareness:
             if item["resource_id"] == resource_id:
                 return item
         raise CognitionTransportAuthorizationError("bound cognition resource changed during transport refresh")
+
+    def _remote_endpoint_binding(self, resource_id: str) -> tuple[Any, str, str]:
+        provider, origin = self._remote_binding(resource_id)
+        endpoint = _provider_endpoint(provider)
+        if endpoint is None:
+            raise CognitionEndpointAuthorizationError("bound remote cognition endpoint is not an exact safe HTTP(S) URL")
+        return provider, origin, endpoint
+
+    def _authorize_endpoint_refresh(
+        self, *, resource_id: str, order: MissionOrder, origin: str, endpoint: str
+    ) -> None:
+        if not isinstance(order, MissionOrder):
+            raise CognitionEndpointAuthorizationError("endpoint refresh requires a MissionOrder")
+        if not order.sealed:
+            raise CognitionEndpointAuthorizationError("endpoint refresh requires an already sealed Mission Order")
+        if "net_fetch" in order.forbidden_actions or "net_fetch" not in order.allowed_actions:
+            raise CognitionEndpointAuthorizationError("sealed Mission Order does not grant net_fetch")
+        if order.parameters.get("operation") != "cognition_endpoint_probe":
+            raise CognitionEndpointAuthorizationError("sealed Mission Order operation must be cognition_endpoint_probe")
+        if order.parameters.get("resource_id") != resource_id:
+            raise CognitionEndpointAuthorizationError("sealed Mission Order does not bind this cognition resource_id")
+        if order.parameters.get("endpoint") != endpoint:
+            raise CognitionEndpointAuthorizationError("sealed Mission Order does not bind this cognition endpoint")
+        raw_origins = order.parameters.get("allowed_origins") or ()
+        if not isinstance(raw_origins, (list, tuple)) or not all(
+            isinstance(value, str) and bool(value.strip()) for value in raw_origins
+        ):
+            raise CognitionEndpointAuthorizationError("sealed Mission Order allowed_origins are invalid")
+        try:
+            order_origins = frozenset(normalize_origin(value) for value in raw_origins)
+        except PolicyError as exc:
+            raise CognitionEndpointAuthorizationError(str(exc)) from exc
+        if origin not in order_origins:
+            raise CognitionEndpointAuthorizationError("bound cognition origin is not granted by the sealed Mission Order")
+        if self.gateway is None:
+            raise CognitionEndpointAuthorizationError("no governed Tool Gateway is bound for endpoint refresh")
+        if not self.gateway.policy.network_enabled:
+            raise CognitionEndpointAuthorizationError("network capability is disabled by host policy")
+        if origin not in self.gateway.policy.allowed_origins:
+            raise CognitionEndpointAuthorizationError("bound cognition origin is outside host Gateway policy")
+
+    def refresh_endpoint_surface(self, *, resource_id: str, order: MissionOrder) -> dict[str, Any]:
+        """Refresh volatile exact-endpoint response evidence without provider credentials or cognition."""
+        _, origin, endpoint = self._remote_endpoint_binding(resource_id)
+        self._authorize_endpoint_refresh(resource_id=resource_id, order=order, origin=origin, endpoint=endpoint)
+        assert self.gateway is not None
+        observed_at = float(self.clock())
+        try:
+            response = self.gateway.fetch_url(order, endpoint)
+        except (ToolDenied, TimeoutError, OSError):
+            self.endpoint_observations[resource_id] = {
+                "observed_at": observed_at, "endpoint": endpoint, "origin": origin,
+                "responded": False, "http_status": None,
+            }
+        else:
+            status = response.get("status") if isinstance(response, dict) else None
+            valid_status = status if isinstance(status, int) and not isinstance(status, bool) and 100 <= status <= 599 else None
+            self.endpoint_observations[resource_id] = {
+                "observed_at": observed_at, "endpoint": endpoint, "origin": origin,
+                "responded": True if valid_status is not None else None, "http_status": valid_status,
+            }
+        refreshed = self.inventory()["resources"]
+        for item in refreshed:
+            if item["resource_id"] == resource_id:
+                return item
+        raise CognitionEndpointAuthorizationError("bound cognition resource changed during endpoint refresh")
 
     def inventory(self, *, policy: CognitionProviderPolicy | None = None) -> dict[str, Any]:
         if policy is not None and not isinstance(policy, CognitionProviderPolicy):
