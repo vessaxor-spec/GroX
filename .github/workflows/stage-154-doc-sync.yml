@@ -1,0 +1,32 @@
+name: Stage 154 stewardship sync
+
+on:
+  pull_request:
+    types: [synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  stage:
+    if: github.event.pull_request.number == 155
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: stewardship-secret-alias-awareness-qualified
+          fetch-depth: 0
+      - name: Apply assertion-bound docs transform
+        run: python scripts/stage_154_docs.py
+      - name: Verify intended documentation scope
+        run: |
+          git diff -- README.md docs/architecture/ARCHITECTURE.md docs/stewardship/ROADMAP.md docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md docs/stewardship/progress-tracker.md docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md
+          test -f docs/history/ships-log/0068-governed-secret-alias-availability-qualified.md
+      - name: Self-clean staging artifacts and commit
+        run: |
+          git rm -f .github/workflows/stage-154-doc-sync.yml scripts/stage_154_docs.py .stage-154-trigger
+          git add README.md docs/architecture/ARCHITECTURE.md docs/stewardship/ROADMAP.md docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md docs/stewardship/progress-tracker.md docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md docs/history/ships-log/0068-governed-secret-alias-availability-qualified.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: synchronize ninth live-awareness qualification"
+          git push origin HEAD:stewardship-secret-alias-awareness-qualified
