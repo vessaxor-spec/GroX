@@ -1,6 +1,6 @@
 # GroX Persistence Architecture
 
-**Qualified release baseline:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`. Canonical source continues on protected `main` and may advance beyond the immutable release through governed PR/CI. Snapshot source binding, ancestor compatibility control, and fail-closed unrelated-source restore are part of the Apex regression boundary. Protected source now also contains the NCI-1A installed-workspace foundation and NCI-1B runtime/state/work filesystem-role separation; those post-release foundations do not move the release or create a new Apex stage.
+**Qualified release baseline:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`. Canonical source continues on protected `main` and may advance beyond the immutable release through governed PR/CI. Snapshot source binding, ancestor compatibility control, and fail-closed unrelated-source restore remain part of the Apex regression boundary. Protected source now also has NCI-1/2/3 qualified bounded local cognition paths plus qualified Live Environment Awareness surfaces; those post-release advances do not move the release or create a new Apex stage.
 
 ## Decision
 
@@ -14,7 +14,7 @@ Pilot GorXu remains the sole operational orchestrator. Persistence planes and fi
 
 ## Plane 1: Cognitive continuity
 
-**Current home:** ChatGPT project `Space Exploration` while native local GorXu cognition remains under development.
+**Current project/session home:** ChatGPT project `Space Exploration` remains the active coordination and cognitive-reconstitution plane. NCI-1/2/3 now additionally qualify bounded local GorXu cognition paths; neither plane supersedes the other or creates command authority.
 
 The project holds the durable human/AI operating context needed to reconstitute Pilot GorXu: Commander intent, GroX doctrine, architectural decisions, Apex trajectory, relevant history, and continuity across project conversations.
 
@@ -105,7 +105,13 @@ NCI-1A established safe local workspace commissioning primitives for supported m
 - collision and implicit-rebinding refusal;
 - recovery of a marked partial commissioning attempt.
 
-NCI-1B then made the runtime/state/work split available beneath Pilot GorXu. Full standalone installed GorXu is **not yet qualified** because canonical runtime assets are not yet packaged into the installed application path. Desktop launchers, the public one-command installer, a bundled general native language model, and offline GorXu qualification also remain future work.
+NCI-1B made the runtime/state/work split available beneath Pilot GorXu. NCI-1C now packages canonical runtime assets and qualifies standalone installed GorXu outside a checkout; NCI-1D qualifies the native model registry/local inference runtime; NCI-2 and NCI-3 qualify the exact local seed and bounded offline GorXu profile. Desktop launchers, the public one-command installer, broader cross-platform consumer packaging, a GroX-pretrained general-purpose foundation model, NCI-4, and NCI-8 remain separate unqualified work.
+
+## Live Environment Awareness persistence rule
+
+Current execution-environment facts are not durable merely because GroX observed them. The #128/#129 transport-freshness observation is intentionally **current-session volatile**: timestamp, reachable/unreachable state, and bounded HTTP status live only in the active Pilot awareness state. Response content is discarded, and the observation is not written into private operational persistence as current provider readiness.
+
+Reconstitution therefore drops that current transport claim. A later session must obtain new exact authority and perform a fresh bounded observation before claiming current transport freshness. Historical identity/execution evidence may remain attributable where separately supported, but it cannot substitute for fresh volatile readiness, credential validity, or provider/service availability.
 
 ## Reconstitution protocol
 

@@ -1,6 +1,6 @@
 # Local Installation and Commissioning Contract
 
-**Status:** AUTHORIZED NCI REQUIREMENT — NCI-1A / NCI-1B / NCI-1C FOUNDATION CANONICAL; FULL LOCAL INSTALLATION NOT YET QUALIFIED  
+**Status:** AUTHORIZED NCI REQUIREMENT — NCI-1A / NCI-1B / NCI-1C / NCI-1D + NCI-2 / NCI-3 BOUNDED LOCAL COGNITION QUALIFIED; PUBLIC ONE-COMMAND INSTALLER / DESKTOP LAUNCHER NOT YET QUALIFIED
 **Originating issue:** #88  
 **Program:** Native Cognition Independence Program 001
 
@@ -14,7 +14,7 @@ The public installation objective is:
 
 > A user on a supported macOS or Linux host should be able to install GroX from one documented README command, invoke `grox`, commission a local Vessel, converse with Pilot GorXu, and later reconstitute the same Vessel without requiring a paid AI subscription or a source checkout.
 
-This contract defines the installation and first-run boundary that NCI implementation must satisfy. NCI-1A, NCI-1B, and NCI-1C now implement and qualify workspace commissioning, separated runtime/state/work roles, packaged canonical runtime assets, and standalone installed GorXu startup. They do not yet prove the complete public installer, native general-purpose language model, desktop launcher, automatic first-run wizard, or offline qualification.
+This contract defines the installation and first-run boundary that NCI implementation must satisfy. NCI-1A through NCI-1D now qualify workspace commissioning, separated runtime/state/work roles, packaged canonical runtime assets, standalone installed GorXu startup, and the native model registry/local inference runtime. NCI-2 and NCI-3 separately qualify the exact local seed and bounded offline GorXu operating profile. These results still do not prove the complete public one-command installer, desktop launcher, automatic first-run wizard, broad cross-platform consumer packaging, a GroX-pretrained general-purpose foundation model, NCI-4, or NCI-8.
 
 ## Preserved command architecture
 
@@ -232,7 +232,7 @@ Commissioning should eventually perform, in a bounded and observable sequence:
 10. run Vessel health/readiness checks;
 11. enter Pilot GorXu only after commissioning is safe enough for the claimed operating mode.
 
-NCI-1A implements bounded workspace selection/defaulting, workspace ownership markers, platform-aware host configuration, atomic binding writes, idempotent same-workspace commissioning, collision/refusal rules, and marked partial-commissioning recovery. NCI-1B separates runtime assets, private state, and Commander work. NCI-1C packages/validates the canonical runtime assets and proves the first standalone installed Pilot boot plus bounded Crew orchestration/reconstitution. Hardware/model provisioning, native model runtime/readiness, automatic first-run flow, and launcher installation remain outstanding.
+NCI-1A implements bounded workspace selection/defaulting, workspace ownership markers, platform-aware host configuration, atomic binding writes, idempotent same-workspace commissioning, collision/refusal rules, and marked partial-commissioning recovery. NCI-1B separates runtime assets, private state, and Commander work. NCI-1C packages/validates canonical runtime assets and proves standalone installed Pilot boot plus bounded Crew orchestration/reconstitution. NCI-1D adds the integrity-bound model registry and explicit local inference runtime. NCI-2/NCI-3 prove the exact qualified local seed/runtime and bounded offline GorXu profile. Automatic first-run asset acquisition, public one-command distribution, broader supported-host provisioning, and launcher installation remain outstanding.
 
 Failure during commissioning must fail closed or leave a recoverable partial state. It must not widen Crew authority or silently bypass health/integrity gates.
 
@@ -332,7 +332,7 @@ grox
 
 The first run should explain that the default workspace is `~/GroX` and that it can be changed during commissioning.
 
-Until a normal-user installer is qualified, README must accurately distinguish the source/developer path from the now-qualified NCI-1C installed-wheel runtime foundation. It may state that a commissioned non-editable wheel can start standalone Pilot GorXu with packaged runtime assets, but must not imply that the public one-command installer, native general-purpose cognition, desktop launcher, or offline profile is already qualified.
+Until a normal-user installer is qualified, README must accurately distinguish the source/developer path from the qualified NCI installed/runtime/cognition foundations. It may state that a commissioned non-editable wheel can start standalone Pilot GorXu with packaged runtime assets and that NCI-2/NCI-3 qualify one exact local seed plus bounded offline GorXu profile, but it must not imply a public one-command installer, desktop launcher, GroX-pretrained general-purpose foundation model, unsupported host profile, NCI-4, or NCI-8.
 
 Developer/source installation should remain clearly labeled as the development path.
 
@@ -382,17 +382,19 @@ NCI-1B was merged through PR #93 as canonical source `55c98b13a169476cfedad89c1d
 
 NCI-1C final head `e0c187567213fdf66cd1baaa03e3230ee1f16dd0` passed exact-head CI `32375436084` / run **275** across all five required jobs. PR #97 merged as canonical `main@0eddbc204b1e7b52158c355e9587731a7cbec08c`; canonical tree `b4a4bf8f389309e79341ad8df9b6e1f5f6801e35` exactly matches CI-tested synthetic merge `73fb8c58d2bd02271e2122b04a12c8f76bacef2d`.
 
-### Remaining NCI-1 runtime work
+### NCI-1D — native model registry + local inference runtime
 
-The broader NCI-1 exit still includes the native model/runtime contract: model registry and lineage, local inference-provider interface, hardware/runtime discovery, deterministic resource/context ceilings, cognition placement, model health/readiness evidence, fail-closed fallback, and reconstitution. **NCI-1D — Native Model Registry + Local Inference Runtime Contract** is the next bounded slice. NCI-1 as a whole is therefore **not yet qualified** merely because NCI-1A, NCI-1B, and NCI-1C are canonical.
+**COMPLETE / QUALIFIED.** GroX owns the integrity-bound model registry, lineage/readiness/resource contract, provider-neutral local inference interface, explicit load/invoke/unload semantics, and fail-closed reconstitution. PR #102 later supplied the installed-wheel packaged-model proof needed to close the overall NCI-1 exit.
 
-### NCI-2
+**NCI-1 is QUALIFIED.** This does not itself claim language-capable seed cognition, public installation, or offline GorXu; NCI-2 and NCI-3 supply the next bounded evidence.
 
-Built-in local seed cognition must be provisionable into an installed/commissioned Vessel without requiring a source checkout.
+### NCI-2 — built-in local seed cognition
 
-### NCI-3
+**COMPLETE / QUALIFIED.** Issue #109 / PR #110 qualify the exact `qwen3-4b-q4-k-m-seed-v1` (`Qwen3-4B-Q4_K_M.gguf`) through pinned `llama.cpp` b10218 on the recorded Linux x86_64 CPU-first installed path. The proof uses no vendor credential or external network and reconstitutes with zero active models. It does not turn arbitrary local models/runtimes/platforms into qualified resources.
 
-Offline GorXu qualification must run from the installed local Vessel path rather than relying on a developer checkout as the product architecture. It must preserve direct Commander↔GorXu interaction and GorXu's Crew-orchestration role.
+### NCI-3 — offline GorXu cognition
+
+**COMPLETE / QUALIFIED.** Issue #113 / PR #114 qualify the bounded installed/offline GorXu conversational profile on the same exact NCI-2 seed/runtime path. Direct `grox ask` works without Mission creation; the governed Mission path can also interpret a natural-language objective, delegate bounded high-risk Inspect work, synthesize, obtain independent verification, and reconstitute without vendor credentials or an external route. This is not the broader NCI-8 offline Vessel qualification and does not qualify every tool/personal-assistant surface offline.
 
 ### NCI-8
 
@@ -452,9 +454,9 @@ Current protected source now establishes more than the original contract did, bu
 - the current README source quick start remains the truthful developer path while the public normal-user installer remains unqualified;
 - the public one-command normal-user installer is not yet qualified;
 - automatic no-argument interactive first-run commissioning is not yet complete;
-- a self-contained native general-purpose language model is not yet shipped;
+- the exact NCI-2 Qwen seed + pinned `llama.cpp` path and the bounded NCI-3 offline GorXu profile are qualified, but GroX does not claim a GroX-pretrained general-purpose foundation model or arbitrary local model/runtime support;
 - desktop launchers are not yet qualified;
-- NCI offline personal-assistant + Crew-orchestration qualification is not yet complete.
+- the broader NCI-8 offline Vessel qualification, public cross-platform installer, and automatic consumer provisioning flow remain incomplete.
 
 ## Preserved Vessel state
 

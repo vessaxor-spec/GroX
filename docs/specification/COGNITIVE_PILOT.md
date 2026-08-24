@@ -2,6 +2,8 @@
 
 **Qualification status:** **A1 SESSION-QUALIFIED** in GroX `v0.8.0`. Project-hosted cognition may occupy the Pilot reasoning seat; deterministic authority remains authoritative and safe fallback remains mandatory.
 
+Protected source has since qualified a separate bounded local path through NCI-2/NCI-3: the exact Qwen3-4B Q4_K_M seed and pinned `llama.cpp` runtime can occupy GorXu's reasoning seat for the recorded installed/offline profile without changing the A1 authority contract.
+
 ## Purpose
 
 The Cognitive Pilot layer gives Pilot GorXu model-backed interpretation and strategy formation without transferring command authority to the model.
@@ -36,7 +38,7 @@ GorXu's cognitive provider receives a compact discovery directory derived from t
 
 The directory deliberately omits capability grants and expanded routing tags. Capabilities, eligibility, experienced routing, Mission authority, risk floors, Repair permission, and verifier independence remain local deterministic GroX controls. A cognitive Crew recommendation is advisory; an invalid or ineligible recommendation cannot make a Crew member eligible and falls back through the qualified deterministic routing path.
 
-Deep specialist craft cards are not part of this directory and are not injected merely because a Crew member is selected. `craft_card()` remains an explicit read-only craft lookup. Future model-backed Crew cognition, if separately authorized, should activate bounded Mission-relevant craft rather than require complete-card reinjection per tour.
+Deep specialist craft cards are not part of this directory and are not injected merely because a Crew member is selected. `craft_card()` remains an explicit read-only craft lookup. The later selective Crew-cognition implementation follows this boundary by activating bounded Mission-relevant craft rather than complete-card reinjection per tour.
 
 ## Cognitive usage evidence
 
@@ -79,7 +81,13 @@ As GroX gains more powerful tools, policy may require cognitive availability for
 
 The runtime exposes a provider-neutral `ReasoningProvider` contract. Provider adapters are implementation details and may be replaced without changing the command architecture.
 
-The first implemented adapter uses the OpenAI Responses API with structured JSON output and disables response storage at the request level. No provider key is stored in the Vessel repository.
+The first implemented adapter uses the OpenAI Responses API with structured JSON output and disables response storage at the request level. Current source also implements `local-llama-cpp`, which binds an explicitly loaded registered local model through the GroX-owned `LocalModelRuntime` and a supplied `llama.cpp` executable. No provider key is stored in the Vessel repository, and local registration/readiness never auto-activates a model.
+
+## Live cognition awareness boundary
+
+Cognition configuration and cognition awareness are separate from cognition authority. Passive awareness may describe already-bound hosted/session resources without invoking them. Current protected source additionally permits one explicit transport-freshness refresh for an already-bound remote cognition resource only through an already sealed exact Mission Order and the existing Tool Gateway.
+
+Transport reachability is not cognitive readiness. An HTTP response at the exact authorized origin does not validate provider credentials, model availability, provider/service health, qualification/fit, authorization, selection, or routing. The remote provider remains `ready=False` until a future bounded mechanism proves the stronger state under its own authority and evidence requirements.
 
 ## Qualified A1 boundary
 
@@ -93,4 +101,4 @@ A1 qualification was established with a real configured reasoning model, not a t
 6. mutation authority cannot be self-granted;
 7. structured reasoning evidence is persisted and independently inspectable.
 
-**Current status:** SESSION-QUALIFIED. Loss of the project/session cognitive provider degrades to deterministic control and never widens authority.
+**Current A1 status:** SESSION-QUALIFIED. Protected source additionally has NCI-3's bounded offline GorXu profile qualified on the exact NCI-2 local seed/runtime path. Loss or invalidity of any configured cognition path narrows or degrades operation and never widens authority; provider/service readiness beyond the qualified evidence remains unclaimed.

@@ -72,6 +72,19 @@ All five canonical CI jobs passed.
 | 11 | Installed runtime without a Vessel root fails closed | final `VesselRootError` replaced with fabricated current directory root | `VesselRootTests.test_unbound_installed_runtime_refuses_empty_vessel` | KILLED | GREEN |
 | 12 | Third-party Actions remain pinned to immutable full commit SHAs | one regression-job checkout pin changed to mutable `@v7` | `CISupplyChainTest.test_external_actions_are_pinned_to_full_commit_sha` | KILLED | GREEN |
 
+## Post-Apex matrix extensions
+
+The original Stage 1 qualification above remains historical **12/12 KILLED** evidence. Protected source later extended the same permanent harness with four additional high-consequence Live Environment Awareness authority mutations. The current matrix is therefore **16/16 KILLED**; this extension does not rewrite the original Stage 1 run.
+
+| # | Invariant | Production mutation | Target detector | Current evidence |
+|---|---|---|---|---|
+| 13 | A discovered, ready, and qualified live resource cannot be selected without explicit authorization | disable the `not_authorized` gate in `src/grox/live_environment.py` | `LiveEnvironmentAwarenessTests.test_selection_uses_only_policy_order_and_requires_every_gate` | KILLED |
+| 14 | Host-enabled/ready Tool Gateway capability state cannot imply Mission authorization without sealed Order context | make `order is None` return authorized in `src/grox/tool_awareness.py` | `ToolCapabilityAwarenessTests.test_host_ready_never_implies_mission_authorization` | KILLED |
+| 15 | A bound/structurally ready hosted cognition provider cannot become authorized without explicit exact-resource policy | force hosted cognition authorization true without policy in `src/grox/cognition_awareness.py` | `CognitionProviderAwarenessTests.test_bound_session_provider_is_discovered_selected_but_not_authorized_or_observed` | KILLED |
+| 16 | Remote cognition transport awareness cannot acquire network authority by allowing the Tool Gateway to seal an unsealed Mission Order | disable the pre-sealed Order rejection in `src/grox/cognition_awareness.py` | `CognitionTransportFreshnessTests.test_unsealed_order_is_rejected_without_becoming_sealed` | KILLED |
+
+Latest exact-head evidence is PR #129 CI #426 / `32710787713`: Python 3.12 killed **16/16** critical mutations with zero survivors while all health, reconstitution, operational-drift, source-provenance, and Post-Apex gates remained green. The #16 mutation is `cognition-transport-presealed-authority`.
+
 ## New detector coverage added in Stage 1
 
 Two gaps warranted permanent regression tests rather than relying only on indirect coverage:
