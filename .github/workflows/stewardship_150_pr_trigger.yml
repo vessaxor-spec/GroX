@@ -20,6 +20,16 @@ jobs:
       - name: Apply asserted documentation transformation
         shell: bash
         run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('.github/stewardship_150_stage.py')
+          t = p.read_text()
+          old = '''if nxt < 0:\n    nxt = t.find("\\n## ", start)\nif nxt < 0:\n    raise SystemExit("doctrine evidence insertion point missing")'''
+          new = '''if nxt < 0:\n    nxt = t.find("\\n## ", start)\nif nxt < 0:\n    nxt = len(t)'''
+          if t.count(old) != 1:
+              raise SystemExit(f'doctrine append patch target count={t.count(old)}')
+          p.write_text(t.replace(old, new, 1))
+          PY
           python .github/stewardship_150_stage.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
