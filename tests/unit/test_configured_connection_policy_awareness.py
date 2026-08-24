@@ -95,11 +95,24 @@ class ConfiguredConnectionPolicyAwarenessTests(unittest.TestCase):
             awareness.inventory(resource=resource, order=order)
         self.assertFalse(order.sealed)
 
+    def test_wrong_resource_id_never_authorizes_connection(self):
+        resource = self._resource()
+        order = self._order(
+            resource_id="cognition:configured:openai:wrong",
+            endpoint=resource["endpoint"],
+        )
+        snapshot = ConfiguredConnectionPolicyAwareness(self._gateway()).inventory(
+            resource=resource,
+            order=order,
+        )
+        self.assertFalse(snapshot["authorized"])
+        self.assertEqual(snapshot["authorization_status"], "resource_mismatch")
+        self.assertFalse(snapshot["ready"])
+
     def test_resource_endpoint_operation_and_origin_binding_fail_closed(self):
         resource = self._resource()
         awareness = ConfiguredConnectionPolicyAwareness(self._gateway())
         cases = [
-            {"resource_id": "cognition:configured:openai:wrong", "endpoint": resource["endpoint"], "operation": "configured_cognition_connection_authorization", "origins": ["https://api.openai.com"]},
             {"resource_id": resource["resource_id"], "endpoint": "https://api.openai.com/v1/other", "operation": "configured_cognition_connection_authorization", "origins": ["https://api.openai.com"]},
             {"resource_id": resource["resource_id"], "endpoint": resource["endpoint"], "operation": "other_operation", "origins": ["https://api.openai.com"]},
             {"resource_id": resource["resource_id"], "endpoint": resource["endpoint"], "operation": "configured_cognition_connection_authorization", "origins": ["https://example.invalid"]},
