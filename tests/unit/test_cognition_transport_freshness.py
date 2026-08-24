@@ -195,6 +195,33 @@ class CognitionTransportFreshnessTests(unittest.TestCase):
         self.assertFalse(item["transport_fresh"])
         self.assertEqual(item["transport_status"], "unproven")
 
+    def test_same_resource_identity_endpoint_rebind_invalidates_prior_origin_evidence(self):
+        with patch.object(
+            self.gateway,
+            "fetch_url",
+            return_value={"origin": ORIGIN, "status": 200, "preview": "ignored"},
+        ):
+            first = self.awareness.refresh_transport(resource_id=self.resource_id, order=self.order())
+        self.assertTrue(first["transport_reachable"])
+
+        rebound = OpenAIResponsesProvider(
+            api_key="different-secret",
+            model="remote-model-sentinel",
+            endpoint="https://example.invalid/v1/responses",
+        )
+        rebound_awareness = CognitionProviderAwareness(
+            reasoner=rebound,
+            gateway=self.gateway,
+            transport_observations=self.observations,
+            clock=lambda: self.now,
+            transport_freshness_seconds=60,
+        )
+        item = rebound_awareness.inventory()["resources"][0]
+        self.assertEqual(item["resource_id"], self.resource_id)
+        self.assertFalse(item["transport_reachable"])
+        self.assertFalse(item["transport_fresh"])
+        self.assertEqual(item["transport_status"], "unproven")
+
     def test_non_remote_bound_resource_cannot_be_transport_probed(self):
         from grox.reasoning.session import SessionReasoningProvider
 
