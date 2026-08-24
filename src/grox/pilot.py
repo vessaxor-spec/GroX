@@ -2,6 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 from time import perf_counter
+import os
 import traceback
 import uuid
 from .contracts import MissionOrder, MissionMode, RiskClass, Evidence, TourResult
@@ -22,6 +23,7 @@ from .tool_awareness import ToolCapabilityAwareness
 from .cognition_awareness import CognitionProviderAwareness, CognitionProviderPolicy
 from .cognition_discovery import ConfiguredCognitionDiscovery, nonsecret_reasoner_config_from_env
 from .configured_connection_awareness import ConfiguredConnectionPolicyAwareness
+from .configured_local_readiness import ConfiguredLocalCognitionReadiness
 from .graph import MissionGraphPlan
 from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
@@ -127,6 +129,14 @@ class PilotGorXu:
         resources=inventory.get('resources') or []
         resource=resources[0] if len(resources)==1 else {}
         return ConfiguredConnectionPolicyAwareness(self.gateway).inventory(resource=resource,order=order)
+
+    def live_configured_local_cognition_readiness_inventory(self)->dict[str,Any]:
+        """Report explicit non-activating readiness for configured local llama.cpp cognition."""
+        inventory=self.live_configured_cognition_inventory()
+        resources=inventory.get('resources') or []
+        resource=resources[0] if len(resources)==1 else {}
+        executable=os.getenv('GROX_LLAMA_CPP_EXECUTABLE','').strip()
+        return ConfiguredLocalCognitionReadiness(self.layout).inventory(resource=resource,executable=executable)
 
     def refresh_cognition_transport(self, *, resource_id:str, order:MissionOrder)->dict[str,Any]:
         """Refresh bounded remote-origin transport evidence through the governed Tool Gateway."""
