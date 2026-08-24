@@ -192,6 +192,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_discovery.py::ConfiguredCognitionDiscoveryTests::test_supported_openai_configuration_is_discovered_only",
     ),
     MutationSpec(
+        name="configured-connection-exact-resource-binding",
+        invariant="Configured remote connection authorization must remain bound to the exact discovered resource identity.",
+        path="src/grox/configured_connection_awareness.py",
+        old='        elif parameters.get("resource_id") != resource_id:\n',
+        new='        elif False and parameters.get("resource_id") != resource_id:\n',
+        nodeid="tests/unit/test_configured_connection_policy_awareness.py::ConfiguredConnectionPolicyAwarenessTests::test_resource_endpoint_operation_and_origin_binding_fail_closed",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
