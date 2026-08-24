@@ -184,6 +184,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_cognition_endpoint_freshness.py::CognitionEndpointFreshnessTests::test_exact_endpoint_authority_is_required",
     ),
     MutationSpec(
+        name="configured-cognition-discovery-state-separation",
+        invariant="Configured cognition discovery must never imply readiness before an independently qualified readiness check.",
+        path="src/grox/cognition_discovery.py",
+        old='            "ready": False,\n',
+        new='            "ready": True,\n',
+        nodeid="tests/unit/test_configured_cognition_discovery.py::ConfiguredCognitionDiscoveryTests::test_supported_openai_configuration_is_discovered_only",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
