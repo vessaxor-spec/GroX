@@ -86,6 +86,7 @@ class ConfiguredConnectionPolicyAwarenessTests(unittest.TestCase):
         self.assertEqual(snapshot["authorization_status"], "sealed_mission_order_authorized")
         self.assertFalse(snapshot["ready"])
         self.assertFalse(snapshot["network_invoked"])
+        self.assertFalse(snapshot["credential_inspected"])
 
     def test_unsealed_order_is_rejected_without_becoming_sealed(self):
         resource = self._resource()
