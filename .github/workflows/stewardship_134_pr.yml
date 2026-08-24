@@ -1,0 +1,38 @@
+name: Stewardship 134 PR sync
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'stewardship-transport-origin-repair-qualified'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: stewardship-transport-origin-repair-qualified
+          fetch-depth: 0
+      - name: Execute bounded stewardship sync
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = Path('.github/workflows/stewardship_134_sync.yml').read_text().splitlines()
+          start = src.index("          python - <<'PY'") + 1
+          end = src.index('          PY', start)
+          program = '\n'.join(line[10:] if line.startswith('          ') else line for line in src[start:end]) + '\n'
+          exec(compile(program, '<stewardship-134>', 'exec'), {'__name__': '__main__'})
+          PY
+          git diff --check
+          test "$(git status --porcelain | wc -l)" -eq 4
+          git config user.name "VESSAXOR"
+          git config user.email "vessaxor@gmail.com"
+          git add docs/stewardship/progress-tracker.md docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md docs/history/ships-log/0064-transport-origin-evidence-binding-repaired.md
+          git commit -m "docs: record transport origin-binding repair qualification"
+          git rm .github/workflows/stewardship_134_sync.yml .github/workflows/stewardship_134_pr.yml
+          git commit -m "chore: remove stewardship #134 staging workflows"
+          git push origin HEAD:stewardship-transport-origin-repair-qualified
