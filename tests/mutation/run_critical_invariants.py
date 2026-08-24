@@ -208,6 +208,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_local_readiness.py::ConfiguredLocalCognitionReadinessTests::test_ready_state_never_implies_authorization",
     ),
     MutationSpec(
+        name="secret-alias-exact-binding",
+        invariant="Secret-alias availability must remain bound to the exact requested alias rather than any broker secret.",
+        path="src/grox/tools/secrets.py",
+        old='        return isinstance(alias, str) and bool(alias) and alias in self._secrets\n',
+        new='        return isinstance(alias, str) and bool(alias) and bool(self._secrets)\n',
+        nodeid="tests/unit/test_secret_alias_awareness.py::SecretAliasAwarenessTests::test_absent_alias_fails_closed_without_enumerating_other_aliases",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
