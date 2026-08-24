@@ -200,6 +200,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_connection_policy_awareness.py::ConfiguredConnectionPolicyAwarenessTests::test_wrong_resource_id_never_authorizes_connection",
     ),
     MutationSpec(
+        name="configured-local-readiness-authorization-separation",
+        invariant="Configured local cognition readiness must never imply Mission authorization.",
+        path="src/grox/configured_local_readiness.py",
+        old='            "authorized": False,\n',
+        new='            "authorized": True,\n',
+        nodeid="tests/unit/test_configured_local_readiness.py::ConfiguredLocalCognitionReadinessTests::test_ready_state_never_implies_authorization",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
