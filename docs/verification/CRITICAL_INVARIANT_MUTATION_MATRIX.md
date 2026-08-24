@@ -74,7 +74,7 @@ All five canonical CI jobs passed.
 
 ## Post-Apex matrix extensions
 
-The original Stage 1 qualification above remains historical **12/12 KILLED** evidence. Protected source later extended the same permanent harness with six additional high-consequence Live Environment Awareness authority/evidence mutations. The current matrix is therefore **18/18 KILLED**; this extension does not rewrite the original Stage 1 run.
+The original Stage 1 qualification above remains historical **12/12 KILLED** evidence. Protected source later extended the same permanent harness with seven additional high-consequence Live Environment Awareness authority/evidence mutations. The current matrix is therefore **19/19 KILLED**; this extension does not rewrite the original Stage 1 run.
 
 | # | Invariant | Production mutation | Target detector | Current evidence |
 |---|---|---|---|---|
@@ -84,8 +84,9 @@ The original Stage 1 qualification above remains historical **12/12 KILLED** evi
 | 16 | Remote cognition transport awareness cannot acquire network authority by allowing the Tool Gateway to seal an unsealed Mission Order | disable the pre-sealed Order rejection in `src/grox/cognition_awareness.py` | `CognitionTransportFreshnessTests.test_unsealed_order_is_rejected_without_becoming_sealed` | KILLED |
 | 17 | Remote cognition transport evidence must remain bound to the exact currently configured origin | disable current-origin equality rejection in `src/grox/cognition_awareness.py` | `CognitionTransportFreshnessTests.test_same_resource_identity_endpoint_rebind_invalidates_prior_origin_evidence` | KILLED |
 | 18 | Remote cognition endpoint-surface refresh must remain bound to the exact currently configured endpoint | disable exact endpoint equality rejection in `src/grox/cognition_awareness.py` | `CognitionEndpointFreshnessTests.test_exact_endpoint_authority_is_required` | KILLED |
+| 19 | Configured cognition discovery must never imply readiness before an independently qualified readiness check | change configured-resource `ready` from false to true in `src/grox/cognition_discovery.py` | `ConfiguredCognitionDiscoveryTests.test_supported_openai_configuration_is_discovered_only` | KILLED |
 
-Latest exact-head evidence is PR #137 CI #463 / `32742888955`: Python 3.12 killed **18/18** critical mutations with zero survivors while all health, reconstitution, operational-drift, source-provenance, and Post-Apex gates remained green. The #16 mutation remains `cognition-transport-presealed-authority`; #17 is `cognition-transport-origin-binding`; #18 is `cognition-endpoint-exact-binding`. The original Stage 1 **12/12** qualification remains preserved above as historical evidence.
+Latest exact-head evidence is PR #141 CI #476 / `32771922889`: Python 3.12 killed **19/19** critical mutations with zero survivors while all health, reconstitution, operational-drift, source-provenance, and Post-Apex gates remained green. The #16 mutation remains `cognition-transport-presealed-authority`; #17 is `cognition-transport-origin-binding`; #18 is `cognition-endpoint-exact-binding`; #19 is `configured-cognition-discovery-state-separation`. The original Stage 1 **12/12** qualification remains preserved above as historical evidence.
 
 ## New detector coverage added in Stage 1
 
