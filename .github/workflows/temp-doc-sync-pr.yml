@@ -32,6 +32,10 @@ jobs:
           start = workflow.index(start_marker) + len(start_marker)
           end = workflow.index(end_marker, start)
           script = textwrap.dedent(workflow[start:end])
+          old_helper = "def replace_all(path, old, new, minimum=1):"
+          if script.count(old_helper) != 1:
+              raise SystemExit(f"expected one replace_all helper, found {script.count(old_helper)}")
+          script = script.replace(old_helper, "def replace_all(path, old, new, minimum=0):", 1)
           compile(script, 'staged-doc-sync', 'exec')
           exec(script, {'__name__': '__main__'})
           PY
@@ -49,5 +53,9 @@ jobs:
           git add -u .github/workflows/temp-doc-sync.yml .github/workflows/temp-doc-sync-pr.yml .tmp-doc-sync-trigger
           echo "Candidate paths relative to current checkout:"
           git diff --cached --name-only
+          if git diff --cached --name-only | grep -Ev '^(README\.md|AI_INSTRUCTIONS\.md|configs/reasoning/README\.md|docs/.+\.md|\.github/workflows/temp-doc-sync\.yml|\.github/workflows/temp-doc-sync-pr\.yml|\.tmp-doc-sync-trigger)$'; then
+            echo "Unexpected path in synchronization commit" >&2
+            exit 1
+          fi
           git commit -m "docs: synchronize qualified runtime awareness"
           git push origin HEAD:stewardship-remote-cognition-transport-qualified
