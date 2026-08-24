@@ -237,6 +237,32 @@ class CognitionTransportFreshnessTests(unittest.TestCase):
                 self.assertEqual(item["transport_status"], "unproven")
                 self.assertIsNone(item["transport_http_status"])
 
+    def test_invalid_current_origin_cannot_match_missing_observation_origin(self):
+        self.observations[self.resource_id] = {
+            "observed_at": self.now,
+            "origin": None,
+            "reachable": True,
+            "http_status": 200,
+        }
+        rebound = OpenAIResponsesProvider(
+            api_key="different-secret",
+            model="remote-model-sentinel",
+            endpoint="not-an-http-origin",
+        )
+        rebound_awareness = CognitionProviderAwareness(
+            reasoner=rebound,
+            gateway=self.gateway,
+            transport_observations=self.observations,
+            clock=lambda: self.now,
+            transport_freshness_seconds=60,
+        )
+        item = rebound_awareness.inventory()["resources"][0]
+        self.assertEqual(item["resource_id"], self.resource_id)
+        self.assertFalse(item["transport_reachable"])
+        self.assertFalse(item["transport_fresh"])
+        self.assertEqual(item["transport_status"], "unproven")
+        self.assertIsNone(item["transport_http_status"])
+
     def test_non_remote_bound_resource_cannot_be_transport_probed(self):
         from grox.reasoning.session import SessionReasoningProvider
 
