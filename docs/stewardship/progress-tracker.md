@@ -4,8 +4,8 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after supported configured cognition-resource discovery qualification:** `main@bf3d0f622ed4088330324f865611e40a4466ae59`
-**Current verified canonical tree:** `baf7841fabbdc02b91fcc750fedc02b0a4e8f929`
+**Current verified canonical source after configured remote cognition connection-policy awareness qualification:** `main@ef88cf34ea6732b65cf2ca461d06076d6af1221b`
+**Current verified canonical tree:** `1480d54f15a4713a083e53cb7174ed8c6c244adf`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,9 +15,38 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **392 passed, 2 skipped, 467 subtests**; unittest **394 OK, 2 skipped**; mutations **19/19**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
-**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS + SUPPORTED CONFIGURED COGNITION DISCOVERY EXITS QUALIFIED**
-**Next bounded implementation:** **Continue issue #115 beyond the six qualified bounded exits using the smallest repository-native evidence-backed surface. Credential validity, authenticated provider/service readiness, model existence/availability/fitness, arbitrary/unconfigured provider catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, provider switching/fallback, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **399 passed, 2 skipped, 470 subtests**; unittest **401 OK, 2 skipped**; mutations **20/20**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
+**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS + SUPPORTED CONFIGURED COGNITION DISCOVERY + CONFIGURED REMOTE CONNECTION POLICY AWARENESS EXITS QUALIFIED**
+**Next bounded implementation:** **Continue issue #115 beyond the seven qualified bounded exits using the smallest repository-native evidence-backed surface. Credential validity, authenticated provider/service readiness, model existence/availability/fitness, arbitrary/unconfigured provider catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, provider switching/fallback, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+
+## Live Environment Awareness — configured remote cognition connection-policy awareness — issue #144 / PR #145
+
+**Status: COMPLETE — QUALIFIED — CANONICAL MERGED AND EXACT-TREE VERIFIED.**
+
+Qualified boundary:
+
+- applies only to one valid passive configured remote `openai` cognition resource; local `local-llama-cpp` configuration is not promoted into this remote-connection surface;
+- derives the exact normalized origin from the configured endpoint and reports host Tool Gateway permission separately from Mission authorization;
+- host policy alone never implies authorization;
+- an Order must already be sealed before awareness examines it; unsealed Orders fail closed without being changed;
+- `authorized=True` requires exact `net_fetch`, `operation=configured_cognition_connection_authorization`, exact configured resource ID, exact endpoint, exact origin grant, and independent host-policy permission;
+- no network request, credential inspection/validation, provider construction/binding, model/executable activation, cognition invocation, Mission creation, fallback, or routing occurs;
+- `ready`, `qualified_fit`, `selected`, and `observed` remain false.
+
+Qualification evidence:
+
+- red-before-green tests-only head `1ff2903752dd0fd273f760502f4ab05713555260`: Wheel PASS; Python 3.11–3.14 red only because `grox.configured_connection_awareness` was absent while Python 3.12 source Health/reconstitution stayed green;
+- final PR #145 head `c6257872847746b0ef913f2291a6634ac206cc2b`;
+- exact-head GroX CI #491 / `32775200609`: PASS Wheel + Python 3.11–3.14;
+- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **399 passed, 2 skipped, 470 subtests**; unittest **401 OK, 2 skipped**; critical mutations **20/20**; health **7/7**; reconstitution **9/9**; operational drift **4/4**; source provenance **6/6**; Post-Apex PASS;
+- permanent mutation `configured-connection-exact-resource-binding`: KILLED;
+- bounded review `5012382826`: PASS with no review threads;
+- CI-tested synthetic merge `14ac96d070c4c5f22005de3b1a170128dc9b7b88`, tree `1480d54f15a4713a083e53cb7174ed8c6c244adf`;
+- guarded canonical merge `main@ef88cf34ea6732b65cf2ca461d06076d6af1221b`, same tree;
+- synthetic-to-canonical tree equality: **PASS**;
+- issue #144 closed completed; parent #115 remains **OPEN**.
+
+Still unqualified: credential validity, authenticated provider/service readiness, model existence/availability/fitness, successful cognition semantics, arbitrary/unconfigured provider catalogs, broader external-connection/application/process awareness, provider switching/fallback, and adaptive routing. No release/package/NCI/Apex/A8 advancement occurred.
 
 ## Live Environment Awareness — supported configured cognition-resource discovery — issue #140 / PR #141
 
