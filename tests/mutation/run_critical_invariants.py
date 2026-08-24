@@ -197,7 +197,7 @@ SPECS: tuple[MutationSpec, ...] = (
         path="src/grox/configured_connection_awareness.py",
         old='        elif parameters.get("resource_id") != resource_id:\n',
         new='        elif False and parameters.get("resource_id") != resource_id:\n',
-        nodeid="tests/unit/test_configured_connection_policy_awareness.py::ConfiguredConnectionPolicyAwarenessTests::test_resource_endpoint_operation_and_origin_binding_fail_closed",
+        nodeid="tests/unit/test_configured_connection_policy_awareness.py::ConfiguredConnectionPolicyAwarenessTests::test_wrong_resource_id_never_authorizes_connection",
     ),
     MutationSpec(
         name="ci-action-immutable-pin",
