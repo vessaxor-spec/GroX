@@ -8,19 +8,21 @@ from grox.cognition_discovery import ConfiguredCognitionDiscovery, nonsecret_rea
 
 class ConfiguredCognitionDiscoveryTests(unittest.TestCase):
     def test_supported_openai_configuration_is_discovered_only(self):
-        inventory = ConfiguredCognitionDiscovery(
-            {
-                "GROX_REASONER_PROVIDER": "openai",
-                "GROX_REASONER_MODEL": "gpt-test-model",
-                "GROX_REASONER_ENDPOINT": "https://api.openai.com/v1/responses",
-            }
-        ).inventory()
+        config = {
+            "GROX_REASONER_PROVIDER": "openai",
+            "GROX_REASONER_MODEL": "gpt-test-model",
+            "GROX_REASONER_ENDPOINT": "https://api.openai.com/v1/responses",
+        }
+        inventory = ConfiguredCognitionDiscovery(config).inventory()
+        repeated = ConfiguredCognitionDiscovery(config).inventory()
         self.assertEqual(inventory["status"], "ok")
         self.assertEqual(len(inventory["resources"]), 1)
         item = inventory["resources"][0]
         self.assertEqual(item["provider_kind"], "openai")
         self.assertEqual(item["model"], "gpt-test-model")
         self.assertEqual(item["endpoint"], "https://api.openai.com/v1/responses")
+        self.assertTrue(item["resource_id"].startswith("cognition:configured:openai:"))
+        self.assertEqual(item["resource_id"], repeated["resources"][0]["resource_id"])
         self.assertTrue(item["discovered"])
         for field in ("authorized", "ready", "qualified_fit", "selected", "observed"):
             self.assertFalse(item[field], field)
