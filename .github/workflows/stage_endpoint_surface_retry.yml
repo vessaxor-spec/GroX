@@ -1,0 +1,40 @@
+name: Retry bounded endpoint-surface staging
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  retry:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'live-awareness-bound-endpoint-surface'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: live-awareness-bound-endpoint-surface
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+      - name: Install test runtime
+        run: python -m pip install -e '.[test]'
+      - name: Execute original bounded staging script
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          lines = Path('.github/workflows/stage_endpoint_surface.yml').read_text().splitlines()
+          start = next(i for i, line in enumerate(lines) if line == '        run: |') + 1
+          body = []
+          for line in lines[start:]:
+              body.append(line[10:] if line.startswith('          ') else line)
+          script = '\n'.join(body) + '\n'
+          script = script.replace(
+              'git rm .github/workflows/stage_endpoint_surface.yml',
+              'git rm .github/workflows/stage_endpoint_surface.yml .github/workflows/stage_endpoint_surface_retry.yml',
+          )
+          Path('/tmp/stage-endpoint.sh').write_text(script)
+          PY
+          bash /tmp/stage-endpoint.sh
