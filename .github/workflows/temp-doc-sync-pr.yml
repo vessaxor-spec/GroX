@@ -1,0 +1,10 @@
+name: Temporary README Cleanup Marker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  marker:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo staging
