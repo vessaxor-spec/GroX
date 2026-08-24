@@ -160,6 +160,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_cognition_provider_awareness.py::CognitionProviderAwarenessTests::test_bound_session_provider_is_discovered_selected_but_not_authorized_or_observed",
     ),
     MutationSpec(
+        name="cognition-transport-presealed-authority",
+        invariant="Remote cognition transport awareness must never acquire authority by allowing the Tool Gateway to seal an unsealed Mission Order.",
+        path="src/grox/cognition_awareness.py",
+        old='        if not order.sealed:\n            raise CognitionTransportAuthorizationError("transport refresh requires an already sealed Mission Order")\n',
+        new='        if False and not order.sealed:\n            raise CognitionTransportAuthorizationError("transport refresh requires an already sealed Mission Order")\n',
+        nodeid="tests/unit/test_cognition_transport_freshness.py::CognitionTransportFreshnessTests::test_unsealed_order_is_rejected_without_becoming_sealed",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
