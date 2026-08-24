@@ -4,7 +4,7 @@
 
 Issue #136 / PR #137 qualified the fifth bounded Live Environment Awareness exit.
 
-GroX can now explicitly refresh current-session evidence that the exact configured HTTP(S) endpoint path of one already-bound remote cognition resource produced a bounded HTTP response, but only under an already sealed Mission Order carrying exact `net_fetch`, `operation=cognition_endpoint_probe`, exact resource ID, exact endpoint URL, and exact normalized origin authority that is independently permitted by host Tool Gateway policy.
+GroX can now explicitly refresh volatile current-session evidence that the exact configured HTTP(S) endpoint path of one already-bound remote cognition resource produced a bounded HTTP response, but only under an already sealed Mission Order carrying exact `net_fetch`, `operation=cognition_endpoint_probe`, exact resource ID, exact endpoint URL, and exact normalized origin authority that is independently permitted by host Tool Gateway policy.
 
 The qualified observation is credential-free and privacy-minimized. It sends no Authorization header, provider credential, prompt/model request, Commander content, Crew context, secret, or cognition payload; response body/preview is discarded. Evidence is volatile, exact-endpoint and exact-origin bound, expires or is replaced by failure, and malformed responses fail closed. Remote `ready` remains false.
 
