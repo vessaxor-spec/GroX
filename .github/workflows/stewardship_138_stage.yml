@@ -1,0 +1,127 @@
+name: Stewardship 138 staging
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  stage:
+    if: github.event.pull_request.head.ref == 'stewardship-fifth-live-awareness-sync'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: stewardship-fifth-live-awareness-sync
+          fetch-depth: 0
+      - name: Synchronize canonical stewardship records
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def once(path, old, new):
+              p=Path(path); text=p.read_text()
+              count=text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly one match, found {count}: {old[:120]!r}')
+              p.write_text(text.replace(old,new,1))
+
+          # README current-state and current mutation evidence only.
+          once('README.md',
+               '**IN PROGRESS — four bounded exits QUALIFIED**: local runtime (#119/#120), governed Tool Gateway (#122/#123), bound hosted/session cognition awareness (#125/#126), and governed bound-remote origin transport freshness (#128/#129). Parent #115 remains open; provider/service readiness, credential validity, unbound discovery, broader external-connection/application awareness, and adaptive routing remain unqualified.',
+               '**IN PROGRESS — five bounded exits QUALIFIED**: local runtime (#119/#120), governed Tool Gateway (#122/#123), bound hosted/session cognition awareness (#125/#126), governed bound-remote origin transport freshness (#128/#129), and exact bound-remote endpoint-surface freshness (#136/#137). Parent #115 remains open; credential validity, authenticated provider/service readiness, model availability/fitness, unbound discovery, broader external-connection/application awareness, and adaptive routing remain unqualified.')
+          once('README.md',
+               '**16/16** current critical-invariant mutations killed; the original Stage 1 qualification remains historically **12/12**, with four later Live Environment Awareness authority mutations extending the current matrix;',
+               '**18/18** current critical-invariant mutations killed; the original Stage 1 qualification remains historically **12/12**, with six later Live Environment Awareness authority/evidence mutations extending the current matrix;')
+
+          # Architecture status sentence.
+          once('docs/architecture/ARCHITECTURE.md',
+               'Protected source additionally has **NCI-1, NCI-2, and NCI-3 QUALIFIED** and four bounded Live Environment Awareness exits qualified: local runtime, governed Tool Gateway capability awareness, already-bound hosted/session cognition awareness, and already-bound remote origin transport freshness.',
+               'Protected source additionally has **NCI-1, NCI-2, and NCI-3 QUALIFIED** and five bounded Live Environment Awareness exits qualified: local runtime, governed Tool Gateway capability awareness, already-bound hosted/session cognition awareness, already-bound remote origin transport freshness, and already-bound exact endpoint-surface freshness.')
+
+          # Main Roadmap current position + mutation count + completed fifth exit.
+          once('docs/stewardship/ROADMAP.md',
+               'qualified bound hosted/session cognition-awareness exit, and qualified bound remote cognition origin transport-freshness exit**.',
+               'qualified bound hosted/session cognition-awareness exit, qualified bound remote cognition origin transport-freshness exit, and qualified exact bound remote endpoint-surface freshness exit**.')
+          once('docs/stewardship/ROADMAP.md',
+               '- 16 high-consequence production invariants continuously mutation-proven; the original Stage 1 12/12 record remains historical and four later Live Environment Awareness authority mutations extend the current matrix.',
+               '- 18 high-consequence production invariants continuously mutation-proven; the original Stage 1 12/12 record remains historical and six later Live Environment Awareness authority/evidence mutations extend the current matrix.')
+          marker='- **Live Environment Awareness bound remote cognition transport-freshness exit is QUALIFIED:** issue #128 / PR #129 add explicit current-session exact-origin transport evidence for an already-bound remote cognition resource under an already sealed Mission Order and existing A5 Tool Gateway authority. Exact-head CI #426 / `32710787713` passed Wheel plus Python 3.11–3.14; Python 3.12 recorded Vessel Health 10/0/0/0, pytest 373 passed / 2 skipped / 453 subtests, unittest 375 / 2 skipped, critical mutations 16/16 plus 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex PASS. PR #129 merged as `main@922a35add9c92e7e0d7eed31dc1ff80895e28e61`; canonical tree `9cc6ed2765cfc226e279ae498ebabd6ade675bd5` exactly matches the CI-tested synthetic merge tree. The observation proves transport only and never sets remote provider readiness, authorization, or qualification. Parent #115 remains open.\n'
+          p=Path('docs/stewardship/ROADMAP.md'); text=p.read_text()
+          if text.count(marker)!=1: raise SystemExit('ROADMAP transport marker mismatch')
+          fifth='- **Live Environment Awareness exact bound remote endpoint-surface freshness exit is QUALIFIED:** issue #136 / PR #137 add credential-free current-session evidence that the exact configured HTTP(S) endpoint path of one already-bound remote cognition resource produced a bounded HTTP response under explicit already-sealed exact `net_fetch` authority and the existing Tool Gateway origin policy. Exact-head CI #463 / `32742888955` passed Wheel plus Python 3.11–3.14 on head `f86b6dff1cc73b8487ed09ce58720dc4c09f3677`; Python 3.12 recorded Vessel Health 10/0/0/0, pytest 386 passed / 2 skipped / 463 subtests, unittest 388 / 2 skipped, critical mutations 18/18 plus 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex PASS. CI-tested synthetic merge `0daa8fe53f1c3d13b7a1a61b7d5d9a18a8348488` and canonical merge `main@2b516b8b5e4757c216e5fe561db5325a1471f6de` share exact tree `581b492e285f85a43680cb6315ae299b1ea85f33`. The observation proves endpoint-surface response only; credentials, authenticated provider/service readiness, model availability/fitness, cognition success, provider qualification, selection/fallback, adaptive routing, and remote `ready=True` remain unqualified. Parent #115 remains open.\n'
+          p.write_text(text.replace(marker,marker+fifth,1))
+
+          # Live Environment Awareness doctrine status/current boundary/sequencing/evidence.
+          once('docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md',
+               '**Status:** ROADMAP-BOUND / IMPLEMENTATION IN PROGRESS / LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS EXITS QUALIFIED',
+               '**Status:** ROADMAP-BOUND / IMPLEMENTATION IN PROGRESS / LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS EXITS QUALIFIED')
+          once('docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md',
+               'Canonical issue #128 / PR #129 now additionally qualify explicit current-session **origin transport freshness** for an already-bound remote cognition resource, only under an already sealed exact `net_fetch` Mission Order and the existing A5 Tool Gateway origin policy. That transport observation remains separate from provider/service readiness, credential validity, authorization, qualification/fit, provider selection, or cognition invocation. These exits still do **not** establish ambient application/process scanning, arbitrary tool discovery, unbound remote/cloud provider discovery, remote provider/service readiness beyond origin transport freshness, authorized external-connection discovery beyond the exact bound cognition-origin surface, broader operational capability awareness, or adaptive startup/resource routing.',
+               'Canonical issue #128 / PR #129 additionally qualify explicit current-session **origin transport freshness** for an already-bound remote cognition resource, only under an already sealed exact `net_fetch` Mission Order and the existing A5 Tool Gateway origin policy. Issue #132 / PR #133 repair that surface so freshness remains bound to the exact current normalized origin even when provider/model resource identity is unchanged. Canonical issue #136 / PR #137 now additionally qualify explicit current-session **exact endpoint-surface freshness** for the same already-bound remote cognition class: a credential-free bounded GET to the exact configured endpoint path under an already sealed Order carrying exact operation/resource/endpoint/origin authority. Endpoint response evidence remains separate from credential validity, authenticated provider/service readiness, model availability/fitness, authorization, qualification/fit, provider selection, or cognition invocation, and remote `ready` remains false. These exits still do **not** establish ambient application/process scanning, arbitrary tool discovery, unbound remote/cloud provider discovery, authenticated provider/service readiness, credential validity, broader authorized external-connection discovery, model availability/fitness, broader operational capability awareness, or adaptive startup/resource routing.')
+          once('docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md',
+               'The bound remote cognition transport-freshness exit is **QUALIFIED** through issue #128 / PR #129 for current-session exact-origin transport evidence under already sealed A5 network authority; it does not qualify provider/service readiness or routing. Broader issue #115 remains open.',
+               'The bound remote cognition transport-freshness exit is **QUALIFIED** through issue #128 / PR #129 for current-session exact-origin transport evidence under already sealed A5 network authority. Its exact-origin evidence seam was repaired through issue #132 / PR #133 without adding a new awareness surface. The exact bound remote endpoint-surface freshness exit is **QUALIFIED** through issue #136 / PR #137 for credential-free current-session evidence that the exact configured endpoint path produced a bounded HTTP response under already sealed exact authority; it does not qualify credentials, authenticated provider/service readiness, model availability/fitness, provider qualification, cognition success, selection/fallback, routing, or remote `ready=True`. Broader issue #115 remains open.')
+          p=Path('docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md'); text=p.read_text()
+          anchor='**Transport exact-origin evidence-binding repair:** post-qualification recalibration found that provider/model resource identity does not itself bind endpoint/origin.'
+          idx=text.find(anchor)
+          if idx<0: raise SystemExit('live awareness repair anchor missing')
+          insert_at=text.find('\n\nNCI-4 remains', idx)
+          if insert_at<0: raise SystemExit('live awareness NCI-4 anchor missing')
+          fifth_block='\n\n**Exact bound remote endpoint-surface freshness qualification evidence:** issue #136 / PR #137 qualified the fifth bounded awareness exit from canonical base `main@8184e13141646ee9d232fc10b32714534bf9be5e`. The final head `f86b6dff1cc73b8487ed09ce58720dc4c09f3677` passed exact-head GroX CI #463 / `32742888955` across Wheel + Python 3.11–3.14. Python 3.12 recorded Vessel Health 10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN, pytest 386 passed / 2 skipped / 463 subtests, unittest 388 / 2 skipped, critical mutations 18/18 plus 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex PASS. The permanent `cognition-endpoint-exact-binding` mutation was killed. CI-tested synthetic merge `0daa8fe53f1c3d13b7a1a61b7d5d9a18a8348488` had tree `581b492e285f85a43680cb6315ae299b1ea85f33`; guarded canonical merge `main@2b516b8b5e4757c216e5fe561db5325a1471f6de` has the identical tree. The qualified claim is only that the exact configured endpoint surface produced a current bounded HTTP response under explicit pre-sealed authority. Credential validity, authenticated provider/service readiness, model existence/availability/fitness, cognition semantics, provider qualification, provider selection/fallback, adaptive routing, and remote `ready=True` remain unqualified.'
+          p.write_text(text[:insert_at]+fifth_block+text[insert_at:])
+
+          # Progress tracker top-line current truth and fifth qualification section.
+          once('docs/stewardship/progress-tracker.md',
+               '**Current verified canonical source after transport exact-origin evidence-binding repair:** `main@d7024261f9c49a8b2bb95a26e5ad0a08a6d5a34a`',
+               '**Current verified canonical source after exact bound remote endpoint-surface freshness qualification:** `main@2b516b8b5e4757c216e5fe561db5325a1471f6de`')
+          once('docs/stewardship/progress-tracker.md',
+               '**Current verified canonical tree:** `d8959016ce59dbd61cb148d974ba0c9e1d351c21`',
+               '**Current verified canonical tree:** `581b492e285f85a43680cb6315ae299b1ea85f33`')
+          once('docs/stewardship/progress-tracker.md',
+               '**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **376 passed, 2 skipped, 455 subtests**; unittest **378 OK, 2 skipped**; mutations **17/17**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS',
+               '**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **386 passed, 2 skipped, 463 subtests**; unittest **388 OK, 2 skipped**; mutations **18/18**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS')
+          once('docs/stewardship/progress-tracker.md',
+               '**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS EXITS QUALIFIED**',
+               '**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS EXITS QUALIFIED**')
+          once('docs/stewardship/progress-tracker.md',
+               '**Next bounded implementation:** **Continue issue #115 beyond the four qualified bounded exits using the smallest repository-native evidence-backed surface. Provider/service readiness beyond origin transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**',
+               '**Next bounded implementation:** **Continue issue #115 beyond the five qualified bounded exits using the smallest repository-native evidence-backed surface. Credential validity, authenticated provider/service readiness, model existence/availability/fitness, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**')
+          p=Path('docs/stewardship/progress-tracker.md'); text=p.read_text()
+          anchor='## Live Environment Awareness — bound remote cognition transport freshness — issue #128 / PR #129\n'
+          if text.count(anchor)!=1: raise SystemExit('progress tracker anchor mismatch')
+          section='''## Live Environment Awareness — exact bound remote endpoint-surface freshness — issue #136 / PR #137\n\n**Status: COMPLETE — QUALIFIED — CANONICAL MERGED AND EXACT-TREE VERIFIED.**\n\nQualified boundary:\n\n- passive cognition inventory remains zero-network and non-invoking;\n- active refresh applies only to one already-bound remote cognition resource with an exact safe current HTTP(S) endpoint;\n- the Mission Order must already be sealed and carry exact `net_fetch`, `operation=cognition_endpoint_probe`, exact current `resource_id`, exact current endpoint URL, and exact normalized origin authority;\n- host Tool Gateway policy must independently permit that origin;\n- network I/O reuses `ToolGateway.fetch_url` only and sends no provider credential, Authorization header, prompt/model request, Commander content, Crew context, secret, or cognition payload;\n- awareness discards response body/preview and retains only volatile bounded endpoint observation metadata; malformed Gateway responses fail closed as `unproven`;\n- observations bind to the exact current endpoint and origin, expire, and are replaced by failure; endpoint rebind invalidates prior evidence even when provider/model resource identity is unchanged;\n- HTTP response classification preserves evidence (`responding`, `not_found`, `server_degraded`, `unreachable`, `stale`, `unproven`) without interpreting any response as authenticated readiness;\n- remote provider `ready=False`; authorization, qualification/fit, provider selection/fallback, cognition invocation, routing, Repair, verifier, and Tool Gateway authority remain unchanged.\n\nQualification evidence:\n\n- red-before-green test-only head `7e1b3294…`: Wheel remained green while Python 3.11–3.14 failed on the intended missing endpoint-refresh seam;\n- final PR #137 head `f86b6dff1cc73b8487ed09ce58720dc4c09f3677`;\n- exact-head GroX CI #463 / `32742888955`: PASS Wheel + Python 3.11–3.14;\n- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **386 passed, 2 skipped, 463 subtests**; unittest **388 OK, 2 skipped**; critical mutations **18/18**; health **7/7**; reconstitution **9/9**; operational drift **4/4**; source provenance **6/6**; Post-Apex PASS;\n- permanent mutation `cognition-endpoint-exact-binding`: KILLED;\n- final bounded review `5009439807`: PASS with no review threads;\n- CI-tested synthetic merge `0daa8fe53f1c3d13b7a1a61b7d5d9a18a8348488`, tree `581b492e285f85a43680cb6315ae299b1ea85f33`;\n- canonical merge `main@2b516b8b5e4757c216e5fe561db5325a1471f6de`, tree `581b492e285f85a43680cb6315ae299b1ea85f33`;\n- synthetic-to-canonical tree equality: **PASS**;\n- issue #136 closed completed; parent #115 remains **OPEN**.\n\nStill unqualified: credential validity, authenticated provider/service readiness, model existence/availability/fitness, successful cognition semantics, provider qualification, provider switching/fallback, unbound provider/catalog discovery, broader authorized external-connection/application/process awareness, and adaptive provider/resource routing. No release/package/NCI/Apex/A8 advancement occurred.\n\n'''
+          p.write_text(text.replace(anchor,section+anchor,1))
+
+          # Critical mutation matrix current extension only; preserve historical Stage 1 section verbatim.
+          once('docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md',
+               'Protected source later extended the same permanent harness with five additional high-consequence Live Environment Awareness authority/evidence mutations. The current matrix is therefore **17/17 KILLED**; this extension does not rewrite the original Stage 1 run.',
+               'Protected source later extended the same permanent harness with six additional high-consequence Live Environment Awareness authority/evidence mutations. The current matrix is therefore **18/18 KILLED**; this extension does not rewrite the original Stage 1 run.')
+          row='| 17 | Remote cognition transport evidence must remain bound to the exact currently configured origin | disable current-origin equality rejection in `src/grox/cognition_awareness.py` | `CognitionTransportFreshnessTests.test_same_resource_identity_endpoint_rebind_invalidates_prior_origin_evidence` | KILLED |\n'
+          p=Path('docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md'); text=p.read_text()
+          if text.count(row)!=1: raise SystemExit('mutation row 17 mismatch')
+          row18='| 18 | Remote cognition endpoint-surface refresh must remain bound to the exact currently configured endpoint | disable exact endpoint equality rejection in `src/grox/cognition_awareness.py` | `CognitionEndpointFreshnessTests.test_exact_endpoint_authority_is_required` | KILLED |\n'
+          text=text.replace(row,row+row18,1)
+          old='Latest exact-head evidence is PR #133 CI #448 / `32717652432`: Python 3.12 killed **17/17** critical mutations with zero survivors while all health, reconstitution, operational-drift, source-provenance, and Post-Apex gates remained green. The #16 mutation remains `cognition-transport-presealed-authority`; #17 is `cognition-transport-origin-binding`. The original Stage 1 **12/12** qualification remains preserved above as historical evidence.'
+          new='Latest exact-head evidence is PR #137 CI #463 / `32742888955`: Python 3.12 killed **18/18** critical mutations with zero survivors while all health, reconstitution, operational-drift, source-provenance, and Post-Apex gates remained green. The #16 mutation remains `cognition-transport-presealed-authority`; #17 is `cognition-transport-origin-binding`; #18 is `cognition-endpoint-exact-binding`. The original Stage 1 **12/12** qualification remains preserved above as historical evidence.'
+          if text.count(old)!=1: raise SystemExit('mutation latest evidence mismatch')
+          p.write_text(text.replace(old,new,1))
+
+          # Append-only Ship's Log entry.
+          ship=Path('docs/history/ships-log/0064-bound-remote-endpoint-surface-freshness-qualified.md')
+          if ship.exists(): raise SystemExit('0064 ship log already exists')
+          ship.write_text('''# Ship's Log 0064 — Bound Remote Endpoint-Surface Freshness Qualified\n\n**Date:** 2026-08-24\n\nIssue #136 / PR #137 qualified the fifth bounded Live Environment Awareness exit.\n\nGroX can now explicitly refresh current-session evidence that the exact configured HTTP(S) endpoint path of one already-bound remote cognition resource produced a bounded HTTP response, but only under an already sealed Mission Order carrying exact `net_fetch`, `operation=cognition_endpoint_probe`, exact resource ID, exact endpoint URL, and exact normalized origin authority that is independently permitted by host Tool Gateway policy.\n\nThe qualified observation is credential-free and privacy-minimized. It sends no Authorization header, provider credential, prompt/model request, Commander content, Crew context, secret, or cognition payload; response body/preview is discarded. Evidence is volatile, exact-endpoint and exact-origin bound, expires or is replaced by failure, and malformed responses fail closed. Remote `ready` remains false.\n\nThis qualification does **not** establish credential validity, authenticated provider/service readiness, model existence/availability/fitness, cognition success, provider qualification, provider selection/fallback, adaptive routing, or wider authority.\n\nQualification evidence:\n\n- final PR #137 head: `f86b6dff1cc73b8487ed09ce58720dc4c09f3677`;\n- exact-head GroX CI #463 / `32742888955`: PASS across Wheel + Python 3.11–3.14;\n- Python 3.12: Health 10/0/0/0; pytest 386 passed, 2 skipped, 463 subtests; unittest 388 OK, 2 skipped; critical mutations 18/18; health 7/7; reconstitution 9/9; drift 4/4; provenance 6/6; Post-Apex PASS;\n- permanent `cognition-endpoint-exact-binding` mutation: KILLED;\n- bounded review `5009439807`: PASS;\n- CI-tested synthetic merge `0daa8fe53f1c3d13b7a1a61b7d5d9a18a8348488`, tree `581b492e285f85a43680cb6315ae299b1ea85f33`;\n- guarded canonical merge `main@2b516b8b5e4757c216e5fe561db5325a1471f6de`, tree `581b492e285f85a43680cb6315ae299b1ea85f33`;\n- exact synthetic/canonical tree equality: PASS.\n\nIssue #136 is closed completed. Parent Live Environment Awareness issue #115 remains open. No release/package/NCI/Apex/A8 change occurred.\n''')
+
+          # Remove this staging workflow from the candidate before commit.
+          Path('.github/workflows/stewardship_138_stage.yml').unlink()
+          PY
+          git diff --check
+          git status --short
+          git config user.name 'VESSAXOR'
+          git config user.email 'vessaxor@gmail.com'
+          git add README.md docs/architecture/ARCHITECTURE.md docs/stewardship/ROADMAP.md docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md docs/stewardship/progress-tracker.md docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md docs/history/ships-log/0064-bound-remote-endpoint-surface-freshness-qualified.md .github/workflows/stewardship_138_stage.yml
+          git commit -m 'Stewardship: record fifth live awareness qualification'
+          git push origin HEAD:stewardship-fifth-live-awareness-sync
