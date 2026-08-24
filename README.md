@@ -305,13 +305,16 @@ workspace [default: ~/GroX]
 Pilot GorXu online
 ```
 
-Current protected source has established three installation/runtime foundations:
+Current protected source has established the qualified installed/local cognition foundations:
 
 - **NCI-1A:** `grox init` / `grox workspace`, `~/GroX` defaulting, Linux/macOS user configuration, workspace markers/binding, collision and rebinding refusal, idempotent commissioning, and installed-wheel commissioning outside a checkout.
 - **NCI-1B:** explicit runtime/assets, private-state, and Commander-work roles with non-overlap, legacy compatibility, Crew/policy loading from runtime assets, private mutable state outside Commander work, and Tool Gateway confinement to Commander work.
 - **NCI-1C:** the non-editable wheel packages and validates the canonical runtime assets, starts the same Pilot GorXu from a commissioned workspace without a checkout or manual `GROX_VESSEL_ROOT`, loads all 82 Standing Crew, persists private state separately, and fails closed on missing/corrupt packaged assets.
+- **NCI-1D:** the integrity-bound native model registry, lineage/readiness/resource contract, provider-neutral local inference interface, explicit load/invoke/unload semantics, and fail-closed non-activating reconstitution are qualified; the installed-wheel packaged-model proof closes the overall NCI-1 exit.
+- **NCI-2:** the exact Qwen3-4B Q4_K_M seed through pinned `llama.cpp` b10218 is qualified on the recorded installed Linux x86_64 CPU-first path without a vendor credential or external network route.
+- **NCI-3:** the bounded offline GorXu conversational + governed Crew-orchestration profile is qualified on that exact NCI-2 seed/runtime path, including direct `grox ask`, high-risk Inspect delegation, synthesis, independent verification, and fail-closed reconstitution.
 
-The next bounded NCI-1 runtime slice is **NCI-1D: native model registry + local inference runtime contract**. NCI-1 as a whole remains unqualified until that remaining model/runtime boundary earns its own evidence.
+These qualifications do not imply the broader NCI-8 offline Vessel profile, a public one-command installer, desktop launcher, arbitrary local model/runtime support, or a GroX-pretrained general-purpose foundation model.
 
 The public one-command installer, desktop launcher, and any GroX-pretrained general-purpose foundation-model claim remain **unqualified**. Bounded offline GorXu cognition is now qualified through NCI-3, but that evidence does not imply those broader product or distribution claims.
 
