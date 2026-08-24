@@ -17,28 +17,17 @@ jobs:
         with:
           ref: stewardship-configured-local-readiness-qualified
           fetch-depth: 0
-      - name: Execute staged transform and remove temporary artifacts
+      - name: Apply asserted documentation transformation
         shell: bash
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          src = Path('.github/workflows/stewardship_150_stage.yml').read_text().splitlines()
-          marker = '        run: |'
-          try:
-              i = src.index(marker)
-          except ValueError:
-              raise SystemExit('staging run block missing')
-          block = []
-          for line in src[i+1:]:
-              if line.startswith('          '):
-                  block.append(line[10:])
-              elif not line.strip():
-                  block.append('')
-              else:
-                  raise SystemExit(f'unexpected staging indentation: {line!r}')
-          Path('/tmp/stewardship-150-stage.sh').write_text('\n'.join(block) + '\n')
-          PY
-          bash /tmp/stewardship-150-stage.sh
-          git rm .github/workflows/stewardship_150_pr_trigger.yml .stewardship-150-trigger
-          git commit -m 'Remove stewardship staging artifacts'
+          python .github/stewardship_150_stage.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/stewardship_150_stage.yml
+          git rm .github/workflows/stewardship_150_pr_trigger.yml
+          git rm .github/stewardship_150_stage.py
+          git rm .stewardship-150-trigger .stewardship-150-pr-open .stewardship-150-pr-open-2 .stewardship-150-pr-open-3
+          git add README.md docs/architecture/ARCHITECTURE.md docs/stewardship/ROADMAP.md docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md docs/stewardship/progress-tracker.md docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md docs/history/ships-log/0067-configured-local-llama-readiness-qualified.md
+          git diff --cached --check
+          git commit -m 'Synchronize configured local readiness qualification stewardship'
           git push origin HEAD:stewardship-configured-local-readiness-qualified
