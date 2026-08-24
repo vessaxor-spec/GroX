@@ -4,8 +4,8 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after bound remote cognition transport-freshness qualification:** `main@922a35add9c92e7e0d7eed31dc1ff80895e28e61`
-**Current verified canonical tree:** `9cc6ed2765cfc226e279ae498ebabd6ade675bd5`
+**Current verified canonical source after transport exact-origin evidence-binding repair:** `main@d7024261f9c49a8b2bb95a26e5ad0a08a6d5a34a`
+**Current verified canonical tree:** `d8959016ce59dbd61cb148d974ba0c9e1d351c21`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,7 +15,7 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **373 passed, 2 skipped, 453 subtests**; unittest **375 OK, 2 skipped**; mutations **16/16**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
+**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **376 passed, 2 skipped, 455 subtests**; unittest **378 OK, 2 skipped**; mutations **17/17**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
 **Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS EXITS QUALIFIED**
 **Next bounded implementation:** **Continue issue #115 beyond the four qualified bounded exits using the smallest repository-native evidence-backed surface. Provider/service readiness beyond origin transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
 
@@ -32,7 +32,7 @@ Qualified boundary:
 - network I/O reuses `ToolGateway.fetch_url` only; no parallel HTTP/socket authority path exists;
 - no provider credential, prompt/model request, Commander content, Crew context, or secret is sent by awareness;
 - only volatile observation timestamp, reachable/unreachable state, and bounded HTTP status are retained; response content is discarded;
-- transport evidence expires and failure replaces prior positive current transport state; provider rebinding changes resource identity;
+- transport evidence expires and failure replaces prior positive current transport state; every observation is bound to the exact normalized origin probed, and any endpoint/origin rebind invalidates prior evidence even when provider/model resource identity remains unchanged;
 - fresh transport reachability never sets remote `ready`, `authorized`, or `qualified_fit`, never invokes cognition, and never changes provider binding or routing.
 
 Qualification evidence:
@@ -47,6 +47,36 @@ Qualification evidence:
 - issue #128 closed completed; parent #115 remains **OPEN**.
 
 Still unqualified: provider/service readiness beyond exact-origin transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, provider switching/fallback, and adaptive provider/resource routing. No release/package/NCI/Apex/A8 advancement occurred.
+
+## Live Environment Awareness — transport exact-origin evidence-binding repair — issue #132 / PR #133
+
+**Status: COMPLETE — QUALIFIED REPAIR — CANONICAL MERGED AND EXACT-TREE VERIFIED.**
+
+Post-#131 recalibration found one fail-closed defect in the already-qualified fourth awareness surface: remote transport observations were keyed by cognition resource identity, while that identity does not include endpoint/origin. Rebinding the same provider/model/class to a different endpoint could therefore inherit a still-fresh observation from the prior origin.
+
+Repair boundary:
+
+- every positive or negative transport observation now records the exact normalized origin actually probed;
+- passive inventory compares recorded origin with the resource's current bound origin before freshness/reachability can be claimed;
+- missing, malformed, invalid-current, or mismatched origin evidence fails closed as `unproven`;
+- same-provider/same-model endpoint rebinding immediately invalidates prior transport evidence without network I/O;
+- the existing already-sealed exact `net_fetch` Mission Order, exact resource ID, exact allowed origin, and host Tool Gateway origin policy remain unchanged;
+- remote provider `ready=False`; authorization, qualification/fit, selection, invocation, fallback, and routing semantics remain unchanged;
+- no fifth Live Environment Awareness surface is qualified by this repair.
+
+Qualification evidence:
+
+- red-before-green: test-only PR #133 head `149d09f8c323cd6d51f0f8600523855d408974f6`, GroX CI #443 / `32716652029`, failed the intended endpoint-rebind assertion while Wheel remained green;
+- final PR #133 head `b50605bb90660a9f3325fd356df65ab5409666e1`;
+- exact-head GroX CI #448 / `32717652432`: PASS Wheel + Python 3.11–3.14;
+- Python 3.12: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **376 passed, 2 skipped, 455 subtests**; unittest **378 OK, 2 skipped**; critical mutations **17/17**; health **7/7**; reconstitution **9/9**; operational drift **4/4**; source provenance **6/6**; Post-Apex PASS;
+- permanent mutation `cognition-transport-origin-binding`: KILLED;
+- CI-tested synthetic merge `726fc1ef6b351f7bf0371731dd18abafce8fe882`, tree `d8959016ce59dbd61cb148d974ba0c9e1d351c21`;
+- canonical merge `main@d7024261f9c49a8b2bb95a26e5ad0a08a6d5a34a`, tree `d8959016ce59dbd61cb148d974ba0c9e1d351c21`;
+- synthetic-to-canonical tree equality: **PASS**;
+- issue #132 closed completed; parent #115 remains **OPEN**.
+
+This repair strengthens the already-qualified bound remote transport-freshness exit only. Provider/service readiness beyond exact-origin transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, provider switching/fallback, and adaptive provider/resource routing remain unqualified. No release/package/NCI/Apex/A8 advancement occurred.
 
 ## GorXu command/infrastructure invariant — current synchronization
 
