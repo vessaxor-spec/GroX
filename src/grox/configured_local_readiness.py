@@ -21,9 +21,10 @@ class ConfiguredLocalCognitionReadiness:
     This surface is intentionally narrower than provider construction or model
     activation. It may read the existing GroX model registry/artifact, inspect
     host constraints, and run the pinned local llama.cpp ``--version`` probe
-    already used by the runtime readiness contract. It never loads a model,
-    invokes cognition, touches credentials or network, selects a provider, or
-    grants Mission authority.
+    already used by the runtime readiness contract. Filesystem reads remain
+    confined to the commissioned runtime/model-store roots. It never loads a
+    model, invokes cognition, touches credentials or network, selects a
+    provider, or grants Mission authority.
     """
 
     schema = "grox-configured-local-cognition-readiness-v1"
