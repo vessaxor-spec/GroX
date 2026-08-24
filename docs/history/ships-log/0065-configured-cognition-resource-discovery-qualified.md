@@ -4,7 +4,7 @@
 
 Issue #140 / PR #141 qualified the sixth bounded Live Environment Awareness exit.
 
-GroX can now passively recognize cognition resources represented by its repository-supported non-secret reasoning configuration kinds: `openai` and `local-llama-cpp`. The discovery seam reads only provider/model/endpoint identity, derives deterministic privacy-minimized resource identity, and establishes `Discovered` only.
+GroX can now passively recognize cognition resources represented by its repository-supported non-secret reasoning configuration kinds: `openai` and `local-llama-cpp`. The discovery seam reads only provider/model/endpoint identity, derives deterministic privacy-minimized resource identity, and establishes `Discovered` only for valid supported configuration.
 
 The seam does not read `OPENAI_API_KEY`, inspect or validate any credential, construct or bind a provider, touch network/model/executable runtime, load a model, invoke cognition, create a Mission, change the current reasoner binding, qualify/select a provider, perform fallback, or alter routing. Missing, incomplete, malformed, and unsupported configuration fail closed.
 
