@@ -37,7 +37,7 @@ class PilotConfiguredCognitionDiscoveryTests(unittest.TestCase):
             self.assertFalse(item["selected"])
             self.assertFalse(item["observed"])
             self.assertNotIn("SUPER-SECRET-SENTINEL", repr(inventory))
-            self.assertEqual(pilot.store.list_missions(), [])
+            self.assertEqual(pilot.store.recent_missions(), [])
 
 
 if __name__ == "__main__":
