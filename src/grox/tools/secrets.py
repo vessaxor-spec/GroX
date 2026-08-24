@@ -18,6 +18,14 @@ class SecretBroker:
     def __init__(self, secrets: Mapping[str, str] | None = None):
         self._secrets = {str(k): str(v) for k, v in (secrets or {}).items()}
 
+    def has_alias(self, alias: str) -> bool:
+        """Return only whether one exact alias is represented by this broker.
+
+        This predicate deliberately exposes no enumeration or secret material.
+        It does not validate, transform, hash, log, or materialize a value.
+        """
+        return isinstance(alias, str) and bool(alias) and alias in self._secrets
+
     def materialize_env(self, order: MissionOrder, requested: Mapping[str, str] | None) -> tuple[dict[str, str], list[str]]:
         requested = requested or {}
         grants = set(order.parameters.get("secret_grants") or [])
