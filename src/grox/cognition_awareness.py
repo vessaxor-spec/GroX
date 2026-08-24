@@ -213,9 +213,10 @@ class CognitionProviderAwareness:
 
     Passive inventory never scans for providers, reads credential values, invokes
     callbacks/network endpoints, changes bindings, or performs provider selection.
-    A separate explicitly authorized refresh may observe only current transport
-    reachability for an already-bound remote origin through the existing A5 Tool
-    Gateway. Transport evidence never establishes provider readiness or fitness.
+    Separate explicitly authorized refreshes may observe current origin transport
+    reachability or exact configured endpoint-surface response evidence for an
+    already-bound remote resource through the existing A5 Tool Gateway. Neither
+    observation establishes provider readiness, credential validity, or fitness.
     """
 
     schema = "grox-live-hosted-cognition-inventory-v1"
@@ -374,13 +375,15 @@ class CognitionProviderAwareness:
         age = max(0.0, float(self.clock()) - float(observed_at))
         if age > self.transport_freshness_seconds:
             return {**base, "endpoint_surface_status": "stale", "endpoint_age_seconds": age}
-        if raw.get("responded") is not True:
+        if raw.get("responded") is False:
             return {
                 "endpoint_surface_fresh": True,
                 "endpoint_surface_status": "unreachable",
                 "endpoint_http_status": None,
                 "endpoint_age_seconds": age,
             }
+        if raw.get("responded") is not True:
+            return base
         status = raw.get("http_status")
         if isinstance(status, bool) or not isinstance(status, int) or not 100 <= status <= 599:
             return base
@@ -637,7 +640,7 @@ class CognitionProviderAwareness:
             valid_status = status if isinstance(status, int) and not isinstance(status, bool) and 100 <= status <= 599 else None
             self.endpoint_observations[resource_id] = {
                 "observed_at": observed_at, "endpoint": endpoint, "origin": origin,
-                "responded": valid_status is not None, "http_status": valid_status,
+                "responded": True if valid_status is not None else None, "http_status": valid_status,
             }
         refreshed = self.inventory()["resources"]
         for item in refreshed:

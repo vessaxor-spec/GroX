@@ -66,4 +66,12 @@ class CognitionEndpointFreshnessTests(unittest.TestCase):
             self.observations[self.resource_id]={"observed_at":self.now,"endpoint":endpoint,"origin":origin,"responded":True,"http_status":200}
             item=self.awareness.inventory()["resources"][0]; self.assertFalse(item["endpoint_surface_fresh"]); self.assertEqual(item["endpoint_surface_status"],"unproven")
 
+    def test_malformed_gateway_response_fails_closed_as_unproven(self):
+        with patch.object(self.gateway,"fetch_url",return_value={"url":ENDPOINT,"origin":ORIGIN,"status":"405","preview":"ignored"}):
+            item=self.awareness.refresh_endpoint_surface(resource_id=self.resource_id,order=self.order())
+        self.assertFalse(item["endpoint_surface_fresh"])
+        self.assertEqual(item["endpoint_surface_status"],"unproven")
+        self.assertIsNone(item["endpoint_http_status"])
+        self.assertFalse(item["ready"])
+
 if __name__=="__main__": unittest.main()
