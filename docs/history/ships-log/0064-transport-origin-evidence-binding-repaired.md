@@ -32,4 +32,4 @@ Issue #132 bounded the repair. PR #133 first added a test-only red baseline, the
 
 This is a repair to the fourth qualified Live Environment Awareness exit, not a fifth exit. Parent issue #115 remains OPEN. Provider/service readiness beyond exact-origin transport freshness, credential validity, unbound provider/catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, provider switching/fallback, and adaptive provider/resource routing remain unqualified. No release/package, NCI, Apex, A8, public installer/desktop, or general-purpose GroX model claim changed.
 
-Issue #134 tracks this documentation synchronization and is not pre-claimed complete by this log entry.
+Issue #134 / PR #135 tracks this documentation synchronization and is not pre-claimed complete by this log entry.
