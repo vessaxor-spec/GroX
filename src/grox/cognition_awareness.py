@@ -271,6 +271,14 @@ class CognitionProviderAwareness:
                 observed_origin = normalize_origin(observed_origin_raw)
             except (PolicyError, ValueError):
                 observed_origin = None
+        if observed_origin is None or current_origin is None:
+            return {
+                "transport_reachable": False,
+                "transport_fresh": False,
+                "transport_status": "unproven",
+                "transport_http_status": None,
+                "transport_age_seconds": None,
+            }
         if observed_origin != current_origin:
             return {
                 "transport_reachable": False,
