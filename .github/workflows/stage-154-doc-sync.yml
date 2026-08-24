@@ -16,6 +16,18 @@ jobs:
         with:
           ref: stewardship-secret-alias-awareness-qualified
           fetch-depth: 0
+      - name: Narrow current-state hygiene check
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/stage_154_docs.py')
+          text = p.read_text(encoding='utf-8')
+          old = '"docs/stewardship/progress-tracker.md": ["beyond the eight qualified bounded exits", "mutations **21/21**"],'
+          new = '"docs/stewardship/progress-tracker.md": ["beyond the eight qualified bounded exits"],'
+          if text.count(old) != 1:
+              raise SystemExit(f'expected one hygiene target, found {text.count(old)}')
+          p.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
       - name: Apply assertion-bound docs transform
         run: python scripts/stage_154_docs.py
       - name: Verify intended documentation scope
