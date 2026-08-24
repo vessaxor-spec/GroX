@@ -1,0 +1,53 @@
+name: Temporary GroX Documentation Synchronizer PR Kick
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  synchronize:
+    if: github.head_ref == 'stewardship-remote-cognition-transport-qualified'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout documentation branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: stewardship-remote-cognition-transport-qualified
+          fetch-depth: 0
+
+      - name: Execute staged exact documentation synchronization
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import textwrap
+
+          workflow = Path('.github/workflows/temp-doc-sync.yml').read_text(encoding='utf-8')
+          start_marker = "          python3 - <<'PY'\n"
+          end_marker = "\n          PY\n"
+          start = workflow.index(start_marker) + len(start_marker)
+          end = workflow.index(end_marker, start)
+          script = textwrap.dedent(workflow[start:end])
+          compile(script, 'staged-doc-sync', 'exec')
+          exec(script, {'__name__': '__main__'})
+          PY
+          git diff --check
+
+      - name: Commit documentation-only candidate and remove staging artifacts
+        shell: bash
+        run: |
+          rm .github/workflows/temp-doc-sync.yml
+          rm .github/workflows/temp-doc-sync-pr.yml
+          rm .tmp-doc-sync-trigger
+          git config user.name "VESSAXOR"
+          git config user.email "vessaxor@gmail.com"
+          git add README.md AI_INSTRUCTIONS.md configs/reasoning/README.md docs
+          git add -u .github/workflows/temp-doc-sync.yml .github/workflows/temp-doc-sync-pr.yml .tmp-doc-sync-trigger
+          echo "Candidate paths relative to current checkout:"
+          git diff --cached --name-only
+          git commit -m "docs: synchronize qualified runtime awareness"
+          git push origin HEAD:stewardship-remote-cognition-transport-qualified
