@@ -35,7 +35,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git rm .github/workflows/stewardship_150_stage.yml
           git rm .github/workflows/stewardship_150_pr_trigger.yml
-          git rm .github/stewardship_150_stage.py
+          git rm -f .github/stewardship_150_stage.py
           git rm .stewardship-150-trigger .stewardship-150-pr-open .stewardship-150-pr-open-2 .stewardship-150-pr-open-3
           git add README.md docs/architecture/ARCHITECTURE.md docs/stewardship/ROADMAP.md docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md docs/stewardship/progress-tracker.md docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md docs/history/ships-log/0067-configured-local-llama-readiness-qualified.md
           git diff --cached --check
