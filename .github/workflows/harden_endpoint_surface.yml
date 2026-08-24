@@ -1,0 +1,49 @@
+name: Harden endpoint-surface evidence
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  harden:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'live-awareness-bound-endpoint-surface'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: live-awareness-bound-endpoint-surface
+          fetch-depth: 0
+      - name: Tighten malformed-response evidence handling
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          def repl(path, old, new):
+              p=Path(path); t=p.read_text(); assert t.count(old)==1,(path,t.count(old)); p.write_text(t.replace(old,new,1))
+          p='src/grox/cognition_awareness.py'
+          repl(p,
+          '        if raw.get("responded") is not True:\n            return {\n                "endpoint_surface_fresh": True,\n                "endpoint_surface_status": "unreachable",\n                "endpoint_http_status": None,\n                "endpoint_age_seconds": age,\n            }\n        status = raw.get("http_status")\n',
+          '        if raw.get("responded") is False:\n            return {\n                "endpoint_surface_fresh": True,\n                "endpoint_surface_status": "unreachable",\n                "endpoint_http_status": None,\n                "endpoint_age_seconds": age,\n            }\n        if raw.get("responded") is not True:\n            return base\n        status = raw.get("http_status")\n')
+          repl(p,
+          '                "responded": valid_status is not None, "http_status": valid_status,\n',
+          '                "responded": True if valid_status is not None else None, "http_status": valid_status,\n')
+          repl(p,
+          '    A separate explicitly authorized refresh may observe only current transport\n    reachability for an already-bound remote origin through the existing A5 Tool\n    Gateway. Transport evidence never establishes provider readiness or fitness.\n',
+          '    Separate explicitly authorized refreshes may observe current origin transport\n    reachability or exact configured endpoint-surface response evidence for an\n    already-bound remote resource through the existing A5 Tool Gateway. Neither\n    observation establishes provider readiness, credential validity, or fitness.\n')
+          p='tests/unit/test_cognition_endpoint_freshness.py'
+          marker='\nif __name__=="__main__": unittest.main()\n'
+          text=Path(p).read_text(); assert text.count(marker)==1
+          test='''\n    def test_malformed_gateway_response_fails_closed_as_unproven(self):\n        with patch.object(self.gateway,"fetch_url",return_value={"url":ENDPOINT,"origin":ORIGIN,"status":"405","preview":"ignored"}):\n            item=self.awareness.refresh_endpoint_surface(resource_id=self.resource_id,order=self.order())\n        self.assertFalse(item["endpoint_surface_fresh"])\n        self.assertEqual(item["endpoint_surface_status"],"unproven")\n        self.assertIsNone(item["endpoint_http_status"])\n        self.assertFalse(item["ready"])\n'''
+          Path(p).write_text(text.replace(marker,test+marker,1))
+          PY
+          python -m compileall -q src tests
+          git diff --check
+          git config user.name VESSAXOR
+          git config user.email vessaxor@gmail.com
+          git add src/grox/cognition_awareness.py tests/unit/test_cognition_endpoint_freshness.py
+          git commit -m "test: fail closed on malformed endpoint evidence"
+          git rm .github/workflows/harden_endpoint_surface.yml
+          git commit -m "chore: remove endpoint hardening workflow"
+          git push origin HEAD:live-awareness-bound-endpoint-surface
