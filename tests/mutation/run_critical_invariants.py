@@ -232,6 +232,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_credential_availability.py::ConfiguredCredentialAliasAvailabilityTests::test_other_broker_alias_never_satisfies_missing_exact_configured_alias",
     ),
     MutationSpec(
+        name="configured-credential-use-exact-alias-authorization",
+        invariant="Configured credential-use authorization must remain bound to the exact configured alias granted by the sealed Mission Order.",
+        path="src/grox/configured_credential_use_authorization.py",
+        old='                    elif alias not in grants:\n',
+        new='                    elif "fallback-alias" not in grants:\n',
+        nodeid="tests/unit/test_configured_credential_use_authorization.py::ConfiguredCredentialUseAuthorizationTests::test_other_granted_alias_never_authorizes_exact_configured_alias",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
