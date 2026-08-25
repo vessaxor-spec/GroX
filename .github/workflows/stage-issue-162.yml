@@ -1,0 +1,167 @@
+name: Stage issue 162 exact docs transform
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  transform:
+    if: github.head_ref == 'stewardship-credential-alias-availability-qualified' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: stewardship-credential-alias-availability-qualified
+          fetch-depth: 0
+      - name: Apply assertion-bound stewardship transform and self-clean
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly one match, found {count}: {old[:120]!r}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          # README: current-state summary and mutation count only.
+          replace_once('README.md', '**IN PROGRESS — ten bounded exits QUALIFIED**', '**IN PROGRESS — eleven bounded exits QUALIFIED**')
+          replace_once(
+              'README.md',
+              'governed secret-alias availability awareness (#152/#153), and configured cognition credential-alias binding awareness (#156/#157). Parent #115 remains open;',
+              'governed secret-alias availability awareness (#152/#153), configured cognition credential-alias binding awareness (#156/#157), and configured cognition credential-alias availability composition (#160/#161). Parent #115 remains open;'
+          )
+          replace_once('README.md', '**23/23** current critical-invariant mutations killed', '**24/24** current critical-invariant mutations killed')
+          replace_once('README.md', 'with eleven later Live Environment Awareness authority/evidence mutations extending the current matrix', 'with twelve later Live Environment Awareness authority/evidence mutations extending the current matrix')
+
+          # Architecture: surface list plus strict eleventh composition boundary.
+          replace_once('docs/architecture/ARCHITECTURE.md', 'and ten bounded Live Environment Awareness exits qualified:', 'and eleven bounded Live Environment Awareness exits qualified:')
+          replace_once(
+              'docs/architecture/ARCHITECTURE.md',
+              'governed secret-alias availability awareness, and configured cognition credential-alias binding awareness. These source advances',
+              'governed secret-alias availability awareness, configured cognition credential-alias binding awareness, and configured cognition credential-alias availability composition. These source advances'
+          )
+          replace_once('docs/architecture/ARCHITECTURE.md', 'Current protected source qualifies ten bounded surfaces:', 'Current protected source qualifies eleven bounded surfaces:')
+          replace_once(
+              'docs/architecture/ARCHITECTURE.md',
+              'governed secret-alias availability awareness (#152/#153), and configured cognition credential-alias binding awareness (#156/#157).',
+              'governed secret-alias availability awareness (#152/#153), configured cognition credential-alias binding awareness (#156/#157), and configured cognition credential-alias availability composition (#160/#161).'
+          )
+          arch_anchor = "The configured credential-alias binding surface is explicit non-secret metadata only. For one valid configured remote `openai` cognition resource, `GROX_REASONER_CREDENTIAL_ALIAS` binds a validated alias name to the exact existing configured cognition resource identity while base discovery continues to omit credential-alias metadata. Missing or malformed aliases fail closed, and `local-llama-cpp` resources are not promoted. The surface does not consult or enumerate `SecretBroker`, check alias availability, read or materialize a secret value, validate credentials, perform network/provider/cognition/Mission activity, authorize work, promote readiness/qualification/selection/observation, perform fallback, or change routing.\n"
+          arch_new = arch_anchor + "\nThe configured credential-alias availability composition surface joins only those two already-qualified facts. For one valid configured remote `openai` cognition resource, `ConfiguredCredentialAliasAvailability` preserves the exact configured resource and alias identity and asks only whether that exact configured alias is represented in the already-injected memory-only `SecretBroker`. Invalid, unbound, or local bindings fail closed without consulting the broker. It never enumerates aliases or materializes, inspects, validates, hashes, compares, persists, logs, transforms, or exposes a secret value; it performs no network/provider/cognition/Mission activity and promotes no authorization, readiness, qualification/fit, selection, or observation state. Exact alias membership is not credential validity, authenticated provider/service readiness, or successful cognition.\n"
+          replace_once('docs/architecture/ARCHITECTURE.md', arch_anchor, arch_new)
+
+          # General roadmap: current position, current mutation count, and eleventh qualification block.
+          replace_once(
+              'docs/stewardship/ROADMAP.md',
+              'qualified governed secret-alias availability awareness exit, and qualified configured cognition credential-alias binding awareness exit**.',
+              'qualified governed secret-alias availability awareness exit, qualified configured cognition credential-alias binding awareness exit, and qualified configured cognition credential-alias availability composition exit**.'
+          )
+          replace_once(
+              'docs/stewardship/ROADMAP.md',
+              '- 23 high-consequence production invariants continuously mutation-proven; the original Stage 1 12/12 record remains historical and eleven later Live Environment Awareness authority/evidence mutations extend the current matrix.',
+              '- 24 high-consequence production invariants continuously mutation-proven; the original Stage 1 12/12 record remains historical and twelve later Live Environment Awareness authority/evidence mutations extend the current matrix.'
+          )
+          roadmap_marker = '\n## Apex critical path\n'
+          roadmap = Path('docs/stewardship/ROADMAP.md')
+          text = roadmap.read_text(encoding='utf-8')
+          if text.count(roadmap_marker) != 1 or 'configured cognition credential-alias availability composition exit is QUALIFIED' in text:
+              raise SystemExit('ROADMAP.md: unexpected eleventh-exit insertion state')
+          block = "\n- **Live Environment Awareness configured cognition credential-alias availability composition exit is QUALIFIED:** issue #160 / PR #161 compose one valid configured remote `openai` cognition resource's exact non-secret credential-alias binding with exact secret-blind membership of that alias in the already-injected memory-only `SecretBroker`. The surface preserves exact resource/provider/model/endpoint/alias identity; invalid, unbound, or local bindings fail closed without broker consultation. It does not enumerate aliases or read/materialize/inspect/validate/hash/compare/persist/log/transform secret values, performs no network/provider/cognition/Mission activity, and promotes no authorization/readiness/fitness/selection/observation state. Red-before-green head `d2d16cc764177b1db50d16fac463b55fef6e32bf` produced CI #550 / `32820989293`, with Wheel green and Python 3.11–3.14 red exactly on missing `grox.configured_credential_availability`; Python 3.12 Health remained 10/0/0/0. Final head `ece4d05c3c9e1402968e2047adecaa8e60be7660` passed exact-head GroX CI #555 / `32821385793` across Wheel + Python 3.11–3.14; Python 3.12 job `97720097426` recorded Health 10/0/0/0, pytest 421 passed / 2 skipped / 480 subtests, unittest 423 OK / 2 skipped, critical mutations 24/24 plus 7/7 + 9/9 + 4/4 + 6/6 killed, and Post-Apex PASS. Permanent mutation `configured-credential-availability-exact-alias` was killed with source restored clean. Bounded review `5016024391` passed with no threads. CI-tested ready-state synthetic merge `351bf54b84e57090b7cfc154640b9577c4391530` and guarded canonical merge `main@7ac5b8832d4c6e08a3c545a76c5125818461977f` share exact tree `adc4a4fd512eaa65794e7088c4567a25d65727fa`; exact-tree equality PASS. Secret non-emptiness/currentness/usability, credential validity, authenticated provider/service readiness, model quality / Mission-specific fitness, successful cognition semantics, broader catalog/connection/application/process awareness, switching/fallback, and adaptive routing remain unqualified. Parent #115 remains open.\n"
+          roadmap.write_text(text.replace(roadmap_marker, block + roadmap_marker, 1), encoding='utf-8')
+
+          # Live Environment Awareness doctrine: status, narrative, sequencing, and exact evidence.
+          replace_once(
+              'docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md',
+              '+ GOVERNED SECRET-ALIAS AVAILABILITY + CONFIGURED CREDENTIAL-ALIAS BINDING EXITS QUALIFIED',
+              '+ GOVERNED SECRET-ALIAS AVAILABILITY + CONFIGURED CREDENTIAL-ALIAS BINDING + CONFIGURED CREDENTIAL-ALIAS AVAILABILITY EXITS QUALIFIED'
+          )
+          replace_once(
+              'docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md',
+              'The binding surface does not consult or enumerate `SecretBroker`, check alias availability, inspect/materialize/validate credential values, perform network/provider/cognition/Mission activity, authorize work, or promote readiness/qualification/selection/observation, fallback, or routing. These exits still do **not** establish',
+              'The binding surface does not consult or enumerate `SecretBroker`, check alias availability, inspect/materialize/validate credential values, perform network/provider/cognition/Mission activity, authorize work, or promote readiness/qualification/selection/observation, fallback, or routing. Issue #160 / PR #161 additionally qualify **configured cognition credential-alias availability composition**: for one valid configured remote `openai` resource, the exact bound alias is checked only for secret-blind membership in the already-injected memory-only broker while exact resource/provider/model/endpoint/alias identity is preserved. Invalid, unbound, or local bindings fail closed without broker consultation. The surface does not enumerate aliases or materialize/inspect/validate secret values, perform network/provider/cognition/Mission activity, promote later awareness state, perform fallback, or change routing. These exits still do **not** establish'
+          )
+          replace_once(
+              'docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md',
+              'The configured cognition credential-alias binding exit is **QUALIFIED** through issue #156 / PR #157 and establishes only explicit non-secret alias metadata bound to the exact configured remote cognition resource identity; it does not consult the broker, prove alias availability, inspect or validate credential values, perform authenticated provider activity, or promote any later awareness state. Broader issue #115 remains open.',
+              'The configured cognition credential-alias binding exit is **QUALIFIED** through issue #156 / PR #157 and establishes only explicit non-secret alias metadata bound to the exact configured remote cognition resource identity; it does not consult the broker, prove alias availability, inspect or validate credential values, perform authenticated provider activity, or promote any later awareness state. The configured cognition credential-alias availability composition exit is **QUALIFIED** through issue #160 / PR #161 and establishes only that the exact alias already bound to one valid configured remote resource is represented in the already-injected broker; it neither materializes nor validates credential values, proves secret usability, performs authenticated provider activity, nor promotes any later awareness state. Broader issue #115 remains open.'
+          )
+          doctrine = Path('docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md')
+          text = doctrine.read_text(encoding='utf-8')
+          evidence_heading = '**Configured cognition credential-alias availability qualification evidence:**'
+          if evidence_heading in text:
+              raise SystemExit('ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md: eleventh evidence already present')
+          evidence = "\n\n**Configured cognition credential-alias availability qualification evidence:** issue #160 / PR #161 qualified the eleventh bounded awareness exit. Red-before-green tests-only head `d2d16cc764177b1db50d16fac463b55fef6e32bf` kept Wheel bootstrap green while Python 3.11–3.14 failed exactly on the intentionally missing `grox.configured_credential_availability` module in GroX CI #550 / `32820989293`; Python 3.12 Health remained 10/0/0/0. Final head `ece4d05c3c9e1402968e2047adecaa8e60be7660` passed exact-head GroX CI #555 / `32821385793` across Wheel + Python 3.11–3.14. Python 3.12 job `97720097426` recorded Health 10/0/0/0, pytest 421 passed / 2 skipped / 480 subtests, unittest 423 OK / 2 skipped, critical mutations 24/24 plus health 7/7, reconstitution 9/9, operational drift 4/4, source provenance 6/6, and Post-Apex PASS. Permanent mutation `configured-credential-availability-exact-alias` was KILLED with zero survivors and source restored clean. Bounded review `5016024391` passed with no review threads. CI-tested ready-state synthetic merge `351bf54b84e57090b7cfc154640b9577c4391530` and guarded canonical merge `main@7ac5b8832d4c6e08a3c545a76c5125818461977f` share exact tree `adc4a4fd512eaa65794e7088c4567a25d65727fa`; exact-tree equality PASS. This evidence qualifies exact configured alias membership composition only. Secret non-emptiness/currentness/usability, credential validity, authenticated provider/service readiness, model quality/Mission fitness, successful cognition semantics, broader catalog/application discovery, switching/fallback, adaptive routing, and any release/package/NCI/Apex/A8 advancement remain unqualified."
+          doctrine.write_text(text.rstrip() + evidence + '\n', encoding='utf-8')
+
+          # Progress tracker: current implementation source and prepend the eleventh canonical record.
+          replace_once(
+              'docs/stewardship/progress-tracker.md',
+              '**Current verified canonical source after configured cognition credential-alias binding qualification:** `main@4401b78e33db964b6789ec42997bc32489ef095a`',
+              '**Current verified canonical source after configured cognition credential-alias availability composition qualification:** `main@7ac5b8832d4c6e08a3c545a76c5125818461977f`'
+          )
+          replace_once('docs/stewardship/progress-tracker.md', '**Current verified canonical tree:** `99c096cfb183044a17318999389ead7d06346868`', '**Current verified canonical tree:** `adc4a4fd512eaa65794e7088c4567a25d65727fa`')
+          replace_once(
+              'docs/stewardship/progress-tracker.md',
+              'pytest **417 passed, 2 skipped, 477 subtests**; unittest **419 OK, 2 skipped**; mutations **23/23**, **7/7**, **9/9**, **4/4**, **6/6** killed;',
+              'pytest **421 passed, 2 skipped, 480 subtests**; unittest **423 OK, 2 skipped**; mutations **24/24**, **7/7**, **9/9**, **4/4**, **6/6** killed;'
+          )
+          replace_once(
+              'docs/stewardship/progress-tracker.md',
+              '+ GOVERNED SECRET-ALIAS AVAILABILITY + CONFIGURED CREDENTIAL-ALIAS BINDING EXITS QUALIFIED**',
+              '+ GOVERNED SECRET-ALIAS AVAILABILITY + CONFIGURED CREDENTIAL-ALIAS BINDING + CONFIGURED CREDENTIAL-ALIAS AVAILABILITY EXITS QUALIFIED**'
+          )
+          replace_once('docs/stewardship/progress-tracker.md', 'beyond the ten qualified bounded exits', 'beyond the eleven qualified bounded exits')
+          replace_once(
+              'docs/stewardship/progress-tracker.md',
+              'Still unqualified: configured-alias availability composition, actual credential validity,',
+              'Still unqualified: actual credential validity,'
+          )
+          tracker_marker = '\n## Live Environment Awareness — configured cognition credential-alias binding awareness — issue #156 / PR #157\n'
+          tracker = Path('docs/stewardship/progress-tracker.md')
+          text = tracker.read_text(encoding='utf-8')
+          if text.count(tracker_marker) != 1 or '## Live Environment Awareness — configured cognition credential-alias availability composition — issue #160 / PR #161' in text:
+              raise SystemExit('progress-tracker.md: unexpected eleventh section state')
+          section = "\n## Live Environment Awareness — configured cognition credential-alias availability composition — issue #160 / PR #161\n\n**Status: COMPLETE — QUALIFIED — CANONICAL MERGED AND EXACT-TREE VERIFIED.**\n\nQualified boundary:\n\n- applies only to one valid configured remote `openai` cognition resource with one valid exact non-secret configured credential alias;\n- preserves exact configured resource ID/provider/model/endpoint and alias metadata while consulting only exact secret-blind alias membership in the already-injected memory-only `SecretBroker`;\n- invalid, unbound, or `local-llama-cpp` bindings fail closed without broker consultation;\n- no alias enumeration or secret materialization/inspection/validation/hash/compare/persist/log/transform/disclosure occurs;\n- no network/provider/cognition/Mission activity, authorization/readiness/qualification-fit/selection/observation promotion, fallback, or routing change occurs;\n- exact alias membership is not proof of secret non-emptiness/currentness/usability, credential validity, authenticated provider/service readiness, model quality/Mission fitness, or successful cognition.\n\nQualification evidence:\n\n- red-before-green tests-only head `d2d16cc764177b1db50d16fac463b55fef6e32bf`: GroX CI #550 / `32820989293` kept Wheel bootstrap green while Python 3.11–3.14 failed exactly because `grox.configured_credential_availability` was absent; Python 3.12 Health remained **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**;\n- final PR #161 head `ece4d05c3c9e1402968e2047adecaa8e60be7660`;\n- exact-head GroX CI #555 / `32821385793`: PASS Wheel + Python 3.11–3.14;\n- Python 3.12 job `97720097426`: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **421 passed, 2 skipped, 480 subtests**; unittest **423 OK, 2 skipped**; critical mutations **24/24**; health **7/7**; reconstitution **9/9**; operational drift **4/4**; source provenance **6/6**; Post-Apex PASS; source restored clean;\n- permanent mutation `configured-credential-availability-exact-alias`: KILLED;\n- bounded review `5016024391`: PASS with no review threads;\n- CI-tested ready-state synthetic merge `351bf54b84e57090b7cfc154640b9577c4391530`, tree `adc4a4fd512eaa65794e7088c4567a25d65727fa`;\n- guarded canonical merge `main@7ac5b8832d4c6e08a3c545a76c5125818461977f`, same tree;\n- synthetic-to-canonical tree equality: **PASS**;\n- issue #160 closed completed; parent #115 remains **OPEN**.\n\nStill unqualified: actual credential validity, authenticated remote provider/service readiness, model quality / Mission-specific fitness, successful cognition semantics, arbitrary/unconfigured provider catalogs, broader authorized external-connection/application/process awareness, provider switching/fallback, and adaptive routing. No release/package/NCI/Apex/A8 advancement occurred.\n"
+          tracker.write_text(text.replace(tracker_marker, section + tracker_marker, 1), encoding='utf-8')
+
+          # Critical mutation matrix: preserve historical Stage 1 and extend current matrix by #24.
+          replace_once(
+              'docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md',
+              'extended the same permanent harness with eleven additional high-consequence Live Environment Awareness authority/evidence mutations. The current matrix is therefore **23/23 KILLED**;',
+              'extended the same permanent harness with twelve additional high-consequence Live Environment Awareness authority/evidence mutations. The current matrix is therefore **24/24 KILLED**;'
+          )
+          row23 = '| 23 | Configured credential-alias binding must preserve the exact configured cognition resource identity | replace the bound `resource_id` in `src/grox/credential_binding.py` with a different configured-resource identity | `ConfiguredCredentialBindingTests.test_valid_remote_binding_preserves_exact_resource_identity` | KILLED |\n'
+          row24 = '| 24 | Configured credential-alias availability must remain bound to the exact configured alias | replace the exact bound alias passed to `SecretAliasAwareness.inspect` in `src/grox/configured_credential_availability.py` with `fallback-alias` | `ConfiguredCredentialAliasAvailabilityTests.test_other_broker_alias_never_satisfies_missing_exact_configured_alias` | KILLED |\n'
+          replace_once('docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md', row23, row23 + row24)
+          matrix = Path('docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md')
+          text = matrix.read_text(encoding='utf-8')
+          start = 'Latest exact-head evidence is PR #157 CI #541 / `32818899816`:'
+          end = 'The original Stage 1 **12/12** qualification remains preserved above as historical evidence.'
+          if text.count(start) != 1 or text.count(end) != 1:
+              raise SystemExit('mutation matrix: latest-evidence anchor drift')
+          a = text.index(start)
+          b = text.index(end, a) + len(end)
+          latest = 'Latest exact-head evidence is PR #161 CI #555 / `32821385793`: Python 3.12 job `97720097426` killed **24/24** critical mutations with zero survivors and `source_restored_clean=true` while all health, reconstitution, operational-drift, source-provenance, and Post-Apex gates remained green. The #16 mutation remains `cognition-transport-presealed-authority`; #17 is `cognition-transport-origin-binding`; #18 is `cognition-endpoint-exact-binding`; #19 is `configured-cognition-discovery-state-separation`; #20 is `configured-connection-exact-resource-binding`; #21 is `configured-local-readiness-authorization-separation`; #22 is `secret-alias-exact-binding`; #23 is `configured-credential-binding-exact-resource`; #24 is `configured-credential-availability-exact-alias`. The original Stage 1 **12/12** qualification remains preserved above as historical evidence.'
+          matrix.write_text(text[:a] + latest + text[b:], encoding='utf-8')
+
+          # Staging workflow must not survive the transform.
+          workflow = Path('.github/workflows/stage-issue-162.yml')
+          workflow.unlink()
+          PY
+
+          git diff --check
+          test ! -e .github/workflows/stage-issue-162.yml
+          git status --short
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/architecture/ARCHITECTURE.md docs/stewardship/ROADMAP.md docs/stewardship/ROADMAP_LIVE_ENVIRONMENT_AWARENESS_001.md docs/stewardship/progress-tracker.md docs/verification/CRITICAL_INVARIANT_MUTATION_MATRIX.md .github/workflows/stage-issue-162.yml
+          git commit -m "docs: synchronize credential alias availability qualification"
+          git push origin HEAD:stewardship-credential-alias-availability-qualified
