@@ -3,8 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
 
+from grox.configured_credential_availability import ConfiguredCredentialAliasAvailability
 from grox.pilot import PilotGorXu
 from grox.tools.secrets import SecretBroker
 
@@ -19,11 +19,11 @@ OPENAI_CONFIG = {
 
 class MaterializationTrapBroker(SecretBroker):
     def materialize_env(self, order, requested):
-        raise AssertionError("Pilot awareness must never materialize credential values")
+        raise AssertionError("configured credential availability must never materialize credential values")
 
 
 class PilotConfiguredCredentialAliasAvailabilityTests(unittest.TestCase):
-    def test_pilot_composes_exact_alias_availability_without_mission_secret_or_network_activity(self):
+    def test_gorxu_broker_composes_exact_alias_availability_without_mission_secret_or_network_activity(self):
         secret = "PILOT-CREDENTIAL-SECRET-SENTINEL"
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -35,8 +35,9 @@ class PilotConfiguredCredentialAliasAvailabilityTests(unittest.TestCase):
             pilot = PilotGorXu(root, reasoner=None, secret_broker=broker)
             before = pilot.store.recent_missions(1000)
 
-            with patch("grox.pilot.nonsecret_reasoner_config_from_env", return_value=OPENAI_CONFIG):
-                result = pilot.live_configured_credential_alias_availability_inventory()
+            result = ConfiguredCredentialAliasAvailability(
+                OPENAI_CONFIG, pilot.gateway.secret_broker
+            ).inventory()
 
             self.assertEqual(result["status"], "ok")
             item = result["resources"][0]
