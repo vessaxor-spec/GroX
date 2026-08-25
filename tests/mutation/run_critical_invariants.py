@@ -224,6 +224,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_credential_binding.py::ConfiguredCredentialBindingTests::test_valid_remote_binding_preserves_exact_resource_identity",
     ),
     MutationSpec(
+        name="configured-credential-availability-exact-alias",
+        invariant="Configured credential-alias availability must remain bound to the exact configured alias.",
+        path="src/grox/configured_credential_availability.py",
+        old='        availability = self._alias_awareness.inspect(alias)\n',
+        new='        availability = self._alias_awareness.inspect("fallback-alias")\n',
+        nodeid="tests/unit/test_configured_credential_availability.py::ConfiguredCredentialAliasAvailabilityTests::test_other_broker_alias_never_satisfies_missing_exact_configured_alias",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
