@@ -4,8 +4,8 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after configured cognition credential-alias binding qualification:** `main@4401b78e33db964b6789ec42997bc32489ef095a`
-**Current verified canonical tree:** `99c096cfb183044a17318999389ead7d06346868`
+**Current verified canonical source after configured cognition credential-alias availability composition qualification:** `main@7ac5b8832d4c6e08a3c545a76c5125818461977f`
+**Current verified canonical tree:** `adc4a4fd512eaa65794e7088c4567a25d65727fa`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,9 +15,37 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **417 passed, 2 skipped, 477 subtests**; unittest **419 OK, 2 skipped**; mutations **23/23**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
-**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS + SUPPORTED CONFIGURED COGNITION DISCOVERY + CONFIGURED REMOTE CONNECTION POLICY AWARENESS + CONFIGURED LOCAL LLAMA.CPP READINESS + GOVERNED SECRET-ALIAS AVAILABILITY + CONFIGURED CREDENTIAL-ALIAS BINDING EXITS QUALIFIED**
-**Next bounded implementation:** **Continue issue #115 beyond the ten qualified bounded exits using the smallest repository-native evidence-backed surface. Credential validity, authenticated remote provider/service readiness, model quality / Mission-specific fitness, successful cognition semantics, arbitrary/unconfigured provider catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, provider switching/fallback, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **421 passed, 2 skipped, 480 subtests**; unittest **423 OK, 2 skipped**; mutations **24/24**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
+**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS + SUPPORTED CONFIGURED COGNITION DISCOVERY + CONFIGURED REMOTE CONNECTION POLICY AWARENESS + CONFIGURED LOCAL LLAMA.CPP READINESS + GOVERNED SECRET-ALIAS AVAILABILITY + CONFIGURED CREDENTIAL-ALIAS BINDING + CONFIGURED CREDENTIAL-ALIAS AVAILABILITY EXITS QUALIFIED**
+**Next bounded implementation:** **Continue issue #115 beyond the eleven qualified bounded exits using the smallest repository-native evidence-backed surface. Credential validity, authenticated remote provider/service readiness, model quality / Mission-specific fitness, successful cognition semantics, arbitrary/unconfigured provider catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, provider switching/fallback, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+
+## Live Environment Awareness — configured cognition credential-alias availability composition — issue #160 / PR #161
+
+**Status: COMPLETE — QUALIFIED — CANONICAL MERGED AND EXACT-TREE VERIFIED.**
+
+Qualified boundary:
+
+- applies only to one valid configured remote `openai` cognition resource with one valid exact non-secret configured credential alias;
+- preserves exact configured resource ID/provider/model/endpoint and alias metadata while consulting only exact secret-blind alias membership in the already-injected memory-only `SecretBroker`;
+- invalid, unbound, or `local-llama-cpp` bindings fail closed without broker consultation;
+- no alias enumeration or secret materialization/inspection/validation/hash/compare/persist/log/transform/disclosure occurs;
+- no network/provider/cognition/Mission activity, authorization/readiness/qualification-fit/selection/observation promotion, fallback, or routing change occurs;
+- exact alias membership is not proof of secret non-emptiness/currentness/usability, credential validity, authenticated provider/service readiness, model quality/Mission fitness, or successful cognition.
+
+Qualification evidence:
+
+- red-before-green tests-only head `d2d16cc764177b1db50d16fac463b55fef6e32bf`: GroX CI #550 / `32820989293` kept Wheel bootstrap green while Python 3.11–3.14 failed exactly because `grox.configured_credential_availability` was absent; Python 3.12 Health remained **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**;
+- final PR #161 head `ece4d05c3c9e1402968e2047adecaa8e60be7660`;
+- exact-head GroX CI #555 / `32821385793`: PASS Wheel + Python 3.11–3.14;
+- Python 3.12 job `97720097426`: Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **421 passed, 2 skipped, 480 subtests**; unittest **423 OK, 2 skipped**; critical mutations **24/24**; health **7/7**; reconstitution **9/9**; operational drift **4/4**; source provenance **6/6**; Post-Apex PASS; source restored clean;
+- permanent mutation `configured-credential-availability-exact-alias`: KILLED;
+- bounded review `5016024391`: PASS with no review threads;
+- CI-tested ready-state synthetic merge `351bf54b84e57090b7cfc154640b9577c4391530`, tree `adc4a4fd512eaa65794e7088c4567a25d65727fa`;
+- guarded canonical merge `main@7ac5b8832d4c6e08a3c545a76c5125818461977f`, same tree;
+- synthetic-to-canonical tree equality: **PASS**;
+- issue #160 closed completed; parent #115 remains **OPEN**.
+
+Still unqualified: actual credential validity, authenticated remote provider/service readiness, model quality / Mission-specific fitness, successful cognition semantics, arbitrary/unconfigured provider catalogs, broader authorized external-connection/application/process awareness, provider switching/fallback, and adaptive routing. No release/package/NCI/Apex/A8 advancement occurred.
 
 ## Live Environment Awareness — configured cognition credential-alias binding awareness — issue #156 / PR #157
 
@@ -44,7 +72,7 @@ Qualification evidence:
 - synthetic-to-canonical tree equality: **PASS**;
 - issue #156 closed completed; parent #115 remains **OPEN**.
 
-Still unqualified: configured-alias availability composition, actual credential validity, authenticated remote provider/service readiness, model quality / Mission-specific fitness, successful cognition semantics, arbitrary/unconfigured provider catalogs, broader authorized external-connection/application/process awareness, provider switching/fallback, and adaptive routing. No release/package/NCI/Apex/A8 advancement occurred.
+Still unqualified: actual credential validity, authenticated remote provider/service readiness, model quality / Mission-specific fitness, successful cognition semantics, arbitrary/unconfigured provider catalogs, broader authorized external-connection/application/process awareness, provider switching/fallback, and adaptive routing. No release/package/NCI/Apex/A8 advancement occurred.
 
 ## Live Environment Awareness — governed secret-alias availability awareness — issue #152 / PR #153
 
