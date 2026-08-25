@@ -12,17 +12,19 @@ _NONSECRET_ENV_KEYS = (
     "GROX_REASONER_PROVIDER",
     "GROX_REASONER_MODEL",
     "GROX_REASONER_ENDPOINT",
+    "GROX_REASONER_CREDENTIAL_ALIAS",
 )
 _SUPPORTED_PROVIDER_KINDS = frozenset({"openai", "local-llama-cpp"})
 _DEFAULT_OPENAI_ENDPOINT = "https://api.openai.com/v1/responses"
 
 
 def nonsecret_reasoner_config_from_env() -> dict[str, str]:
-    """Return only non-secret reasoning identity configuration.
+    """Return only explicit non-secret reasoning identity configuration.
 
-    Credential names are intentionally absent from this allowlist. This function
-    must never become a credential-presence, credential-validity, readiness, or
-    provider-construction seam.
+    Secret values and credential presence remain outside this allowlist. A
+    credential *alias name* may be returned as non-secret binding metadata, but
+    it does not imply that the alias exists in a broker, contains usable
+    material, is valid, or grants any authority/readiness.
     """
     snapshot: dict[str, str] = {}
     for key in _NONSECRET_ENV_KEYS:
@@ -75,6 +77,8 @@ class ConfiguredCognitionDiscovery:
     Discovery reads only an explicit non-secret configuration allowlist. It does
     not construct providers, inspect credentials, touch the network/filesystem,
     load models, invoke cognition, bind resources, select providers, or route.
+    Credential-alias metadata is intentionally not exposed on the base resource;
+    that binding is handled by a separate awareness surface.
     """
 
     def __init__(self, config: Mapping[str, Any]):

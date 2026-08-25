@@ -24,6 +24,7 @@ from .cognition_awareness import CognitionProviderAwareness, CognitionProviderPo
 from .cognition_discovery import ConfiguredCognitionDiscovery, nonsecret_reasoner_config_from_env
 from .configured_connection_awareness import ConfiguredConnectionPolicyAwareness
 from .configured_local_readiness import ConfiguredLocalCognitionReadiness
+from .credential_binding import ConfiguredCredentialBinding
 from .graph import MissionGraphPlan
 from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
@@ -122,6 +123,10 @@ class PilotGorXu:
     def live_configured_cognition_inventory(self)->dict[str,Any]:
         """Discover supported non-secret cognition configuration without binding or invocation."""
         return ConfiguredCognitionDiscovery(nonsecret_reasoner_config_from_env()).inventory()
+
+    def live_configured_credential_binding_inventory(self)->dict[str,Any]:
+        """Report explicit non-secret credential-alias binding without broker or provider activity."""
+        return ConfiguredCredentialBinding(nonsecret_reasoner_config_from_env()).inventory()
 
     def live_configured_connection_policy_inventory(self, *, order:MissionOrder|None=None)->dict[str,Any]:
         """Report configured remote connection policy state without network or provider activity."""

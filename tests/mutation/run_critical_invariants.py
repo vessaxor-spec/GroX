@@ -216,6 +216,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_secret_alias_awareness.py::SecretAliasAwarenessTests::test_absent_alias_fails_closed_without_enumerating_other_aliases",
     ),
     MutationSpec(
+        name="configured-credential-binding-exact-resource",
+        invariant="Configured credential-alias binding must preserve the exact configured cognition resource identity.",
+        path="src/grox/credential_binding.py",
+        old='            "resource_id": resource["resource_id"],\n',
+        new='            "resource_id": "cognition:configured:openai:wrong-binding",\n',
+        nodeid="tests/unit/test_configured_credential_binding.py::ConfiguredCredentialBindingTests::test_valid_remote_binding_preserves_exact_resource_identity",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
