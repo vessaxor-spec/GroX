@@ -74,7 +74,7 @@ All five canonical CI jobs passed.
 
 ## Post-Apex matrix extensions
 
-The original Stage 1 qualification above remains historical **12/12 KILLED** evidence. Protected source later extended the same permanent harness with ten additional high-consequence Live Environment Awareness authority/evidence mutations. The current matrix is therefore **22/22 KILLED**; this extension does not rewrite the original Stage 1 run.
+The original Stage 1 qualification above remains historical **12/12 KILLED** evidence. Protected source later extended the same permanent harness with eleven additional high-consequence Live Environment Awareness authority/evidence mutations. The current matrix is therefore **23/23 KILLED**; this extension does not rewrite the original Stage 1 run.
 
 | # | Invariant | Production mutation | Target detector | Current evidence |
 |---|---|---|---|---|
@@ -88,8 +88,9 @@ The original Stage 1 qualification above remains historical **12/12 KILLED** evi
 | 20 | Configured remote connection authorization must remain bound to the exact discovered resource identity | disable the exact configured resource-ID mismatch rejection in `src/grox/configured_connection_awareness.py` | `ConfiguredConnectionPolicyAwarenessTests.test_wrong_resource_id_never_authorizes_connection` | KILLED |
 | 21 | Configured local cognition readiness must never imply Mission authorization | change configured-local readiness `authorized` from false to true in `src/grox/configured_local_readiness.py` | `ConfiguredLocalCognitionReadinessTests.test_ready_state_never_implies_authorization` | KILLED |
 | 22 | Secret-alias availability must remain bound to the exact requested alias rather than any broker secret | replace exact alias membership in `src/grox/tools/secrets.py` with `bool(self._secrets)` | `SecretAliasAwarenessTests.test_absent_alias_fails_closed_without_enumerating_other_aliases` | KILLED |
+| 23 | Configured credential-alias binding must preserve the exact configured cognition resource identity | replace the bound `resource_id` in `src/grox/credential_binding.py` with a different configured-resource identity | `ConfiguredCredentialBindingTests.test_valid_remote_binding_preserves_exact_resource_identity` | KILLED |
 
-Latest exact-head evidence is PR #153 CI #523 / `32789939644`: Python 3.12 killed **22/22** critical mutations with zero survivors while all health, reconstitution, operational-drift, source-provenance, and Post-Apex gates remained green. The #16 mutation remains `cognition-transport-presealed-authority`; #17 is `cognition-transport-origin-binding`; #18 is `cognition-endpoint-exact-binding`; #19 is `configured-cognition-discovery-state-separation`; #20 is `configured-connection-exact-resource-binding`; #21 is `configured-local-readiness-authorization-separation`; #22 is `secret-alias-exact-binding`. The original Stage 1 **12/12** qualification remains preserved above as historical evidence.
+Latest exact-head evidence is PR #157 CI #541 / `32818899816`: after a same-head rerun of one runner-local Python 3.12 Docker isolation anomaly with no source change, successful replacement job `97712960486` killed **23/23** critical mutations with zero survivors and `source_restored_clean=true` while all health, reconstitution, operational-drift, source-provenance, and Post-Apex gates remained green. The #16 mutation remains `cognition-transport-presealed-authority`; #17 is `cognition-transport-origin-binding`; #18 is `cognition-endpoint-exact-binding`; #19 is `configured-cognition-discovery-state-separation`; #20 is `configured-connection-exact-resource-binding`; #21 is `configured-local-readiness-authorization-separation`; #22 is `secret-alias-exact-binding`; #23 is `configured-credential-binding-exact-resource`. The original Stage 1 **12/12** qualification remains preserved above as historical evidence.
 
 ## New detector coverage added in Stage 1
 
