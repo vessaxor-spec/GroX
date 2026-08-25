@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
 from grox.credential_binding import ConfiguredCredentialBinding
-from grox.cognition_discovery import ConfiguredCognitionDiscovery
+from grox.cognition_discovery import ConfiguredCognitionDiscovery, nonsecret_reasoner_config_from_env
 
 
 OPENAI_CONFIG = {
@@ -72,6 +73,22 @@ class ConfiguredCredentialBindingTests(unittest.TestCase):
         item = ConfiguredCognitionDiscovery(OPENAI_CONFIG).inventory()["resources"][0]
         self.assertNotIn("credential_alias", item)
         self.assertFalse(item["ready"])
+
+    def test_environment_reader_accepts_alias_name_but_never_reads_secret_value(self):
+        touched: list[str] = []
+
+        def fake_getenv(name: str, default: str = "") -> str:
+            touched.append(name)
+            if name == "OPENAI_API_KEY":
+                raise AssertionError("credential value must not be inspected")
+            return OPENAI_CONFIG.get(name, default)
+
+        with patch("grox.cognition_discovery.os.getenv", side_effect=fake_getenv):
+            snapshot = nonsecret_reasoner_config_from_env()
+
+        self.assertEqual(snapshot, OPENAI_CONFIG)
+        self.assertIn("GROX_REASONER_CREDENTIAL_ALIAS", touched)
+        self.assertNotIn("OPENAI_API_KEY", touched)
 
 
 if __name__ == "__main__":
