@@ -149,6 +149,7 @@ class OpenAICognitionGatewayTests(unittest.TestCase):
         return json.dumps({
             "id": "resp_test",
             "model": MODEL,
+            "provider_extra": "RAW-PROVIDER-SENTINEL",
             "output_text": json.dumps(interpretation),
         }).encode()
 
@@ -174,7 +175,11 @@ class OpenAICognitionGatewayTests(unittest.TestCase):
         self.assertEqual(result["status"], 200)
         self.assertEqual(result["response_id"], "resp_test")
         self.assertEqual(result["response_model"], MODEL)
+        self.assertEqual(result["interpretation"].commander_intent, INTENT)
         self.assertTrue(result["cognition_invoked"])
+        self.assertFalse(result["raw_response_returned"])
+        self.assertNotIn("_payload", result)
+        self.assertNotIn("RAW-PROVIDER-SENTINEL", repr(result))
         self.assertNotIn(secret, repr(result))
         self.assertEqual(
             broker.materialize_calls,
@@ -228,7 +233,7 @@ class OpenAICognitionGatewayTests(unittest.TestCase):
             )
         self.assertEqual(broker.materialize_calls, [])
 
-    def test_non_200_and_invalid_json_are_sanitized_failures(self):
+    def test_non_200_invalid_json_and_invalid_structure_are_sanitized_failures(self):
         gateway, _ = self._gateway({ALIAS: "SECRET-SENTINEL"})
         FakeHTTPSConnection.response = FakeResponse(
             429,
@@ -243,6 +248,14 @@ class OpenAICognitionGatewayTests(unittest.TestCase):
         FakeHTTPSConnection.response = FakeResponse(200, b"{not-json")
         with patch("grox.tools.layout_gateway.http.client.HTTPSConnection", FakeHTTPSConnection):
             with self.assertRaisesRegex(ToolDenied, "invalid JSON"):
+                self._invoke(gateway, self._order())
+
+        FakeHTTPSConnection.response = FakeResponse(
+            200,
+            json.dumps({"output_text": "{not-valid-structured-output"}).encode(),
+        )
+        with patch("grox.tools.layout_gateway.http.client.HTTPSConnection", FakeHTTPSConnection):
+            with self.assertRaisesRegex(ToolDenied, "invalid structured interpretation"):
                 self._invoke(gateway, self._order())
 
 
