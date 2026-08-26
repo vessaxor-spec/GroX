@@ -240,6 +240,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_credential_use_authorization.py::ConfiguredCredentialUseAuthorizationTests::test_other_granted_alias_never_authorizes_exact_configured_alias",
     ),
     MutationSpec(
+        name="configured-remote-reasoner-requires-exact-authorization",
+        invariant="Configured remote reasoner activation must not materialize a credential unless the exact activation operation is authorized.",
+        path="src/grox/configured_remote_reasoner.py",
+        old='        if item.get("credential_use_authorized") is not True:\n',
+        new='        if False and item.get("credential_use_authorized") is not True:\n',
+        nodeid="tests/unit/test_configured_remote_reasoner.py::ConfiguredRemoteReasonerActivationTests::test_authorization_awareness_operation_cannot_materialize_or_construct_provider",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
