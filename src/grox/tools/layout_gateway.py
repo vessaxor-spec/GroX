@@ -1,11 +1,23 @@
 from __future__ import annotations
 
+import hashlib
+import http.client
+import json
+import ssl
+from urllib.parse import quote
+
 from ..runtime_layout import VesselLayout
 from .browser import BrowserRuntime
 from .gateway import ToolDenied, ToolGateway
 from .policy import GatewayPolicy
-from .secrets import SecretDenied
+from .secrets import SecretBroker, SecretDenied
 from .workspace import IsolatedWorkspace, WorkspaceUnavailable
+
+
+_OFFICIAL_OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses"
+_OFFICIAL_OPENAI_ORIGIN = "https://api.openai.com"
+_OPENAI_PROBE_OPERATION = "configured_openai_authenticated_model_probe"
+_OPENAI_PROBE_SECRET_ENV = "GROX_OPENAI_PROBE_CREDENTIAL"
 
 
 class LayoutToolGateway(ToolGateway):
@@ -73,3 +85,121 @@ class LayoutToolGateway(ToolGateway):
         result["stderr"] = self.secret_broker.redact(result["stderr"], secret_values)
         result["secret_aliases"] = aliases
         return result
+
+    def openai_model_probe(
+        self,
+        order,
+        *,
+        resource_id: str,
+        responses_endpoint: str,
+        model: str,
+        credential_alias: str,
+    ) -> dict:
+        """Perform one credential-bearing official OpenAI model metadata GET.
+
+        This is intentionally not a generic authenticated HTTP surface. The
+        credential may leave the Vessel only for the exact official OpenAI API
+        endpoint and only under a sealed Order that binds the exact configured
+        resource/model/endpoint/alias plus both network and secret authority.
+        Response body text and credential material are never returned.
+        """
+        self._allowed(order, "net_fetch")
+        self._allowed(order, "secret_use")
+        if not self.policy.network_enabled:
+            raise ToolDenied("network access disabled by host policy")
+        if responses_endpoint != _OFFICIAL_OPENAI_RESPONSES_ENDPOINT:
+            raise ToolDenied("authenticated OpenAI probe requires the exact official Responses endpoint")
+        parameters = order.parameters
+        exact = (
+            parameters.get("operation") == _OPENAI_PROBE_OPERATION
+            and parameters.get("resource_id") == resource_id
+            and parameters.get("provider_kind") == "openai"
+            and parameters.get("model") == model
+            and parameters.get("endpoint") == responses_endpoint
+            and parameters.get("credential_alias") == credential_alias
+        )
+        if not exact:
+            raise ToolDenied("authenticated OpenAI probe Mission identity mismatch")
+
+        model_url = f"{_OFFICIAL_OPENAI_ORIGIN}/v1/models/{quote(model, safe='')}"
+        origin, _ = self._assert_url(order, model_url)
+        if origin != _OFFICIAL_OPENAI_ORIGIN:
+            raise ToolDenied("authenticated OpenAI probe origin mismatch")
+
+        try:
+            secret_values, aliases = self.secret_broker.materialize_env(
+                order,
+                {_OPENAI_PROBE_SECRET_ENV: credential_alias},
+            )
+        except SecretDenied as exc:
+            raise ToolDenied("authenticated OpenAI probe credential materialization denied") from exc
+        if aliases != [credential_alias]:
+            secret_values.clear()
+            raise ToolDenied("authenticated OpenAI probe credential identity mismatch")
+        api_key = secret_values.pop(_OPENAI_PROBE_SECRET_ENV, None)
+        secret_values.clear()
+        if not isinstance(api_key, str) or not api_key:
+            raise ToolDenied("authenticated OpenAI probe credential materialization produced no usable value")
+
+        conn = http.client.HTTPSConnection(
+            "api.openai.com",
+            443,
+            timeout=self.policy.network_timeout_seconds,
+            context=ssl.create_default_context(),
+        )
+        try:
+            conn.request(
+                "GET",
+                f"/v1/models/{quote(model, safe='')}",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "User-Agent": "GroX/1.0",
+                    "Accept": "application/json",
+                },
+            )
+            response = conn.getresponse()
+            raw = response.read(self.policy.max_response_bytes + 1)
+            if len(raw) > self.policy.max_response_bytes:
+                raise ToolDenied(
+                    f"network response exceeds {self.policy.max_response_bytes} bytes"
+                )
+            status = int(response.status)
+            content_type = (response.getheader("Content-Type") or "")[:200]
+            model_identity = None
+            metadata_valid = False
+            if status == 200:
+                try:
+                    payload = json.loads(raw.decode("utf-8"))
+                except (UnicodeDecodeError, json.JSONDecodeError):
+                    payload = None
+                if isinstance(payload, dict):
+                    candidate = payload.get("id")
+                    metadata_valid = (
+                        candidate == model and payload.get("object") == "model"
+                    )
+                    if metadata_valid:
+                        model_identity = candidate
+            return {
+                "url": model_url,
+                "origin": _OFFICIAL_OPENAI_ORIGIN,
+                "status": status,
+                "content_type": content_type,
+                "bytes": len(raw),
+                "sha256": hashlib.sha256(raw).hexdigest(),
+                "requested_model": model,
+                "model_identity": model_identity,
+                "metadata_valid": metadata_valid,
+                "credential_alias": credential_alias,
+                "secret_materialized": True,
+                "network_invoked": True,
+                "response_body_returned": False,
+            }
+        except TimeoutError:
+            raise
+        except OSError as exc:
+            raise ToolDenied(
+                "authenticated OpenAI probe network request failed within exact official origin"
+            ) from exc
+        finally:
+            api_key = None
+            conn.close()
