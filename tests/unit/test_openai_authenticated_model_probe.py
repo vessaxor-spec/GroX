@@ -216,7 +216,7 @@ class OpenAIAuthenticatedModelProbeTests(unittest.TestCase):
         )
         order = self._order(
             endpoint=endpoint,
-            allowed_origins=("https://compatible.example",),
+            allowed_origins=(OFFICIAL_ORIGIN, "https://compatible.example"),
         )
         with patch(
             "grox.tools.layout_gateway.http.client.HTTPSConnection",
