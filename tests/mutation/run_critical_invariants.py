@@ -248,6 +248,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_remote_reasoner.py::ConfiguredRemoteReasonerActivationTests::test_authorization_awareness_operation_cannot_materialize_or_construct_provider",
     ),
     MutationSpec(
+        name="openai-authenticated-probe-official-endpoint-boundary",
+        invariant="A non-official configured endpoint must never cross the authenticated OpenAI secret/network boundary.",
+        path="src/grox/tools/layout_gateway.py",
+        old='        if responses_endpoint != _OFFICIAL_OPENAI_RESPONSES_ENDPOINT:\n            raise ToolDenied("authenticated OpenAI probe requires the exact official Responses endpoint")\n',
+        new='        if False and responses_endpoint != _OFFICIAL_OPENAI_RESPONSES_ENDPOINT:\n            raise ToolDenied("authenticated OpenAI probe requires the exact official Responses endpoint")\n',
+        nodeid="tests/unit/test_openai_authenticated_model_probe.py::OpenAIAuthenticatedModelProbeTests::test_non_official_configured_endpoint_never_receives_credential",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
