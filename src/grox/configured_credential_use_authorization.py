@@ -67,9 +67,11 @@ class ConfiguredCredentialUseAuthorization:
     def _parameter_identity_matches(
         parameters: Mapping[str, Any],
         item: Mapping[str, Any],
+        *,
+        expected_operation: str,
     ) -> tuple[bool, str]:
         checks = (
-            ("operation", ConfiguredCredentialUseAuthorization.operation, "operation_mismatch"),
+            ("operation", expected_operation, "operation_mismatch"),
             ("resource_id", item["resource_id"], "resource_mismatch"),
             ("provider_kind", item["provider_kind"], "provider_mismatch"),
             ("model", item["model"], "model_mismatch"),
@@ -94,6 +96,7 @@ class ConfiguredCredentialUseAuthorization:
         self,
         *,
         order: MissionOrder | None = None,
+        expected_operation: str | None = None,
     ) -> dict[str, Any]:
         if order is not None and not isinstance(order, MissionOrder):
             raise TypeError("order must be a MissionOrder or null")
@@ -101,6 +104,14 @@ class ConfiguredCredentialUseAuthorization:
             raise ConfiguredCredentialUseAuthorizationError(
                 "credential-use awareness requires an already sealed Mission Order"
             )
+        if expected_operation is None:
+            expected_operation = self.operation
+        if (
+            not isinstance(expected_operation, str)
+            or not expected_operation
+            or expected_operation.strip() != expected_operation
+        ):
+            raise ValueError("expected_operation must be a bounded non-empty operation name")
 
         availability = ConfiguredCredentialAliasAvailability(
             self._config, self.gateway.secret_broker
@@ -153,7 +164,9 @@ class ConfiguredCredentialUseAuthorization:
         authorization_status = "no_mission_context"
         if order is not None:
             identity_matches, authorization_status = self._parameter_identity_matches(
-                order.parameters, item
+                order.parameters,
+                item,
+                expected_operation=expected_operation,
             )
             if identity_matches:
                 if not item["credential_alias_available"]:
