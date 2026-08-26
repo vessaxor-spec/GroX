@@ -22,7 +22,7 @@ class OpenAIResponsesProvider:
     def __init__(self, *, api_key: str, model: str, endpoint: str="https://api.openai.com/v1/responses", timeout: int=90):
         if not api_key: raise ValueError("api_key is required")
         if not model: raise ValueError("model is required")
-        self.api_key=api_key; self.model=model; self.endpoint=endpoint; self.timeout=timeout
+        self.__api_key=api_key; self.model=model; self.endpoint=endpoint; self.timeout=timeout
         self._last_usage:CognitiveUsage|None=None
 
     def usage_snapshot(self) -> CognitiveUsage | None:
@@ -72,7 +72,7 @@ class OpenAIResponsesProvider:
             "prompt_cache_key": cache_key,
             "text": {"format": {"type":"json_schema","name":"grox_mission_interpretation","strict":True,"schema":schema}},
         }
-        req=Request(self.endpoint,data=json.dumps(body).encode("utf-8"),headers={"Authorization":f"Bearer {self.api_key}","Content-Type":"application/json"},method="POST")
+        req=Request(self.endpoint,data=json.dumps(body).encode("utf-8"),headers={"Authorization":f"Bearer {self.__api_key}","Content-Type":"application/json"},method="POST")
         try:
             with urlopen(req,timeout=self.timeout) as r:
                 payload=json.loads(r.read().decode("utf-8"))
