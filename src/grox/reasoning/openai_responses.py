@@ -49,8 +49,14 @@ class OpenAIResponsesProvider:
             total_tokens=token("total_tokens",usage),
         )
 
-    def interpret(self, directive: str, *, roster: list[dict[str, Any]]) -> MissionInterpretation:
-        self._last_usage=None
+    @staticmethod
+    def build_interpret_body(*, model: str, directive: str, roster: list[dict[str, Any]]) -> dict[str, Any]:
+        if not isinstance(model, str) or not model:
+            raise ValueError("model is required")
+        if not isinstance(directive, str) or not directive:
+            raise ValueError("directive is required")
+        if not isinstance(roster, list) or not all(isinstance(item, dict) for item in roster):
+            raise ValueError("roster must be a list of mappings")
         directory_json=json.dumps(roster, ensure_ascii=False, separators=(",",":"))
         schema=MissionInterpretation.json_schema()
         stable_prefix=(
@@ -60,18 +66,38 @@ class OpenAIResponsesProvider:
         user=(stable_prefix + "Commander directive:\n" + directive +
               "\n\nProduce a structured Mission interpretation with at least two strategy options when meaningful.")
         cache_material=(
-            self.model + "\n" + _SYSTEM + "\n" + directory_json + "\n" +
+            model + "\n" + _SYSTEM + "\n" + directory_json + "\n" +
             json.dumps(schema,ensure_ascii=False,separators=(",",":"),sort_keys=True)
         )
         cache_key="grox-cognitive-"+hashlib.sha256(cache_material.encode("utf-8")).hexdigest()[:32]
-        body={
-            "model": self.model,
+        return {
+            "model": model,
             "store": False,
             "instructions": _SYSTEM,
             "input": user,
             "prompt_cache_key": cache_key,
             "text": {"format": {"type":"json_schema","name":"grox_mission_interpretation","strict":True,"schema":schema}},
         }
+
+    @classmethod
+    def interpretation_from_payload(
+        cls,
+        payload: dict[str, Any],
+        *,
+        expected_intent: str,
+    ) -> MissionInterpretation:
+        if not isinstance(payload, dict):
+            raise ReasoningError("reasoning provider returned a non-object response")
+        text=cls._output_text(payload)
+        try:
+            raw=json.loads(text)
+            return MissionInterpretation.from_mapping(raw,expected_intent=expected_intent)
+        except (json.JSONDecodeError,ValueError) as e:
+            raise ReasoningError(f"invalid structured reasoning output: {e}") from e
+
+    def interpret(self, directive: str, *, roster: list[dict[str, Any]]) -> MissionInterpretation:
+        self._last_usage=None
+        body=self.build_interpret_body(model=self.model, directive=directive, roster=roster)
         req=Request(self.endpoint,data=json.dumps(body).encode("utf-8"),headers={"Authorization":f"Bearer {self.__api_key}","Content-Type":"application/json"},method="POST")
         try:
             with urlopen(req,timeout=self.timeout) as r:
@@ -82,12 +108,7 @@ class OpenAIResponsesProvider:
         except (URLError,TimeoutError,OSError,json.JSONDecodeError) as e:
             raise ReasoningError(f"reasoning provider failure: {e}") from e
         self._capture_usage(payload)
-        text=self._output_text(payload)
-        try:
-            raw=json.loads(text)
-            return MissionInterpretation.from_mapping(raw,expected_intent=directive)
-        except (json.JSONDecodeError,ValueError) as e:
-            raise ReasoningError(f"invalid structured reasoning output: {e}") from e
+        return self.interpretation_from_payload(payload, expected_intent=directive)
 
     @staticmethod
     def _output_text(payload: dict[str, Any]) -> str:
