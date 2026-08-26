@@ -121,12 +121,13 @@ class ConfiguredOpenAIAuthenticatedModelProbeTests(unittest.TestCase):
             "selected": False,
             "authority_changed": False,
         }
+        order = self._order()
         with patch.object(gateway, "openai_model_probe", return_value=expected) as probe_mock:
-            result = service.probe(order=self._order())
+            result = service.probe(order=order)
 
         resource = self._resource()
         probe_mock.assert_called_once_with(
-            self._order(),
+            order,
             resource_id=resource["resource_id"],
             responses_endpoint=OFFICIAL_ENDPOINT,
             model=MODEL,
