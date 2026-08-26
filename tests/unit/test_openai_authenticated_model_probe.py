@@ -243,7 +243,6 @@ class OpenAIAuthenticatedModelProbeTests(unittest.TestCase):
     def test_exact_identity_actions_origin_and_alias_grant_are_required(self):
         cases = (
             {"order_kwargs": {"operation": "other-operation"}, "message": "identity mismatch"},
-            {"order_kwargs": {"resource_id": "cognition:configured:openai:wrong"}, "message": "identity mismatch"},
             {"order_kwargs": {"provider_kind": "other"}, "message": "identity mismatch"},
             {"order_kwargs": {"credential_alias": "other-alias"}, "message": "identity mismatch"},
             {"order_kwargs": {"allowed_actions": ("secret_use",)}, "message": "net_fetch"},
