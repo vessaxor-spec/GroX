@@ -20,14 +20,14 @@ class ConfiguredRemoteReasonerActivationError(PermissionError):
 
 @dataclass(frozen=True)
 class ConfiguredRemoteReasonerHandle:
-    """Non-secret activation result carrying the constructed provider separately."""
+    """Non-secret activation result retaining the provider as internal capability."""
 
     resource_id: str
     provider_kind: str
     model: str
     endpoint: str
     credential_alias: str
-    provider: OpenAIResponsesProvider = field(repr=False, compare=False)
+    _provider: OpenAIResponsesProvider = field(repr=False, compare=False)
 
     def evidence(self) -> dict[str, Any]:
         return {
@@ -60,7 +60,8 @@ class ConfiguredRemoteReasonerActivation:
     cognition. It consumes only the exact configured credential alias after the
     existing credential-use authorization contract passes for this operation,
     constructs the configured provider, and performs no network request or
-    cognition invocation.
+    cognition invocation. The resulting provider remains an internal capability
+    of the handle rather than a public invocation surface.
     """
 
     operation = "configured_cognition_remote_reasoner_activation"
@@ -149,5 +150,5 @@ class ConfiguredRemoteReasonerActivation:
             model=str(item["model"]),
             endpoint=str(item["endpoint"]),
             credential_alias=alias,
-            provider=provider,
+            _provider=provider,
         )
