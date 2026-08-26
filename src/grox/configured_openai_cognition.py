@@ -9,9 +9,7 @@ from .configured_credential_use_authorization import (
     ConfiguredCredentialUseAuthorizationError,
 )
 from .contracts import MissionOrder
-from .reasoning.base import ReasoningError
 from .reasoning.contracts import MissionInterpretation
-from .reasoning.openai_responses import OpenAIResponsesProvider
 from .tools.gateway import ToolDenied
 from .tools.layout_gateway import LayoutToolGateway
 
@@ -140,12 +138,12 @@ class ConfiguredOpenAICognition:
                 directive=order.commander_intent,
                 roster=roster,
             )
-            payload = response["_payload"]
-            interpretation = OpenAIResponsesProvider.interpretation_from_payload(
-                payload,
-                expected_intent=order.commander_intent,
-            )
-        except (ToolDenied, ReasoningError, KeyError, TypeError, ValueError, TimeoutError) as exc:
+            interpretation = response["interpretation"]
+            if not isinstance(interpretation, MissionInterpretation):
+                raise TypeError("gateway returned invalid structured interpretation")
+            if interpretation.commander_intent != order.commander_intent:
+                raise ValueError("gateway interpretation Commander intent mismatch")
+        except (ToolDenied, KeyError, TypeError, ValueError, TimeoutError) as exc:
             raise ConfiguredOpenAICognitionError(
                 f"configured OpenAI cognition failed closed: {exc}"
             ) from exc
