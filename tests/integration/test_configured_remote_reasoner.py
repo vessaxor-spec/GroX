@@ -79,9 +79,10 @@ class ConfiguredRemoteReasonerIntegrationTests(unittest.TestCase):
             evidence = handle.evidence()
 
             self.assertEqual(handle.resource_id, resource["resource_id"])
-            self.assertEqual(handle.provider.model, "remote-model-sentinel")
-            self.assertEqual(handle.provider.endpoint, "https://api.openai.com/v1/responses")
-            self.assertFalse(hasattr(handle.provider, "api_key"))
+            self.assertEqual(handle.provider_kind, "openai")
+            self.assertEqual(handle.model, "remote-model-sentinel")
+            self.assertEqual(handle.endpoint, "https://api.openai.com/v1/responses")
+            self.assertFalse(hasattr(handle, "provider"))
             self.assertTrue(evidence["secret_materialized"])
             self.assertTrue(evidence["provider_constructed"])
             self.assertFalse(evidence["credential_validated"])
