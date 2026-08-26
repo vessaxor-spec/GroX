@@ -10,7 +10,7 @@ from ..runtime_layout import VesselLayout
 from .browser import BrowserRuntime
 from .gateway import ToolDenied, ToolGateway
 from .policy import GatewayPolicy
-from .secrets import SecretBroker, SecretDenied
+from .secrets import SecretDenied
 from .workspace import IsolatedWorkspace, WorkspaceUnavailable
 
 
@@ -150,13 +150,14 @@ class LayoutToolGateway(ToolGateway):
         if not isinstance(api_key, str) or not api_key:
             raise ToolDenied("authenticated OpenAI probe credential materialization produced no usable value")
 
-        conn = http.client.HTTPSConnection(
-            "api.openai.com",
-            443,
-            timeout=self.policy.network_timeout_seconds,
-            context=ssl.create_default_context(),
-        )
+        conn = None
         try:
+            conn = http.client.HTTPSConnection(
+                "api.openai.com",
+                443,
+                timeout=self.policy.network_timeout_seconds,
+                context=ssl.create_default_context(),
+            )
             conn.request(
                 "GET",
                 f"/v1/models/{quote(model, safe='')}",
@@ -221,4 +222,5 @@ class LayoutToolGateway(ToolGateway):
             ) from exc
         finally:
             api_key = None
-            conn.close()
+            if conn is not None:
+                conn.close()
