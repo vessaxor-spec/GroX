@@ -21,7 +21,7 @@ class ConfiguredOpenAIAuthenticatedModelProbe:
     Configuration identity is resolved here before the Tool Gateway is allowed to
     materialize or transmit a credential. The gateway remains the final secret and
     network boundary. No cognition request, readiness promotion, fitness decision,
-    provider selection, fallback, or authority widening occurs here.
+    provider selection, fallback, observation promotion, or authority widening occurs.
     """
 
     operation = "configured_openai_authenticated_model_probe"
@@ -97,6 +97,6 @@ class ConfiguredOpenAIAuthenticatedModelProbe:
             "endpoint": self.official_responses_endpoint,
             "credential_use_authorized": True,
             "mission_created": False,
-            "observed": result.get("classification") == "authenticated_model_visible",
+            "observed": False,
             "auto_selection": False,
         }
