@@ -380,6 +380,8 @@ class LayoutToolGateway(ToolGateway):
                 "cognition_invoked": True,
                 "authority_changed": False,
             }
+        except ToolDenied:
+            raise
         except TimeoutError:
             raise
         except (OSError, http.client.HTTPException) as exc:
