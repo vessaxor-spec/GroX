@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import hashlib
 import http.client
 import json
 import ssl
 from urllib.parse import quote
 
+from ..contracts import MissionOrder
 from ..runtime_layout import VesselLayout
 from .browser import BrowserRuntime
 from .gateway import ToolDenied, ToolGateway
@@ -88,7 +88,7 @@ class LayoutToolGateway(ToolGateway):
 
     def openai_model_probe(
         self,
-        order,
+        order: MissionOrder,
         *,
         resource_id: str,
         responses_endpoint: str,
@@ -99,16 +99,25 @@ class LayoutToolGateway(ToolGateway):
 
         This is intentionally not a generic authenticated HTTP surface. The
         credential may leave the Vessel only for the exact official OpenAI API
-        endpoint and only under a sealed Order that binds the exact configured
-        resource/model/endpoint/alias plus both network and secret authority.
-        Response body text and credential material are never returned.
+        endpoint and only under an already-sealed Order that binds the exact
+        configured resource/model/endpoint/alias plus both network and secret
+        authority. Response body text and credential material are never returned.
         """
+        if not isinstance(order, MissionOrder):
+            raise TypeError("order must be a MissionOrder")
+        if not order.sealed:
+            raise ToolDenied("authenticated OpenAI probe requires an already sealed Mission Order")
         self._allowed(order, "net_fetch")
         self._allowed(order, "secret_use")
         if not self.policy.network_enabled:
             raise ToolDenied("network access disabled by host policy")
         if responses_endpoint != _OFFICIAL_OPENAI_RESPONSES_ENDPOINT:
             raise ToolDenied("authenticated OpenAI probe requires the exact official Responses endpoint")
+        if not isinstance(model, str) or not model or len(model) > 160:
+            raise ToolDenied("authenticated OpenAI probe requires a bounded model identity")
+        if not isinstance(credential_alias, str) or not credential_alias:
+            raise ToolDenied("authenticated OpenAI probe requires an exact credential alias")
+
         parameters = order.parameters
         exact = (
             parameters.get("operation") == _OPENAI_PROBE_OPERATION
@@ -164,7 +173,6 @@ class LayoutToolGateway(ToolGateway):
                     f"network response exceeds {self.policy.max_response_bytes} bytes"
                 )
             status = int(response.status)
-            content_type = (response.getheader("Content-Type") or "")[:200]
             model_identity = None
             metadata_valid = False
             if status == 200:
@@ -174,25 +182,36 @@ class LayoutToolGateway(ToolGateway):
                     payload = None
                 if isinstance(payload, dict):
                     candidate = payload.get("id")
-                    metadata_valid = (
-                        candidate == model and payload.get("object") == "model"
-                    )
+                    metadata_valid = candidate == model and payload.get("object") == "model"
                     if metadata_valid:
                         model_identity = candidate
+
+            if status == 200 and metadata_valid:
+                classification = "authenticated_model_visible"
+            elif status == 401:
+                classification = "credential_rejected"
+            else:
+                classification = "indeterminate"
+
             return {
-                "url": model_url,
+                "schema": "grox-openai-authenticated-model-probe-v1",
                 "origin": _OFFICIAL_OPENAI_ORIGIN,
                 "status": status,
-                "content_type": content_type,
-                "bytes": len(raw),
-                "sha256": hashlib.sha256(raw).hexdigest(),
+                "classification": classification,
                 "requested_model": model,
                 "model_identity": model_identity,
                 "metadata_valid": metadata_valid,
                 "credential_alias": credential_alias,
+                "credential_accepted_for_model_visibility": classification == "authenticated_model_visible",
+                "credential_rejected": classification == "credential_rejected",
                 "secret_materialized": True,
                 "network_invoked": True,
                 "response_body_returned": False,
+                "cognition_invoked": False,
+                "ready": False,
+                "qualified_fit": False,
+                "selected": False,
+                "authority_changed": False,
             }
         except TimeoutError:
             raise
