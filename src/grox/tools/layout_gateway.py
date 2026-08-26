@@ -6,6 +6,7 @@ import ssl
 from urllib.parse import quote
 
 from ..contracts import MissionOrder
+from ..reasoning.base import ReasoningError
 from ..reasoning.openai_responses import OpenAIResponsesProvider
 from ..runtime_layout import VesselLayout
 from .browser import BrowserRuntime
@@ -245,7 +246,9 @@ class LayoutToolGateway(ToolGateway):
         This provider-specific surface intentionally refuses arbitrary URLs,
         arbitrary JSON request bodies, and OpenAI tool declarations. The request
         shape is built internally from the exact sealed Commander intent and
-        supplied Standing Crew directory.
+        supplied Standing Crew directory. Raw provider response data never leaves
+        this gateway method; only the validated interpretation and bounded metadata
+        are returned.
         """
         if not isinstance(order, MissionOrder):
             raise TypeError("order must be a MissionOrder")
@@ -361,6 +364,15 @@ class LayoutToolGateway(ToolGateway):
                 raise ToolDenied("configured OpenAI cognition returned invalid JSON") from exc
             if not isinstance(payload, dict):
                 raise ToolDenied("configured OpenAI cognition returned a non-object response")
+            try:
+                interpretation = OpenAIResponsesProvider.interpretation_from_payload(
+                    payload,
+                    expected_intent=directive,
+                )
+            except ReasoningError as exc:
+                raise ToolDenied(
+                    "configured OpenAI cognition returned invalid structured interpretation"
+                ) from exc
 
             response_id = payload.get("id")
             if not isinstance(response_id, str) or not response_id or len(response_id) > 200:
@@ -368,16 +380,18 @@ class LayoutToolGateway(ToolGateway):
             response_model = payload.get("model")
             if not isinstance(response_model, str) or not response_model or len(response_model) > 200:
                 response_model = None
+            payload = None
             return {
                 "schema": "grox-openai-responses-cognition-transport-v1",
                 "origin": _OFFICIAL_OPENAI_ORIGIN,
                 "status": status,
                 "response_id": response_id,
                 "response_model": response_model,
-                "_payload": payload,
+                "interpretation": interpretation,
                 "secret_materialized": True,
                 "network_invoked": True,
                 "cognition_invoked": True,
+                "raw_response_returned": False,
                 "authority_changed": False,
             }
         except ToolDenied:
