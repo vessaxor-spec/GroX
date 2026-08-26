@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-import json
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -12,6 +11,7 @@ from grox.configured_openai_cognition import (
     ConfiguredOpenAICognitionError,
 )
 from grox.contracts import MissionMode, MissionOrder
+from grox.reasoning.contracts import MissionInterpretation
 from grox.runtime_layout import VesselLayout
 from grox.tools.layout_gateway import LayoutToolGateway
 from grox.tools.policy import GatewayPolicy
@@ -73,11 +73,10 @@ class ConfiguredOpenAICognitionTests(unittest.TestCase):
         )
         return order.seal() if seal else order
 
-    def test_exact_configured_identity_is_forwarded_and_later_states_remain_false(self):
-        payload = {
-            "id": "resp_test",
-            "model": MODEL,
-            "output_text": json.dumps({
+    @staticmethod
+    def _interpretation() -> MissionInterpretation:
+        return MissionInterpretation.from_mapping(
+            {
                 "commander_intent": INTENT,
                 "objective": "Inspect configured cognition",
                 "ambiguous": False,
@@ -96,14 +95,18 @@ class ConfiguredOpenAICognitionTests(unittest.TestCase):
                 "confidence": 0.9,
                 "proposed_mode": "inspect",
                 "proposed_risk": "low",
-            }),
-        }
+            },
+            expected_intent=INTENT,
+        )
+
+    def test_exact_configured_identity_is_forwarded_and_later_states_remain_false(self):
         transport = {
             "schema": "grox-openai-responses-cognition-transport-v1",
             "status": 200,
             "response_id": "resp_test",
             "response_model": MODEL,
-            "_payload": payload,
+            "interpretation": self._interpretation(),
+            "raw_response_returned": False,
         }
         with patch.object(self.gateway, "openai_responses_cognition", return_value=transport) as invoke:
             result = ConfiguredOpenAICognition(CONFIG, self.gateway).invoke(
@@ -119,7 +122,8 @@ class ConfiguredOpenAICognitionTests(unittest.TestCase):
         self.assertFalse(evidence["selected"])
         self.assertFalse(evidence["observed"])
         self.assertFalse(evidence["authority_changed"])
-        self.assertNotIn("_payload", repr(evidence))
+        self.assertTrue(evidence["raw_response_returned"] is False)
+        self.assertNotIn("_payload", repr(transport))
         kwargs = invoke.call_args.kwargs
         self.assertEqual(kwargs["directive"], INTENT)
         self.assertEqual(kwargs["resource_id"], self._resource()["resource_id"])
