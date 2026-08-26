@@ -11,6 +11,7 @@ from grox.configured_remote_reasoner import (
     ConfiguredRemoteReasonerActivationError,
 )
 from grox.contracts import MissionMode, MissionOrder
+from grox.reasoning.openai_responses import OpenAIResponsesProvider
 from grox.tools.gateway import ToolGateway
 from grox.tools.policy import GatewayPolicy
 from grox.tools.secrets import SecretBroker
@@ -104,9 +105,7 @@ class ConfiguredRemoteReasonerActivationTests(unittest.TestCase):
         self.assertEqual(handle.model, "remote-model-sentinel")
         self.assertEqual(handle.endpoint, "https://api.openai.com/v1/responses")
         self.assertEqual(handle.credential_alias, "openai-primary")
-        self.assertEqual(handle.provider.model, handle.model)
-        self.assertEqual(handle.provider.endpoint, handle.endpoint)
-        self.assertFalse(hasattr(handle.provider, "api_key"))
+        self.assertFalse(hasattr(handle, "provider"))
         self.assertTrue(evidence["credential_use_authorized"])
         self.assertTrue(evidence["secret_materialized"])
         self.assertTrue(evidence["provider_constructed"])
@@ -127,6 +126,15 @@ class ConfiguredRemoteReasonerActivationTests(unittest.TestCase):
         self.assertNotIn(secret, repr(handle))
         self.assertNotIn(secret, repr(evidence))
         urlopen_mock.assert_not_called()
+
+    def test_openai_provider_does_not_expose_public_api_key_attribute(self):
+        provider = OpenAIResponsesProvider(
+            api_key="PRIVATE-PROVIDER-CREDENTIAL-SENTINEL",
+            model="remote-model-sentinel",
+            endpoint="https://api.openai.com/v1/responses",
+        )
+        self.assertFalse(hasattr(provider, "api_key"))
+        self.assertNotIn("PRIVATE-PROVIDER-CREDENTIAL-SENTINEL", repr(provider))
 
     def test_authorization_awareness_operation_cannot_materialize_or_construct_provider(self):
         gateway, broker = self._gateway({"openai-primary": "SECRET-SENTINEL"})
