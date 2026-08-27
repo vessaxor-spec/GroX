@@ -264,6 +264,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_openai_cognition_gateway.py::OpenAICognitionGatewayTests::test_missing_cognition_invoke_grant_fails_before_secret_or_network",
     ),
     MutationSpec(
+        name="configured-cognition-fitness-roster-confinement",
+        invariant="Configured cognition Mission fitness must never qualify Crew references outside the supplied roster.",
+        path="src/grox/configured_cognition_fitness.py",
+        old='        roster_constrained = all(\n            crew_id in roster_ids for crew_id in candidate_ids + option_crew_ids\n        )\n',
+        new='        roster_constrained = True\n',
+        nodeid="tests/unit/test_configured_cognition_fitness.py::ConfiguredCognitionMissionFitnessTests::test_out_of_roster_crew_reference_never_qualifies_fit",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
