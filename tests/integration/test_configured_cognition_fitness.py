@@ -1,0 +1,133 @@
+from __future__ import annotations
+
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+
+from grox.cognition_discovery import ConfiguredCognitionDiscovery
+from grox.configured_cognition_fitness import ConfiguredCognitionMissionFitness
+from grox.configured_openai_cognition import ConfiguredOpenAICognition
+from grox.contracts import MissionMode, MissionOrder
+from grox.reasoning.contracts import MissionInterpretation
+from grox.runtime_layout import VesselLayout
+from grox.tools.layout_gateway import LayoutToolGateway
+from grox.tools.policy import GatewayPolicy
+from grox.tools.secrets import SecretBroker
+
+
+ENDPOINT = "https://api.openai.com/v1/responses"
+ORIGIN = "https://api.openai.com"
+MODEL = "remote-model-sentinel"
+ALIAS = "openai-primary"
+INTENT = "Inspect configured cognition safely"
+ROSTER = [
+    {"crew_id": "backend-engineer", "title": "Backend Engineer"},
+    {"crew_id": "application-security-engineer", "title": "Application Security Engineer"},
+]
+CONFIG = {
+    "GROX_REASONER_PROVIDER": "openai",
+    "GROX_REASONER_MODEL": MODEL,
+    "GROX_REASONER_ENDPOINT": ENDPOINT,
+    "GROX_REASONER_CREDENTIAL_ALIAS": ALIAS,
+}
+
+
+class ConfiguredCognitionFitnessIntegrationTests(unittest.TestCase):
+    def test_successful_governed_cognition_can_be_qualified_without_second_secret_or_network_use(self):
+        with tempfile.TemporaryDirectory() as td:
+            broker = SecretBroker({ALIAS: "SECRET-SENTINEL"})
+            gateway = LayoutToolGateway(
+                VesselLayout.legacy(Path(td)),
+                policy=GatewayPolicy(network_enabled=True, allowed_origins=frozenset({ORIGIN})),
+                secret_broker=broker,
+            )
+            resource = ConfiguredCognitionDiscovery(CONFIG).inventory()["resources"][0]
+            order = MissionOrder.new(
+                "MSN-configured-cognition-fitness-integration",
+                INTENT,
+                "qualify configured cognition fitness",
+                MissionMode.inspect,
+                "application-security-engineer",
+                allowed_actions=("cognition_invoke", "net_fetch", "secret_use"),
+                parameters={
+                    "operation": ConfiguredOpenAICognition.operation,
+                    "resource_id": resource["resource_id"],
+                    "provider_kind": resource["provider_kind"],
+                    "model": resource["model"],
+                    "endpoint": resource["endpoint"],
+                    "credential_alias": ALIAS,
+                    "allowed_origins": [ORIGIN],
+                    "secret_grants": [ALIAS],
+                },
+            ).seal()
+            interpretation = MissionInterpretation.from_mapping(
+                {
+                    "commander_intent": INTENT,
+                    "objective": "Inspect configured cognition",
+                    "ambiguous": False,
+                    "ambiguities": [],
+                    "assumptions": [],
+                    "information_needs": [],
+                    "candidate_crew_ids": ["backend-engineer"],
+                    "options": [
+                        {
+                            "name": "inspect",
+                            "rationale": "Use bounded inspection.",
+                            "advantages": ["bounded"],
+                            "risks": [],
+                            "crew_ids": ["backend-engineer"],
+                        },
+                        {
+                            "name": "inspect-with-security",
+                            "rationale": "Use bounded inspection with security review.",
+                            "advantages": ["bounded", "reviewed"],
+                            "risks": [],
+                            "crew_ids": ["application-security-engineer"],
+                        },
+                    ],
+                    "recommended_option": "inspect",
+                    "confidence": 0.9,
+                    "proposed_mode": "inspect",
+                    "proposed_risk": "low",
+                },
+                expected_intent=INTENT,
+            )
+            transport = {
+                "schema": "grox-openai-responses-cognition-transport-v1",
+                "status": 200,
+                "response_id": "resp_fitness_integration",
+                "response_model": MODEL,
+                "interpretation": interpretation,
+                "raw_response_returned": False,
+            }
+            with patch.object(gateway, "openai_responses_cognition", return_value=transport) as invoke:
+                result = ConfiguredOpenAICognition(CONFIG, gateway).invoke(order=order, roster=ROSTER)
+                self.assertEqual(invoke.call_count, 1)
+
+                with patch.object(
+                    broker,
+                    "materialize_env",
+                    side_effect=AssertionError("fitness must not materialize any secret"),
+                ) as materialize:
+                    report = ConfiguredCognitionMissionFitness.evaluate(
+                        result,
+                        order=order,
+                        roster=ROSTER,
+                    )
+                materialize.assert_not_called()
+                self.assertEqual(invoke.call_count, 1)
+
+            self.assertEqual(report.status, "PASS")
+            self.assertTrue(report.qualified_fit)
+            evidence = report.evidence()
+            self.assertFalse(evidence["network_invoked"])
+            self.assertFalse(evidence["secret_materialized"])
+            self.assertFalse(evidence["cognition_invoked"])
+            self.assertFalse(evidence["selected"])
+            self.assertFalse(evidence["observed"])
+            self.assertFalse(evidence["authority_changed"])
+
+
+if __name__ == "__main__":
+    unittest.main()

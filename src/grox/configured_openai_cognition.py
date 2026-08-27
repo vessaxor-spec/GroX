@@ -27,6 +27,8 @@ class ConfiguredOpenAICognitionResult:
     model: str
     endpoint: str
     credential_alias: str
+    mission_id: str
+    order_id: str
     response_id: str | None
     response_model: str | None
     _interpretation: MissionInterpretation = field(repr=False, compare=False)
@@ -43,6 +45,8 @@ class ConfiguredOpenAICognitionResult:
             "model": self.model,
             "endpoint": self.endpoint,
             "credential_alias": self.credential_alias,
+            "mission_id": self.mission_id,
+            "order_id": self.order_id,
             "response_id": self.response_id,
             "response_model": self.response_model,
             "credential_use_authorized": True,
@@ -154,6 +158,8 @@ class ConfiguredOpenAICognition:
             model=str(item["model"]),
             endpoint=self.official_responses_endpoint,
             credential_alias=alias,
+            mission_id=order.mission_id,
+            order_id=order.order_id,
             response_id=response.get("response_id"),
             response_model=response.get("response_model"),
             _interpretation=interpretation,
