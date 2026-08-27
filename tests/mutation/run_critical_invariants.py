@@ -256,6 +256,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_openai_authenticated_model_probe.py::OpenAIAuthenticatedModelProbeTests::test_non_official_configured_endpoint_never_receives_credential",
     ),
     MutationSpec(
+        name="configured-openai-cognition-requires-dedicated-invoke-authority",
+        invariant="Configured OpenAI cognition must not cross the secret/network boundary without the dedicated cognition_invoke Mission grant.",
+        path="src/grox/tools/layout_gateway.py",
+        old='        self._allowed(order, "cognition_invoke")\n',
+        new='        if False:\n            self._allowed(order, "cognition_invoke")\n',
+        nodeid="tests/unit/test_openai_cognition_gateway.py::OpenAICognitionGatewayTests::test_missing_cognition_invoke_grant_fails_before_secret_or_network",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
