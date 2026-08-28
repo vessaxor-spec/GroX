@@ -1,0 +1,53 @@
+name: Insert mutation 30
+
+on:
+  push:
+    branches:
+      - lea/configured-cognition-selection-176
+
+permissions:
+  contents: write
+
+jobs:
+  insert-mutation-30:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact branch head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      - name: Fail closed on unexpected source state
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "8b1c1723b3c8c72b672936ff2fadb318aece1fbf"
+          test "$(git diff --name-only HEAD^ HEAD)" = ".github/workflows/insert-mutation-30.yml"
+      - name: Insert exact critical mutation and self-remove
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('tests/mutation/run_critical_invariants.py')
+          text = path.read_text(encoding='utf-8')
+          anchor = '''    MutationSpec(\n        name="ci-action-immutable-pin",\n'''
+          insertion = '''    MutationSpec(\n        name="configured-cognition-selection-requires-qualified-fit",\n        invariant="Configured cognition must never be selected unless the exact Mission fitness result is positively qualified fit.",\n        path="src/grox/configured_cognition_selection.py",\n        old='        if not fitness.qualified_fit:\\n            raise ConfiguredCognitionSelectionError("configured cognition is not qualified fit for selection")\\n',\n        new='        if False and not fitness.qualified_fit:\\n            raise ConfiguredCognitionSelectionError("configured cognition is not qualified fit for selection")\\n',\n        nodeid="tests/unit/test_configured_cognition_selection.py::ConfiguredCognitionSelectionTests::test_failed_fitness_never_selects",\n    ),\n'''
+          if text.count(anchor) != 1:
+              raise SystemExit(f'expected exactly one insertion anchor, found {text.count(anchor)}')
+          if 'configured-cognition-selection-requires-qualified-fit' in text:
+              raise SystemExit('mutation 30 already present')
+          path.write_text(text.replace(anchor, insertion + anchor, 1), encoding='utf-8')
+          PY
+          rm .github/workflows/insert-mutation-30.yml
+          git diff --check
+          test "$(git diff --name-only)" = $'.github/workflows/insert-mutation-30.yml\ntests/mutation/run_critical_invariants.py'
+      - name: Commit exact final tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/insert-mutation-30.yml tests/mutation/run_critical_invariants.py
+          git commit -m 'Add configured cognition selection fit mutation proof'
+          git push origin HEAD:lea/configured-cognition-selection-176
