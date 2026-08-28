@@ -1,0 +1,53 @@
+name: Insert mutation 31
+
+on:
+  push:
+    branches:
+      - lea/selected-configured-cognition-invocation-178
+
+permissions:
+  contents: write
+
+jobs:
+  insert-mutation-31:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact branch head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      - name: Fail closed on unexpected source state
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "1bea33a20c77e36bd552408419ecf899e5da6dab"
+          test "$(git diff --name-only HEAD^ HEAD)" = ".github/workflows/insert-mutation-31.yml"
+      - name: Insert exact critical mutation and self-remove
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('tests/mutation/run_critical_invariants.py')
+          text = path.read_text(encoding='utf-8')
+          anchor = '''    MutationSpec(\n        name="ci-action-immutable-pin",\n'''
+          insertion = '''    MutationSpec(\n        name="selected-configured-cognition-requires-active-selection",\n        invariant="Selected configured cognition must validate the exact active selection before any provider invocation can occur.",\n        path="src/grox/selected_configured_cognition.py",\n        old='            self._selection_state.validate_active(selection, order=order)\\n',\n        new='            if False:\\n                self._selection_state.validate_active(selection, order=order)\\n',\n        nodeid="tests/unit/test_selected_configured_cognition.py::SelectedConfiguredCognitionTests::test_reconstituted_selection_fails_before_binding_or_provider_activity",\n    ),\n'''
+          if text.count(anchor) != 1:
+              raise SystemExit(f'expected exactly one insertion anchor, found {text.count(anchor)}')
+          if 'selected-configured-cognition-requires-active-selection' in text:
+              raise SystemExit('mutation 31 already present')
+          path.write_text(text.replace(anchor, insertion + anchor, 1), encoding='utf-8')
+          PY
+          rm .github/workflows/insert-mutation-31.yml
+          git diff --check
+          test "$(git diff --name-only)" = $'.github/workflows/insert-mutation-31.yml\ntests/mutation/run_critical_invariants.py'
+      - name: Commit exact final tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/insert-mutation-31.yml tests/mutation/run_critical_invariants.py
+          git commit -m 'Add selected configured cognition active-selection mutation proof'
+          git push origin HEAD:lea/selected-configured-cognition-invocation-178
