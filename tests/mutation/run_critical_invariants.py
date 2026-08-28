@@ -280,6 +280,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_selection.py::ConfiguredCognitionSelectionTests::test_failed_fitness_never_selects",
     ),
     MutationSpec(
+        name="selected-configured-cognition-requires-active-selection",
+        invariant="Selected configured cognition must validate the exact active selection before any provider invocation can occur.",
+        path="src/grox/selected_configured_cognition.py",
+        old='            self._selection_state.validate_active(selection, order=order)\n',
+        new='            if False:\n                self._selection_state.validate_active(selection, order=order)\n',
+        nodeid="tests/unit/test_selected_configured_cognition.py::SelectedConfiguredCognitionTests::test_reconstituted_selection_fails_before_binding_or_provider_activity",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
