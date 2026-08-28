@@ -1,0 +1,53 @@
+name: Insert mutation 32
+
+on:
+  push:
+    branches:
+      - lea/configured-cognition-fallback-180
+
+permissions:
+  contents: write
+
+jobs:
+  insert-mutation-32:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact branch head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      - name: Fail closed on unexpected source state
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = "07a1a9c43f60fa078da8510ccf372fe230a2d8dc"
+          test "$(git diff --name-only HEAD^ HEAD)" = ".github/workflows/insert-mutation-32.yml"
+      - name: Insert exact critical mutation and self-remove
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('tests/mutation/run_critical_invariants.py')
+          text = path.read_text(encoding='utf-8')
+          anchor = '''    MutationSpec(\n        name="ci-action-immutable-pin",\n'''
+          insertion = '''    MutationSpec(\n        name="configured-cognition-fallback-timeout-only",\n        invariant="Configured cognition fallback must never advance beyond a candidate unless the selected provider invocation failed through the exact timeout cause chain.",\n        path="src/grox/configured_cognition_fallback.py",\n        old='        return (\\n            isinstance(cognition_error, ConfiguredOpenAICognitionError)\\n            and isinstance(cognition_error.__cause__, TimeoutError)\\n        )\\n',\n        new='        return True\\n',\n        nodeid="tests/unit/test_configured_cognition_fallback.py::ConfiguredCognitionFallbackTests::test_non_timeout_provider_failure_never_falls_through",\n    ),\n'''
+          if text.count(anchor) != 1:
+              raise SystemExit(f'expected exactly one insertion anchor, found {text.count(anchor)}')
+          if 'configured-cognition-fallback-timeout-only' in text:
+              raise SystemExit('mutation 32 already present')
+          path.write_text(text.replace(anchor, insertion + anchor, 1), encoding='utf-8')
+          PY
+          rm .github/workflows/insert-mutation-32.yml
+          git diff --check
+          test "$(git diff --name-only)" = $'.github/workflows/insert-mutation-32.yml\ntests/mutation/run_critical_invariants.py'
+      - name: Commit exact final tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/insert-mutation-32.yml tests/mutation/run_critical_invariants.py
+          git commit -m 'Add configured cognition timeout-only fallback mutation proof'
+          git push origin HEAD:lea/configured-cognition-fallback-180
