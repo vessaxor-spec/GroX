@@ -272,6 +272,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_fitness.py::ConfiguredCognitionMissionFitnessTests::test_out_of_roster_crew_reference_never_qualifies_fit",
     ),
     MutationSpec(
+        name="configured-cognition-selection-requires-qualified-fit",
+        invariant="Configured cognition must never be selected unless the exact Mission fitness result is positively qualified fit.",
+        path="src/grox/configured_cognition_selection.py",
+        old='        if not fitness.qualified_fit:\n            raise ConfiguredCognitionSelectionError("configured cognition is not qualified fit for selection")\n',
+        new='        if False and not fitness.qualified_fit:\n            raise ConfiguredCognitionSelectionError("configured cognition is not qualified fit for selection")\n',
+        nodeid="tests/unit/test_configured_cognition_selection.py::ConfiguredCognitionSelectionTests::test_failed_fitness_never_selects",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
