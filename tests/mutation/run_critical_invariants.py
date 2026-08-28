@@ -288,6 +288,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_selected_configured_cognition.py::SelectedConfiguredCognitionTests::test_reconstituted_selection_fails_before_binding_or_provider_activity",
     ),
     MutationSpec(
+        name="configured-cognition-fallback-timeout-only",
+        invariant="Configured cognition fallback must never advance beyond a candidate unless the selected provider invocation failed through the exact timeout cause chain.",
+        path="src/grox/configured_cognition_fallback.py",
+        old='        return (\n            isinstance(cognition_error, ConfiguredOpenAICognitionError)\n            and isinstance(cognition_error.__cause__, TimeoutError)\n        )\n',
+        new='        return True\n',
+        nodeid="tests/unit/test_configured_cognition_fallback.py::ConfiguredCognitionFallbackTests::test_non_timeout_provider_failure_never_falls_through",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
