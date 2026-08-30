@@ -304,6 +304,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_route_admission.py::ConfiguredCognitionRouteAdmissionTests::test_missing_current_credential_alias_is_excluded_before_routing",
     ),
     MutationSpec(
+        name="configured-cognition-readiness-freshness-expiry",
+        invariant="Configured cognition readiness must expire authenticated model visibility evidence after the bounded monotonic freshness window.",
+        path="src/grox/configured_cognition_readiness.py",
+        old='        if age > self._max_age_seconds:\n',
+        new='        if False and age > self._max_age_seconds:\n',
+        nodeid="tests/unit/test_configured_cognition_readiness.py::ConfiguredCognitionReadinessTests::test_stale_authenticated_visibility_expires_without_becoming_ready",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
