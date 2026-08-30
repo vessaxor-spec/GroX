@@ -15,13 +15,13 @@ jobs:
       - name: Checkout exact branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 4
+          fetch-depth: 5
       - name: Insert exact mutation and self-remove
         shell: bash
         run: |
           set -euo pipefail
           EXPECTED_BASE="824f8a7db9b39f6259cb36cd647c6f8eb27850be"
-          EXPECTED_PARENT="64a24d9afe28d51bb3a6ed142d6287e7536155e9"
+          EXPECTED_PARENT="99537e54ca6bbf806cba46b1a6cd1f74100a2bcc"
           ACTUAL_PARENT="$(git rev-parse HEAD^)"
           test "$ACTUAL_PARENT" = "$EXPECTED_PARENT"
           CHANGED="$(git diff --name-only "$EXPECTED_BASE" HEAD)"
@@ -31,19 +31,20 @@ jobs:
 
           path = Path("tests/mutation/run_critical_invariants.py")
           text = path.read_text(encoding="utf-8")
-          anchor = '''    MutationSpec(
-              name="ci-action-immutable-pin",'''
+          anchor = '    MutationSpec(\n        name="ci-action-immutable-pin",'
           if text.count(anchor) != 1:
               raise SystemExit(f"expected exactly one mutation insertion anchor, found {text.count(anchor)}")
-          insertion = '''    MutationSpec(
-              name="configured-cognition-route-admission-requires-current-credential-authority",
-              invariant="Configured cognition route admission must not admit a candidate unless its exact configured credential alias is currently available and authorized under the sealed cognition Order.",
-              path="src/grox/configured_cognition_route_admission.py",
-              old='        if item.get("credential_alias_available") is not True:\\n            return "credential_alias_unavailable"\\n        if item.get("credential_use_authorized") is not True:\\n            return "credential_use_not_authorized"\\n',
-              new='        if False:\\n            return "credential_alias_unavailable"\\n        if False:\\n            return "credential_use_not_authorized"\\n',
-              nodeid="tests/unit/test_configured_cognition_route_admission.py::ConfiguredCognitionRouteAdmissionTests::test_missing_current_credential_alias_is_excluded_before_routing",
-          ),
-          '''
+          insertion = "\n".join([
+              '    MutationSpec(',
+              '        name="configured-cognition-route-admission-requires-current-credential-authority",',
+              '        invariant="Configured cognition route admission must not admit a candidate unless its exact configured credential alias is currently available and authorized under the sealed cognition Order.",',
+              '        path="src/grox/configured_cognition_route_admission.py",',
+              '        old=\'        if item.get("credential_alias_available") is not True:\\n            return "credential_alias_unavailable"\\n        if item.get("credential_use_authorized") is not True:\\n            return "credential_use_not_authorized"\\n\',',
+              '        new=\'        if False:\\n            return "credential_alias_unavailable"\\n        if False:\\n            return "credential_use_not_authorized"\\n\',',
+              '        nodeid="tests/unit/test_configured_cognition_route_admission.py::ConfiguredCognitionRouteAdmissionTests::test_missing_current_credential_alias_is_excluded_before_routing",',
+              '    ),',
+              '',
+          ])
           path.write_text(text.replace(anchor, insertion + anchor, 1), encoding="utf-8")
           PY
           rm .github/workflows/insert-mutation-33.yml
