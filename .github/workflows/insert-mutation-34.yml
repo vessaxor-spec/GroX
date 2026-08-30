@@ -1,0 +1,52 @@
+name: Insert mutation 34
+
+on:
+  push:
+    branches:
+      - lea/configured-cognition-readiness-freshness-187
+
+permissions:
+  contents: write
+
+jobs:
+  insert:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 4
+      - name: Insert exact mutation and self-remove
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_PARENT="6078c493fa170299406698b1b27a154345f39031"
+          ACTUAL_PARENT="$(git rev-parse HEAD^)"
+          test "$ACTUAL_PARENT" = "$EXPECTED_PARENT"
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("tests/mutation/run_critical_invariants.py")
+          text = path.read_text(encoding="utf-8")
+          anchor = '    MutationSpec(\n        name="ci-action-immutable-pin",'
+          if text.count(anchor) != 1:
+              raise SystemExit(f"expected exactly one mutation insertion anchor, found {text.count(anchor)}")
+          insertion = (
+              '    MutationSpec(\n'
+              '        name="configured-cognition-readiness-freshness-expiry",\n'
+              '        invariant="Configured cognition readiness must expire authenticated model visibility evidence after the bounded monotonic freshness window.",\n'
+              '        path="src/grox/configured_cognition_readiness.py",\n'
+              '        old=\'        if age > self._max_age_seconds:\\n\',\n'
+              '        new=\'        if False and age > self._max_age_seconds:\\n\',\n'
+              '        nodeid="tests/unit/test_configured_cognition_readiness.py::ConfiguredCognitionReadinessTests::test_stale_authenticated_visibility_expires_without_becoming_ready",\n'
+              '    ),\n'
+          )
+          path.write_text(text.replace(anchor, insertion + anchor, 1), encoding="utf-8")
+          PY
+          rm .github/workflows/insert-mutation-34.yml
+          git diff --check
+          git add tests/mutation/run_critical_invariants.py .github/workflows/insert-mutation-34.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Add configured cognition readiness freshness mutation proof"
+          git push origin HEAD:lea/configured-cognition-readiness-freshness-187
