@@ -1,0 +1,52 @@
+name: Insert mutation 35
+
+on:
+  push:
+    branches:
+      - lea/configured-cognition-route-plan-190
+
+permissions:
+  contents: write
+
+jobs:
+  insert:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 4
+      - name: Insert exact mutation and self-remove
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_PARENT="2867c631bd99b6fb119d132e532b9f11aba4510f"
+          ACTUAL_PARENT="$(git rev-parse HEAD^)"
+          test "$ACTUAL_PARENT" = "$EXPECTED_PARENT"
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("tests/mutation/run_critical_invariants.py")
+          text = path.read_text(encoding="utf-8")
+          anchor = '    MutationSpec(\n        name="ci-action-immutable-pin",'
+          if text.count(anchor) != 1:
+              raise SystemExit(f"expected exactly one mutation insertion anchor, found {text.count(anchor)}")
+          insertion = (
+              '    MutationSpec(\n'
+              '        name="configured-cognition-route-plan-requires-fresh-readiness",\n'
+              '        invariant="Configured cognition route planning must never place a candidate in the planned route unless current readiness is freshly READY at planning time.",\n'
+              '        path="src/grox/configured_cognition_route_plan.py",\n'
+              '        old=\'            if not readiness.ready:\\n                rejected[resource_id] = readiness.reason or "provider_not_ready"\\n                continue\\n\',\n'
+              '        new=\'            if False and not readiness.ready:\\n                rejected[resource_id] = readiness.reason or "provider_not_ready"\\n                continue\\n\',\n'
+              '        nodeid="tests/unit/test_configured_cognition_route_plan.py::ConfiguredCognitionRoutePlanTests::test_stale_first_candidate_is_pruned_and_ready_policy_order_is_preserved",\n'
+              '    ),\n'
+          )
+          path.write_text(text.replace(anchor, insertion + anchor, 1), encoding="utf-8")
+          PY
+          rm .github/workflows/insert-mutation-35.yml
+          git diff --check
+          git add tests/mutation/run_critical_invariants.py .github/workflows/insert-mutation-35.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Add configured cognition route-plan freshness mutation proof"
+          git push origin HEAD:lea/configured-cognition-route-plan-190
