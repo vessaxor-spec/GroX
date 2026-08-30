@@ -296,6 +296,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_fallback.py::ConfiguredCognitionFallbackTests::test_non_timeout_provider_failure_never_falls_through",
     ),
     MutationSpec(
+        name="configured-cognition-route-admission-requires-current-credential-authority",
+        invariant="Configured cognition route admission must not admit a candidate unless its exact configured credential alias is currently available and authorized under the sealed cognition Order.",
+        path="src/grox/configured_cognition_route_admission.py",
+        old='        if item.get("credential_alias_available") is not True:\n            return "credential_alias_unavailable"\n        if item.get("credential_use_authorized") is not True:\n            return "credential_use_not_authorized"\n',
+        new='        if False:\n            return "credential_alias_unavailable"\n        if False:\n            return "credential_use_not_authorized"\n',
+        nodeid="tests/unit/test_configured_cognition_route_admission.py::ConfiguredCognitionRouteAdmissionTests::test_missing_current_credential_alias_is_excluded_before_routing",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
