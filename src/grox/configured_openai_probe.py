@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
+import math
+import time
 from typing import Any
 
 from .configured_credential_use_authorization import (
@@ -22,18 +24,31 @@ class ConfiguredOpenAIAuthenticatedModelProbe:
     materialize or transmit a credential. The gateway remains the final secret and
     network boundary. No cognition request, readiness promotion, fitness decision,
     provider selection, fallback, observation promotion, or authority widening occurs.
+
+    Completed probe evidence carries a process-local monotonic observation stamp so
+    a separate pure evaluator can bound freshness. The stamp is deliberately not a
+    wall-clock timestamp and is not portable across process reconstitution.
     """
 
     operation = "configured_openai_authenticated_model_probe"
     official_responses_endpoint = "https://api.openai.com/v1/responses"
 
-    def __init__(self, config: Mapping[str, Any], gateway: LayoutToolGateway):
+    def __init__(
+        self,
+        config: Mapping[str, Any],
+        gateway: LayoutToolGateway,
+        *,
+        clock: Callable[[], float] | None = None,
+    ):
         if not isinstance(config, Mapping):
             raise TypeError("config must be a mapping")
         if not isinstance(gateway, LayoutToolGateway):
             raise TypeError("gateway must be a LayoutToolGateway")
+        if clock is not None and not callable(clock):
+            raise TypeError("clock must be callable or null")
         self._config = dict(config)
         self._gateway = gateway
+        self._clock = clock or time.monotonic
         self._authorization = ConfiguredCredentialUseAuthorization(self._config, gateway)
 
     def probe(self, *, order: MissionOrder) -> dict[str, Any]:
@@ -90,12 +105,26 @@ class ConfiguredOpenAIAuthenticatedModelProbe:
                 f"authenticated OpenAI model probe denied: {exc}"
             ) from exc
 
+        observed = self._clock()
+        if (
+            isinstance(observed, bool)
+            or not isinstance(observed, (int, float))
+            or not math.isfinite(float(observed))
+            or float(observed) < 0.0
+        ):
+            raise ConfiguredOpenAIAuthenticatedModelProbeError(
+                "authenticated OpenAI model probe produced an invalid monotonic observation stamp"
+            )
+
         return {
             **result,
             "resource_id": str(item["resource_id"]),
             "provider_kind": "openai",
             "endpoint": self.official_responses_endpoint,
             "credential_use_authorized": True,
+            "observed_monotonic_seconds": float(observed),
+            "observation_clock": "process_monotonic",
+            "persistable_readiness_evidence": False,
             "mission_created": False,
             "observed": False,
             "auto_selection": False,
