@@ -312,6 +312,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_readiness.py::ConfiguredCognitionReadinessTests::test_stale_authenticated_visibility_expires_without_becoming_ready",
     ),
     MutationSpec(
+        name="configured-cognition-route-plan-requires-fresh-readiness",
+        invariant="Configured cognition route planning must never place a candidate in the planned route unless current readiness is freshly READY at planning time.",
+        path="src/grox/configured_cognition_route_plan.py",
+        old='            if not readiness.ready:\n                rejected[resource_id] = readiness.reason or "provider_not_ready"\n                continue\n',
+        new='            if False and not readiness.ready:\n                rejected[resource_id] = readiness.reason or "provider_not_ready"\n                continue\n',
+        nodeid="tests/unit/test_configured_cognition_route_plan.py::ConfiguredCognitionRoutePlanTests::test_stale_first_candidate_is_pruned_and_ready_policy_order_is_preserved",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
