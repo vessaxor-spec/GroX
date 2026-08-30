@@ -10,21 +10,21 @@ permissions:
 
 jobs:
   insert:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout exact branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 2
+          fetch-depth: 3
       - name: Insert exact mutation and self-remove
         shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_PARENT="824f8a7db9b39f6259cb36cd647c6f8eb27850be"
+          EXPECTED_BASE="824f8a7db9b39f6259cb36cd647c6f8eb27850be"
+          EXPECTED_PARENT="a12fa3749bbb893f6726139e92ca5aa2412feb46"
           ACTUAL_PARENT="$(git rev-parse HEAD^)"
           test "$ACTUAL_PARENT" = "$EXPECTED_PARENT"
-          CHANGED="$(git diff --name-only "$EXPECTED_PARENT" HEAD)"
+          CHANGED="$(git diff --name-only "$EXPECTED_BASE" HEAD)"
           test "$CHANGED" = ".github/workflows/insert-mutation-33.yml"
           python - <<'PY'
           from pathlib import Path
