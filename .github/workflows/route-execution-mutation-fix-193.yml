@@ -1,0 +1,62 @@
+name: Route execution mutation escape repair 193
+
+on:
+  push:
+    branches:
+      - lea/configured-cognition-route-execution-freshness-193
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: lea/configured-cognition-route-execution-freshness-193
+          fetch-depth: 1
+      - name: Repair exact mutation literals and remove helper
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('tests/mutation/run_critical_invariants.py')
+          text = path.read_text(encoding='utf-8')
+          name = 'configured-cognition-route-execution-requires-attempt-freshness'
+          if text.count(name) != 1:
+              raise SystemExit(f'expected exactly one mutation name, found {text.count(name)}')
+          anchor = text.index(name)
+          start = text.rfind('    MutationSpec(', 0, anchor)
+          end = text.find('    MutationSpec(', anchor)
+          if start < 0 or end < 0:
+              raise SystemExit('mutation block boundaries not found')
+          block = text[start:end]
+          bad = chr(92) + chr(92) + 'n'
+          good = chr(92) + 'n'
+          if block.count(bad) != 2:
+              raise SystemExit(f'expected two over-escaped newline literals, found {block.count(bad)}')
+          repaired = block.replace(bad, good)
+          if repaired.count(bad) != 0 or repaired.count(good) != 2:
+              raise SystemExit('mutation literal repair did not normalize exactly')
+          text = text[:start] + repaired + text[end:]
+          path.write_text(text, encoding='utf-8')
+
+          helper = Path('.github/workflows/route-execution-mutation-fix-193.yml')
+          if not helper.exists():
+              raise SystemExit('repair helper missing')
+          helper.unlink()
+          PY
+          git diff --check
+      - name: Commit exact repaired mutation tree
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tests/mutation/run_critical_invariants.py .github/workflows/route-execution-mutation-fix-193.yml
+          git diff --cached --quiet && { echo 'no staged repair'; exit 1; }
+          git commit -m 'Repair route execution freshness mutation literal [skip ci]'
+          git push origin HEAD:lea/configured-cognition-route-execution-freshness-193
