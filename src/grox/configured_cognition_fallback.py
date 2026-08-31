@@ -5,22 +5,18 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any
 
+from .configured_cognition_attempt import ConfiguredCognitionAttempt
 from .configured_cognition_fitness import (
     ConfiguredCognitionFitnessResult,
     ConfiguredCognitionMissionFitness,
 )
-from .configured_cognition_selection import (
-    ConfiguredCognitionSelection,
-    ConfiguredCognitionSelectionError,
-    ConfiguredCognitionSelectionPolicy,
-)
+from .configured_cognition_selection import ConfiguredCognitionSelectionError
 from .configured_openai_cognition import (
     ConfiguredOpenAICognitionError,
     ConfiguredOpenAICognitionResult,
 )
 from .contracts import MissionOrder
 from .selected_configured_cognition import (
-    SelectedConfiguredCognition,
     SelectedConfiguredCognitionError,
     SelectedConfiguredCognitionResult,
 )
@@ -151,6 +147,8 @@ class ConfiguredCognitionFallback:
     fitness evidence, exact sealed Mission Order, configured identity, and Tool
     Gateway. This class adds no authority. It selects and invokes candidates only
     in the policy order and advances only after a provider invocation TimeoutError.
+    An optional pre-attempt gate is deny-only: it may stop an attempt but can never
+    append, reorder, select, authorize, or otherwise widen the fallback envelope.
     """
 
     def __init__(
@@ -159,6 +157,7 @@ class ConfiguredCognitionFallback:
         policy: ConfiguredCognitionFallbackPolicy,
         *,
         observation_recorder: Callable[..., Any] | None = None,
+        pre_attempt_gate: Callable[[ConfiguredCognitionFallbackCandidate], None] | None = None,
     ):
         if not isinstance(policy, ConfiguredCognitionFallbackPolicy):
             raise TypeError("policy must be a ConfiguredCognitionFallbackPolicy")
@@ -166,6 +165,8 @@ class ConfiguredCognitionFallback:
             raise TypeError("candidates must be a sequence")
         if observation_recorder is not None and not callable(observation_recorder):
             raise TypeError("observation_recorder must be callable or null")
+        if pre_attempt_gate is not None and not callable(pre_attempt_gate):
+            raise TypeError("pre_attempt_gate must be callable or null")
         frozen = tuple(candidates)
         if len(frozen) != len(policy.candidate_order):
             raise ConfiguredCognitionFallbackPolicyError(
@@ -236,6 +237,7 @@ class ConfiguredCognitionFallback:
         self._candidates = MappingProxyType(by_id)
         self._policy = policy
         self._observation_recorder = observation_recorder
+        self._pre_attempt_gate = pre_attempt_gate
 
     @staticmethod
     def _is_recoverable_provider_timeout(exc: SelectedConfiguredCognitionError) -> bool:
@@ -254,32 +256,33 @@ class ConfiguredCognitionFallback:
         timed_out: list[str] = []
         for index, resource_id in enumerate(self._policy.candidate_order):
             candidate = self._candidates[resource_id]
-            selector = ConfiguredCognitionSelection(candidate.config)
+
+            if self._pre_attempt_gate is not None:
+                try:
+                    self._pre_attempt_gate(candidate)
+                except Exception as exc:
+                    raise ConfiguredCognitionFallbackError(
+                        f"fallback candidate failed pre-attempt gate before selection: {resource_id}"
+                    ) from exc
+
+            attempt = ConfiguredCognitionAttempt(
+                candidate.config,
+                candidate.gateway,
+                candidate.qualification,
+                candidate.fitness,
+                candidate.order,
+                observation_recorder=self._observation_recorder,
+            )
             try:
-                selection = selector.select(
-                    candidate.qualification,
-                    candidate.fitness,
-                    order=candidate.order,
-                    policy=ConfiguredCognitionSelectionPolicy(resource_id=resource_id),
-                )
+                selection = attempt.select()
             except ConfiguredCognitionSelectionError as exc:
                 raise ConfiguredCognitionFallbackError(
                     f"fallback candidate failed exact selection before invocation: {resource_id}"
                 ) from exc
 
-            runner = SelectedConfiguredCognition(
-                candidate.config,
-                candidate.gateway,
-                selector,
-                observation_recorder=self._observation_recorder,
-            )
             attempted.append(resource_id)
             try:
-                executed = runner.invoke(
-                    selection,
-                    order=candidate.order,
-                    roster=roster,
-                )
+                executed = attempt.invoke_selected(selection, roster=roster)
             except SelectedConfiguredCognitionError as exc:
                 if not self._is_recoverable_provider_timeout(exc):
                     raise ConfiguredCognitionFallbackError(
