@@ -323,8 +323,8 @@ SPECS: tuple[MutationSpec, ...] = (
         name="configured-cognition-route-execution-requires-attempt-freshness",
         invariant="Configured cognition route execution must revalidate fresh readiness immediately before every planned candidate attempt.",
         path="src/grox/configured_cognition_fallback.py",
-        old='            if self._pre_attempt_gate is not None:\\n',
-        new='            if False and self._pre_attempt_gate is not None:\\n',
+        old='            if self._pre_attempt_gate is not None:\n',
+        new='            if False and self._pre_attempt_gate is not None:\n',
         nodeid="tests/unit/test_configured_cognition_route_execution.py::ConfiguredCognitionRouteExecutionTests::test_fallback_is_revalidated_after_primary_timeout_and_stale_fallback_stops",
     ),
     MutationSpec(
