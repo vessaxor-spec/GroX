@@ -26,18 +26,17 @@ jobs:
 
           path = Path('tests/mutation/run_critical_invariants.py')
           text = path.read_text(encoding='utf-8')
-          marker = '''    MutationSpec(
-              name="ci-action-immutable-pin",
-          '''
-          block = '''    MutationSpec(
-              name="configured-cognition-route-execution-requires-attempt-freshness",
-              invariant="Configured cognition route execution must revalidate fresh readiness immediately before every planned candidate attempt.",
-              path="src/grox/configured_cognition_fallback.py",
-              old='            if self._pre_attempt_gate is not None:\\n',
-              new='            if False and self._pre_attempt_gate is not None:\\n',
-              nodeid="tests/unit/test_configured_cognition_route_execution.py::ConfiguredCognitionRouteExecutionTests::test_fallback_is_revalidated_after_primary_timeout_and_stale_fallback_stops",
-          ),
-          '''
+          marker = '    MutationSpec(\n        name="ci-action-immutable-pin",\n'
+          block = (
+              '    MutationSpec(\n'
+              '        name="configured-cognition-route-execution-requires-attempt-freshness",\n'
+              '        invariant="Configured cognition route execution must revalidate fresh readiness immediately before every planned candidate attempt.",\n'
+              '        path="src/grox/configured_cognition_fallback.py",\n'
+              "        old='            if self._pre_attempt_gate is not None:\\\\n',\n"
+              "        new='            if False and self._pre_attempt_gate is not None:\\\\n',\n"
+              '        nodeid="tests/unit/test_configured_cognition_route_execution.py::ConfiguredCognitionRouteExecutionTests::test_fallback_is_revalidated_after_primary_timeout_and_stale_fallback_stops",\n'
+              '    ),\n'
+          )
           if text.count(marker) != 1:
               raise SystemExit(f'expected one CI mutation marker, found {text.count(marker)}')
           if 'configured-cognition-route-execution-requires-attempt-freshness' in text:
