@@ -1,0 +1,62 @@
+name: Route execution mutation staging 193
+
+on:
+  push:
+    branches:
+      - lea/configured-cognition-route-execution-freshness-193
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: lea/configured-cognition-route-execution-freshness-193
+          fetch-depth: 1
+      - name: Add exact permanent mutation and remove staging workflow
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('tests/mutation/run_critical_invariants.py')
+          text = path.read_text(encoding='utf-8')
+          marker = '''    MutationSpec(
+              name="ci-action-immutable-pin",
+          '''
+          block = '''    MutationSpec(
+              name="configured-cognition-route-execution-requires-attempt-freshness",
+              invariant="Configured cognition route execution must revalidate fresh readiness immediately before every planned candidate attempt.",
+              path="src/grox/configured_cognition_fallback.py",
+              old='            if self._pre_attempt_gate is not None:\\n',
+              new='            if False and self._pre_attempt_gate is not None:\\n',
+              nodeid="tests/unit/test_configured_cognition_route_execution.py::ConfiguredCognitionRouteExecutionTests::test_fallback_is_revalidated_after_primary_timeout_and_stale_fallback_stops",
+          ),
+          '''
+          if text.count(marker) != 1:
+              raise SystemExit(f'expected one CI mutation marker, found {text.count(marker)}')
+          if 'configured-cognition-route-execution-requires-attempt-freshness' in text:
+              raise SystemExit('route execution mutation already exists')
+          text = text.replace(marker, block + marker, 1)
+          path.write_text(text, encoding='utf-8')
+
+          workflow = Path('.github/workflows/route-execution-mutation-193.yml')
+          if not workflow.exists():
+              raise SystemExit('staging workflow missing')
+          workflow.unlink()
+          PY
+          git diff --check
+      - name: Commit exact mutation tree
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tests/mutation/run_critical_invariants.py .github/workflows/route-execution-mutation-193.yml
+          git diff --cached --quiet && { echo 'no staged mutation'; exit 1; }
+          git commit -m 'Add route execution freshness mutation proof [skip ci]'
+          git push origin HEAD:lea/configured-cognition-route-execution-freshness-193
