@@ -101,6 +101,21 @@ class ConfiguredCognitionDiscoveryTests(unittest.TestCase):
         self.assertNotIn("PRIVATE-SENTINEL", encoded)
         self.assertNotIn("OPENAI_API_KEY", encoded)
 
+    def test_malformed_legacy_alias_does_not_change_base_discovery_contract(self):
+        config = {
+            "GROX_REASONER_PROVIDER": "openai",
+            "GROX_REASONER_MODEL": "legacy-model",
+            "GROX_REASONER_ENDPOINT": "https://api.openai.com/v1/responses",
+            "GROX_REASONER_CREDENTIAL_ALIAS": "not valid alias",
+        }
+
+        inventory = ConfiguredCognitionDiscovery(config).inventory()
+
+        self.assertEqual(inventory["status"], "ok")
+        self.assertEqual(inventory["configuration_source"], "legacy_single")
+        self.assertEqual(inventory["resources"][0]["model"], "legacy-model")
+        self.assertNotIn("credential_alias", inventory["resources"][0])
+
     def test_explicit_catalog_discovers_multiple_resources_in_declared_order_without_alias_exposure(self):
         catalog = [
             {
