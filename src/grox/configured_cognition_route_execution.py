@@ -7,6 +7,7 @@ from types import MappingProxyType
 from typing import Any
 
 from .configured_cognition_attempt import ConfiguredCognitionAttempt
+from .configured_cognition_attempt_performance import ConfiguredCognitionAttemptPerformance
 from .configured_cognition_fallback import (
     ConfiguredCognitionFallback,
     ConfiguredCognitionFallbackCandidate,
@@ -51,6 +52,7 @@ class ConfiguredCognitionRouteExecutionResult:
     attempted_resource_ids: tuple[str, ...]
     timed_out_resource_ids: tuple[str, ...]
     attempt_readiness_age_seconds: Mapping[str, float]
+    attempt_performance: tuple[ConfiguredCognitionAttemptPerformance, ...]
     executed: SelectedConfiguredCognitionResult
 
     @property
@@ -68,6 +70,7 @@ class ConfiguredCognitionRouteExecutionResult:
             "attempted_resource_ids": list(self.attempted_resource_ids),
             "timed_out_resource_ids": list(self.timed_out_resource_ids),
             "attempt_readiness_age_seconds": dict(self.attempt_readiness_age_seconds),
+            "attempt_performance": [item.evidence() for item in self.attempt_performance],
             "executed_resource_id": self.executed.resource_id,
             "executed_observation_id": self.executed.observation_id,
             "mission_id": self.executed.mission_id,
@@ -255,11 +258,25 @@ class ConfiguredCognitionRouteExecution:
                 resource_id=candidate.resource_id,
                 reason="selected_invocation_failed",
             ) from exc
+        performance = ConfiguredCognitionAttemptPerformance(
+            resource_id=candidate.qualification.resource_id,
+            provider_kind=candidate.qualification.provider_kind,
+            model=candidate.qualification.model,
+            endpoint=candidate.qualification.endpoint,
+            credential_alias=candidate.qualification.credential_alias,
+            mission_id=candidate.order.mission_id,
+            order_id=candidate.order.order_id,
+            selection_id=selection.selection_id,
+            placement=candidate.fitness.placement,
+            outcome="success",
+            observation_id=executed.observation_id,
+        )
         return ConfiguredCognitionRouteExecutionResult(
             candidate_order=(candidate.resource_id,),
             attempted_resource_ids=(candidate.resource_id,),
             timed_out_resource_ids=(),
             attempt_readiness_age_seconds=MappingProxyType(dict(self._attempt_ages)),
+            attempt_performance=(performance,),
             executed=executed,
         )
 
@@ -301,5 +318,6 @@ class ConfiguredCognitionRouteExecution:
             attempted_resource_ids=result.attempted_resource_ids,
             timed_out_resource_ids=result.timed_out_resource_ids,
             attempt_readiness_age_seconds=MappingProxyType(dict(self._attempt_ages)),
+            attempt_performance=result.attempt_performance,
             executed=result.executed,
         )
