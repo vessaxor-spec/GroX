@@ -344,6 +344,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_route_ranking.py::ConfiguredCognitionRouteRankingTests::test_credential_alias_rebind_history_is_not_attributed_to_current_identity",
     ),
     MutationSpec(
+        name="configured-cognition-catalog-rejects-duplicate-resource",
+        invariant="Configured cognition catalog discovery must reject duplicate configured resource identities instead of exposing an ambiguous routable candidate set.",
+        path="src/grox/cognition_discovery.py",
+        old='            if resource_id in resource_ids:\n                return "invalid_catalog", ()\n',
+        new='            if False and resource_id in resource_ids:\n                return "invalid_catalog", ()\n',
+        nodeid="tests/unit/test_configured_cognition_discovery.py::ConfiguredCognitionDiscoveryTests::test_catalog_malformed_unsupported_duplicate_and_over_limit_fail_closed_without_partial_inventory",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
