@@ -251,10 +251,8 @@ class ConfiguredCognitionDiscovery:
                 return ()
             config["GROX_REASONER_ENDPOINT"] = endpoint
             alias_raw = self._config.get("GROX_REASONER_CREDENTIAL_ALIAS")
-            if alias_raw:
-                alias = _safe_credential_alias(alias_raw)
-                if alias is None:
-                    return ()
+            alias = _safe_credential_alias(alias_raw)
+            if alias is not None:
                 config["GROX_REASONER_CREDENTIAL_ALIAS"] = alias
         return (config,)
 
