@@ -328,6 +328,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_route_execution.py::ConfiguredCognitionRouteExecutionTests::test_fallback_is_revalidated_after_primary_timeout_and_stale_fallback_stops",
     ),
     MutationSpec(
+        name="configured-cognition-attempt-performance-exact-credential-alias",
+        invariant="Configured cognition attempt-performance evidence must preserve the exact credential alias of the actual attempted candidate.",
+        path="src/grox/configured_cognition_fallback.py",
+        old='            credential_alias=qualification.credential_alias,\n',
+        new='            credential_alias="mutated-alias",\n',
+        nodeid="tests/unit/test_configured_cognition_route_execution.py::ConfiguredCognitionRouteExecutionTests::test_timeout_advances_only_to_fallback_that_is_fresh_at_its_own_attempt",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
