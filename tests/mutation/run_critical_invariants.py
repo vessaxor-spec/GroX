@@ -352,6 +352,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_discovery.py::ConfiguredCognitionDiscoveryTests::test_catalog_malformed_unsupported_duplicate_and_over_limit_fail_closed_without_partial_inventory",
     ),
     MutationSpec(
+        name="configured-cognition-catalog-binding-exact-resource-identity",
+        invariant="Catalog-wide configured cognition credential binding must preserve the exact discovered resource identity.",
+        path="src/grox/configured_cognition_catalog_binding.py",
+        old='            if not self._binding_matches_resource(bound, resource):\n',
+        new='            if False and not self._binding_matches_resource(bound, resource):\n',
+        nodeid="tests/unit/test_configured_cognition_catalog_binding.py::ConfiguredCognitionCatalogBindingTests::test_binding_identity_mismatch_fails_closed",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
