@@ -54,6 +54,9 @@ class ConfiguredCognitionRouteExecutionResult:
     attempt_readiness_age_seconds: Mapping[str, float]
     attempt_performance: tuple[ConfiguredCognitionAttemptPerformance, ...]
     executed: SelectedConfiguredCognitionResult
+    ranking_evaluated: bool = False
+    ranking_applied: bool = False
+    baseline_ready_resource_ids: tuple[str, ...] = ()
 
     @property
     def switched(self) -> bool:
@@ -67,6 +70,9 @@ class ConfiguredCognitionRouteExecutionResult:
         return {
             "schema": "grox-configured-cognition-route-execution-v1",
             "candidate_order": list(self.candidate_order),
+            "baseline_ready_resource_ids": list(
+                self.baseline_ready_resource_ids or self.candidate_order
+            ),
             "attempted_resource_ids": list(self.attempted_resource_ids),
             "timed_out_resource_ids": list(self.timed_out_resource_ids),
             "attempt_readiness_age_seconds": dict(self.attempt_readiness_age_seconds),
@@ -86,8 +92,9 @@ class ConfiguredCognitionRouteExecutionResult:
             "fallback_reason": "provider_timeout" if self.switched else None,
             "timeout_only_fallback": True,
             "candidate_expansion": False,
-            "adaptive_routing_enabled": False,
-            "ranking_enabled": False,
+            "adaptive_routing_enabled": self.ranking_applied,
+            "ranking_enabled": self.ranking_evaluated,
+            "ranking_applied": self.ranking_applied,
             "learning_enabled": False,
             "mission_created": False,
             "authority_changed": False,
@@ -278,6 +285,11 @@ class ConfiguredCognitionRouteExecution:
             attempt_readiness_age_seconds=MappingProxyType(dict(self._attempt_ages)),
             attempt_performance=(performance,),
             executed=executed,
+            ranking_evaluated=self._route.ranking_evaluated,
+            ranking_applied=self._route.ranking_applied,
+            baseline_ready_resource_ids=(
+                self._route.baseline_ready_resource_ids or self._route.ready_resource_ids
+            ),
         )
 
     def invoke(self, *, roster: list[dict[str, Any]]) -> ConfiguredCognitionRouteExecutionResult:
@@ -320,4 +332,9 @@ class ConfiguredCognitionRouteExecution:
             attempt_readiness_age_seconds=MappingProxyType(dict(self._attempt_ages)),
             attempt_performance=result.attempt_performance,
             executed=result.executed,
+            ranking_evaluated=self._route.ranking_evaluated,
+            ranking_applied=self._route.ranking_applied,
+            baseline_ready_resource_ids=(
+                self._route.baseline_ready_resource_ids or self._route.ready_resource_ids
+            ),
         )

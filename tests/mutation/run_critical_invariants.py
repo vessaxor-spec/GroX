@@ -336,6 +336,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_route_execution.py::ConfiguredCognitionRouteExecutionTests::test_timeout_advances_only_to_fallback_that_is_fresh_at_its_own_attempt",
     ),
     MutationSpec(
+        name="configured-cognition-route-ranking-exact-credential-alias-history",
+        invariant="Configured cognition route ranking must never attribute prior attempt history across a credential-alias rebind.",
+        path="src/grox/configured_cognition_route_ranking.py",
+        old='            and item.credential_alias == qualification.credential_alias\n',
+        new='            and True  # deliberate mutation: ignore credential alias history identity\n',
+        nodeid="tests/unit/test_configured_cognition_route_ranking.py::ConfiguredCognitionRouteRankingTests::test_credential_alias_rebind_history_is_not_attributed_to_current_identity",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",

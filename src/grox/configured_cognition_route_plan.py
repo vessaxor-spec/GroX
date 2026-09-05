@@ -42,6 +42,16 @@ class ConfiguredCognitionRoutePlanResult:
         repr=False,
         compare=False,
     )
+    baseline_ready_resource_ids: tuple[str, ...] = ()
+    ranking_sample_counts: Mapping[str, int] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    ranking_scores: Mapping[str, float] = field(
+        default_factory=lambda: MappingProxyType({})
+    )
+    ranking_evaluated: bool = False
+    ranking_applied: bool = False
+    ranking_reason: str = "not_requested"
 
     @property
     def ready_candidates(self) -> tuple[ConfiguredCognitionFallbackCandidate, ...]:
@@ -60,6 +70,9 @@ class ConfiguredCognitionRoutePlanResult:
             "candidate_order": list(self.candidate_order),
             "admitted_resource_ids": list(self.admitted_resource_ids),
             "ready_resource_ids": list(self.ready_resource_ids),
+            "baseline_ready_resource_ids": list(
+                self.baseline_ready_resource_ids or self.ready_resource_ids
+            ),
             "primary_resource_id": self.primary_resource_id,
             "fallback_resource_ids": list(self.fallback_resource_ids),
             "not_ready_reasons": dict(self.not_ready_reasons),
@@ -70,7 +83,16 @@ class ConfiguredCognitionRoutePlanResult:
             "fresh_readiness_revalidated_at_plan_time": True,
             "readiness_scope": "authenticated_model_visibility",
             "freshness_clock": "process_monotonic",
-            "deterministic_policy_order": True,
+            "deterministic_policy_order": not self.ranking_applied,
+            "deterministic_ranked_order": self.ranking_applied,
+            "ranking_evaluated": self.ranking_evaluated,
+            "ranking_applied": self.ranking_applied,
+            "ranking_reason": self.ranking_reason,
+            "ranking_sample_counts": dict(self.ranking_sample_counts),
+            "ranking_scores": dict(self.ranking_scores),
+            "ranking_score_basis": (
+                "laplace_timeout_reliability" if self.ranking_applied else None
+            ),
             "active_selection_created": False,
             "selected": False,
             "observed": False,
@@ -82,10 +104,10 @@ class ConfiguredCognitionRoutePlanResult:
             "fallback_invoked": False,
             "mission_created": False,
             "authority_changed": False,
-            "historical_scoring_used": False,
-            "ranking_enabled": False,
+            "historical_scoring_used": self.ranking_applied,
+            "ranking_enabled": self.ranking_evaluated,
             "learning_enabled": False,
-            "adaptive_scoring_enabled": False,
+            "adaptive_scoring_enabled": self.ranking_applied,
         }
 
 
