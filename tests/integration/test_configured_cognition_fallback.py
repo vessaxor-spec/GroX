@@ -200,6 +200,17 @@ class ConfiguredCognitionFallbackIntegrationTests(unittest.TestCase):
             self.assertEqual(report.executed.order_id, order_b.order_id)
             self.assertEqual(report.executed.response_id, "resp-fallback-execution")
             self.assertEqual(report.interpretation.commander_intent, INTENT)
+            self.assertEqual([item.outcome for item in report.attempt_performance], ["provider_timeout", "success"])
+            self.assertEqual(report.attempt_performance[0].resource_id, candidate_a.resource_id)
+            self.assertEqual(report.attempt_performance[0].model, MODEL_A)
+            self.assertEqual(report.attempt_performance[0].credential_alias, ALIAS_A)
+            self.assertEqual(report.attempt_performance[0].order_id, order_a.order_id)
+            self.assertIsNone(report.attempt_performance[0].observation_id)
+            self.assertEqual(report.attempt_performance[1].resource_id, candidate_b.resource_id)
+            self.assertEqual(report.attempt_performance[1].model, MODEL_B)
+            self.assertEqual(report.attempt_performance[1].credential_alias, ALIAS_B)
+            self.assertEqual(report.attempt_performance[1].order_id, order_b.order_id)
+            self.assertEqual(report.attempt_performance[1].observation_id, report.executed.observation_id)
             self.assertEqual(len(observed), 1)
             observed_identity = observed[0]["identity"]
             self.assertEqual(observed_identity["resource_id"], candidate_b.resource_id)
@@ -221,6 +232,14 @@ class ConfiguredCognitionFallbackIntegrationTests(unittest.TestCase):
             self.assertFalse(evidence["raw_response_returned"])
             self.assertFalse(evidence["mission_created"])
             self.assertFalse(evidence["authority_changed"])
+            self.assertEqual(
+                [item["outcome"] for item in evidence["attempt_performance"]],
+                ["provider_timeout", "success"],
+            )
+            self.assertNotIn("SECRET-A", repr(evidence))
+            self.assertNotIn("SECRET-B", repr(evidence))
+            self.assertFalse(any(item["ranking_applied"] for item in evidence["attempt_performance"]))
+            self.assertFalse(any(item["learning_applied"] for item in evidence["attempt_performance"]))
 
 
 if __name__ == "__main__":
