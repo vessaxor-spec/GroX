@@ -6,6 +6,7 @@ from types import MappingProxyType
 from typing import Any
 
 from .configured_cognition_attempt import ConfiguredCognitionAttempt
+from .configured_cognition_attempt_performance import ConfiguredCognitionAttemptPerformance
 from .configured_cognition_fitness import (
     ConfiguredCognitionFitnessResult,
     ConfiguredCognitionMissionFitness,
@@ -102,6 +103,7 @@ class ConfiguredCognitionFallbackResult:
     candidate_order: tuple[str, ...]
     attempted_resource_ids: tuple[str, ...]
     timed_out_resource_ids: tuple[str, ...]
+    attempt_performance: tuple[ConfiguredCognitionAttemptPerformance, ...]
     executed: SelectedConfiguredCognitionResult
 
     @property
@@ -118,6 +120,7 @@ class ConfiguredCognitionFallbackResult:
             "candidate_order": list(self.candidate_order),
             "attempted_resource_ids": list(self.attempted_resource_ids),
             "timed_out_resource_ids": list(self.timed_out_resource_ids),
+            "attempt_performance": [item.evidence() for item in self.attempt_performance],
             "executed_resource_id": self.executed.resource_id,
             "executed_observation_id": self.executed.observation_id,
             "mission_id": self.executed.mission_id,
@@ -248,12 +251,36 @@ class ConfiguredCognitionFallback:
             and isinstance(cognition_error.__cause__, TimeoutError)
         )
 
+    @staticmethod
+    def _attempt_performance(
+        candidate: ConfiguredCognitionFallbackCandidate,
+        *,
+        selection_id: str,
+        outcome: str,
+        observation_id: str | None = None,
+    ) -> ConfiguredCognitionAttemptPerformance:
+        qualification = candidate.qualification
+        return ConfiguredCognitionAttemptPerformance(
+            resource_id=qualification.resource_id,
+            provider_kind=qualification.provider_kind,
+            model=qualification.model,
+            endpoint=qualification.endpoint,
+            credential_alias=qualification.credential_alias,
+            mission_id=candidate.order.mission_id,
+            order_id=candidate.order.order_id,
+            selection_id=selection_id,
+            placement=candidate.fitness.placement,
+            outcome=outcome,
+            observation_id=observation_id,
+        )
+
     def invoke(self, *, roster: list[dict[str, Any]]) -> ConfiguredCognitionFallbackResult:
         if not isinstance(roster, list) or not all(isinstance(item, dict) for item in roster):
             raise TypeError("roster must be a list of mappings")
 
         attempted: list[str] = []
         timed_out: list[str] = []
+        performance: list[ConfiguredCognitionAttemptPerformance] = []
         for index, resource_id in enumerate(self._policy.candidate_order):
             candidate = self._candidates[resource_id]
 
@@ -289,16 +316,32 @@ class ConfiguredCognitionFallback:
                         f"fallback stopped on non-recoverable candidate failure: {resource_id}"
                     ) from exc
                 timed_out.append(resource_id)
+                performance.append(
+                    self._attempt_performance(
+                        candidate,
+                        selection_id=selection.selection_id,
+                        outcome="provider_timeout",
+                    )
+                )
                 if index + 1 >= len(self._policy.candidate_order):
                     raise ConfiguredCognitionFallbackError(
                         "explicit configured cognition fallback envelope exhausted on provider timeouts"
                     ) from exc
                 continue
 
+            performance.append(
+                self._attempt_performance(
+                    candidate,
+                    selection_id=selection.selection_id,
+                    outcome="success",
+                    observation_id=executed.observation_id,
+                )
+            )
             return ConfiguredCognitionFallbackResult(
                 candidate_order=self._policy.candidate_order,
                 attempted_resource_ids=tuple(attempted),
                 timed_out_resource_ids=tuple(timed_out),
+                attempt_performance=tuple(performance),
                 executed=executed,
             )
 
