@@ -317,6 +317,14 @@ class ConfiguredCognitionRouteExecutionTests(unittest.TestCase):
         self.assertEqual(result.executed.resource_id, fallback.resource_id)
         self.assertEqual(result.attempt_readiness_age_seconds[primary.resource_id], 20.0)
         self.assertEqual(result.attempt_readiness_age_seconds[fallback.resource_id], 30.0)
+        self.assertEqual([item.outcome for item in result.attempt_performance], ["provider_timeout", "success"])
+        self.assertEqual(result.attempt_performance[0].resource_id, primary.resource_id)
+        self.assertEqual(result.attempt_performance[0].credential_alias, "alias-primary")
+        self.assertEqual(result.attempt_performance[0].order_id, primary.order.order_id)
+        self.assertEqual(result.attempt_performance[1].resource_id, fallback.resource_id)
+        self.assertEqual(result.attempt_performance[1].credential_alias, "alias-fallback")
+        self.assertEqual(result.attempt_performance[1].order_id, fallback.order.order_id)
+        self.assertEqual(result.attempt_performance[1].observation_id, result.executed.observation_id)
         evidence = result.evidence()
         self.assertTrue(evidence["fresh_readiness_revalidated_per_attempt"])
         self.assertTrue(evidence["ready_at_plan_time_not_sufficient"])
@@ -324,6 +332,13 @@ class ConfiguredCognitionRouteExecutionTests(unittest.TestCase):
         self.assertFalse(evidence["candidate_expansion"])
         self.assertFalse(evidence["adaptive_routing_enabled"])
         self.assertFalse(evidence["authority_changed"])
+        self.assertEqual(
+            [item["outcome"] for item in evidence["attempt_performance"]],
+            ["provider_timeout", "success"],
+        )
+        self.assertFalse(any(item["ranking_applied"] for item in evidence["attempt_performance"]))
+        self.assertFalse(any(item["learning_applied"] for item in evidence["attempt_performance"]))
+        self.assertNotIn("SECRET-", repr(evidence))
 
     def test_single_candidate_route_uses_same_shared_attempt_seam(self):
         primary = self._candidate("model-primary", "alias-primary")
@@ -358,6 +373,10 @@ class ConfiguredCognitionRouteExecutionTests(unittest.TestCase):
         self.assertEqual(result.attempted_resource_ids, (primary.resource_id,))
         self.assertEqual(result.timed_out_resource_ids, ())
         self.assertFalse(result.switched)
+        self.assertEqual(len(result.attempt_performance), 1)
+        self.assertEqual(result.attempt_performance[0].outcome, "success")
+        self.assertEqual(result.attempt_performance[0].resource_id, primary.resource_id)
+        self.assertEqual(result.attempt_performance[0].credential_alias, "alias-primary")
 
 
 if __name__ == "__main__":
