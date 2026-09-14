@@ -4,8 +4,8 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after catalog-wide configured cognition credential-binding qualification:** `main@873557f349dc9945236d701dad4d19ad1de07242`
-**Current verified canonical tree:** `59852d416bb4754dd11991934022afce7d469dbf`
+**Latest qualified implementation baseline before this stewardship-only repair:** `main@873557f349dc9945236d701dad4d19ad1de07242`
+**Qualified implementation tree:** `59852d416bb4754dd11991934022afce7d469dbf`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -21,7 +21,7 @@
 
 ## Stewardship recalibration — 2026-09-14
 
-**Status: COMPLETE AT INSPECTION BASELINE — IMPLEMENTATION FROZEN PENDING THIS STEWARDSHIP REPAIR.**
+**Status: RECONCILED ON THIS STEWARDSHIP REPAIR — NO RUNTIME CHANGE.**
 
 Repository truth inspected against protected `main`:
 
