@@ -1,11 +1,11 @@
 # GroX Progress Tracker
 
-**Status date:** 2026-08-25
+**Status date:** 2026-09-14
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after configured cognition credential-alias availability composition qualification:** `main@7ac5b8832d4c6e08a3c545a76c5125818461977f`
-**Current verified canonical tree:** `adc4a4fd512eaa65794e7088c4567a25d65727fa`
+**Latest qualified implementation baseline before this stewardship-only repair:** `main@873557f349dc9945236d701dad4d19ad1de07242`
+**Qualified implementation tree:** `59852d416bb4754dd11991934022afce7d469dbf`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,9 +15,26 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** Python **3.11–3.14 + Wheel bootstrap PASS**; Python 3.12 Vessel Health **10 PASS / 0 WARN / 0 FAIL / 0 UNKNOWN**; pytest **421 passed, 2 skipped, 480 subtests**; unittest **423 OK, 2 skipped**; mutations **24/24**, **7/7**, **9/9**, **4/4**, **6/6** killed; integrated Post-Apex PASS
-**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS; LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS + SUPPORTED CONFIGURED COGNITION DISCOVERY + CONFIGURED REMOTE CONNECTION POLICY AWARENESS + CONFIGURED LOCAL LLAMA.CPP READINESS + GOVERNED SECRET-ALIAS AVAILABILITY + CONFIGURED CREDENTIAL-ALIAS BINDING + CONFIGURED CREDENTIAL-ALIAS AVAILABILITY EXITS QUALIFIED**
-**Next bounded implementation:** **Continue issue #115 beyond the eleven qualified bounded exits using the smallest repository-native evidence-backed surface. Credential validity, authenticated remote provider/service readiness, model quality / Mission-specific fitness, successful cognition semantics, arbitrary/unconfigured provider catalog discovery, broader authorized external-connection awareness, ambient application/process awareness, provider switching/fallback, and adaptive provider/resource routing remain unqualified; adaptive routing must not outrun those gates.**
+**Current verified regression:** canonical push GroX CI **#644 / 33969205594 PASS** across Wheel bootstrap and Python **3.11–3.14** at `main@873557f349dc9945236d701dad4d19ad1de07242`; exact final PR #202 head on the same canonical tree recorded Python 3.12 pytest **535 passed, 2 skipped, 522 subtests**, unittest **537**, critical mutation matrix **40/40 KILLED**, and Post-Apex evidence present.
+**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS WITH 27 BOUNDED EXITS QUALIFIED THROUGH EXPLICIT CONFIGURED-COGNITION AUTHORIZATION/ACTIVATION, AUTHENTICATED MODEL VISIBILITY, GOVERNED INVOCATION, MISSION FITNESS, SELECTION/OBSERVATION, TIMEOUT-ONLY FALLBACK, CURRENT-GATE ROUTING/FRESHNESS, EXACT-HISTORY PERFORMANCE/RANKING, BOUNDED MULTI-RESOURCE CATALOG DISCOVERY, AND CATALOG-WIDE CREDENTIAL BINDING.**
+**Next bounded implementation:** **Issue #203 — catalog-wide configured cognition credential-alias availability. Preserve exact resource/provider/model/endpoint/alias identity and declaration order; do not infer credential validity, authorization, readiness, fitness, selection, routing, cognition success, or authority from alias membership. Parent issue #115 remains open.**
+
+## Stewardship recalibration — 2026-09-14
+
+**Status: RECONCILED ON THIS STEWARDSHIP REPAIR — NO RUNTIME CHANGE.**
+
+Repository truth inspected against protected `main`:
+
+- current canonical implementation head before this stewardship repair: `main@873557f349dc9945236d701dad4d19ad1de07242`, tree `59852d416bb4754dd11991934022afce7d469dbf`;
+- canonical push CI #644 / `33969205594`: PASS across all five required jobs;
+- after the previously documented eleventh exit (#160/#161), sixteen additional bounded implementation exits were completed through issues #164, #168, #170, #172, #174, #176, #178, #180, #183, #187, #190, #193, #195, #197, #199, and #201;
+- the latest completed implementation is issue #201 / PR #202, catalog-wide configured cognition credential-binding awareness;
+- issue #203 is the next open bounded implementation under parent #115;
+- NCI-1, NCI-2, and NCI-3 remain qualified; NCI-4 remains unqualified and follows the Commander-designated Live Environment Awareness priority unless replanned;
+- the canonical command spine remains `Commander → Pilot GorXu → Divisions → Standing Crew`; Pilot GorXu remains the sole operational orchestrator;
+- this recalibration authorizes no new capability, runtime behavior, release, NCI stage, Apex stage, routing authority, or model promotion.
+
+This section records the state-alignment repair after stewardship lagged behind protected-main implementation. Historical qualification sections below remain evidence records for their exact points in time and are not rewritten to look newer than they were.
 
 ## Live Environment Awareness — configured cognition credential-alias availability composition — issue #160 / PR #161
 
