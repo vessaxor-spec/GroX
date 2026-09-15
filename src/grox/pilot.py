@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
+from collections.abc import Mapping, Sequence
 from typing import Any
 from time import perf_counter
 import os
@@ -27,6 +28,22 @@ from .configured_local_readiness import ConfiguredLocalCognitionReadiness
 from .credential_binding import ConfiguredCredentialBinding
 from .configured_cognition_catalog_binding import ConfiguredCognitionCatalogBinding
 from .configured_cognition_catalog_availability import ConfiguredCognitionCatalogCredentialAvailability
+from .configured_cognition_attempt_performance import ConfiguredCognitionAttemptPerformance
+from .configured_cognition_fallback import (
+    ConfiguredCognitionFallbackCandidate,
+    ConfiguredCognitionFallbackPolicy,
+)
+from .configured_cognition_readiness import ConfiguredCognitionReadiness
+from .configured_cognition_route_admission import ConfiguredCognitionRouteAdmission
+from .configured_cognition_route_execution import (
+    ConfiguredCognitionRouteExecution,
+    ConfiguredCognitionRouteExecutionResult,
+)
+from .configured_cognition_route_plan import (
+    ConfiguredCognitionRoutePlan,
+    ConfiguredCognitionRoutePlanResult,
+)
+from .configured_cognition_route_ranking import ConfiguredCognitionRouteRanker
 from .graph import MissionGraphPlan
 from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
@@ -139,6 +156,55 @@ class PilotGorXu:
         return ConfiguredCognitionCatalogCredentialAvailability(
             nonsecret_reasoner_config_from_env(), self.gateway.secret_broker
         ).inventory()
+
+    def plan_configured_cognition_route(
+        self,
+        candidates:Sequence[ConfiguredCognitionFallbackCandidate],
+        policy:ConfiguredCognitionFallbackPolicy,
+        probe_evidence:Mapping[str,Mapping[str,Any]],
+        *,
+        attempt_history:Sequence[ConfiguredCognitionAttemptPerformance]|None=None,
+        min_exact_samples:int=ConfiguredCognitionRouteRanker.default_min_exact_samples,
+        clock:Any=None,
+        max_age_seconds:float=ConfiguredCognitionReadiness.default_max_age_seconds,
+    )->ConfiguredCognitionRoutePlanResult:
+        """Plan one explicit governed configured-cognition route under current evidence.
+
+        GorXu owns this integration point but does not replace any underlying gate:
+        admission revalidates current authority, planning revalidates readiness,
+        and optional ranking can only reorder already-ready exact candidates.
+        """
+        admission=ConfiguredCognitionRouteAdmission(candidates,policy).plan()
+        route=ConfiguredCognitionRoutePlan(
+            admission,
+            probe_evidence,
+            clock=clock,
+            max_age_seconds=max_age_seconds,
+        ).plan()
+        if attempt_history is not None:
+            route=ConfiguredCognitionRouteRanker(
+                route,
+                attempt_history,
+                min_exact_samples=min_exact_samples,
+            ).rank()
+        return route
+
+    def execute_configured_cognition_route(
+        self,
+        route:ConfiguredCognitionRoutePlanResult,
+        probe_evidence:Mapping[str,Mapping[str,Any]],
+        *,
+        clock:Any=None,
+        max_age_seconds:float=ConfiguredCognitionReadiness.default_max_age_seconds,
+    )->ConfiguredCognitionRouteExecutionResult:
+        """Execute only an already-planned route through existing qualified gates."""
+        return ConfiguredCognitionRouteExecution(
+            route,
+            probe_evidence,
+            clock=clock,
+            max_age_seconds=max_age_seconds,
+            observation_recorder=self.store.record_resource_observation,
+        ).invoke(roster=self.roster.cognitive_directory())
 
     def live_configured_connection_policy_inventory(self, *, order:MissionOrder|None=None)->dict[str,Any]:
         """Report configured remote connection policy state without network or provider activity."""
