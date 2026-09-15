@@ -26,6 +26,7 @@ from .configured_connection_awareness import ConfiguredConnectionPolicyAwareness
 from .configured_local_readiness import ConfiguredLocalCognitionReadiness
 from .credential_binding import ConfiguredCredentialBinding
 from .configured_cognition_catalog_binding import ConfiguredCognitionCatalogBinding
+from .configured_cognition_catalog_availability import ConfiguredCognitionCatalogCredentialAvailability
 from .graph import MissionGraphPlan
 from .graph.runtime import GraphExecutionError, MissionGraphRunner
 from .intelligence import LivingCompanyIntelligence
@@ -132,6 +133,12 @@ class PilotGorXu:
     def live_configured_cognition_catalog_binding_inventory(self)->dict[str,Any]:
         """Report per-resource non-secret credential binding across configured cognition catalog."""
         return ConfiguredCognitionCatalogBinding(nonsecret_reasoner_config_from_env()).inventory()
+
+    def live_configured_cognition_catalog_credential_availability_inventory(self)->dict[str,Any]:
+        """Report exact secret-blind alias availability across configured cognition catalog."""
+        return ConfiguredCognitionCatalogCredentialAvailability(
+            nonsecret_reasoner_config_from_env(), self.gateway.secret_broker
+        ).inventory()
 
     def live_configured_connection_policy_inventory(self, *, order:MissionOrder|None=None)->dict[str,Any]:
         """Report configured remote connection policy state without network or provider activity."""

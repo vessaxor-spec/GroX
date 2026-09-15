@@ -360,6 +360,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_catalog_binding.py::ConfiguredCognitionCatalogBindingTests::test_binding_identity_mismatch_fails_closed",
     ),
     MutationSpec(
+        name="configured-cognition-catalog-availability-exact-resource-identity",
+        invariant="Catalog-wide configured credential-alias availability must preserve the exact configured resource identity.",
+        path="src/grox/configured_cognition_catalog_availability.py",
+        old='            "resource_id": resource["resource_id"],\n',
+        new='            "resource_id": "cognition:configured:openai:wrong-availability",\n',
+        nodeid="tests/unit/test_configured_cognition_catalog_availability.py::ConfiguredCognitionCatalogCredentialAvailabilityTests::test_mixed_catalog_preserves_exact_identity_order_and_alias_membership",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
