@@ -6,6 +6,7 @@ import unittest
 from grox.configured_cognition_catalog_availability import (
     ConfiguredCognitionCatalogCredentialAvailability,
 )
+from grox.configured_cognition_catalog_binding import ConfiguredCognitionCatalogBinding
 from grox.configured_credential_availability import ConfiguredCredentialAliasAvailability
 from grox.tools.secrets import SecretBroker
 
@@ -66,6 +67,7 @@ class ConfiguredCognitionCatalogCredentialAvailabilityTests(unittest.TestCase):
             ]
         )
 
+        binding = ConfiguredCognitionCatalogBinding(config).inventory()
         result = ConfiguredCognitionCatalogCredentialAvailability(config, broker).inventory()
 
         self.assertEqual(result["status"], "incomplete_binding")
@@ -76,6 +78,10 @@ class ConfiguredCognitionCatalogCredentialAvailabilityTests(unittest.TestCase):
         self.assertEqual(
             [item["model"] for item in result["resources"]],
             ["model-a", "local-b", "model-c", "model-d"],
+        )
+        self.assertEqual(
+            [item["resource_id"] for item in result["resources"]],
+            [item["resource_id"] for item in binding["resources"]],
         )
 
         first, local, third, unbound = result["resources"]
