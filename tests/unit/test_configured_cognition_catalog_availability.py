@@ -123,21 +123,46 @@ class ConfiguredCognitionCatalogCredentialAvailabilityTests(unittest.TestCase):
         self.assertNotIn("SECRET-A-SENTINEL", repr(result))
         self.assertNotIn("UNRELATED-SECRET-SENTINEL", repr(result))
 
-    def test_malformed_catalog_fails_closed_without_broker_consultation(self):
-        broker = TrackingSecretBroker({"alias-a": "SECRET-SENTINEL"})
-        result = ConfiguredCognitionCatalogCredentialAvailability(
-            {"GROX_REASONER_CATALOG_JSON": "{not-json"},
-            broker,
-        ).inventory()
+    def test_malformed_or_ambiguous_catalog_fails_closed_without_broker_consultation(self):
+        cases = [
+            (
+                {"GROX_REASONER_CATALOG_JSON": "{not-json"},
+                "invalid_catalog",
+            ),
+            (
+                {
+                    "GROX_REASONER_CATALOG_JSON": json.dumps(
+                        [
+                            {
+                                "provider_kind": "openai",
+                                "model": "model-a",
+                                "endpoint": ENDPOINT,
+                                "credential_alias": "alias-a",
+                            }
+                        ]
+                    ),
+                    "GROX_REASONER_PROVIDER": "openai",
+                },
+                "ambiguous",
+            ),
+        ]
 
-        self.assertEqual(result["status"], "invalid_catalog")
-        self.assertEqual(result["resources"], [])
-        self.assertEqual(result["remote_resource_count"], 0)
-        self.assertEqual(result["bound_remote_resource_count"], 0)
-        self.assertEqual(result["available_remote_resource_count"], 0)
-        self.assertEqual(broker.alias_checks, [])
-        self.assertFalse(result["secret_broker_consulted"])
-        self.assertFalse(result["secret_alias_availability_checked"])
+        for config, expected_status in cases:
+            with self.subTest(expected_status=expected_status):
+                broker = TrackingSecretBroker({"alias-a": "SECRET-SENTINEL"})
+                result = ConfiguredCognitionCatalogCredentialAvailability(
+                    config,
+                    broker,
+                ).inventory()
+
+                self.assertEqual(result["status"], expected_status)
+                self.assertEqual(result["resources"], [])
+                self.assertEqual(result["remote_resource_count"], 0)
+                self.assertEqual(result["bound_remote_resource_count"], 0)
+                self.assertEqual(result["available_remote_resource_count"], 0)
+                self.assertEqual(broker.alias_checks, [])
+                self.assertFalse(result["secret_broker_consulted"])
+                self.assertFalse(result["secret_alias_availability_checked"])
 
     def test_legacy_single_resource_availability_remains_compatible(self):
         config = {
