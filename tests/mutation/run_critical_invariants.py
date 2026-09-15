@@ -368,6 +368,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/unit/test_configured_cognition_catalog_availability.py::ConfiguredCognitionCatalogCredentialAvailabilityTests::test_mixed_catalog_preserves_exact_identity_order_and_alias_membership",
     ),
     MutationSpec(
+        name="pilot-configured-route-observation-persistence",
+        invariant="Pilot GorXu configured cognition route execution must persist the exact observed execution identity.",
+        path="src/grox/pilot.py",
+        old='            observation_recorder=self.store.record_resource_observation,\n        ).invoke(roster=self.roster.cognitive_directory())\n',
+        new='            observation_recorder=None,\n        ).invoke(roster=self.roster.cognitive_directory())\n',
+        nodeid="tests/integration/test_pilot_configured_cognition_route.py::PilotConfiguredCognitionRouteTests::test_gorxu_plans_and_executes_existing_route_with_exact_observation",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",

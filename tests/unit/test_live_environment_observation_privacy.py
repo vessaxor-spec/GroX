@@ -27,6 +27,51 @@ class LiveEnvironmentObservationPrivacyTests(unittest.TestCase):
             },
         }
 
+    def test_configured_remote_observation_has_separate_strict_allowlist(self):
+        with tempfile.TemporaryDirectory() as td:
+            store = StateStore(Path(td) / "grox.sqlite3")
+            identity = {
+                "observation_id": "OBS-remote",
+                "selection_id": "SEL-remote",
+                "resource_id": "cognition:configured:openai:abc123",
+                "resource_kind": "configured_remote_cognition",
+                "provider_kind": "openai",
+                "model": "remote-model",
+                "endpoint": "https://api.openai.com/v1/responses",
+                "mission_id": "MSN-remote",
+                "order_id": "ORD-remote",
+                "placement": "mission_interpretation",
+                "response_id": "resp-remote",
+                "response_model": "remote-model",
+                "authority_changed": False,
+            }
+            try:
+                row_id = store.record_resource_observation(
+                    resource_id=identity["resource_id"],
+                    resource_kind="configured_remote_cognition",
+                    placement="mission_interpretation",
+                    identity=identity,
+                )
+                self.assertGreater(row_id, 0)
+                history = store.resource_observations(identity["resource_id"])
+                self.assertEqual(history[0]["identity"], identity)
+
+                with self.assertRaisesRegex(
+                    ValueError, "unsupported configured remote identity field"
+                ):
+                    store.record_resource_observation(
+                        resource_id=identity["resource_id"],
+                        resource_kind="configured_remote_cognition",
+                        placement="mission_interpretation",
+                        identity={
+                            **identity,
+                            "credential_alias": "must-not-enter-observation-ledger",
+                        },
+                    )
+                self.assertEqual(len(store.resource_observations(identity["resource_id"])), 1)
+            finally:
+                store.close()
+
     def test_nested_hardware_observation_is_field_allowlisted(self):
         with tempfile.TemporaryDirectory() as td:
             store = StateStore(Path(td) / "grox.sqlite3")

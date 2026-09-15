@@ -17,6 +17,11 @@ _RESOURCE_OBSERVATION_HARDWARE_FIELDS = frozenset({
     "system", "machine", "cpu_count", "total_memory_bytes", "accelerators",
     "python_implementation", "python_version",
 })
+_CONFIGURED_REMOTE_OBSERVATION_IDENTITY_FIELDS = frozenset({
+    "observation_id", "selection_id", "resource_id", "resource_kind",
+    "provider_kind", "model", "endpoint", "mission_id", "order_id", "placement",
+    "response_id", "response_model", "authority_changed",
+})
 
 
 def now() -> str:
@@ -162,12 +167,64 @@ class StateStore:
                 raise ValueError(f"{label} must be a non-empty string")
         if not isinstance(identity, dict) or not identity:
             raise ValueError("execution identity must be a non-empty mapping")
-        unsupported = sorted(set(identity) - _RESOURCE_OBSERVATION_IDENTITY_FIELDS)
-        if unsupported:
-            raise ValueError(f"unsupported execution identity field(s): {unsupported}")
         resource_id = resource_id.strip()
         resource_kind = resource_kind.strip()
         placement = placement.strip()
+
+        if resource_kind == "configured_remote_cognition":
+            unsupported = sorted(
+                set(identity) - _CONFIGURED_REMOTE_OBSERVATION_IDENTITY_FIELDS
+            )
+            if unsupported:
+                raise ValueError(
+                    f"unsupported configured remote identity field(s): {unsupported}"
+                )
+            for field in (
+                "observation_id",
+                "selection_id",
+                "resource_id",
+                "resource_kind",
+                "provider_kind",
+                "model",
+                "endpoint",
+                "mission_id",
+                "order_id",
+                "placement",
+            ):
+                value = identity.get(field)
+                if not isinstance(value, str) or not value.strip():
+                    raise ValueError(
+                        f"configured remote execution identity {field} must be a non-empty string"
+                    )
+            if identity.get("resource_id") != resource_id:
+                raise ValueError("configured remote resource identity mismatch")
+            if identity.get("resource_kind") != resource_kind:
+                raise ValueError("configured remote resource kind mismatch")
+            if identity.get("placement") != placement:
+                raise ValueError("configured remote placement identity mismatch")
+            if identity.get("provider_kind") != "openai":
+                raise ValueError("configured remote provider kind is unsupported")
+            if identity.get("authority_changed") is not False:
+                raise ValueError("resource observation cannot record an authority change")
+            for field in ("response_id", "response_model"):
+                value = identity.get(field)
+                if value is not None and (
+                    not isinstance(value, str) or not value.strip()
+                ):
+                    raise ValueError(
+                        f"configured remote execution identity {field} must be null or a non-empty string"
+                    )
+            encoded = json.dumps(identity, sort_keys=True)
+            cur = self.db.execute(
+                "INSERT INTO resource_observations(resource_id,resource_kind,placement,identity,created_at) VALUES(?,?,?,?,?)",
+                (resource_id, resource_kind, placement, encoded, now()),
+            )
+            self.db.commit()
+            return int(cur.lastrowid)
+
+        unsupported = sorted(set(identity) - _RESOURCE_OBSERVATION_IDENTITY_FIELDS)
+        if unsupported:
+            raise ValueError(f"unsupported execution identity field(s): {unsupported}")
         if identity.get("model_id") != resource_id:
             raise ValueError("model identity mismatch for resource observation")
         if identity.get("placement") != placement:
