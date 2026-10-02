@@ -138,6 +138,26 @@ The ClaudX review demonstrates that intake decisions are made per candidate seam
 | ClaudX synthetic 57.4% token-savings claim as GroX proof | REJECT | External synthetic measurement is not GroX qualification evidence; #30 must establish GroX evidence independently. |
 | Remove `orchestration-evaluation-analyst` because ClaudX removed a similar role | REJECT | GroX role decisions must use actual GroX authority and capability evidence. |
 
+## Worked application — Autolith review
+
+**User fork provenance:** `sylvesterroos/autolith@e5f6610b6a67b3f9b31285a06efd6e714db95810`  
+**Current upstream inspected:** `lambda-symbolics/autolith@ef110edc66e04cc7c263bba3c9ce66845dc0a692`  
+**License:** ISC
+
+Autolith is reviewed per seam. Its surrounding live self-modifying Lisp agent architecture is not imported into GroX.
+
+| Candidate seam | Decision | Rationale / next action |
+|---|---|---|
+| Content-addressed read-only context objects and bounded slice/search views | HARVEST | Useful containment primitive not previously canonical in GroX. Reimplemented natively under #211 / PR #212 with SHA-256 identity, metadata-only references, shared read budget, focused tests and mutation proof. |
+| Recursive inference shared call/token/depth budgets and typed returns | HARVEST / DEFER | Valuable long-context discipline, but recursive inference is not required for NCI-4A. Revisit only after the context-view substrate and typed Neural Crew decision contract qualify. |
+| Stable prefix versus volatile request-local context | HARVEST / PARTIALLY NATIVE | GroX already keeps stable OpenAI instructions/cache key separate from per-request Commander directive/roster input. Do not duplicate Autolith request assembly. |
+| Prompt-cache miss/stall telemetry | HARVEST | GroX already records cached-input tokens but does not yet emit explicit cache-health evidence. Follow-up #213. |
+| Crash-safe pending-input/steering vault | ADAPT | GroX Mission/state recovery is stronger, but current source lacks an equivalent pending Commander-input vault. Research/design follow-up #214; never auto-submit after recovery. |
+| Read-only conversation replay | HARVEST / DEFER | Useful forensic pattern, but GroX already has durable Mission/Order/evidence state. Revisit only for a concrete Commander-conversation recovery/debugging need. |
+| Live self-modifying image, private generations and self-redefinition | REJECT | Conflicts with protected-source/PR/CI/provenance authority and would introduce a second mutation path. |
+| Autolith child-agent/localgroup command model | REJECT | Duplicates Pilot GorXu, Mission Graph, Divisions/Crew, durable recovery and bounded replanning. |
+| Common Lisp runtime/image architecture | REJECT | Host/runtime-specific implementation detail with no demonstrated GroX need; importing it would add unjustified complexity and split the Vessel. |
+
 ## Completion criterion
 
 This convention is successful when it prevents circular or duplicative adoption while allowing useful external evidence to enter GroX through bounded, attributable, GroX-native evolution.
