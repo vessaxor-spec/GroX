@@ -68,6 +68,8 @@ Candidate contents:
 - eligible advisory decision vocabulary;
 - current evidence state.
 
+Large or expensive evidence may be represented through GroX-native content-addressed context references. A reference exposes only a stable label, SHA-256 identity, and size; exact raw material is returned only through bounded read-only slice/search views under a shared operation/character budget. This harvests the useful containment principle from Autolith's recursive-inference context objects without importing recursive agents, Lisp environments, provider recursion, or another command path.
+
 This may harvest the qualified HOT/WARM/COLD context principles but does not activate unrestricted automatic whole-Vessel compression.
 
 ### Experimental corpus gate

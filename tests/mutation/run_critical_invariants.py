@@ -376,6 +376,14 @@ SPECS: tuple[MutationSpec, ...] = (
         nodeid="tests/integration/test_pilot_configured_cognition_route.py::PilotConfiguredCognitionRouteTests::test_gorxu_plans_and_executes_existing_route_with_exact_observation",
     ),
     MutationSpec(
+        name="context-object-reference-no-raw-content",
+        invariant="Content-addressed context references must expose metadata identity rather than raw context.",
+        path="src/grox/context_objects.py",
+        old='            label=self.label,\n            sha256=self.sha256,\n',
+        new='            label=self._content,\n            sha256=self.sha256,\n',
+        nodeid="tests/unit/test_context_objects.py::ContentAddressedContextObjectTests::test_reference_is_deterministic_metadata_only",
+    ),
+    MutationSpec(
         name="ci-action-immutable-pin",
         invariant="Third-party GitHub Actions must remain pinned to immutable full commit SHAs.",
         path=".github/workflows/ci.yml",
