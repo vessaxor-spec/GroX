@@ -16,7 +16,7 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** canonical protected-main GroX CI **#666 / 37027147981 PASS** across Wheel bootstrap and Python **3.11–3.14** at `main@74c605202115d2094688cdc7492b74bc60edb888`; critical mutation matrix **43/43 KILLED**. Latest runtime cognition-route qualification remains PR #207 / `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`.
+**Latest implementation-bearing verified regression:** protected-main GroX CI **#666 / 37027147981 PASS** across Wheel bootstrap and Python **3.11–3.14** at `main@74c605202115d2094688cdc7492b74bc60edb888`; critical mutation matrix **43/43 KILLED**. Latest runtime cognition-route qualification remains PR #207 / `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`.
 **Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS PROGRAM 001 COMPLETE; NCI-4 PLANNING ACTIVE THROUGH NCI-4A CONTRACT/EVALUATION GATE. NCI-4 REMAINS UNQUALIFIED AND NO NEW MODEL IS TRAINED OR ACTIVATED.**
 **Next bounded implementation:** **Issue #209 — NCI-4A Neural Crew decision contract and evaluation gate. Define typed advisory output, experimental corpus admission/provenance, immutable gold holdout, trainer-independent evaluation, and parent/Trainer bake-off protocol before any Generation 1 training.**
 
