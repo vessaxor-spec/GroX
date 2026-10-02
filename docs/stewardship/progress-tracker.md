@@ -1,11 +1,12 @@
 # GroX Progress Tracker
 
-**Status date:** 2026-09-15
+**Status date:** 2026-10-02
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current verified canonical source after Pilot-owned configured cognition route integration:** `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`
-**Current verified canonical tree:** `5e52c3e9c9457308e88c02f79e44ddf320a8bc2f`
+**Current protected source before this NCI-4A planning-only change:** `main@95601e13153e851b933d41130b89a56ba1bedd6f`
+**Current protected tree:** `2c1d61dc975a8347af0ab171d698cfc627875499`
+**Latest runtime qualification baseline:** `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`, tree `5e52c3e9c9457308e88c02f79e44ddf320a8bc2f`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,9 +16,21 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** canonical post-merge GroX CI **#659 / 34952008554 PASS** across Wheel bootstrap and Python **3.11–3.14** at `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`; exact final PR #207 head `d410afd42eb0b396772154a55e00fe033d033e44` passed the same five-gate boundary with critical mutation matrix **42/42 KILLED**.
-**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS PROGRAM 001 COMPLETE AT ITS BOUNDED DOCTRINE EXIT WITH 29 QUALIFIED EXITS, INCLUDING CATALOG-WIDE ALIAS AVAILABILITY AND PILOT-OWNED CONFIGURED-COGNITION ROUTE PLANNING/EXECUTION.**
-**Next numbered strategic stage:** **NCI-4 — Neural Crew evolution — remains UNQUALIFIED and is not activated by this closeout. Any implementation must begin from current canonical evidence under a separate bounded decision/work item.**
+**Current verified regression:** canonical protected-main GroX CI **#661 / 37020960733 PASS** across Wheel bootstrap and Python **3.11–3.14** at `main@95601e13153e851b933d41130b89a56ba1bedd6f`; latest runtime qualification remains PR #207 / `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be` with critical mutation matrix **42/42 KILLED**.
+**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS PROGRAM 001 COMPLETE; NCI-4 PLANNING ACTIVE THROUGH NCI-4A CONTRACT/EVALUATION GATE. NCI-4 REMAINS UNQUALIFIED AND NO NEW MODEL IS TRAINED OR ACTIVATED.**
+**Next bounded implementation:** **Issue #209 — NCI-4A Neural Crew decision contract and evaluation gate. Define typed advisory output, experimental corpus admission/provenance, immutable gold holdout, trainer-independent evaluation, and parent/Trainer bake-off protocol before any Generation 1 training.**
+
+## NCI-4A planning activation — 2026-10-02
+
+**Status: PLANNING ACTIVE — NO MODEL TRAINING OR OPERATIONAL ACTIVATION.**
+
+- issue #209 opens the bounded NCI-4A decision-contract and evaluation gate;
+- NCI-4 now begins with a typed Crew advisory contract, experimental corpus admission/provenance rules, immutable gold holdout, and paired evaluation rather than by selecting a Trainer or immediately fine-tuning Qwen;
+- Soup, TRL, MLX-LM, Qwen3/Qwen3.5 and future alternatives remain replaceable capability candidates rather than GroX architecture;
+- Generation 1 training is explicitly deferred until NCI-4A qualifies;
+- deterministic Mission authority, Tool Gateway, verifier independence, the 82-Crew company, release posture, and the Commander → Pilot GorXu → Divisions → Standing Crew command spine are unchanged.
+
+Canonical plan: `docs/stewardship/NCI4_NEURAL_CREW_EVOLUTION_001.md`.
 
 ## Live Environment Awareness closeout — 2026-09-15
 
