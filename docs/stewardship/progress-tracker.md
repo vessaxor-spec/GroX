@@ -1,11 +1,11 @@
 # GroX Progress Tracker
 
-**Status date:** 2026-09-14
+**Status date:** 2026-09-15
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Latest qualified implementation baseline before this stewardship-only repair:** `main@873557f349dc9945236d701dad4d19ad1de07242`
-**Qualified implementation tree:** `59852d416bb4754dd11991934022afce7d469dbf`
+**Current verified canonical source after Pilot-owned configured cognition route integration:** `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`
+**Current verified canonical tree:** `5e52c3e9c9457308e88c02f79e44ddf320a8bc2f`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
 **First Apex-qualified release:** `v0.7.0@71ffd60769d81b5b249dac4eca56333ff27e26d0`
@@ -15,9 +15,28 @@
 **Prime function:** **Persistent AI personal assistant to the Commander; evolution is subordinate to improving that service**
 **Canonical command spine:** **Commander → Pilot GorXu → Divisions → Standing Crew**
 **Operational orchestrator:** **Pilot GorXu only**
-**Current verified regression:** canonical push GroX CI **#644 / 33969205594 PASS** across Wheel bootstrap and Python **3.11–3.14** at `main@873557f349dc9945236d701dad4d19ad1de07242`; exact final PR #202 head on the same canonical tree recorded Python 3.12 pytest **535 passed, 2 skipped, 522 subtests**, unittest **537**, critical mutation matrix **40/40 KILLED**, and Post-Apex evidence present.
-**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS IN PROGRESS WITH 27 BOUNDED EXITS QUALIFIED THROUGH EXPLICIT CONFIGURED-COGNITION AUTHORIZATION/ACTIVATION, AUTHENTICATED MODEL VISIBILITY, GOVERNED INVOCATION, MISSION FITNESS, SELECTION/OBSERVATION, TIMEOUT-ONLY FALLBACK, CURRENT-GATE ROUTING/FRESHNESS, EXACT-HISTORY PERFORMANCE/RANKING, BOUNDED MULTI-RESOURCE CATALOG DISCOVERY, AND CATALOG-WIDE CREDENTIAL BINDING.**
-**Next bounded implementation:** **Issue #203 — catalog-wide configured cognition credential-alias availability. Preserve exact resource/provider/model/endpoint/alias identity and declaration order; do not infer credential validity, authorization, readiness, fitness, selection, routing, cognition success, or authority from alias membership. Parent issue #115 remains open.**
+**Current verified regression:** canonical post-merge GroX CI **#659 / 34952008554 PASS** across Wheel bootstrap and Python **3.11–3.14** at `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`; exact final PR #207 head `d410afd42eb0b396772154a55e00fe033d033e44` passed the same five-gate boundary with critical mutation matrix **42/42 KILLED**.
+**Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS PROGRAM 001 COMPLETE AT ITS BOUNDED DOCTRINE EXIT WITH 29 QUALIFIED EXITS, INCLUDING CATALOG-WIDE ALIAS AVAILABILITY AND PILOT-OWNED CONFIGURED-COGNITION ROUTE PLANNING/EXECUTION.**
+**Next numbered strategic stage:** **NCI-4 — Neural Crew evolution — remains UNQUALIFIED and is not activated by this closeout. Any implementation must begin from current canonical evidence under a separate bounded decision/work item.**
+
+## Live Environment Awareness closeout — 2026-09-15
+
+**Status: COMPLETE — BOUNDED DOCTRINE EXIT SATISFIED; #115 READY FOR CLOSURE.**
+
+Closeout evidence:
+
+- issue #203 / PR #205 qualified the 28th bounded exit: catalog-wide configured cognition credential-alias availability, preserving exact catalog identity/order and exact secret-blind broker membership while keeping authorization/readiness/fitness/selection/routing/cognition/authority separate;
+- PR #205 merged as `main@0786a3cfc1ca79300a3770a8809b1fad0ca12194`; post-merge GroX CI #654 passed all five required jobs; the critical mutation matrix was **41/41 KILLED**;
+- issue #206 / PR #207 qualified the 29th bounded exit: Pilot GorXu now owns the integration path over the already-qualified configured cognition admission/readiness/ranking/selection/execution stack without duplicating those controls;
+- exact final PR #207 head `d410afd42eb0b396772154a55e00fe033d033e44` passed GroX CI #658 with critical mutation matrix **42/42 KILLED**;
+- PR #207 merged as `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`, tree `5e52c3e9c9457308e88c02f79e44ddf320a8bc2f`; post-merge GroX CI #659 passed all five required jobs;
+- GorXu can now use current exact authority/readiness/fitness evidence to plan and execute a finite configured-cognition route, preserve timeout-only fallback, persist exact privacy-bounded observed execution identity, and retain that identity as historical continuity evidence without treating it as current readiness;
+- discovery/catalog state still cannot create Mission authority, readiness, fitness, selection, or activation;
+- arbitrary ambient scanning, unrestricted provider expansion, unrestricted desktop actuation, and automatic NCI-4/release/Apex advancement remain outside the qualified boundary.
+
+This satisfies the Live Environment Awareness doctrine's bounded operating success condition: GorXu can know supported execution resources, distinguish permission and fitness, select deliberately, execute through bounded authority, record what actually ran, and preserve continuity without turning discovery into authority.
+
+No release, package version, NCI-4 qualification, Apex stage, or Commander-authority change is implied.
 
 ## Stewardship recalibration — 2026-09-14
 

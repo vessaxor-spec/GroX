@@ -1,10 +1,29 @@
 # GroX Roadmap Doctrine 001 — Live Environment Awareness
 
-**Status:** ROADMAP-BOUND / IMPLEMENTATION IN PROGRESS / LOCAL-RUNTIME + GOVERNED TOOL GATEWAY + BOUND HOSTED COGNITION + BOUND REMOTE TRANSPORT FRESHNESS + BOUND REMOTE ENDPOINT-SURFACE FRESHNESS + SUPPORTED CONFIGURED COGNITION DISCOVERY + CONFIGURED REMOTE CONNECTION POLICY AWARENESS + CONFIGURED LOCAL LLAMA.CPP READINESS + GOVERNED SECRET-ALIAS AVAILABILITY + CONFIGURED CREDENTIAL-ALIAS BINDING + CONFIGURED CREDENTIAL-ALIAS AVAILABILITY EXITS QUALIFIED
+**Status:** COMPLETE / BOUNDED DOCTRINE EXIT QUALIFIED / 29 EVIDENCE-BACKED EXITS
 
-**Placement:** NCI-3 is qualified. Live Environment Awareness is the Commander-designated immediate bounded workstream before the next numbered Native Cognition Independence stage, unless later repository evidence supports replanning.
+**Placement:** NCI-3 is qualified. Live Environment Awareness Program 001 is complete. NCI-4 is next in Native Cognition Independence numbering but remains unqualified and requires its own bounded implementation/qualification decision.
 
 **Command invariant:** Commander → Pilot GorXu → Divisions → Standing Crew
+
+## Completion record — 2026-09-15
+
+The bounded doctrine exit is satisfied after 29 qualified implementation exits.
+
+The final two exits close the remaining operational integration gap:
+
+- **#203 / PR #205 — catalog-wide configured cognition credential-alias availability:** preserves exact multi-resource declaration order and resource/provider/model/endpoint/alias identity; checks only exact bound alias membership in the injected memory-only SecretBroker; retains unbound remote entries and local not-applicable entries; fails closed on malformed/ambiguous catalog state; performs no secret materialization, credential validation, network/provider/cognition activity, or state promotion.
+- **#206 / PR #207 — Pilot-owned configured cognition route integration:** Pilot GorXu owns the entrypoints over the existing qualified route-admission, readiness, exact-history ranking, selection, invocation, timeout-only fallback, and per-attempt freshness gates. The Pilot does not duplicate or bypass those components. Actual remote execution identity is persisted through a dedicated privacy-bounded `configured_remote_cognition` observation schema, while historical observation remains explicitly non-authoritative for current readiness.
+
+Qualification evidence:
+
+- PR #205 exact final head `c4d35d544c09cddda51af6ce696e074ea5e99f14`: GroX CI #653 PASS; critical mutations **41/41 KILLED**; merged as `main@0786a3cfc1ca79300a3770a8809b1fad0ca12194`; post-merge CI #654 PASS.
+- PR #207 preserved two useful red states: CI #655 proved the Pilot integration was absent; CI #656 exposed that the existing local-only observation ledger rejected configured remote execution identity. The repair introduced a resource-kind-specific remote allowlist without weakening the existing local observation schema.
+- PR #207 exact final head `d410afd42eb0b396772154a55e00fe033d033e44`: GroX CI #658 PASS; critical mutations **42/42 KILLED**; merged as `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`, tree `5e52c3e9c9457308e88c02f79e44ddf320a8bc2f`; post-merge CI #659 PASS.
+
+The success condition is therefore met for the supported bounded resource classes: GorXu can know what exists, preserve exact permission/readiness/fitness distinctions, select deliberately, execute through existing authority gates, record what actually ran, and preserve historical continuity while re-discovering volatile readiness after change or reconstitution.
+
+Completion does **not** claim maximum environment enumeration. Arbitrary ambient process/application scanning, arbitrary provider-family discovery, unrestricted external-system access, unrestricted desktop actuation, self-installation, self-activation, or any automatic NCI-4/release/Apex advancement remain outside this doctrine exit.
 
 ## Doctrine
 
