@@ -4,8 +4,8 @@
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
-**Current protected source before this NCI-4A planning-only change:** `main@95601e13153e851b933d41130b89a56ba1bedd6f`
-**Current protected tree:** `2c1d61dc975a8347af0ab171d698cfc627875499`
+**NCI-4A planning baseline source:** `main@95601e13153e851b933d41130b89a56ba1bedd6f`
+**NCI-4A planning baseline tree:** `2c1d61dc975a8347af0ab171d698cfc627875499`
 **Latest runtime qualification baseline:** `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`, tree `5e52c3e9c9457308e88c02f79e44ddf320a8bc2f`
 **Current source package:** `0.8.0`
 **Current released source:** `v0.8.0@27da3cbbe60fb53e88af325baeb3fbb3b4adbfeb`
@@ -34,7 +34,7 @@ Canonical plan: `docs/stewardship/NCI4_NEURAL_CREW_EVOLUTION_001.md`.
 
 ## Live Environment Awareness closeout — 2026-09-15
 
-**Status: COMPLETE — BOUNDED DOCTRINE EXIT SATISFIED; #115 READY FOR CLOSURE.**
+**Status: COMPLETE — BOUNDED DOCTRINE EXIT SATISFIED; #115 CLOSED.**
 
 Closeout evidence:
 
