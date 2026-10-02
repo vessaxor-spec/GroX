@@ -468,47 +468,28 @@ Exit evidence: offline, the Commander can converse with GorXu, state an objectiv
 
 NCI-3 does not qualify every personal-assistant/tool surface for offline use, a public one-command installer or desktop launcher, NCI-4 neural Crew evolution, model self-activation, a new release/tag, or A8.
 
-#### NCI-4 — Neural Crew evolution
+#### NCI-4 — Neural Crew evolution — PLANNING ACTIVE / UNQUALIFIED
 
-Evolve the local Crew policy beyond the 75-parameter seed toward richer Mission-state cognition: action selection, path choice, evidence sufficiency, test interpretation, confidence, stop/continue decisions, and failure triage.
+Canonical plan: [`NCI4_NEURAL_CREW_EVOLUTION_001.md`](NCI4_NEURAL_CREW_EVOLUTION_001.md)  
+Current bounded work: **issue #209 — NCI-4A Neural Crew decision contract and evaluation gate**.
 
-##### Candidate training capability — Soup evaluation track
+Evolve the existing qualified local Crew cognition seam beyond the 75-parameter action-selection policy toward richer Mission-state judgment while keeping deterministic GroX controls authoritative.
 
-Evaluate [`MakazhanAlpamys/Soup`](https://github.com/MakazhanAlpamys/Soup) as a **bounded training/post-training capability** for NCI-4 rather than a GroX command layer or runtime dependency. The current upstream surface is materially aligned with this stage: Qwen 3 support, LoRA/QLoRA and SFT, preference/post-training methods, continual-learning rehearsal, evaluation, model merge/export, and low-VRAM layer streaming. Listing it here is an evaluation decision only; Soup is not adopted, qualified, bundled, or required until GroX-specific evidence proves the fit.
+The 2026 recalibrated sequence is:
 
-Proposed training boundary:
+1. **NCI-4A — decision contract + evaluation gate:** typed advisory output; bounded Mission Decision Packet; experimental corpus admission/provenance; immutable gold holdout; paired parent/candidate evaluation; permanent authority-boundary invariants. **No training required.**
+2. **NCI-4B — parent + Trainer bake-off:** continuity Qwen3-4B baseline versus current small-model challengers such as Qwen3.5-4B / Qwen3.5-2B, using isolated replaceable Trainer lanes such as Soup, Hugging Face TRL and optional supported MLX-LM paths.
+3. **NCI-4C — Generation 1:** begin with LoRA/QLoRA + SFT; use DPO only when legitimate preference pairs exist and GRPO only when GroX owns deterministic/verifiable reward functions.
+4. **NCI-4D — shadow qualification:** candidate sees bounded live Mission state and records what it would recommend with zero operational effect.
+5. **NCI-4E — bounded live Inspect qualification:** only after shadow PASS, one or a very small cohort of Inspect Crew may consume neural recommendations through existing deterministic validation and Tool Gateway authority.
 
-1. **Train from a trainable parent, not the inference GGUF.** Use an explicitly selected upstream/Hugging Face Qwen3-4B checkpoint (or another separately approved trainable parent) as the training input. The NCI-2/NCI-3 `Q4_K_M` GGUF remains an inference artifact and is not treated as directly trainable weights.
-2. **Keep the Trainer isolated.** Soup currently supports Python `>=3.10,<3.13`, while GroX protects its own Python 3.11-3.14 CI/runtime compatibility. Run Soup in a bounded trainer environment rather than adding it to GroX's core dependency/runtime surface.
-3. **GroX owns the cognition lifecycle.** GorXu/GroX define the learning objective, admit datasets, preserve provenance, authorize training, define evaluation and regression gates, record lineage, qualify candidates, and control activation. Soup performs bounded training/post-training only and receives no orchestration or command authority.
-4. **Preserve a governed candidate pipeline.** Verified/admitted corpus → trainable parent checkpoint → Soup fine-tune/post-train → GroX evaluation/regression gates → merge where required → approved runtime export such as GGUF → GroX model registry → qualification → separately governed activation.
-5. **Make every generation reproducible and attributable.** Preserve parent/candidate artifacts, training configuration, seeds, trainer/runtime versions, dataset/provenance digests, model digests, evaluation evidence, resource profile, and rejected descendants.
-6. **Remain trainer-portable.** A Soup-backed implementation must fail closed and remain replaceable. GroX may own its cognition lifecycle while reusing third-party numerical/training machinery; the machinery does not become architectural authority.
+Neural Crew output remains advisory. It cannot create/seal Orders, set risk, grant capabilities, change Inspect/Repair/Execute/Verify authority, choose arbitrary tools, bypass verifier independence, widen scope, self-promote, self-activate, or become another orchestrator.
 
-Initial Soup qualification should prove, before any NCI-4 capability claim:
+The first-generation model/Trainer selection is deliberately **not fixed**. Soup remains a candidate bounded Trainer, not a runtime dependency or command layer. Current upstream evidence keeps it isolated because Soup 0.75.0 supports Python `>=3.10,<3.13`, while GroX protects Python 3.11–3.14. TRL is the reference alternate post-training lane; MLX-LM is an optional Apple-Silicon lane only where actual selected-model support is proven.
 
-- reproducible Qwen3-4B fine-tuning or post-training on a bounded GroX-relevant dataset;
-- measurable held-out improvement on Mission-state/Crew cognition relevant to the target generation;
-- no material regression in Commander alignment, authority compliance, GorXu orchestration/delegation quality, evidence/stop behavior, safety, general assistant usefulness, reliability, latency, and maintainability;
-- export into a format accepted by the existing GroX local model/runtime path with identity and provenance preserved;
-- parent-versus-candidate comparison, preserved red evidence, and appropriately independent verification;
-- no automatic registration, selection, promotion, or activation merely because training succeeds.
+Each generation must preserve parent/candidate artifacts, training configuration, seeds, Trainer/runtime versions, corpus/provenance digests, model digests, paired evaluation evidence, resource profile and rejected descendants.
 
-**Roadmap status:** Soup is a **candidate Trainer capability for NCI-4**. Qualification is pending and must precede adoption.
-
-Each generation records:
-
-- parent generation;
-- architecture and parameter count;
-- training corpus and provenance digest;
-- training configuration;
-- pre/post model digests;
-- benchmark results;
-- regressions;
-- accepted/rejected disposition;
-- qualification status.
-
-Larger is not automatically better. A descendant that regresses on safety, authority compliance, personal-assistant usefulness, orchestration/delegation quality, generalization, cost, reliability, latency, or maintainability is rejected even if another metric improves.
+Larger/newer is not automatically better. A descendant is rejected for any authority, safety, verifier-independence, Commander-alignment, personal-assistant usefulness, orchestration, generalization, cost, latency, reliability, recovery or maintainability regression that violates the applicable gate.
 
 #### NCI-5 — Mission learning corpus and evolution registry
 
@@ -605,7 +586,7 @@ This roadmap does not claim:
 
 There is no predeclared A8. **Post-Apex Operational Evolution Program 001 is complete and canonical.** `v0.8.0` is published from the verified Program 001 baseline. Later protected-main hardening and evolution—including Mission Outcome Truthfulness, Selective Deep-Craft Crew Cognition, the live local neural Crew qualification, qualified NCI-1 local runtime/install/model foundations, qualified NCI-2 built-in local seed cognition, and qualified NCI-3 offline GorXu conversational cognition—remain source evolution beyond the immutable release and do not themselves create a new Apex stage or release.
 
-The current strategic program is **Native Cognition Independence Program 001 — implementation in progress**. **NCI-1, NCI-2, and NCI-3 are qualified. Live Environment Awareness Program 001 is COMPLETE at its bounded doctrine exit after 29 qualified exits.** The final two exits qualify catalog-wide configured credential-alias availability (#203/#205) and Pilot-owned configured-cognition route planning/execution (#206/#207) using the already-qualified authorization/readiness/fitness/selection/fallback stack. GorXu now owns the bounded operational integration path and persists exact privacy-minimized observed execution identity while preserving current-readiness rediscovery and discovery/authorization/readiness/qualification/selection/observation separation. **NCI-4 — Neural Crew evolution — is the next numbered Native Cognition Independence stage, but remains unqualified and is not activated by this closeout.** No roadmap item inherits qualification merely because it is listed here. The Prime Function and orchestration doctrine constrain every stage: evolution must improve or preserve GroX as the Commander's AI personal assistant, keep GorXu at the helm above Divisions/Crew, and cannot create independent purpose.
+The current strategic program is **Native Cognition Independence Program 001 — implementation in progress**. **NCI-1, NCI-2, and NCI-3 are qualified. Live Environment Awareness Program 001 is COMPLETE at its bounded doctrine exit after 29 qualified exits. NCI-4 planning is now active through issue #209 / NCI-4A, while NCI-4 itself remains unqualified and no richer neural Crew model is trained or activated.** NCI-4A establishes the typed advisory decision contract, bounded context packet, experimental corpus admission/provenance, immutable holdout and trainer-independent evaluation gate before any model training. No roadmap item inherits qualification merely because it is listed here. The Prime Function and orchestration doctrine constrain every stage: evolution must improve or preserve GroX as the Commander's AI personal assistant, keep GorXu at the helm above Divisions/Crew, and cannot create independent purpose.
 
 Other known deliberate limits remain candidates, not automatic commitments: autonomous memory consolidation, generic external-system compensation, unrestricted interactive desktop actuation, broader/networked MCP, and optional external-agent interoperability.
 
