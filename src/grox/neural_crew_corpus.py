@@ -246,8 +246,16 @@ class NeuralCrewCorpus:
             or manifest["schema"] != GENERATION_SCHEMA
             or manifest["generation_id"] != generation_id
             or type(manifest["cases"]) is not list
+            or not 2 <= len(manifest["cases"]) <= _MAX_CASES
         ):
             raise NeuralCrewCorpusError("generation schema/identity mismatch")
+        # A pinned manifest proves historical bytes, not that its source remains
+        # present at this checkout revision. Recheck source provenance on *every*
+        # read so trainer/evaluator access cannot silently accept stale sources.
+        for case in manifest["cases"]:
+            if not isinstance(case, dict) or not isinstance(case.get("provenance"), dict):
+                raise NeuralCrewCorpusError("generation case provenance is malformed")
+            self._verify_source(case["provenance"])
         return manifest
 
     def training_cases(self, generation_id: str, *, expected_digest: str) -> list[dict[str, Any]]:
