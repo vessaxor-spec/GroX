@@ -1,6 +1,6 @@
 # GroX Progress Tracker
 
-**Status date:** 2026-10-02
+**Status date:** 2026-11-07
 **Canonical release:** `v0.8.0`
 **Release status:** PUBLISHED — LATEST
 **Canonical source branch:** `main`
@@ -19,6 +19,29 @@
 **Latest implementation-bearing verified regression:** protected-main GroX CI **#666 / 37027147981 PASS** across Wheel bootstrap and Python **3.11–3.14** at `main@74c605202115d2094688cdc7492b74bc60edb888`; critical mutation matrix **43/43 KILLED**. Latest runtime cognition-route qualification remains PR #207 / `main@9fdfd9ff02a4c133c8e05475627867974b0aa4be`.
 **Current strategic program:** **Native Cognition Independence Program 001 — IMPLEMENTATION IN PROGRESS; NCI-1 + NCI-2 + NCI-3 QUALIFIED; LIVE ENVIRONMENT AWARENESS PROGRAM 001 COMPLETE; NCI-4 PLANNING ACTIVE THROUGH NCI-4A CONTRACT/EVALUATION GATE. NCI-4 REMAINS UNQUALIFIED AND NO NEW MODEL IS TRAINED OR ACTIVATED.**
 **Next bounded implementation:** **Issue #209 — NCI-4A Neural Crew decision contract and evaluation gate. Define typed advisory output, experimental corpus admission/provenance, immutable gold holdout, trainer-independent evaluation, and parent/Trainer bake-off protocol before any Generation 1 training.**
+
+## NCI-4A contract and corpus qualification candidate — 2026-11-07
+
+**Status: IMPLEMENTED ON REVIEW BRANCH, NOT MERGED, NOT NCI-4A QUALIFIED.**
+
+- Issue #209 / draft PR #217 carry a strict advisory-only Neural Crew decision
+  contract and synthetic-only, source-SHA-verified corpus admission.
+- In the existing private SQLite state plane, NCI-4A generations are write-once
+  and carry an independently required manifest commitment; only `train` entries
+  are returned by the trainer-facing export.
+- Versioned synthetic Generation 1 contains 12 fabricated cases, partitioned
+  six training/six gold, with an exact SHA-256 pin
+  `4888ea9aa30af61937f528cda134adb9d469b2676b1edc6bd83c071ccb6b72a5`.
+- Private Commander conversations and Mission trajectories cannot enter this
+  limited admission path. No provider/model or operational route is activated.
+- Four new permanent critical mutations cover advisory field rejection,
+  prohibited provenance, gold leakage, and external commitment pinning.
+- Normative specification: `docs/specification/NEURAL_CREW_ADVICE.md`,
+  `docs/specification/NEURAL_CREW_CORPUS.md`.
+- Independent review packet: `docs/stewardship/NCI4A_CONTRACT_CORPUS_REVIEW_001.md`.
+- Final exact-head CI, independent PR review, and post-merge CI remain release
+  gates. No claim of full NCI-4A qualification is made. The paired tiny-policy
+  versus untrained-language-parent evaluator is still outstanding.
 
 ## Autolith bounded-context harvest — 2026-10-02
 
