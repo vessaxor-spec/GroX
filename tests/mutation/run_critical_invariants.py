@@ -48,6 +48,14 @@ class MutationResult:
 
 SPECS: tuple[MutationSpec, ...] = (
     MutationSpec(
+        name="nci4a-source-freshness-on-read",
+        invariant="Every training/gold read revalidates source provenance against the checked-out source bytes.",
+        path="src/grox/neural_crew_corpus.py",
+        old='            self._verify_source(case["provenance"])\\n',
+        new='            pass  # source recheck removed\\n',
+        nodeid="tests/unit/test_neural_crew_corpus.py::NeuralCrewCorpusTests::test_pinned_generation_rechecks_source_at_each_training_and_gold_read",
+    ),
+    MutationSpec(
         name="nci4a-private-source-admission-denied",
         invariant="NCI-4A corpus must not admit Commander chats, private Mission traces, or external/unverified sources.",
         path="src/grox/neural_crew_corpus.py",
