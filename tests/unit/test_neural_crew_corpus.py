@@ -138,7 +138,7 @@ class NeuralCrewCorpusTests(unittest.TestCase):
     def test_pinned_generation_rechecks_source_at_each_training_and_gold_read(self):
         digest = self.seal()
         source = self.root / "tests" / "unit" / "source_case.py"
-        source.write_text("x = 2\\n", encoding="utf-8")
+        source.write_text("x = 2\n", encoding="utf-8")
         for load in (
             self.corpus.training_cases,
             self.corpus.gold_cases_for_evaluation,
@@ -147,7 +147,7 @@ class NeuralCrewCorpusTests(unittest.TestCase):
             with self.subTest(load=load.__name__):
                 with self.assertRaisesRegex(NeuralCrewCorpusError, "source SHA-256"):
                     load("generation-001", expected_digest=digest)
-        source.write_text("x = 1\\n", encoding="utf-8")
+        source.write_text("x = 1\n", encoding="utf-8")
         self.assertEqual(len(self.corpus.training_cases("generation-001", expected_digest=digest)), 1)
         source.unlink()
         with self.assertRaisesRegex(NeuralCrewCorpusError, "source file is not available"):
