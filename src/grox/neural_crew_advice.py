@@ -48,20 +48,20 @@ class NeuralCrewAdvice:
     requested_evidence: tuple[str, ...]
 
     def __post_init__(self) -> None:
-        if self.recommended_action not in ACTIONS:
+        if type(self.recommended_action) is not str or self.recommended_action not in ACTIONS:
             raise NeuralCrewAdviceError("unsupported advisory action")
         if type(self.evidence_sufficient) is not bool:
             raise NeuralCrewAdviceError("evidence_sufficient must be boolean")
-        if self.test_interpretation not in TEST_INTERPRETATIONS:
+        if type(self.test_interpretation) is not str or self.test_interpretation not in TEST_INTERPRETATIONS:
             raise NeuralCrewAdviceError("unsupported test interpretation")
-        if self.continue_or_stop not in DECISIONS:
+        if type(self.continue_or_stop) is not str or self.continue_or_stop not in DECISIONS:
             raise NeuralCrewAdviceError("unsupported continue_or_stop decision")
-        if self.failure_classification not in FAILURE_CLASSES:
+        if type(self.failure_classification) is not str or self.failure_classification not in FAILURE_CLASSES:
             raise NeuralCrewAdviceError("unsupported failure classification")
         if (
             type(self.confidence) not in (int, float)
-            or not math.isfinite(self.confidence)
             or not 0 <= self.confidence <= 1
+            or not math.isfinite(self.confidence)
         ):
             raise NeuralCrewAdviceError("confidence must be a finite number in [0, 1]")
         if (
