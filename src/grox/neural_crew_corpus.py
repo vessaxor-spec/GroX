@@ -124,7 +124,10 @@ class NeuralCrewCorpus:
             raise NeuralCrewCorpusError("provenance source digest must be SHA-256")
         if provenance["rights"] != "grox-owned" or provenance["privacy_class"] != "synthetic":
             raise NeuralCrewCorpusError("only GroX-owned synthetic evidence is admitted")
-        source = (self.source_root / path).resolve(strict=True)
+        try:
+            source = (self.source_root / path).resolve(strict=True)
+        except (OSError, RuntimeError) as exc:
+            raise NeuralCrewCorpusError("provenance source file is not available") from exc
         if not source.is_relative_to(self.source_root) or not source.is_file():
             raise NeuralCrewCorpusError("provenance file leaves the declared source checkout")
         if _sha256(source.read_bytes()) != digest:
@@ -153,7 +156,7 @@ class NeuralCrewCorpus:
         count = features["observation_count"]
         if type(count) is not int or not 0 <= count <= 8:
             raise NeuralCrewCorpusError("observation_count is outside the bounded range")
-        if features["test_status"] not in {"not_run", "pass", "fail", "inconclusive"}:
+        if type(features["test_status"]) is not str or features["test_status"] not in {"not_run", "pass", "fail", "inconclusive"}:
             raise NeuralCrewCorpusError("invalid test_status")
         if features["policy_denied"] and features["evidence_sufficient"]:
             raise NeuralCrewCorpusError("policy denial cannot mark evidence sufficient")
