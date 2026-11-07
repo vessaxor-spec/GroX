@@ -88,7 +88,8 @@ class NeuralCrewCorpusTests(unittest.TestCase):
         self.assertEqual([case["case_id"] for case in training], ["case-train"])
         self.assertEqual([case["case_id"] for case in gold], ["case-gold"])
         self.assertNotIn("case-gold", json.dumps(training))
-        self.assertNotIn("policy_denied", json.dumps(training))
+        self.assertFalse(any(case["features"]["policy_denied"] for case in training))
+        self.assertNotIn('"failure_classification": "policy_denied"', json.dumps(training))
         self.assertEqual(gold[0]["expected"]["recommended_action"], "stop")
         self.assertEqual(training[0]["expected"]["recommended_action"], "suggest_test_run")
 
