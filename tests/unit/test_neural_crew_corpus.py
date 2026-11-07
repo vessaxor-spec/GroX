@@ -197,6 +197,32 @@ class NeuralCrewCorpusTests(unittest.TestCase):
                 with self.assertRaises(NeuralCrewCorpusError):
                     self.corpus.seal_generation("attempt", cases)
 
+    def test_frozen_synthetic_generation_is_pinned_and_gold_isolated(self):
+        from tests.fixtures.nci4a_synthetic_seed import GENERATION_ID, synthetic_g1_cases
+
+        cases = synthetic_g1_cases()
+        self.assertEqual(len(cases), 12)
+        self.assertEqual(sum(case["split"] == "train" for case in cases), 6)
+        self.assertEqual(sum(case["split"] == "gold" for case in cases), 6)
+        # The origin file lives in the actual checkout, not this temporary test root.
+        from pathlib import Path
+        import shutil
+        origin = Path(__file__).resolve().parents[1] / "fixtures" / "nci4a_synthetic_seed.py"
+        dest = self.root / "tests" / "fixtures" / "nci4a_synthetic_seed.py"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(origin, dest)
+        digest = self.corpus.seal_generation(GENERATION_ID, cases)
+        pin = origin.with_suffix(".sha256")
+        self.assertTrue(pin.exists(), f"Independent fixed-generation pin missing: {digest}")
+        self.assertEqual(pin.read_text(encoding="utf-8").strip(), digest)
+        training = self.corpus.training_cases(GENERATION_ID, expected_digest=digest)
+        gold = self.corpus.gold_cases_for_evaluation(GENERATION_ID, expected_digest=digest)
+        self.assertEqual(len(training), 6)
+        self.assertEqual(len(gold), 6)
+        self.assertTrue(all(row["case_id"].startswith("g1-trn-") for row in training))
+        self.assertTrue(all(row["case_id"].startswith("g1-gld-") for row in gold))
+        self.assertFalse(any("g1-gld-" in json.dumps(row) for row in training))
+
     def test_generation_rejects_duplicates_missing_split_and_unbounded_size(self):
         cases = self.pair()
         cases[1]["case_id"] = "case-gold"
