@@ -48,6 +48,14 @@ class MutationResult:
 
 SPECS: tuple[MutationSpec, ...] = (
     MutationSpec(
+        name="neural-crew-advice-unknown-fields-denied",
+        invariant="Neural Crew advisory output may never import authority, activation, or tool parameters.",
+        path="src/grox/neural_crew_advice.py",
+        old="        if raw.keys() != FIELDS:\n",
+        new="        if False and raw.keys() != FIELDS:\n",
+        nodeid="tests/unit/test_neural_crew_advice.py::NeuralCrewAdviceContractTests::test_deny_unknown_authority_bearing_or_ambiguous_fields",
+    ),
+    MutationSpec(
         name="source-state-binding",
         invariant="Snapshot restore must enforce source compatibility unless ancestor allowance is explicit.",
         path="src/grox/persistence.py",
