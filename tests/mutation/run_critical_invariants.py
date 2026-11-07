@@ -48,6 +48,30 @@ class MutationResult:
 
 SPECS: tuple[MutationSpec, ...] = (
     MutationSpec(
+        name="nci4a-private-source-admission-denied",
+        invariant="NCI-4A corpus must not admit Commander chats, private Mission traces, or external/unverified sources.",
+        path="src/grox/neural_crew_corpus.py",
+        old="        if type(kind) is not str or kind not in _SOURCE_KINDS:\n",
+        new="        if False and (type(kind) is not str or kind not in _SOURCE_KINDS):\n",
+        nodeid="tests/unit/test_neural_crew_corpus.py::NeuralCrewCorpusTests::test_implicit_private_or_unverified_sources_are_denied",
+    ),
+    MutationSpec(
+        name="nci4a-gold-holdout-never-exported-for-training",
+        invariant="Training export must exclude gold cases and expected holdout decisions.",
+        path="src/grox/neural_crew_corpus.py",
+        old='        return [case for case in manifest["cases"] if case["split"] == "train"]\n',
+        new='        return list(manifest["cases"])\n',
+        nodeid="tests/unit/test_neural_crew_corpus.py::NeuralCrewCorpusTests::test_gold_cannot_leak_into_trainer_facing_export",
+    ),
+    MutationSpec(
+        name="nci4a-external-generation-pin-required",
+        invariant="The generation must fail if stored contents do not match the independently pinned digest.",
+        path="src/grox/neural_crew_corpus.py",
+        old="        if stored_digest != expected_digest or _sha256(encoded) != expected_digest:\n",
+        new="        if False and (stored_digest != expected_digest or _sha256(encoded) != expected_digest):\n",
+        nodeid="tests/unit/test_neural_crew_corpus.py::NeuralCrewCorpusTests::test_wrong_pin_and_missing_generation_refuse_load",
+    ),
+    MutationSpec(
         name="neural-crew-advice-unknown-fields-denied",
         invariant="Neural Crew advisory output may never import authority, activation, or tool parameters.",
         path="src/grox/neural_crew_advice.py",
