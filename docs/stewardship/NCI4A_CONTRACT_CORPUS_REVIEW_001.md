@@ -52,6 +52,8 @@ the train export only.
   - `nci4a-private-source-admission-denied`
   - `nci4a-gold-holdout-never-exported-for-training`
   - `nci4a-external-generation-pin-required`
+  - `nci4a-source-freshness-on-read`
+  - `nci4a-sealed-generation-replace-denied`
 - Independent CI execution: GroX Wheel bootstrap, Python 3.11–3.14,
   Post-Apex integration, and permanent mutation matrix.
 - Deliberate pre-pin red result in CI #679 documented the exact seed
