@@ -114,6 +114,40 @@ class NeuralCrewCorpusTests(unittest.TestCase):
                 self.db.rollback()
         self.assertEqual(self.corpus.read_generation("generation-001", expected_digest=digest)["generation_id"], "generation-001")
 
+    def test_replace_cannot_overwrite_sealed_generation_with_recursive_triggers_off(self):
+        digest = self.seal()
+        original = self.db.execute(
+            "SELECT manifest_json, manifest_sha256 FROM nci4a_corpus_generations WHERE generation_id=?",
+            ("generation-001",),
+        ).fetchone()
+        previous_setting = self.db.execute("PRAGMA recursive_triggers").fetchone()[0]
+        self.db.execute("PRAGMA recursive_triggers=OFF")
+        try:
+            for command in ("INSERT OR REPLACE", "REPLACE"):
+                with self.subTest(command=command):
+                    try:
+                        with self.assertRaisesRegex(sqlite3.DatabaseError, "write-once"):
+                            self.db.execute(
+                                f"{command} INTO nci4a_corpus_generations "
+                                "(generation_id, manifest_json, manifest_sha256) VALUES (?,?,?)",
+                                ("generation-001", '{"schema":"forged"}', "0" * 64),
+                            )
+                    finally:
+                        self.db.rollback()
+                    self.assertEqual(
+                        self.db.execute(
+                            "SELECT manifest_json, manifest_sha256 FROM nci4a_corpus_generations WHERE generation_id=?",
+                            ("generation-001",),
+                        ).fetchone(),
+                        original,
+                    )
+            self.assertEqual(
+                self.corpus.read_generation("generation-001", expected_digest=digest)["generation_id"],
+                "generation-001",
+            )
+        finally:
+            self.db.execute(f"PRAGMA recursive_triggers={previous_setting}")
+
     def test_external_pin_detects_tamper_even_if_database_owner_disables_triggers(self):
         digest = self.seal()
         self.db.execute("DROP TRIGGER nci4a_generations_no_update")
