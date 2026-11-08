@@ -48,6 +48,14 @@ class MutationResult:
 
 SPECS: tuple[MutationSpec, ...] = (
     MutationSpec(
+        name="nci4a-sealed-generation-replace-denied",
+        invariant="A sealed generation cannot be overwritten by SQLite REPLACE with recursive triggers disabled.",
+        path="src/grox/neural_crew_corpus.py",
+        old="                   WHERE generation_id = NEW.generation_id\n",
+        new="                   WHERE generation_id = NEW.generation_id AND 0\n",
+        nodeid="tests/unit/test_neural_crew_corpus.py::NeuralCrewCorpusTests::test_replace_cannot_overwrite_sealed_generation_with_recursive_triggers_off",
+    ),
+    MutationSpec(
         name="nci4a-source-freshness-on-read",
         invariant="Every training/gold read revalidates source provenance against the checked-out source bytes.",
         path="src/grox/neural_crew_corpus.py",
