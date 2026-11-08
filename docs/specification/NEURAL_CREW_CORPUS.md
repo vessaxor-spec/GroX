@@ -60,8 +60,10 @@ unique cases, with both a train and a gold partition.
 
 - SHA-256 commits to the canonical, complete manifest, including exact case
   contents, provenance, expected labels, and split membership.
-- The database enforces write-once generation identity; `UPDATE` and
-  `DELETE` trigger failures, and conflicting resealing fails closed.
+- The database enforces write-once generation identity: `UPDATE` and
+  `DELETE` are denied, and a duplicate-ID `BEFORE INSERT` guard also rejects
+  `INSERT OR REPLACE` / `REPLACE INTO` even with recursive triggers disabled.
+  Conflicting resealing fails closed.
 - **Every read requires `expected_digest` obtained from a separately
   retained trusted record or reviewed source revision.** An owner who
   deliberately alters SQLite and its triggers cannot bypass this independent
