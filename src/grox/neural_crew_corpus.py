@@ -102,6 +102,15 @@ class NeuralCrewCorpus:
             )"""
         )
         self.db.execute(
+            """CREATE TRIGGER IF NOT EXISTS nci4a_generations_no_replace
+               BEFORE INSERT ON nci4a_corpus_generations
+               WHEN EXISTS (
+                   SELECT 1 FROM nci4a_corpus_generations
+                   WHERE generation_id = NEW.generation_id
+               )
+               BEGIN SELECT RAISE(ABORT, 'NCI-4A generation is write-once'); END"""
+        )
+        self.db.execute(
             """CREATE TRIGGER IF NOT EXISTS nci4a_generations_no_update
                BEFORE UPDATE ON nci4a_corpus_generations
                BEGIN SELECT RAISE(ABORT, 'NCI-4A generation is write-once'); END"""
